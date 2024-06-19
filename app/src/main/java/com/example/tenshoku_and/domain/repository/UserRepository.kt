@@ -1,7 +1,8 @@
 package com.example.tenshoku_and.domain.repository
 
 import com.example.tenshoku_and.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun getRemoteUsers():List<User>
+    suspend fun getUsersFromApi(): Flow<List<User>>
 }

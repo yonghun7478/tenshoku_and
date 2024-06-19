@@ -1,7 +1,7 @@
 package com.example.tenshoku_and.di
 
 import com.example.tenshoku_and.domain.repository.UserRepository
-import com.example.tenshoku_and.domain.usecase.UserUseCase
+import com.example.tenshoku_and.domain.usecase.GetUserFromApiUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 object UseCaseModule {
     @Provides
     @Singleton
-    fun provideGetUserUseCase(userRepository: UserRepository): UserUseCase {
-        return UserUseCase(userRepository)
+    fun provideGetUserUseCase(userRepository: UserRepository): GetUserFromApiUseCase {
+        return GetUserFromApiUseCase(userRepository)
     }
 }

@@ -1,6 +1,6 @@
 package com.example.tenshoku_and.di
 
-import com.example.tenshoku_and.data.datasource.repository.UserRepositoryImpl
+import com.example.tenshoku_and.data.repository.UserRepositoryImpl
 import com.example.tenshoku_and.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module

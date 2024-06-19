@@ -1,6 +1,6 @@
 package com.example.tenshoku_and.di
 
-import com.example.tenshoku_and.data.datasource.remote.UserApiService
+import com.example.tenshoku_and.data.remote.UserApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
