@@ -108,6 +108,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.gson)
+    implementation(libs.room)
+    implementation(libs.room.ktx)
+    kapt(libs.room.kapt)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
