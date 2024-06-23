@@ -1,6 +1,6 @@
 package com.example.tenshoku_and.data.repository
 
-import com.example.tenshoku_and.data.model.UserResponse
+import com.example.tenshoku_and.data.local.UserDao
 import com.example.tenshoku_and.data.remote.UserApiService
 import com.example.tenshoku_and.domain.converter.UserConverter
 import com.example.tenshoku_and.domain.model.User
@@ -9,9 +9,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
+    private val userDao: UserDao,
     private val userApiService: UserApiService,
     private val dispatcher: CoroutineDispatcher
 ) : UserRepository {
@@ -30,4 +32,8 @@ class UserRepositoryImpl @Inject constructor(
             emit(emptyList())
         }
     }.flowOn(dispatcher)
+
+    override suspend fun saveUsersToDb(users: List<User>) = withContext(dispatcher) {
+        userDao.insertUsers(users.map { UserConverter.domainToEntity(it) })
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.tenshoku_and.domain.converter
 
+import com.example.tenshoku_and.data.local.UserEntity
 import com.example.tenshoku_and.data.model.AddressResponse
 import com.example.tenshoku_and.data.model.CompanyResponse
 import com.example.tenshoku_and.data.model.GeoResponse
@@ -46,6 +47,26 @@ object UserConverter {
             name = companyResponse.name,
             catchPhrase = companyResponse.catchPhrase,
             bs = companyResponse.bs
+        )
+    }
+
+    fun domainToEntity(user: User): UserEntity {
+        return UserEntity(
+            id = user.id,
+            name = user.name,
+            username = user.username,
+            email = user.email,
+            address_street = user.address.street,
+            address_suite = user.address.suite,
+            address_city = user.address.city,
+            address_zipcode = user.address.zipcode,
+            address_geo_lat = user.address.geo.lat,
+            address_geo_lng = user.address.geo.lng,
+            phone = user.phone,
+            website = user.website,
+            company_name = user.company.name,
+            company_catchPhrase = user.company.catchPhrase,
+            company_bs = user.company.bs
         )
     }
 }

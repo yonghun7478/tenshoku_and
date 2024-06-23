@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun getUsersFromApi(): Flow<List<User>>
+    suspend fun saveUsersToDb(users: List<User>)
 }
