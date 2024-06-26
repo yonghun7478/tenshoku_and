@@ -11,25 +11,27 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.example.tenshoku_and.domain.util.Result
+
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val userApiService: UserApiService,
     private val dispatcher: CoroutineDispatcher
 ) : UserRepository {
-    override suspend fun getUsersFromApi(): Flow<List<User>> = flow {
+    override suspend fun getUsersFromApi(): Flow<Result<List<User>>> = flow {
         try {
             val userResponse = userApiService.getUsers()
 
-            if(userResponse.isSuccessful) {
+            if (userResponse.isSuccessful) {
                 val users = userResponse.body()!!.map { UserConverter.responseToDomain(it) }
-                emit(users)
+                emit(Result.Success(users))
             } else {
-                emit(emptyList())
+                emit(Result.Error(message = "API request failed with code ${userResponse.code()}"))
             }
 
         } catch (e: Exception) {
-            emit(emptyList())
+            emit(Result.Error(throwable = e)) // 에러 상태 방출
         }
     }.flowOn(dispatcher)
 

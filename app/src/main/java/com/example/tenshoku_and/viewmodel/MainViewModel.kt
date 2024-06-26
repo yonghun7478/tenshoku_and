@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tenshoku_and.domain.util.Result
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -23,9 +24,21 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getUserFromApiUseCase().collect { users ->
-                saveUsersUseCase.invoke(users)
-                _uiState.value = UserUiState.Success(users)
+            getUserFromApiUseCase().collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+
+                    }
+
+                    is Result.Success -> {
+
+                    }
+
+                    is Result.Error -> {
+                    }
+                }
+//                saveUsersUseCase.invoke(users)
+//                _uiState.value = UserUiState.Success(users)
             }
         }
     }

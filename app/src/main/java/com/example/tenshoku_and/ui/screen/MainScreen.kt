@@ -5,7 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenshoku_and.ui.state.UserUiState
 import com.example.tenshoku_and.viewmodel.MainViewModel
 import java.lang.reflect.Modifier
@@ -20,9 +19,11 @@ fun MainScreen(
         is UserUiState.Loading -> {
             println("CYHH loading")
         }
+
         is UserUiState.Success -> {
             println("CYHH success ${(uiState as UserUiState.Success).users}")
         }
+
         is UserUiState.Error -> {
             println("CYHH error")
         }
@@ -30,6 +31,7 @@ fun MainScreen(
 
     MainContent()
 }
+
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier()
