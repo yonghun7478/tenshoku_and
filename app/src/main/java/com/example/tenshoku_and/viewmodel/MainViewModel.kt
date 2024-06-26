@@ -15,6 +15,12 @@ class MainViewModel @Inject constructor(
     private val getUserFromApiUseCase: GetUserFromApiUseCase,
     private val saveUsersUseCase: SaveUsersUseCase
 ) : ViewModel() {
+    var buttons = listOf("select", "delete", "update", "insert")
+
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Init)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
+
+    fun clickButton(button: String) {
+
+    }
 }

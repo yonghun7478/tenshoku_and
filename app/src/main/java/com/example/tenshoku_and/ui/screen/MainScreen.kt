@@ -1,28 +1,59 @@
 package com.example.tenshoku_and.ui.screen
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tenshoku_and.viewmodel.MainViewModel
-import java.lang.reflect.Modifier
+import androidx.compose.ui.Modifier
+import com.example.tenshoku_and.ui.theme.Tenshoku_andTheme
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    MainContent()
+    MainContent(
+        buttons = viewModel.buttons, clickButton = viewModel::clickButton
+    )
 }
 
 @Composable
 fun MainContent(
-    modifier: Modifier = Modifier()
+    buttons: List<String> = emptyList(),
+    clickButton: (String) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3), // 3열 Grid
+        modifier = Modifier.padding(8.dp)
+    ) {
+        items(buttons.size) { index ->
+            Button(
+                onClick = { clickButton(buttons[index]) },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = buttons[index])
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainContentPreView(
-    modifier: Modifier = Modifier()
+    modifier: Modifier = Modifier
 ) {
+    Tenshoku_andTheme {
+        var buttons = listOf("select", "delete", "update", "insert")
 
+        MainContent(buttons)
+    }
 }
