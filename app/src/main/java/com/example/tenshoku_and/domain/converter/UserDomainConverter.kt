@@ -10,7 +10,7 @@ import com.example.tenshoku_and.domain.model.Company
 import com.example.tenshoku_and.domain.model.Geo
 import com.example.tenshoku_and.domain.model.User
 
-object UserConverter {
+object UserDomainConverter {
 
     fun responseToDomain(userResponse: UserResponse): User {
         return User(
@@ -67,6 +67,32 @@ object UserConverter {
             company_name = user.company.name,
             company_catchPhrase = user.company.catchPhrase,
             company_bs = user.company.bs
+        )
+    }
+
+    fun entityToDomain(userEntity: UserEntity): User {
+        return User(
+            id = userEntity.id,
+            name = userEntity.name,
+            username = userEntity.username,
+            email = userEntity.email,
+            address = Address(
+                street = userEntity.address_street,
+                suite = userEntity.address_suite,
+                city = userEntity.address_city,
+                zipcode = userEntity.address_zipcode,
+                geo = Geo(
+                    lat = userEntity.address_geo_lat,
+                    lng = userEntity.address_geo_lng
+                )
+            ),
+            phone = userEntity.phone,
+            website = userEntity.website,
+            company = Company(
+                name = userEntity.company_name,
+                catchPhrase = userEntity.company_catchPhrase,
+                bs = userEntity.company_bs
+            )
         )
     }
 }

@@ -6,10 +6,10 @@ import com.example.tenshoku_and.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetUserFromApiUseCase @Inject constructor(
+class GetUserFromDbUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(): Flow<Resource<List<User>>> {
-        return userRepository.getUsersFromApi()
+        return userRepository.getUsersFromDb()
     }
 }
