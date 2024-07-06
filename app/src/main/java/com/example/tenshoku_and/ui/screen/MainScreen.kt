@@ -21,10 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tenshoku_and.viewmodel.MainViewModel
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.state.UserUiState
+import com.example.tenshoku_and.ui.theme.LocalColor
+import com.example.tenshoku_and.ui.theme.LocalSpacing
 import com.example.tenshoku_and.ui.theme.Tenshoku_andTheme
 
 @Composable
@@ -56,7 +57,7 @@ fun MainContent(
                 Button(
                     onClick = { menuListener(buttonsData[index]) },
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(LocalSpacing.current.default)
                         .fillMaxWidth()
                 ) {
                     Text(text = buttonsData[index].name)
@@ -73,7 +74,7 @@ fun MainContent(
                                 .height(150.dp)
                                 .width(250.dp)
                                 .padding(1.dp)/*Padding for surface*/,
-                            color = Color(0xFFA1E2EB),
+                            color = LocalColor.current.test,
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Column {
