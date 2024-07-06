@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tenshoku_and.domain.util.Resource
+import com.example.tenshoku_and.ui.data.ButtonData
+import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.converter.UserUiConverter
 
 @HiltViewModel
@@ -21,15 +23,20 @@ class MainViewModel @Inject constructor(
     private val getUserFromDbUseCase: GetUserFromDbUseCase,
     private val saveUsersUseCase: SaveUsersUseCase
 ) : ViewModel() {
-    var buttons = listOf("select", "delete", "update", "insert")
+    var buttonsData = listOf(
+        ButtonData("select", ButtonType.SELECT),
+        ButtonData("delete", ButtonType.DELETE),
+        ButtonData("update", ButtonType.UPDATE),
+        ButtonData("insert", ButtonType.INSERT),
+        )
 
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Init)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
 
-    fun clickButton(button: String) {
+    fun menuListener(button: ButtonData) {
         viewModelScope.launch {
-            when (button) {
-                "select" -> {
+            when (button.type) {
+                ButtonType.SELECT -> {
                     val users = getUserFromApiUseCase.invoke()
 
                     users.collect { apiResult ->
@@ -60,6 +67,7 @@ class MainViewModel @Inject constructor(
 //                    saveUsersUseCase.invoke(users)
 //                    _uiState.value = UserUiState.Success(users)
 //                }
+                else -> {}
             }
         }
     }

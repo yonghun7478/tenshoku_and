@@ -22,6 +22,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tenshoku_and.viewmodel.MainViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.tenshoku_and.ui.data.ButtonData
+import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.state.UserUiState
 import com.example.tenshoku_and.ui.theme.Tenshoku_andTheme
 
@@ -32,15 +34,17 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     MainContent(
-        buttons = viewModel.buttons, uiState, clickButton = viewModel::clickButton
+        buttonsData = viewModel.buttonsData,
+        userUiState = uiState,
+        menuListener = viewModel::menuListener
     )
 }
 
 @Composable
 fun MainContent(
-    buttons: List<String> = emptyList(),
+    buttonsData: List<ButtonData> = emptyList(),
     userUiState: UserUiState = UserUiState.Init,
-    clickButton: (String) -> Unit = {},
+    menuListener: (ButtonData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -48,14 +52,14 @@ fun MainContent(
             columns = GridCells.Fixed(3), // 3열 Grid
             modifier = Modifier.padding(8.dp)
         ) {
-            items(buttons.size) { index ->
+            items(buttonsData.size) { index ->
                 Button(
-                    onClick = { clickButton(buttons[index]) },
+                    onClick = { menuListener(buttonsData[index]) },
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(text = buttons[index])
+                    Text(text = buttonsData[index].name)
                 }
             }
         }
@@ -92,8 +96,12 @@ fun MainContentPreView(
     modifier: Modifier = Modifier
 ) {
     Tenshoku_andTheme {
-        var buttons = listOf("select", "delete", "update", "insert")
-
+        var buttons = listOf(
+            ButtonData("select", ButtonType.SELECT),
+            ButtonData("delete", ButtonType.DELETE),
+            ButtonData("update", ButtonType.UPDATE),
+            ButtonData("insert", ButtonType.INSERT),
+        )
         MainContent(buttons)
     }
 }
