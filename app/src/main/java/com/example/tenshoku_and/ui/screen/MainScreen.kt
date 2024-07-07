@@ -48,16 +48,19 @@ fun MainContent(
     menuListener: (ButtonData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
+    val color = LocalColor.current
+
     Column {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3), // 3열 Grid
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(spacing.menuPadding)
         ) {
             items(buttonsData.size) { index ->
                 Button(
                     onClick = { menuListener(buttonsData[index]) },
                     modifier = Modifier
-                        .padding(LocalSpacing.current.default)
+                        .padding(spacing.menuBtnPadding)
                         .fillMaxWidth()
                 ) {
                     Text(text = buttonsData[index].name)
@@ -72,18 +75,18 @@ fun MainContent(
                         Surface(
                             modifier = Modifier
                                 .height(150.dp)
-                                .width(250.dp)
+                                .fillMaxWidth()
                                 .padding(1.dp)/*Padding for surface*/,
-                            color = LocalColor.current.test,
+                            color = color.itemColor,
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Column {
-                                Text(text = it.name, Modifier.padding(16.dp)/*Padding for Text*/)
-                                Text(text = it.email, Modifier.padding(16.dp)/*Padding for Text*/)
+                                Text(text = it.name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
+                                Text(text = it.email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(spacing.itemPadding))
                     }
                 }
             }

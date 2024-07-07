@@ -23,19 +23,23 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Pink40
 )
 
-data class LocalSpacingScheme(
-    val default: Dp = 8.dp,
+data class Tenshoku_andSpacing(
+    val menuPadding: Dp = 8.dp,
+    val menuBtnPadding: Dp = 8.dp,
+
+    val textPadding: Dp = 16.dp,
+    val itemPadding: Dp = 16.dp,
 )
 
 val LocalSpacing =
-    compositionLocalOf<LocalSpacingScheme> { error("No Spacing provided") } // 기본값 없이 정의
+    compositionLocalOf<Tenshoku_andSpacing> { error("No Spacing provided") } // 기본값 없이 정의
 
-data class LocalColorScheme(
-    val test: Color = Color(0xFFA1E2EB),
+data class Tenshoku_andColor(
+    val itemColor: Color = Color(0xFFA1E2EB),
 )
 
 val LocalColor =
-    compositionLocalOf<LocalColorScheme> { error("No CustomColor provided") } // 기본값 없이 정의
+    compositionLocalOf<Tenshoku_andColor> { error("No CustomColor provided") } // 기본값 없이 정의
 
 
 @Composable
@@ -48,8 +52,8 @@ fun Tenshoku_andTheme(
         else -> LightColorScheme
     }
     CompositionLocalProvider(
-        LocalSpacing provides LocalSpacingScheme(),
-        LocalColor provides LocalColorScheme()
+        LocalSpacing provides Tenshoku_andSpacing(),
+        LocalColor provides Tenshoku_andColor()
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
