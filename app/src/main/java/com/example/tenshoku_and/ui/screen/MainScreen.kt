@@ -23,6 +23,7 @@ import com.example.tenshoku_and.viewmodel.MainViewModel
 import androidx.compose.ui.Modifier
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
+import com.example.tenshoku_and.ui.model.UserUiModel
 import com.example.tenshoku_and.ui.state.UserUiState
 import com.example.tenshoku_and.ui.theme.LocalColor
 import com.example.tenshoku_and.ui.theme.LocalSpacing
@@ -48,49 +49,77 @@ fun MainContent(
     menuListener: (ButtonData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    Column(modifier) {
+        UserMenu(buttonsData = buttonsData, menuListener = menuListener)
+        UserList(userUiState = userUiState)
+    }
+}
+
+@Composable
+fun UserMenu(
+    buttonsData: List<ButtonData> = emptyList(),
+    menuListener: (ButtonData) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3), // 3열 Grid
+        modifier = modifier.padding(spacing.menuPadding)
+    ) {
+        items(buttonsData.size) { index ->
+            Button(
+                onClick = { menuListener(buttonsData[index]) },
+                modifier = Modifier
+                    .padding(spacing.menuBtnPadding)
+                    .fillMaxWidth()
+            ) {
+                Text(text = buttonsData[index].name)
+            }
+        }
+    }
+}
+
+@Composable
+fun UserList(
+    userUiState: UserUiState = UserUiState.Init,
+) {
+    LazyColumn {
+        if (userUiState is UserUiState.Success) {
+            userUiState.users.forEach {
+                item {
+                    UserItem(it.name, it.email)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserItem(
+    name: String,
+    email: String,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
     val color = LocalColor.current
 
-    Column {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3), // 3열 Grid
-            modifier = Modifier.padding(spacing.menuPadding)
+    Tenshoku_andTheme {
+        Surface(
+            modifier = modifier
+                .height(150.dp)
+                .fillMaxWidth()
+                .padding(1.dp)/*Padding for surface*/,
+            color = color.itemColor,
+            shape = RoundedCornerShape(20.dp)
         ) {
-            items(buttonsData.size) { index ->
-                Button(
-                    onClick = { menuListener(buttonsData[index]) },
-                    modifier = Modifier
-                        .padding(spacing.menuBtnPadding)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = buttonsData[index].name)
-                }
+            Column {
+                Text(text = name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
+                Text(text = email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
             }
         }
 
-        LazyColumn {
-            if (userUiState is UserUiState.Success) {
-                userUiState.users.forEach {
-                    item {
-                        Surface(
-                            modifier = Modifier
-                                .height(150.dp)
-                                .fillMaxWidth()
-                                .padding(1.dp)/*Padding for surface*/,
-                            color = color.itemColor,
-                            shape = RoundedCornerShape(20.dp)
-                        ) {
-                            Column {
-                                Text(text = it.name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
-                                Text(text = it.email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(spacing.itemPadding))
-                    }
-                }
-            }
-        }
+        Spacer(modifier = Modifier.height(spacing.itemPadding))
     }
 }
 
@@ -99,6 +128,31 @@ fun MainContent(
 fun MainContentPreView(
     modifier: Modifier = Modifier
 ) {
+    val userList = listOf(
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        ),
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        ),
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        )
+    )
+    val userUiState: UserUiState = UserUiState.Success(userList)
+
     Tenshoku_andTheme {
         var buttons = listOf(
             ButtonData("select", ButtonType.SELECT),
@@ -106,6 +160,66 @@ fun MainContentPreView(
             ButtonData("update", ButtonType.UPDATE),
             ButtonData("insert", ButtonType.INSERT),
         )
-        MainContent(buttons)
+        MainContent(buttonsData = buttons, userUiState = userUiState)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserMenuPreView(
+    modifier: Modifier = Modifier
+) {
+    var buttons = listOf(
+        ButtonData("select", ButtonType.SELECT),
+        ButtonData("delete", ButtonType.DELETE),
+        ButtonData("update", ButtonType.UPDATE),
+        ButtonData("insert", ButtonType.INSERT),
+    )
+    Tenshoku_andTheme {
+        UserMenu(buttons)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserListPreView(
+    modifier: Modifier = Modifier
+) {
+    val userList = listOf(
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        ),
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        ),
+        UserUiModel(
+            name = "test1",
+            username = "username",
+            email = "email",
+            phone = "phone",
+            website = "website"
+        )
+    )
+    val userUiState: UserUiState = UserUiState.Success(userList)
+    Tenshoku_andTheme {
+        UserList(userUiState = userUiState)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserItemPreView(
+    modifier: Modifier = Modifier
+) {
+    Tenshoku_andTheme {
+        UserItem(name = "testtset", email = "john.mckinley@examplepetstore.com")
     }
 }
