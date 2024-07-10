@@ -8,4 +8,5 @@ interface UserRepository {
     suspend fun getUsersFromApi(): Flow<Resource<List<User>>>
     suspend fun getUsersFromDb(): Flow<Resource<List<User>>>
     suspend fun saveUsersToDb(users: List<User>)
+    suspend fun saveUserToDb(user: User)
 }

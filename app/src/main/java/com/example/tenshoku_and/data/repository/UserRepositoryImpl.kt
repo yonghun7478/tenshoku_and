@@ -53,4 +53,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun saveUsersToDb(users: List<User>) = withContext(dispatcher) {
         userDao.insertUsers(users.map { UserDomainConverter.domainToEntity(it) })
     }
+
+    override suspend fun saveUserToDb(users: User) = withContext(dispatcher) {
+        userDao.insertUser(UserDomainConverter.domainToEntity(users))
+    }
 }

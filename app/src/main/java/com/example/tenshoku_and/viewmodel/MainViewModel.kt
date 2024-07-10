@@ -2,8 +2,10 @@ package com.example.tenshoku_and.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tenshoku_and.domain.model.User
 import com.example.tenshoku_and.domain.usecase.GetUserFromApiUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromDbUseCase
+import com.example.tenshoku_and.domain.usecase.SaveUserUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUsersUseCase
 import com.example.tenshoku_and.ui.state.UserUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +23,9 @@ import com.example.tenshoku_and.ui.converter.UserUiConverter
 class MainViewModel @Inject constructor(
     private val getUserFromApiUseCase: GetUserFromApiUseCase,
     private val getUserFromDbUseCase: GetUserFromDbUseCase,
-    private val saveUsersUseCase: SaveUsersUseCase
-) : ViewModel() {
+    private val saveUsersUseCase: SaveUsersUseCase,
+    private val saveUserUseCase: SaveUserUseCase,
+    ) : ViewModel() {
     var buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
         ButtonData("delete", ButtonType.DELETE),
@@ -71,6 +74,13 @@ class MainViewModel @Inject constructor(
 //                }
                 else -> {}
             }
+        }
+    }
+
+    fun inputListener(str: String) {
+        viewModelScope.launch {
+            val user = User(name = str)
+            saveUserUseCase.invoke(user)
         }
     }
 }

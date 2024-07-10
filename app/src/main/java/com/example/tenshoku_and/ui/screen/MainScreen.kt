@@ -1,6 +1,8 @@
 package com.example.tenshoku_and.ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,11 +13,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,7 +46,8 @@ fun MainScreen(
     MainContent(
         buttonsData = viewModel.buttonsData,
         userUiState = uiState,
-        menuListener = viewModel::menuListener
+        menuListener = viewModel::menuListener,
+        inputListener = viewModel::inputListener,
     )
 }
 
@@ -48,13 +56,15 @@ fun MainContent(
     buttonsData: List<ButtonData> = emptyList(),
     userUiState: UserUiState = UserUiState.Init,
     menuListener: (ButtonData) -> Unit = {},
+    inputListener: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
-        if(userUiState == UserUiState.Loading) {
+        if (userUiState == UserUiState.Loading) {
             Text(text = "loading", fontSize = 30.sp)
         }
         UserMenu(buttonsData = buttonsData, menuListener = menuListener)
+        UserInput(modifier = Modifier.padding(2.dp), inputListener = inputListener)
         UserList(userUiState = userUiState)
     }
 }
@@ -81,6 +91,39 @@ fun UserMenu(
                 Text(text = buttonsData[index].name)
             }
         }
+    }
+}
+
+@Composable
+fun UserInput(
+    inputListener: (String) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        var inputText by remember { mutableStateOf("") }
+
+        OutlinedTextField(
+            value = inputText,
+            onValueChange = { inputText = it },
+            label = { Text("입력") }
+        )
+
+        Button(onClick = { inputListener(inputText) }) {
+            Text("전송")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserInputPreView() {
+    Tenshoku_andTheme {
+        UserInput()
     }
 }
 
