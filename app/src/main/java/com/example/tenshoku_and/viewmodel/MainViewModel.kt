@@ -77,9 +77,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun inputListener(str: String) {
+    fun inputListener(id: Int, name:String) {
         viewModelScope.launch {
-            val user = User(name = str)
+            val user = User(id = id, name = name)
             saveUserUseCase.invoke(user)
         }
     }

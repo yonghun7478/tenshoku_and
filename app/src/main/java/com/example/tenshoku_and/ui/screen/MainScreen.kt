@@ -56,7 +56,7 @@ fun MainContent(
     buttonsData: List<ButtonData> = emptyList(),
     userUiState: UserUiState = UserUiState.Init,
     menuListener: (ButtonData) -> Unit = {},
-    inputListener: (String) -> Unit = {},
+    inputListener: (Int, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -96,7 +96,7 @@ fun UserMenu(
 
 @Composable
 fun UserInput(
-    inputListener: (String) -> Unit = {},
+    inputListener: (Int, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -105,15 +105,25 @@ fun UserInput(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        var inputText by remember { mutableStateOf("") }
+        var idText by remember { mutableStateOf("") }
+        var nameText by remember { mutableStateOf("") }
+
 
         OutlinedTextField(
-            value = inputText,
-            onValueChange = { inputText = it },
-            label = { Text("입력") }
+            value = idText,
+            onValueChange = { idText = it },
+            label = { Text("id") },
+            modifier = Modifier.weight(1f)
         )
 
-        Button(onClick = { inputListener(inputText) }) {
+        OutlinedTextField(
+            value = nameText,
+            onValueChange = { nameText = it },
+            label = { Text("name") },
+            modifier = Modifier.weight(1f)
+        )
+
+        Button(onClick = { inputListener(idText.toInt(), nameText) }) {
             Text("전송")
         }
     }
