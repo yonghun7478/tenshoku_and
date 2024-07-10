@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tenshoku_and.viewmodel.MainViewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.model.UserUiModel
@@ -50,6 +51,9 @@ fun MainContent(
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
+        if(userUiState == UserUiState.Loading) {
+            Text(text = "loading", fontSize = 30.sp)
+        }
         UserMenu(buttonsData = buttonsData, menuListener = menuListener)
         UserList(userUiState = userUiState)
     }

@@ -37,6 +37,8 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             when (button.type) {
                 ButtonType.SELECT -> {
+                    _uiState.value = UserUiState.Loading
+
                     val users = getUserFromApiUseCase.invoke()
 
                     users.collect { apiResult ->
