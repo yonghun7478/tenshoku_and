@@ -51,6 +51,7 @@ fun MainScreen(
         userUiState = uiState,
         menuListener = viewModel::menuListener,
         inputListener = viewModel::inputListener,
+        onDeleteClick = viewModel::onDeleteClick,
     )
 }
 
@@ -60,6 +61,7 @@ fun MainContent(
     userUiState: UserUiState = UserUiState.Init,
     menuListener: (ButtonData) -> Unit = {},
     inputListener: (Int, String) -> Unit = { _, _ -> },
+    onDeleteClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -67,8 +69,8 @@ fun MainContent(
             Text(text = "loading", fontSize = 30.sp)
         }
         UserMenu(buttonsData = buttonsData, menuListener = menuListener)
-        UserInput(modifier = Modifier.padding(2.dp), inputListener = inputListener)
-        UserList(userUiState = userUiState)
+        UserInput(inputListener = inputListener, modifier = Modifier.padding(2.dp))
+        UserList(userUiState = userUiState, onDeleteClick = onDeleteClick)
     }
 }
 
@@ -143,12 +145,13 @@ fun UserInputPreView() {
 @Composable
 fun UserList(
     userUiState: UserUiState = UserUiState.Init,
+    onDeleteClick: (Int) -> Unit = {},
 ) {
     LazyColumn {
         if (userUiState is UserUiState.Success) {
             userUiState.users.forEach {
                 item {
-                    UserItem(it.name, it.email)
+                    UserItem(it.id, it.name, it.email, onDeleteClick = onDeleteClick)
                 }
             }
         }
@@ -157,6 +160,7 @@ fun UserList(
 
 @Composable
 fun UserItem(
+    id: Int,
     name: String,
     email: String,
     onDeleteClick: (Int) -> Unit = {},
@@ -172,7 +176,7 @@ fun UserItem(
             .height(150.dp)
             .fillMaxWidth()
             .padding(1.dp)
-            .pointerInput(Unit){
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
                         showDialog = true // AlertDialog 표시
@@ -198,6 +202,7 @@ fun UserItem(
             confirmButton = {
                 Button(onClick = {
                     showDialog = false
+                    onDeleteClick(id)
                 }) {
                     Text("삭제")
                 }
@@ -218,6 +223,7 @@ fun MainContentPreView(
 ) {
     val userList = listOf(
         UserUiModel(
+            id = 1,
             name = "test1",
             username = "username",
             email = "email",
@@ -225,6 +231,7 @@ fun MainContentPreView(
             website = "website"
         ),
         UserUiModel(
+            id = 2,
             name = "test1",
             username = "username",
             email = "email",
@@ -232,6 +239,7 @@ fun MainContentPreView(
             website = "website"
         ),
         UserUiModel(
+            id = 3,
             name = "test1",
             username = "username",
             email = "email",
@@ -275,6 +283,7 @@ fun UserListPreView(
 ) {
     val userList = listOf(
         UserUiModel(
+            id = 1,
             name = "test1",
             username = "username",
             email = "email",
@@ -282,6 +291,7 @@ fun UserListPreView(
             website = "website"
         ),
         UserUiModel(
+            id = 2,
             name = "test1",
             username = "username",
             email = "email",
@@ -289,6 +299,7 @@ fun UserListPreView(
             website = "website"
         ),
         UserUiModel(
+            id = 3,
             name = "test1",
             username = "username",
             email = "email",
@@ -308,6 +319,6 @@ fun UserItemPreView(
     modifier: Modifier = Modifier
 ) {
     Tenshoku_andTheme {
-        UserItem(name = "testtset", email = "john.mckinley@examplepetstore.com")
+        UserItem(id = 1, name = "testtset", email = "john.mckinley@examplepetstore.com")
     }
 }

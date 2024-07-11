@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun getUsersFromDb(): Flow<Resource<List<User>>>
     suspend fun saveUsersToDb(users: List<User>)
     suspend fun saveUserToDb(user: User)
+    suspend fun deleteUserFromDb(id: Int)
+
 }

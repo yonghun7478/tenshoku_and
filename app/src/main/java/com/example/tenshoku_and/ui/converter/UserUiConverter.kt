@@ -6,6 +6,7 @@ import com.example.tenshoku_and.ui.model.UserUiModel
 object UserUiConverter {
     fun domainUserToUser(user: User): UserUiModel {
         return UserUiModel(
+            id = user.id,
             name = user.name,
             username = user.username,
             email = user.email,

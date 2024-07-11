@@ -3,6 +3,7 @@ package com.example.tenshoku_and.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenshoku_and.domain.model.User
+import com.example.tenshoku_and.domain.usecase.DeleteUserUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromApiUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromDbUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUserUseCase
@@ -25,6 +26,7 @@ class MainViewModel @Inject constructor(
     private val getUserFromDbUseCase: GetUserFromDbUseCase,
     private val saveUsersUseCase: SaveUsersUseCase,
     private val saveUserUseCase: SaveUserUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase,
     ) : ViewModel() {
     var buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
@@ -81,6 +83,12 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val user = User(id = id, name = name)
             saveUserUseCase.invoke(user)
+        }
+    }
+
+    fun onDeleteClick(id: Int) {
+        viewModelScope.launch {
+            deleteUserUseCase.invoke(id)
         }
     }
 }
