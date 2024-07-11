@@ -166,6 +166,7 @@ fun UserItem(
     onDeleteClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var deleteMode by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
     var showDialog by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
 
     val spacing = LocalSpacing.current
@@ -178,7 +179,12 @@ fun UserItem(
             .padding(1.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
+                    onTap = {
+                        deleteMode = false
+                        showDialog = true // AlertDialog 표시
+                    },
                     onLongPress = {
+                        deleteMode = true
                         showDialog = true // AlertDialog 표시
                     }
                 )
@@ -195,16 +201,20 @@ fun UserItem(
     Spacer(modifier = Modifier.height(spacing.itemPadding))
 
     if (showDialog) {
+        val title = if (deleteMode) "삭제" else "수정"
+        val text = if (deleteMode) "삭제하시겠습니까" else "수정하시겠습니까"
+
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("알림") },
-            text = { Text("삭제하시겠습니까?") },
+            title = { Text(title) },
+            text = { Text(text) },
             confirmButton = {
                 Button(onClick = {
                     showDialog = false
-                    onDeleteClick(id)
+                    if (deleteMode)
+                        onDeleteClick(id)
                 }) {
-                    Text("삭제")
+                    Text(title)
                 }
             },
             dismissButton = {
