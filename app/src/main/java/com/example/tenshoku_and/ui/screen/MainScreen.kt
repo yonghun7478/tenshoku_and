@@ -201,29 +201,44 @@ fun UserItem(
     Spacer(modifier = Modifier.height(spacing.itemPadding))
 
     if (showDialog) {
-        val title = if (deleteMode) "삭제" else "수정"
-        val text = if (deleteMode) "삭제하시겠습니까" else "수정하시겠습니까"
-
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(title) },
-            text = { Text(text) },
-            confirmButton = {
-                Button(onClick = {
-                    showDialog = false
-                    if (deleteMode)
-                        onDeleteClick(id)
-                }) {
-                    Text(title)
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("취소")
-                }
-            }
+        UserDialog(
+            deleteMode = deleteMode,
+            id = id,
+            onDeleteClick = onDeleteClick,
+            dissmiss = { showDialog = false }
         )
     }
+}
+
+@Composable
+fun UserDialog(
+    deleteMode: Boolean,
+    id: Int,
+    onDeleteClick: (Int) -> Unit,
+    dissmiss: () -> Unit
+) {
+    val title = if (deleteMode) "삭제" else "수정"
+    val text = if (deleteMode) "삭제하시겠습니까" else "수정하시겠습니까"
+
+    AlertDialog(
+        onDismissRequest = { dissmiss() },
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            Button(onClick = {
+                dissmiss()
+                if (deleteMode)
+                    onDeleteClick(id)
+            }) {
+                Text(title)
+            }
+        },
+        dismissButton = {
+            Button(onClick = { dissmiss() }) {
+                Text("취소")
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)
