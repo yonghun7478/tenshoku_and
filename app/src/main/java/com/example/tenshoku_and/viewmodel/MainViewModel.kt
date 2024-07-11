@@ -27,13 +27,13 @@ class MainViewModel @Inject constructor(
     private val saveUsersUseCase: SaveUsersUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
     var buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
         ButtonData("delete", ButtonType.DELETE),
         ButtonData("update", ButtonType.UPDATE),
         ButtonData("insert", ButtonType.INSERT),
-        )
+    )
 
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Init)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
@@ -60,26 +60,13 @@ class MainViewModel @Inject constructor(
                     }
 
                 }
-//                "delete" -> {
-//                    saveUsersUseCase.invoke(emptyList())
-//                    _uiState.value = UserUiState.Success(emptyList())
-//                }
-//                "update" -> {
-//                    val users = getUserFromApiUseCase.invoke()
-//                    saveUsersUseCase.invoke(users)
-//                    _uiState.value = UserUiState.Success(users)
-//                }
-//                "insert" -> {
-//                    val users = getUserFromApiUseCase.invoke()
-//                    saveUsersUseCase.invoke(users)
-//                    _uiState.value = UserUiState.Success(users)
-//                }
+
                 else -> {}
             }
         }
     }
 
-    fun inputListener(id: Int, name:String) {
+    fun inputListener(id: Int, name: String) {
         viewModelScope.launch {
             val user = User(id = id, name = name)
             saveUserUseCase.invoke(user)

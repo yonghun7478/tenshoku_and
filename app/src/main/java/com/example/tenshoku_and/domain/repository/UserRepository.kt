@@ -10,5 +10,4 @@ interface UserRepository {
     suspend fun saveUsersToDb(users: List<User>)
     suspend fun saveUserToDb(user: User)
     suspend fun deleteUserFromDb(id: Int)
-
 }
