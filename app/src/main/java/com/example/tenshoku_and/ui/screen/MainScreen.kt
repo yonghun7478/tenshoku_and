@@ -1,5 +1,6 @@
 package com.example.tenshoku_and.ui.screen
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tenshoku_and.viewmodel.MainViewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
@@ -156,27 +159,55 @@ fun UserList(
 fun UserItem(
     name: String,
     email: String,
+    onDeleteClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var showDialog by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
+
     val spacing = LocalSpacing.current
     val color = LocalColor.current
 
-    Tenshoku_andTheme {
-        Surface(
-            modifier = modifier
-                .height(150.dp)
-                .fillMaxWidth()
-                .padding(1.dp)/*Padding for surface*/,
-            color = color.itemColor,
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column {
-                Text(text = name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
-                Text(text = email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
-            }
+    Surface(
+        modifier = modifier
+            .height(150.dp)
+            .fillMaxWidth()
+            .padding(1.dp)
+            .pointerInput(Unit){
+                detectTapGestures(
+                    onLongPress = {
+                        showDialog = true // AlertDialog 표시
+                    }
+                )
+            },
+        color = color.itemColor,
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column {
+            Text(text = name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
+            Text(text = email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
         }
+    }
 
-        Spacer(modifier = Modifier.height(spacing.itemPadding))
+    Spacer(modifier = Modifier.height(spacing.itemPadding))
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("알림") },
+            text = { Text("삭제하시겠습니까?") },
+            confirmButton = {
+                Button(onClick = {
+                    showDialog = false
+                }) {
+                    Text("삭제")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("취소")
+                }
+            }
+        )
     }
 }
 
