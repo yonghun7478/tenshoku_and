@@ -6,8 +6,10 @@ import com.example.tenshoku_and.domain.model.User
 import com.example.tenshoku_and.domain.usecase.DeleteUserUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromApiUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromDbUseCase
+import com.example.tenshoku_and.domain.usecase.GetUserNameUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUserUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUsersUseCase
+import com.example.tenshoku_and.domain.usecase.SetUserNameUseCase
 import com.example.tenshoku_and.domain.usecase.UpdateUserUseCase
 import com.example.tenshoku_and.ui.state.UserUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +30,10 @@ class MainViewModel @Inject constructor(
     private val saveUsersUseCase: SaveUsersUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
-    private val updateUserUseCase: UpdateUserUseCase
+    private val updateUserUseCase: UpdateUserUseCase,
+    private val getUserNameUseCase: GetUserNameUseCase,
+    private val setUserNameUseCase: SetUserNameUseCase
+
 ) : ViewModel() {
     var buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
@@ -84,6 +89,8 @@ class MainViewModel @Inject constructor(
     fun onEditClick(id: Int, name: String) {
         viewModelScope.launch {
             updateUserUseCase.invoke(id, name)
+            setUserNameUseCase.invoke(name)
+            println("name : ${getUserNameUseCase.invoke()}")
         }
     }
 }

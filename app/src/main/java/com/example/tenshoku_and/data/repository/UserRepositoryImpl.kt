@@ -1,6 +1,7 @@
 package com.example.tenshoku_and.data.repository
 
 import com.example.tenshoku_and.data.local.UserDao
+import com.example.tenshoku_and.data.local.UserPreferences
 import com.example.tenshoku_and.data.remote.UserApiService
 import com.example.tenshoku_and.domain.converter.UserDomainConverter
 import com.example.tenshoku_and.domain.model.User
@@ -16,6 +17,7 @@ import com.example.tenshoku_and.domain.util.Resource
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
+    private val userPreferences: UserPreferences,
     private val userApiService: UserApiService,
     private val dispatcher: CoroutineDispatcher
 ) : UserRepository {
@@ -64,5 +66,13 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserFromDb(id: Int, name: String) {
         userDao.updateUser(UserDomainConverter.domainToEntity(User(id = id, name = name)))
+    }
+
+    override suspend fun saveUserNameFromPreferences(name: String) {
+        userPreferences.saveUserNameFrompreferences(name)
+    }
+
+    override suspend fun getUserNameFromPreferences(): String? {
+        return userPreferences.getUserNameFrompreferences()
     }
 }

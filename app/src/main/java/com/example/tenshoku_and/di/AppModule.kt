@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.tenshoku_and.data.local.AppDatabase
 import com.example.tenshoku_and.data.local.UserDao
+import com.example.tenshoku_and.data.local.UserPreferences
+import com.example.tenshoku_and.data.local.UserPreferencesImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,5 +36,11 @@ object AppModule {
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences {
+        return UserPreferencesImpl(context)
     }
 }
