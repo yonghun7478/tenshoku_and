@@ -8,6 +8,7 @@ import com.example.tenshoku_and.domain.usecase.GetUserFromApiUseCase
 import com.example.tenshoku_and.domain.usecase.GetUserFromDbUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUserUseCase
 import com.example.tenshoku_and.domain.usecase.SaveUsersUseCase
+import com.example.tenshoku_and.domain.usecase.UpdateUserUseCase
 import com.example.tenshoku_and.ui.state.UserUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ class MainViewModel @Inject constructor(
     private val saveUsersUseCase: SaveUsersUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
+    private val updateUserUseCase: UpdateUserUseCase
 ) : ViewModel() {
     var buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
@@ -76,6 +78,12 @@ class MainViewModel @Inject constructor(
     fun onDeleteClick(id: Int) {
         viewModelScope.launch {
             deleteUserUseCase.invoke(id)
+        }
+    }
+
+    fun onEditClick(id: Int, name: String) {
+        viewModelScope.launch {
+            updateUserUseCase.invoke(id, name)
         }
     }
 }

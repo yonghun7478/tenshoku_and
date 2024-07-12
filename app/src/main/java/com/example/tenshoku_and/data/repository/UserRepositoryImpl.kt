@@ -61,4 +61,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun deleteUserFromDb(id: Int) {
         userDao.deleteUserById(id)
     }
+
+    override suspend fun updateUserFromDb(id: Int, name: String) {
+        userDao.updateUser(UserDomainConverter.domainToEntity(User(id = id, name = name)))
+    }
 }

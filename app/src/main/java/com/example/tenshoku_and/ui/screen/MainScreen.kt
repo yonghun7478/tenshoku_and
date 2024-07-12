@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,6 +53,7 @@ fun MainScreen(
         menuListener = viewModel::menuListener,
         inputListener = viewModel::inputListener,
         onDeleteClick = viewModel::onDeleteClick,
+        onEditClick = viewModel::onEditClick
     )
 }
 
@@ -62,6 +64,7 @@ fun MainContent(
     menuListener: (ButtonData) -> Unit = {},
     inputListener: (Int, String) -> Unit = { _, _ -> },
     onDeleteClick: (Int) -> Unit = {},
+    onEditClick: (Int, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -70,7 +73,11 @@ fun MainContent(
         }
         UserMenu(buttonsData = buttonsData, menuListener = menuListener)
         UserInput(inputListener = inputListener, modifier = Modifier.padding(2.dp))
-        UserList(userUiState = userUiState, onDeleteClick = onDeleteClick)
+        UserList(
+            userUiState = userUiState,
+            onDeleteClick = onDeleteClick,
+            onEditClick = onEditClick
+        )
     }
 }
 
@@ -146,12 +153,19 @@ fun UserInputPreView() {
 fun UserList(
     userUiState: UserUiState = UserUiState.Init,
     onDeleteClick: (Int) -> Unit = {},
+    onEditClick: (Int, String) -> Unit = { _, _ -> },
 ) {
     LazyColumn {
         if (userUiState is UserUiState.Success) {
             userUiState.users.forEach {
                 item {
-                    UserItem(it.id, it.name, it.email, onDeleteClick = onDeleteClick)
+                    UserItem(
+                        it.id,
+                        it.name,
+                        it.email,
+                        onDeleteClick = onDeleteClick,
+                        onEditClick = onEditClick
+                    )
                 }
             }
         }
@@ -164,10 +178,13 @@ fun UserItem(
     name: String,
     email: String,
     onDeleteClick: (Int) -> Unit = {},
+    onEditClick: (Int, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     var deleteMode by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
     var showDialog by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
+    var showEditDialog by remember { mutableStateOf(false) } // AlertDialog 상태 변수 추가
+
 
     val spacing = LocalSpacing.current
     val color = LocalColor.current
@@ -205,8 +222,17 @@ fun UserItem(
             deleteMode = deleteMode,
             id = id,
             onDeleteClick = onDeleteClick,
+            onEditClick = { showEditDialog = true },
             dissmiss = { showDialog = false }
         )
+    }
+
+    if (showEditDialog) {
+        EditDialog(
+            id = id,
+            initialText = "",
+            onEditClick = onEditClick,
+            onDismiss = { showEditDialog = false })
     }
 }
 
@@ -215,6 +241,7 @@ fun UserDialog(
     deleteMode: Boolean,
     id: Int,
     onDeleteClick: (Int) -> Unit,
+    onEditClick: () -> Unit,
     dissmiss: () -> Unit
 ) {
     val title = if (deleteMode) "삭제" else "수정"
@@ -229,12 +256,52 @@ fun UserDialog(
                 dissmiss()
                 if (deleteMode)
                     onDeleteClick(id)
+                else
+                    onEditClick()
             }) {
                 Text(title)
             }
         },
         dismissButton = {
             Button(onClick = { dissmiss() }) {
+                Text("취소")
+            }
+        }
+    )
+}
+
+@Composable
+fun EditDialog(
+    id: Int,
+    initialText: String,
+    onEditClick: (Int, String) -> Unit = { _, _ -> },
+    onDismiss: () -> Unit = {}
+) {
+    var editedText by remember { mutableStateOf(initialText) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier
+            .width(300.dp)
+            .offset(y = 0.dp),
+        title = { Text("수정") },
+        text = {
+            OutlinedTextField(
+                value = editedText,
+                onValueChange = { editedText = it },
+                label = { Text("내용") }
+            )
+        },
+        confirmButton = {
+            Button(onClick = {
+                onEditClick(id, editedText)
+                onDismiss()
+            }) {
+                Text("수정")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
                 Text("취소")
             }
         }
