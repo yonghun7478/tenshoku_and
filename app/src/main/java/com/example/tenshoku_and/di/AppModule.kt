@@ -15,6 +15,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.nio.charset.StandardCharsets
 import javax.inject.Singleton
 
 @Module
@@ -43,11 +45,15 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAppLocalDatabase(@ApplicationContext context: Context): AppLocalDatabase {
+        System.loadLibrary("sqlcipher")
+        val password = "Password1!";
+        val factory = SupportOpenHelperFactory(password.toByteArray(StandardCharsets.UTF_8))
+
         return Room.databaseBuilder(
             context,
             AppLocalDatabase::class.java,
             AppLocalDatabase.DATABASE_NAME
-        ).build()
+        ).openHelperFactory(factory).build()
     }
 
     @Provides

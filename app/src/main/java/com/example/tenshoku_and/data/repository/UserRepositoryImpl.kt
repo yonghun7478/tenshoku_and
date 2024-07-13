@@ -1,5 +1,7 @@
 package com.example.tenshoku_and.data.repository
 
+import com.example.tenshoku_and.data.local.LocalUserDao
+import com.example.tenshoku_and.data.local.LocalUserEntity
 import com.example.tenshoku_and.data.local.UserDao
 import com.example.tenshoku_and.data.local.UserPreferences
 import com.example.tenshoku_and.data.remote.UserApiService
@@ -17,6 +19,7 @@ import com.example.tenshoku_and.domain.util.Resource
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
+    private val localUserDao: LocalUserDao,
     private val userPreferences: UserPreferences,
     private val userApiService: UserApiService,
     private val dispatcher: CoroutineDispatcher
@@ -58,6 +61,25 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun saveUserToDb(users: User) = withContext(dispatcher) {
         userDao.insertUser(UserDomainConverter.domainToEntity(users))
+        localUserDao.insertUser(
+            LocalUserEntity(
+                id = 1,
+                name = "",
+                username = "",
+                email = "",
+                address_street = "",
+                address_suite = "",
+                address_city = "",
+                address_zipcode = "",
+                address_geo_lat = "",
+                address_geo_lng = "",
+                phone = "",
+                website = "",
+                company_name = "",
+                company_bs = "",
+                company_catchPhrase = ""
+            )
+        )
     }
 
     override suspend fun deleteUserFromDb(id: Int) {

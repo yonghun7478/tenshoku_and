@@ -10,27 +10,27 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocalUserDao {
-    @Query("SELECT * FROM users")
-    fun getUsersFlow(): Flow<List<UserEntity>>
+    @Query("SELECT * FROM localusers")
+    fun getUsersFlow(): Flow<List<LocalUserEntity>>
 
-    @Query("SELECT * FROM users")
-     fun getUsersList(): List<UserEntity>
+    @Query("SELECT * FROM localusers")
+     fun getUsersList(): List<LocalUserEntity>
 
-    @Query("SELECT * FROM users WHERE id = :userId")
-    suspend fun getUserById(userId: Int): UserEntity?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUser(user: UserEntity)
+    @Query("SELECT * FROM localusers WHERE id = :userId")
+    suspend fun getUserById(userId: Int): LocalUserEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUsers(users: List<UserEntity>)
+    suspend fun insertUser(user: LocalUserEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUsers(users: List<LocalUserEntity>)
 
     @Update
-    suspend fun updateUser(user: UserEntity)
+    suspend fun updateUser(user: LocalUserEntity)
 
     @Delete
-    suspend fun deleteUser(user: UserEntity)
+    suspend fun deleteUser(user: LocalUserEntity)
 
-    @Query("DELETE FROM users WHERE id = :userId")
+    @Query("DELETE FROM localusers WHERE id = :userId")
     suspend fun deleteUserById(userId: Int)
 }
