@@ -3,6 +3,8 @@ package com.example.tenshoku_and.di
 import android.content.Context
 import androidx.room.Room
 import com.example.tenshoku_and.data.local.AppDatabase
+import com.example.tenshoku_and.data.local.AppLocalDatabase
+import com.example.tenshoku_and.data.local.LocalUserDao
 import com.example.tenshoku_and.data.local.UserDao
 import com.example.tenshoku_and.data.local.UserPreferences
 import com.example.tenshoku_and.data.local.UserPreferencesImpl
@@ -36,6 +38,22 @@ object AppModule {
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppLocalDatabase(@ApplicationContext context: Context): AppLocalDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppLocalDatabase::class.java,
+            AppLocalDatabase.DATABASE_NAME
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalUserDao(appLocalDatabase: AppLocalDatabase): LocalUserDao {
+        return appLocalDatabase.localUserDao()
     }
 
     @Provides

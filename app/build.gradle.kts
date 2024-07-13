@@ -112,6 +112,7 @@ dependencies {
     annotationProcessor(libs.room.compiler)
     kapt(libs.room.kapt)
     implementation(libs.room.ktx)
+    implementation(libs.sqlcipher)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
