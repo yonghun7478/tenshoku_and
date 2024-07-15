@@ -16,6 +16,7 @@ okhttp = "4.9.3"
 gson = "2.10.1"
 room = "2.6.1"
 sqlcipher = "4.6.0"
+jetpack-security = "1.1.0-alpha06"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,8 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 room-kapt = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 sqlcipher = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
+jetpack-security = { group = "androidx.security", name = "security-crypto", version.ref = "jetpack-security" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

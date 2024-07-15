@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.tenshoku_and.data.local.AppDatabase
 import com.example.tenshoku_and.data.local.AppLocalDatabase
+import com.example.tenshoku_and.data.local.EncryptionHelper
 import com.example.tenshoku_and.data.local.LocalUserDao
 import com.example.tenshoku_and.data.local.UserDao
 import com.example.tenshoku_and.data.local.UserPreferences
@@ -44,9 +45,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppLocalDatabase(@ApplicationContext context: Context): AppLocalDatabase {
+    fun provideAppLocalDatabase(
+        @ApplicationContext context: Context,
+        encryptionHelper: EncryptionHelper
+    ): AppLocalDatabase {
         System.loadLibrary("sqlcipher")
-        val password = "Password1!";
+        val password = encryptionHelper.getEncryptedPassword()
         val factory = SupportOpenHelperFactory(password.toByteArray(StandardCharsets.UTF_8))
 
         return Room.databaseBuilder(

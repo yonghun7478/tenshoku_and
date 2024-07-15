@@ -113,6 +113,7 @@ dependencies {
     kapt(libs.room.kapt)
     implementation(libs.room.ktx)
     implementation(libs.sqlcipher)
+    implementation(libs.jetpack.security)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
