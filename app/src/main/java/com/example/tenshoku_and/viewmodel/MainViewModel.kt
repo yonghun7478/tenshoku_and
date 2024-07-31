@@ -22,6 +22,9 @@ import com.example.tenshoku_and.domain.util.Resource
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.converter.UserUiConverter
+import com.example.tenshoku_and.ui.state.UserUiEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -35,15 +38,19 @@ class MainViewModel @Inject constructor(
     private val setUserNameUseCase: SetUserNameUseCase
 
 ) : ViewModel() {
-    var buttonsData = listOf(
+    val buttonsData = listOf(
         ButtonData("select", ButtonType.SELECT),
         ButtonData("delete", ButtonType.DELETE),
         ButtonData("update", ButtonType.UPDATE),
         ButtonData("insert", ButtonType.INSERT),
+        ButtonData("next", ButtonType.NEXT),
     )
 
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Init)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<UserUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     fun menuListener(button: ButtonData) {
         viewModelScope.launch {
@@ -65,7 +72,11 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
-
+                }
+                ButtonType.NEXT -> {
+                    viewModelScope.launch {
+                        _uiEvent.emit(UserUiEvent.NextScreen)
+                    }
                 }
 
                 else -> {}
