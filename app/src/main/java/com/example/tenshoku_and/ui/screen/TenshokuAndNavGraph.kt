@@ -33,7 +33,12 @@ fun TenshokuAndNavGraph(
         modifier = modifier
     ) {
         composable(TenshokuAndDestinations.MAIN_ROUTE) {
-            MainScreen(nextScreen = {
+
+            val data = navController.currentBackStackEntry?.savedStateHandle?.get<String>("data") ?: ""
+
+            MainScreen(
+                fromSecondScreenTitle = data,
+                nextScreen = {
                 navAction.navigateToSecondScreen("test")
             })
         }
@@ -46,7 +51,10 @@ fun TenshokuAndNavGraph(
             )
         ) {entry ->
             val name:String = entry.arguments?.getString(TenshokuAndArgs.USER_NAME_ARGS) ?: ""
-            SecondScreen(name = name)
+            SecondScreen(name = name, backAction = {
+                navController.previousBackStackEntry?.savedStateHandle?.set("data", "Data from SecondScreen")
+                navController.navigateUp()
+            })
         }
     }
 }

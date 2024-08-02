@@ -45,20 +45,24 @@ import com.example.tenshoku_and.ui.theme.Tenshoku_andTheme
 
 @Composable
 fun MainScreen(
+    fromSecondScreenTitle: String = "",
     nextScreen: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val uiEvent by viewModel.uiEvent.collectAsState(initial = UserUiEvent.NOTHING)
 
-    MainContent(
-        buttonsData = viewModel.buttonsData,
-        userUiState = uiState,
-        menuListener = viewModel::menuListener,
-        inputListener = viewModel::inputListener,
-        onDeleteClick = viewModel::onDeleteClick,
-        onEditClick = viewModel::onEditClick
-    )
+    Column {
+        Text(text = fromSecondScreenTitle, fontSize = 30.sp)
+        MainContent(
+            buttonsData = viewModel.buttonsData,
+            userUiState = uiState,
+            menuListener = viewModel::menuListener,
+            inputListener = viewModel::inputListener,
+            onDeleteClick = viewModel::onDeleteClick,
+            onEditClick = viewModel::onEditClick
+        )
+    }
 
     LaunchedEffect(uiEvent) {
         when (uiEvent) {
