@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -43,12 +44,9 @@ fun TenshokuAndNavGraph(
             })
         }
         composable(
-            TenshokuAndDestinations.SECOND_ROUTE,
-            arguments = listOf(
-                navArgument(TenshokuAndArgs.USER_NAME_ARGS) {
-                    type = NavType.StringType; defaultValue = ""
-                }
-            )
+            route = TenshokuAndDestinations.SECOND_ROUTE,
+            arguments = listOf(navArgument(TenshokuAndArgs.USER_NAME_ARGS) { type = NavType.StringType ; defaultValue = ""}),
+            deepLinks = listOf(navDeepLink { uriPattern = TenshokuAndDestinations.SECOND_ROUTE_DEEPLINK })
         ) {entry ->
             val name:String = entry.arguments?.getString(TenshokuAndArgs.USER_NAME_ARGS) ?: ""
             SecondScreen(name = name, backAction = {

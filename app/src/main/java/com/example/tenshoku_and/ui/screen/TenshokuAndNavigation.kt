@@ -17,6 +17,7 @@ object TenshokuAndArgs{
 object TenshokuAndDestinations {
     const val MAIN_ROUTE = MAIN_SCREEN
     const val SECOND_ROUTE = "$SECOND_SCREEN/{$USER_NAME_ARGS}"
+    const val SECOND_ROUTE_DEEPLINK = "tenshokuapp://$SECOND_SCREEN/{$USER_NAME_ARGS}"
 }
 
 class TenshokuAndNavigationActions(private val navController: NavHostController) {
