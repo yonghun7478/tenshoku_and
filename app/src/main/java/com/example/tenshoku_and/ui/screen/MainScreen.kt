@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.tenshoku_and.ui.data.ButtonData
 import com.example.tenshoku_and.ui.data.ButtonType
 import com.example.tenshoku_and.ui.model.UserUiModel
+import com.example.tenshoku_and.ui.state.UserUiEvent
 import com.example.tenshoku_and.ui.state.UserUiState
 import com.example.tenshoku_and.ui.theme.LocalColor
 import com.example.tenshoku_and.ui.theme.LocalSpacing
@@ -43,18 +45,34 @@ import com.example.tenshoku_and.ui.theme.Tenshoku_andTheme
 
 @Composable
 fun MainScreen(
+    fromSecondScreenTitle: String = "",
+    nextScreen: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val uiEvent by viewModel.uiEvent.collectAsState(initial = UserUiEvent.NOTHING)
 
-    MainContent(
-        buttonsData = viewModel.buttonsData,
-        userUiState = uiState,
-        menuListener = viewModel::menuListener,
-        inputListener = viewModel::inputListener,
-        onDeleteClick = viewModel::onDeleteClick,
-        onEditClick = viewModel::onEditClick
-    )
+    Column {
+        Text(text = fromSecondScreenTitle, fontSize = 30.sp)
+        MainContent(
+            buttonsData = viewModel.buttonsData,
+            userUiState = uiState,
+            menuListener = viewModel::menuListener,
+            inputListener = viewModel::inputListener,
+            onDeleteClick = viewModel::onDeleteClick,
+            onEditClick = viewModel::onEditClick
+        )
+    }
+
+    LaunchedEffect(uiEvent) {
+        when (uiEvent) {
+            UserUiEvent.NOTHING -> {
+            }
+            UserUiEvent.NextScreen -> {
+                nextScreen()
+            }
+        }
+    }
 }
 
 @Composable
@@ -347,6 +365,7 @@ fun MainContentPreView(
             ButtonData("delete", ButtonType.DELETE),
             ButtonData("update", ButtonType.UPDATE),
             ButtonData("insert", ButtonType.INSERT),
+            ButtonData("next", ButtonType.NEXT),
         )
         MainContent(buttonsData = buttons, userUiState = userUiState)
     }
@@ -362,6 +381,7 @@ fun UserMenuPreView(
         ButtonData("delete", ButtonType.DELETE),
         ButtonData("update", ButtonType.UPDATE),
         ButtonData("insert", ButtonType.INSERT),
+        ButtonData("next", ButtonType.NEXT),
     )
     Tenshoku_andTheme {
         UserMenu(buttons)

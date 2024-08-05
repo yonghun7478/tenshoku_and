@@ -4,5 +4,6 @@ enum class ButtonType {
     SELECT,
     DELETE,
     UPDATE,
-    INSERT
+    INSERT,
+    NEXT,
 }

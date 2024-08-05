@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "945331839593",
+    "project_id": "tenshoku-and",
+    "storage_bucket": "tenshoku-and.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945331839593:android:b97dd2c354e686a95e78f8",
+        "android_client_info": {
+          "package_name": "com.example.tenshoku_and"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAobUaKtx5fIwzXd35Md5eEplE2MaZCWxw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945331839593:android:ef11b2858c520d005e78f8",
+        "android_client_info": {
+          "package_name": "com.example.tenshoku_and.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAobUaKtx5fIwzXd35Md5eEplE2MaZCWxw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

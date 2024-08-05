@@ -11,4 +11,7 @@ interface UserRepository {
     suspend fun saveUserToDb(user: User)
     suspend fun deleteUserFromDb(id: Int)
     suspend fun updateUserFromDb(id: Int, name: String)
+    suspend fun saveUserNameFromPreferences(name: String)
+    suspend fun getUserNameFromPreferences(): String?
+
 }
