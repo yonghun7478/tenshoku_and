@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "tenshoku_and"
+rootProject.name = "tokitoki"
 include(":app")
  
