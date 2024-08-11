@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tenshoku_and"
+    namespace = "com.example.tokitoki"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.tenshoku_and"
+        applicationId = "com.example.tokitoki"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -63,7 +63,7 @@ android {
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
-                val outputFileName = "tenshoku-${variant.flavorName}-${variant.buildType.name}-${variant.versionCode}.apk"
+                val outputFileName = "tokitoki-${variant.flavorName}-${variant.buildType.name}-${variant.versionCode}.apk"
                 output.outputFileName = outputFileName
             }
     }
@@ -124,6 +124,8 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+    implementation(libs.splashscreen)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
