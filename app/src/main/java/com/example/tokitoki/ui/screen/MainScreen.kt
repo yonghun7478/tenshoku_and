@@ -110,13 +110,13 @@ fun UserMenu(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3), // 3열 Grid
-        modifier = modifier.padding(spacing.menuPadding)
+        modifier = modifier.padding(spacing.smallPadding)
     ) {
         items(buttonsData.size) { index ->
             Button(
                 onClick = { menuListener(buttonsData[index]) },
                 modifier = Modifier
-                    .padding(spacing.menuBtnPadding)
+                    .padding(spacing.smallPadding)
                     .fillMaxWidth()
             ) {
                 Text(text = buttonsData[index].name, style = MaterialTheme.typography.bodyLarge)
@@ -229,12 +229,12 @@ fun UserItem(
         shape = RoundedCornerShape(20.dp)
     ) {
         Column {
-            Text(text = name, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
-            Text(text = email, Modifier.padding(spacing.itemPadding)/*Padding for Text*/)
+            Text(text = name, Modifier.padding(spacing.smallPadding)/*Padding for Text*/)
+            Text(text = email, Modifier.padding(spacing.smallPadding)/*Padding for Text*/)
         }
     }
 
-    Spacer(modifier = Modifier.height(spacing.itemPadding))
+    Spacer(modifier = Modifier.height(spacing.smallPadding))
 
     if (showDialog) {
         UserDialog(

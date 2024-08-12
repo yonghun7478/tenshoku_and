@@ -24,11 +24,11 @@ private val LightColorScheme = lightColorScheme(
 )
 
 data class TokitokiSpacing(
-    val menuPadding: Dp = 8.dp,
-    val menuBtnPadding: Dp = 8.dp,
-
-    val textPadding: Dp = 16.dp,
-    val itemPadding: Dp = 16.dp,
+    val smallPadding: Dp = 2.dp,
+    val middlePadding: Dp = 4.dp,
+    val largePadding: Dp = 8.dp,
+    val extraLargePadding: Dp = 12.dp,
+    val superExtraLargePadding: Dp = 16.dp,
 )
 
 val LocalSpacing =
