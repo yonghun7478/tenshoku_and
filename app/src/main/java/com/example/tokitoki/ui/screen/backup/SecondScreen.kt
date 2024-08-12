@@ -1,4 +1,4 @@
-package com.example.tokitoki.ui.screen
+package com.example.tokitoki.ui.screen.backup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Text
