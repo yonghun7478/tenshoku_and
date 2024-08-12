@@ -35,6 +35,7 @@ val LocalSpacing =
     compositionLocalOf<TokitokiSpacing> { error("No Spacing provided") } // 기본값 없이 정의
 
 data class TokitokiColor(
+    val grayColor: Color = Color(0xFF3b3b3b),
     val itemColor: Color = Color(0xFFA1E2EB),
 )
 
