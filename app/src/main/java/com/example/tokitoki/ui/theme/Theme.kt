@@ -37,7 +37,10 @@ val LocalSpacing =
 data class TokitokiColor(
     val grayColor: Color = Color(0xFF3b3b3b),
     val itemColor: Color = Color(0xFFA1E2EB),
-)
+    val white: Color = Color(0xFFFFFFFF),
+    val black: Color = Color(0xFF000000),
+    val blue: Color = Color(0xFF36C2CE),
+    )
 
 val LocalColor =
     compositionLocalOf<TokitokiColor> { error("No CustomColor provided") } // 기본값 없이 정의
