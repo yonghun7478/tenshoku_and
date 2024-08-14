@@ -65,10 +65,10 @@ fun MainContent(
         )
 
         Row(
-            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .padding(vertical = 12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
         ) {
             Text(
                 modifier = Modifier.padding(end = 8.dp),
@@ -97,9 +97,9 @@ fun TopLogo(
         horizontalArrangement = Arrangement.Center
     ) {
         Image(
+            modifier = Modifier.offset(x = 10.dp),
             painter = painterResource(id = R.drawable.pink_heart_logo),
             contentDescription = null,
-            modifier = Modifier.offset(x = 10.dp)
         )
 
         Text(
@@ -145,14 +145,14 @@ fun SignMenuBtn(
 ) {
     if (isOutLine) {
         OutlinedButton(
+            modifier = modifier
+                .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
             onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     painter = painterResource(id = iconRes),
@@ -165,14 +165,14 @@ fun SignMenuBtn(
         }
     } else {
         Button(
+            modifier = modifier
+                .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
             onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     painter = painterResource(id = iconRes),
