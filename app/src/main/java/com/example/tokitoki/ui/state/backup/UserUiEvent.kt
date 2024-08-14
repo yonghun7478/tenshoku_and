@@ -1,4 +1,4 @@
-package com.example.tokitoki.ui.state
+package com.example.tokitoki.ui.state.backup
 
 sealed class UserUiEvent {
     object NOTHING : UserUiEvent()

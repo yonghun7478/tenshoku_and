@@ -1,4 +1,4 @@
-package com.example.tokitoki.ui.model
+package com.example.tokitoki.ui.model.backup
 
 data class UserUiModel(
     val id: Int,

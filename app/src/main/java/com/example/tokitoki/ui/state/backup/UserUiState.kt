@@ -1,6 +1,6 @@
-package com.example.tokitoki.ui.state
+package com.example.tokitoki.ui.state.backup
 
-import com.example.tokitoki.ui.model.UserUiModel
+import com.example.tokitoki.ui.model.backup.UserUiModel
 
 sealed class UserUiState {
     object Init : UserUiState()

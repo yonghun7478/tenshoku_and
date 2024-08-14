@@ -31,7 +31,7 @@ fun TokitokiNavGraph(
         modifier = modifier
     ) {
         composable(TokitokiDestinations.SIGN_IN_ROUTE) {
-            MainScreen()
+            SignInScreen()
         }
     }
 }

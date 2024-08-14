@@ -35,11 +35,11 @@ import com.example.tokitoki.viewmodel.backup.MainViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
-import com.example.tokitoki.ui.data.ButtonData
-import com.example.tokitoki.ui.data.ButtonType
-import com.example.tokitoki.ui.model.UserUiModel
-import com.example.tokitoki.ui.state.UserUiEvent
-import com.example.tokitoki.ui.state.UserUiState
+import com.example.tokitoki.ui.data.backup.ButtonData
+import com.example.tokitoki.ui.data.backup.ButtonType
+import com.example.tokitoki.ui.model.backup.UserUiModel
+import com.example.tokitoki.ui.state.backup.UserUiEvent
+import com.example.tokitoki.ui.state.backup.UserUiState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.LocalSpacing
 import com.example.tokitoki.ui.theme.TokitokiTheme

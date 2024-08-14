@@ -1,6 +1,9 @@
 package com.example.tokitoki.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +20,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,21 +35,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
+import com.example.tokitoki.ui.util.SignInAction
+import com.example.tokitoki.ui.util.SignInConstants
 import com.example.tokitoki.viewmodel.SignInViewModel
 
 @Composable
 
-fun MainScreen(
+fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-    MainContent()
+    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
+
+    SignInContent(
+        onClick = {
+            viewModel.clickListener(it)
+        }
+    )
+
+    LaunchedEffect(uiEvent) {
+        when (val currentUiEvent = uiEvent) {
+            SignInEvent.NOTHING -> {
+            }
+            is SignInEvent.ACTION -> {
+                Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
+            }
+        }
+    }
 }
 
 @Composable
-fun MainContent(
-    modifier: Modifier = Modifier
+fun SignInContent(
+    modifier: Modifier = Modifier,
+    onClick: (SignInAction) -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -57,7 +84,14 @@ fun MainContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onClick(SignInAction.Help)
+                },
             text = stringResource(id = R.string.sign_in_new_member_help_title),
             color = LocalColor.current.blue,
             fontWeight = FontWeight.Bold,
@@ -71,16 +105,41 @@ fun MainContent(
             horizontalArrangement = Arrangement.Center,
         ) {
             Text(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onClick(SignInAction.Service)
+                    },
                 text = stringResource(id = R.string.terms_of_service),
                 fontSize = 10.sp
             )
             Text(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onClick(SignInAction.Privacy)
+                    },
                 text = stringResource(id = R.string.privacy_policy),
                 fontSize = 10.sp
             )
-            Text(text = stringResource(id = R.string.cookie_policy), fontSize = 10.sp)
+
+            Text(
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onClick(SignInAction.Cookie)
+                    },
+                text = stringResource(id = R.string.cookie_policy),
+                fontSize = 10.sp
+            )
         }
     }
 }
@@ -191,7 +250,7 @@ fun SignMenuBtn(
 @Composable
 fun MainContentPreView() {
     TokitokiTheme {
-        MainContent()
+        SignInContent()
     }
 }
 
