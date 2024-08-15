@@ -79,7 +79,8 @@ fun SignInContent(
         TopLogo()
         Spacer(modifier = Modifier.weight(1f))
         SignInMenu(
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
+            onClick = onClick
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -172,15 +173,18 @@ fun TopLogo(
 
 @Composable
 fun SignInMenu(
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    onClick: (SignInAction) -> Unit = {},
+    ) {
     Column(modifier = modifier) {
         SignMenuBtn(
             text = stringResource(id = R.string.google_btn_text),
             textColor = LocalColor.current.black,
             backgroundColor = LocalColor.current.white,
             iconRes = R.drawable.ic_google,
-            isOutLine = true
+            isOutLine = true,
+            signInAction = SignInAction.LoginWithGoogle,
+            onClick = onClick
         )
 
         SignMenuBtn(
@@ -188,6 +192,8 @@ fun SignInMenu(
             textColor = LocalColor.current.white,
             iconRes = R.drawable.ic_mail,
             backgroundColor = LocalColor.current.blue,
+            signInAction = SignInAction.LoginWithEmail,
+            onClick = onClick
         )
     }
 }
@@ -200,14 +206,17 @@ fun SignMenuBtn(
     backgroundColor: Color = LocalColor.current.white,
     iconRes: Int = -1,
     isOutLine: Boolean = false,
-    onClick: () -> Unit = {},
+    signInAction: SignInAction = SignInAction.Nothing,
+    onClick: (SignInAction) -> Unit = {},
 ) {
     if (isOutLine) {
         OutlinedButton(
             modifier = modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-            onClick = onClick,
+            onClick = {
+                   onClick(signInAction)
+            },
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -227,7 +236,9 @@ fun SignMenuBtn(
             modifier = modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-            onClick = onClick,
+            onClick = {
+                onClick(signInAction)
+            },
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
