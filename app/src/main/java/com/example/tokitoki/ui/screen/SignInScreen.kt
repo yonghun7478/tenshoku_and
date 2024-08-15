@@ -43,7 +43,6 @@ import com.example.tokitoki.ui.util.SignInConstants
 import com.example.tokitoki.viewmodel.SignInViewModel
 
 @Composable
-
 fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel()
 ) {
