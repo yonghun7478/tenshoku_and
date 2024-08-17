@@ -1,6 +1,6 @@
 package com.example.tokitoki
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -10,9 +10,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tokitoki.ui.screen.SignInScreen
+import com.example.tokitoki.ui.screen.SignInMenu
+import com.example.tokitoki.ui.screen.SignMenuBtn
 import com.example.tokitoki.ui.screen.TopLogo
+import com.example.tokitoki.ui.theme.LocalColor
+import com.example.tokitoki.ui.theme.TokitokiColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
+import com.example.tokitoki.ui.util.SignInAction
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -42,6 +46,8 @@ class SignInScreenTest {
             }
         }
 
+        val color = TokitokiColor()
+
         // 이미지가 존재하는지 확인
         composeTestRule.onNodeWithTag("TopLogo")
             .onChildAt(0) // 첫 번째 자식 (Image)
@@ -55,24 +61,48 @@ class SignInScreenTest {
             .assertTextEquals(composeTestRule.activity.getString(R.string.logo_name))
             .assertFontSizeIsEqualTo(52.sp)
             .assertFontWeightIsEqualTo(FontWeight.Bold)
-            .assertFontColorIsEqualTo(Color(0xFF3b3b3b))
+            .assertFontColorIsEqualTo(color.grayColor)
     }
 
     @Test
-    fun menuDisplaysCorrectly() {
+    fun loginBtnWithMailCorrectly() {
         composeTestRule.setContent {
             TokitokiTheme {
-                SignInScreen()
+                SignMenuBtn(
+                    text = stringResource(id = R.string.mail_btn_text),
+                    textColor = LocalColor.current.white,
+                    iconRes = R.drawable.ic_mail,
+                    backgroundColor = LocalColor.current.blue,
+                    signInAction = SignInAction.LoginWithEmail,
+                )
             }
         }
 
-        composeTestRule.onNodeWithTag("SignMenuBtn")
-            .onChildAt(0) // 첫 번째 자식 (Image)
-            .assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("SignMenuBtn")
-            .onChildAt(1) // 두 번째 자식 (Text)
+    }
+
+    @Test
+    fun loginBtnWithGoogleCorrectly() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                SignMenuBtn(
+                    text = stringResource(id = R.string.google_btn_text),
+                    textColor = LocalColor.current.black,
+                    backgroundColor = LocalColor.current.white,
+                    iconRes = R.drawable.ic_google,
+                    isOutLine = true,
+                    signInAction = SignInAction.LoginWithGoogle,
+                )
+            }
+        }
+
+        val color = TokitokiColor()
+
+        composeTestRule
+            .onNodeWithTag("SignMenuBtn")
             .assertIsDisplayed()
-            .assertTextEquals(composeTestRule.activity.getString(R.string.logo_name))
+            .assertTextEquals(activity.resources.getString(R.string.google_btn_text))
+            .assertFontColorIsEqualTo(color.black)
+            .assertBackgroundColor(color.white)
     }
 }

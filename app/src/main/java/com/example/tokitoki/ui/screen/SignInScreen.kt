@@ -59,6 +59,7 @@ fun SignInScreen(
         when (val currentUiEvent = uiEvent) {
             SignInEvent.NOTHING -> {
             }
+
             is SignInEvent.ACTION -> {
                 Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
             }
@@ -177,7 +178,7 @@ fun SignInMenu(
     modifier: Modifier = Modifier,
     onClick: (SignInAction) -> Unit = {},
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.testTag("SignInMenu")) {
         SignMenuBtn(
             text = stringResource(id = R.string.google_btn_text),
             textColor = LocalColor.current.black,
