@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -151,14 +152,15 @@ fun TopLogo(
     Row(
         modifier = modifier
             .height(70.dp)
-            .offset(x = -(10).dp),
+            .offset(x = -(10).dp)
+            .testTag("TopLogo"),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Image(
             modifier = Modifier.offset(x = 10.dp),
             painter = painterResource(id = R.drawable.pink_heart_logo),
-            contentDescription = null,
+            contentDescription = "TopLogoImage",
         )
 
         Text(
@@ -174,7 +176,7 @@ fun TopLogo(
 fun SignInMenu(
     modifier: Modifier = Modifier,
     onClick: (SignInAction) -> Unit = {},
-    ) {
+) {
     Column(modifier = modifier) {
         SignMenuBtn(
             text = stringResource(id = R.string.google_btn_text),
@@ -211,29 +213,8 @@ fun SignMenuBtn(
     if (isOutLine) {
         OutlinedButton(
             modifier = modifier
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-            onClick = {
-                   onClick(signInAction)
-            },
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Icon(
-                    painter = painterResource(id = iconRes),
-                    tint = textColor,
-                    contentDescription = null
-                )
-                Text(text = text, color = textColor)
-                Spacer(modifier = Modifier.width(1.dp))
-            }
-        }
-    } else {
-        Button(
-            modifier = modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag("SignMenuBtn"),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
             onClick = {
                 onClick(signInAction)
@@ -246,7 +227,30 @@ fun SignMenuBtn(
                 Icon(
                     painter = painterResource(id = iconRes),
                     tint = textColor,
-                    contentDescription = null
+                    contentDescription = "SignMenuBtnIcon"
+                )
+                Text(text = text, color = textColor)
+                Spacer(modifier = Modifier.width(1.dp))
+            }
+        }
+    } else {
+        Button(
+            modifier = modifier
+                .fillMaxWidth()
+                .testTag("SignMenuBtn"),
+            colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
+            onClick = {
+                onClick(signInAction)
+            },
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    tint = textColor,
+                    contentDescription = "SignMenuBtnIcon"
                 )
                 Text(text = text, color = textColor)
                 Spacer(modifier = Modifier.width(1.dp))

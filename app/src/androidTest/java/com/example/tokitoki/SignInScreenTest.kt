@@ -1,12 +1,18 @@
 package com.example.tokitoki
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.tokitoki.ui.screen.SignInScreen
+import com.example.tokitoki.ui.screen.TopLogo
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.viewmodel.SignInViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -29,25 +35,44 @@ class SignInScreenTest {
     }
 
     @Test
-    fun testSignInContent_textDisplayed() {
-
-        val viewModel = SignInViewModel()
-        // Start the app
+    fun topLogoDisplaysImageAndTextCorrectly() {
         composeTestRule.setContent {
             TokitokiTheme {
-                SignInScreen(viewModel = viewModel)
+                TopLogo()
             }
         }
 
-        composeTestRule.onNodeWithText(activity.resources.getString(R.string.sign_in_new_member_help_title))
+        // 이미지가 존재하는지 확인
+        composeTestRule.onNodeWithTag("TopLogo")
+            .onChildAt(0) // 첫 번째 자식 (Image)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.resources.getString(R.string.terms_of_service))
+            .assertHeightIsEqualTo(70.dp)
+
+        // 텍스트가 존재하고, 내용이 맞는지 확인
+        composeTestRule.onNodeWithTag("TopLogo")
+            .onChildAt(1) // 두 번째 자식 (Text)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.resources.getString(R.string.privacy_policy))
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.resources.getString(R.string.cookie_policy))
+            .assertTextEquals(composeTestRule.activity.getString(R.string.logo_name))
+            .assertFontSizeIsEqualTo(52.sp)
+            .assertFontWeightIsEqualTo(FontWeight.Bold)
+            .assertFontColorIsEqualTo(Color(0xFF3b3b3b))
+    }
+
+    @Test
+    fun menuDisplaysCorrectly() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                SignInScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithTag("SignMenuBtn")
+            .onChildAt(0) // 첫 번째 자식 (Image)
             .assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(activity.resources.getString(R.string.sign_in_new_member_help_title)).performClick()
+        composeTestRule.onNodeWithTag("SignMenuBtn")
+            .onChildAt(1) // 두 번째 자식 (Text)
+            .assertIsDisplayed()
+            .assertTextEquals(composeTestRule.activity.getString(R.string.logo_name))
     }
 }
