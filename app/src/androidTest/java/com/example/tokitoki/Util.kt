@@ -1,8 +1,8 @@
 package com.example.tokitoki
 
+import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PixelMap
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
@@ -13,8 +13,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
-import org.junit.Assert
-import org.junit.Assert.assertEquals
+import com.example.tokitoki.ui.util.DrawableSemantics.DrawableId
 
 fun SemanticsNodeInteraction.assertFontSizeIsEqualTo(expectedSize: TextUnit): SemanticsNodeInteraction {
     val semanticsMatcher = SemanticsMatcher(
@@ -82,4 +81,9 @@ fun SemanticsNodeInteraction.assertBackgroundColor(tint: Color): SemanticsNodeIn
         }
     }
     throw AssertionError("Assert failed: The component does not contain the color")
+}
+
+fun SemanticsNodeInteraction.assertHasDrawable(@DrawableRes id: Int): SemanticsNodeInteraction {
+    val semanticsMatcher = SemanticsMatcher.expectValue(DrawableId, id)
+    return this.assert(semanticsMatcher)
 }

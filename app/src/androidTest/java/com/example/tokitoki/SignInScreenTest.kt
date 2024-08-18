@@ -53,6 +53,7 @@ class SignInScreenTest {
             .onChildAt(0) // 첫 번째 자식 (Image)
             .assertIsDisplayed()
             .assertHeightIsEqualTo(70.dp)
+            .assertHasDrawable(id = R.drawable.pink_heart_logo)
 
         // 텍스트가 존재하고, 내용이 맞는지 확인
         composeTestRule.onNodeWithTag("TopLogo")
@@ -104,5 +105,6 @@ class SignInScreenTest {
             .assertTextEquals(activity.resources.getString(R.string.google_btn_text))
             .assertFontColorIsEqualTo(color.black)
             .assertBackgroundColor(color.white)
+            .assertHasDrawable(R.drawable.ic_google)
     }
 }

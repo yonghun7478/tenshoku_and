@@ -39,6 +39,7 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
+import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.util.SignInAction
 import com.example.tokitoki.ui.util.SignInConstants
 import com.example.tokitoki.viewmodel.SignInViewModel
@@ -159,7 +160,7 @@ fun TopLogo(
         horizontalArrangement = Arrangement.Center
     ) {
         Image(
-            modifier = Modifier.offset(x = 10.dp),
+            modifier = Modifier.offset(x = 10.dp).then(DrawableSemantics.withDrawableId(resId = R.drawable.pink_heart_logo)),
             painter = painterResource(id = R.drawable.pink_heart_logo),
             contentDescription = "TopLogoImage",
         )
@@ -226,6 +227,7 @@ fun SignMenuBtn(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Icon(
+                    modifier = DrawableSemantics.withDrawableId(resId = iconRes),
                     painter = painterResource(id = iconRes),
                     tint = textColor,
                     contentDescription = "SignMenuBtnIcon"
@@ -249,6 +251,7 @@ fun SignMenuBtn(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Icon(
+                    modifier = DrawableSemantics.withDrawableId(resId = iconRes),
                     painter = painterResource(id = iconRes),
                     tint = textColor,
                     contentDescription = "SignMenuBtnIcon"
