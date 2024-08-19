@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">tokitoki</string>
+    <string name="app_name">TokiToki</string>
+    <string name="logo_name">TokiToki</string>
+    <string name="google_btn_text">Googleでサインイン</string>
+    <string name="mail_btn_text">メールアドレスでサインイン</string>
+    <string name="sign_in_new_member_help_title">サインインや新規会員でお困りの方</string>
+    <string name="terms_of_service">利用規約</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
+    <string name="cookie_policy">クッキーポリシー</string>
 </resources>

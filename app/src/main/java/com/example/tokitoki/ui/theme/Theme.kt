@@ -24,19 +24,23 @@ private val LightColorScheme = lightColorScheme(
 )
 
 data class TokitokiSpacing(
-    val menuPadding: Dp = 8.dp,
-    val menuBtnPadding: Dp = 8.dp,
-
-    val textPadding: Dp = 16.dp,
-    val itemPadding: Dp = 16.dp,
+    val smallPadding: Dp = 2.dp,
+    val middlePadding: Dp = 4.dp,
+    val largePadding: Dp = 8.dp,
+    val extraLargePadding: Dp = 12.dp,
+    val superExtraLargePadding: Dp = 16.dp,
 )
 
 val LocalSpacing =
     compositionLocalOf<TokitokiSpacing> { error("No Spacing provided") } // 기본값 없이 정의
 
 data class TokitokiColor(
+    val grayColor: Color = Color(0xFF3b3b3b),
     val itemColor: Color = Color(0xFFA1E2EB),
-)
+    val white: Color = Color(0xFFFFFFFF),
+    val black: Color = Color(0xFF000000),
+    val blue: Color = Color(0xFF36C2CE),
+    )
 
 val LocalColor =
     compositionLocalOf<TokitokiColor> { error("No CustomColor provided") } // 기본값 없이 정의

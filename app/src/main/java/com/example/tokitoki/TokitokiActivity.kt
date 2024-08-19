@@ -55,7 +55,7 @@ class TokitokiActivity : ComponentActivity() {
             }
         }
 
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
