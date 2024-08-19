@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tokitoki.ui.screen.SignInMenu
 import com.example.tokitoki.ui.screen.SignMenuBtn
 import com.example.tokitoki.ui.screen.TopLogo
 import com.example.tokitoki.ui.theme.LocalColor
@@ -79,7 +78,15 @@ class SignInScreenTest {
             }
         }
 
+        val color = TokitokiColor()
 
+        composeTestRule
+            .onNodeWithTag("SignMenuBtn")
+            .assertIsDisplayed()
+            .assertTextEquals(activity.resources.getString(R.string.mail_btn_text))
+            .assertFontColorIsEqualTo(color.white)
+            .assertBackgroundColor(color.blue)
+            .assertHasDrawable(R.drawable.ic_mail)
     }
 
     @Test
@@ -100,7 +107,7 @@ class SignInScreenTest {
         val color = TokitokiColor()
 
         composeTestRule
-            .onNodeWithTag("SignMenuBtn")
+            .onNodeWithTag("OutlinedSignMenuBtn")
             .assertIsDisplayed()
             .assertTextEquals(activity.resources.getString(R.string.google_btn_text))
             .assertFontColorIsEqualTo(color.black)

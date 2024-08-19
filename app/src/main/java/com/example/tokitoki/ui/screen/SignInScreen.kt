@@ -153,14 +153,16 @@ fun TopLogo(
 ) {
     Row(
         modifier = modifier
-            .height(70.dp)
             .offset(x = -(10).dp)
             .testTag("TopLogo"),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Image(
-            modifier = Modifier.offset(x = 10.dp).then(DrawableSemantics.withDrawableId(resId = R.drawable.pink_heart_logo)),
+            modifier = Modifier
+                .offset(x = 10.dp)
+                .height(70.dp)
+                .then(DrawableSemantics.withDrawableId(resId = R.drawable.pink_heart_logo)),
             painter = painterResource(id = R.drawable.pink_heart_logo),
             contentDescription = "TopLogoImage",
         )
@@ -216,7 +218,7 @@ fun SignMenuBtn(
         OutlinedButton(
             modifier = modifier
                 .fillMaxWidth()
-                .testTag("SignMenuBtn"),
+                .testTag("OutlinedSignMenuBtn"),
             colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
             onClick = {
                 onClick(signInAction)
