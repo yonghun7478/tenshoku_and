@@ -1,4 +1,4 @@
-package com.example.tokitoki.viewmodel.backup
+package com.example.tokitoki.ui.viewmodel.backup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

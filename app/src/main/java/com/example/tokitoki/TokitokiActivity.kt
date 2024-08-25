@@ -12,7 +12,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.viewmodel.TokitokiViewModel
+import com.example.tokitoki.ui.viewmodel.TokitokiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

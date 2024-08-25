@@ -1,4 +1,4 @@
-package com.example.tokitoki.viewmodel
+package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

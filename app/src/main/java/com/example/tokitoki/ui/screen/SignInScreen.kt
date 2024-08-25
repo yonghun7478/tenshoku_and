@@ -42,7 +42,7 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.util.SignInAction
 import com.example.tokitoki.ui.util.SignInConstants
-import com.example.tokitoki.viewmodel.SignInViewModel
+import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
