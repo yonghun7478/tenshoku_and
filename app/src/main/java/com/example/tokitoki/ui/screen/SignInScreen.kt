@@ -46,6 +46,7 @@ import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
+    registerWithEmailClick: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
@@ -62,6 +63,13 @@ fun SignInScreen(
             }
 
             is SignInEvent.ACTION -> {
+                when (currentUiEvent.action) {
+                    SignInAction.LoginWithEmail -> {
+                        registerWithEmailClick()
+                    }
+
+                    else -> {}
+                }
                 Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
             }
 
