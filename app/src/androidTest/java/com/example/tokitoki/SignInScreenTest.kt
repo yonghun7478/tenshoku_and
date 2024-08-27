@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tokitoki.ui.screen.SignMenuBtn
+import com.example.tokitoki.ui.screen.SignMenuOutlinedBtn
 import com.example.tokitoki.ui.screen.TopLogo
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiColor
@@ -29,6 +30,7 @@ class SignInScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+
 
     private val activity get() = composeTestRule.activity
 
@@ -93,12 +95,11 @@ class SignInScreenTest {
     fun loginBtnWithGoogleCorrectly() {
         composeTestRule.setContent {
             TokitokiTheme {
-                SignMenuBtn(
+                SignMenuOutlinedBtn(
                     text = stringResource(id = R.string.google_btn_text),
                     textColor = LocalColor.current.black,
                     backgroundColor = LocalColor.current.white,
                     iconRes = R.drawable.ic_google,
-                    isOutLine = true,
                     signInAction = SignInAction.LoginWithGoogle,
                 )
             }
@@ -107,7 +108,7 @@ class SignInScreenTest {
         val color = TokitokiColor()
 
         composeTestRule
-            .onNodeWithTag("OutlinedSignMenuBtn")
+            .onNodeWithTag("SignMenuOutlinedBtn")
             .assertIsDisplayed()
             .assertTextEquals(activity.resources.getString(R.string.google_btn_text))
             .assertFontColorIsEqualTo(color.black)

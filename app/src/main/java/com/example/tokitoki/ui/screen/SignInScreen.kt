@@ -77,73 +77,19 @@ fun SignInContent(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(300.dp))
-        TopLogo()
+        TopLogo(
+            modifier = Modifier
+                .padding(top = 300.dp)
+                .offset(x = -(10).dp),
+        )
         Spacer(modifier = Modifier.weight(1f))
         SignInMenu(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp),
             onClick = onClick
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    onClick(SignInAction.Help)
-                },
-            text = stringResource(id = R.string.sign_in_new_member_help_title),
-            color = LocalColor.current.blue,
-            fontWeight = FontWeight.Bold,
-            fontSize = 10.sp
-        )
-
-        Row(
-            modifier = Modifier
-                .padding(vertical = 12.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        onClick(SignInAction.Service)
-                    },
-                text = stringResource(id = R.string.terms_of_service),
-                fontSize = 10.sp
-            )
-            Text(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        onClick(SignInAction.Privacy)
-                    },
-                text = stringResource(id = R.string.privacy_policy),
-                fontSize = 10.sp
-            )
-
-            Text(
-                modifier = Modifier
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        onClick(SignInAction.Cookie)
-                    },
-                text = stringResource(id = R.string.cookie_policy),
-                fontSize = 10.sp
-            )
-        }
+        SignInSupportLink(modifier = Modifier.padding(top = 24.dp), onClick = onClick)
+        SignInSubLinks(modifier = Modifier.padding(vertical = 12.dp), onClick = onClick)
     }
 }
 
@@ -152,9 +98,7 @@ fun TopLogo(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .offset(x = -(10).dp)
-            .testTag("TopLogo"),
+        modifier = modifier.testTag("TopLogo"),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -181,18 +125,24 @@ fun SignInMenu(
     modifier: Modifier = Modifier,
     onClick: (SignInAction) -> Unit = {},
 ) {
-    Column(modifier = modifier.testTag("SignInMenu")) {
-        SignMenuBtn(
+    Column(
+        modifier = modifier
+            .testTag("SignInMenu")
+    ) {
+        SignMenuOutlinedBtn(
+            modifier = Modifier
+                .fillMaxWidth(),
             text = stringResource(id = R.string.google_btn_text),
             textColor = LocalColor.current.black,
             backgroundColor = LocalColor.current.white,
             iconRes = R.drawable.ic_google,
-            isOutLine = true,
             signInAction = SignInAction.LoginWithGoogle,
             onClick = onClick
         )
 
         SignMenuBtn(
+            modifier = Modifier
+                .fillMaxWidth(),
             text = stringResource(id = R.string.mail_btn_text),
             textColor = LocalColor.current.white,
             iconRes = R.drawable.ic_mail,
@@ -204,67 +154,143 @@ fun SignInMenu(
 }
 
 @Composable
+fun SignMenuOutlinedBtn(
+    modifier: Modifier = Modifier,
+    text: String = "",
+    textColor: Color = LocalColor.current.black,
+    backgroundColor: Color = LocalColor.current.white,
+    iconRes: Int = -1,
+    signInAction: SignInAction = SignInAction.Nothing,
+    onClick: (SignInAction) -> Unit = {},
+) {
+    OutlinedButton(
+        modifier = modifier.testTag("SignMenuOutlinedBtn"),
+        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
+        onClick = {
+            onClick(signInAction)
+        },
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Icon(
+                modifier = DrawableSemantics.withDrawableId(resId = iconRes),
+                painter = painterResource(id = iconRes),
+                tint = textColor,
+                contentDescription = "SignMenuOutlinedBtnIcon"
+            )
+            Text(text = text, color = textColor)
+            Spacer(modifier = Modifier.width(1.dp))
+        }
+    }
+
+}
+
+@Composable
 fun SignMenuBtn(
     modifier: Modifier = Modifier,
     text: String = "",
     textColor: Color = LocalColor.current.black,
     backgroundColor: Color = LocalColor.current.white,
     iconRes: Int = -1,
-    isOutLine: Boolean = false,
     signInAction: SignInAction = SignInAction.Nothing,
     onClick: (SignInAction) -> Unit = {},
 ) {
-    if (isOutLine) {
-        OutlinedButton(
-            modifier = modifier
-                .fillMaxWidth()
-                .testTag("OutlinedSignMenuBtn"),
-            colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-            onClick = {
-                onClick(signInAction)
-            },
+    Button(
+        modifier = modifier.testTag("SignMenuBtn"),
+        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
+        onClick = {
+            onClick(signInAction)
+        },
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Icon(
-                    modifier = DrawableSemantics.withDrawableId(resId = iconRes),
-                    painter = painterResource(id = iconRes),
-                    tint = textColor,
-                    contentDescription = "SignMenuBtnIcon"
-                )
-                Text(text = text, color = textColor)
-                Spacer(modifier = Modifier.width(1.dp))
-            }
-        }
-    } else {
-        Button(
-            modifier = modifier
-                .fillMaxWidth()
-                .testTag("SignMenuBtn"),
-            colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-            onClick = {
-                onClick(signInAction)
-            },
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Icon(
-                    modifier = DrawableSemantics.withDrawableId(resId = iconRes),
-                    painter = painterResource(id = iconRes),
-                    tint = textColor,
-                    contentDescription = "SignMenuBtnIcon"
-                )
-                Text(text = text, color = textColor)
-                Spacer(modifier = Modifier.width(1.dp))
-            }
+            Icon(
+                modifier = DrawableSemantics.withDrawableId(resId = iconRes),
+                painter = painterResource(id = iconRes),
+                tint = textColor,
+                contentDescription = "SignMenuBtnIcon"
+            )
+            Text(text = text, color = textColor)
+            Spacer(modifier = Modifier.width(1.dp))
         }
     }
+
 }
 
+@Composable
+fun SignInSupportLink(
+    modifier: Modifier = Modifier,
+    onClick: (SignInAction) -> Unit = {},
+) {
+    Text(
+        modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                onClick(SignInAction.Help)
+            }
+            .testTag("SignInSupportLink"),
+        text = stringResource(id = R.string.sign_in_new_member_help_title),
+        color = LocalColor.current.blue,
+        fontWeight = FontWeight.Bold,
+        fontSize = 10.sp
+    )
+}
+
+@Composable
+fun SignInSubLinks(
+    modifier: Modifier = Modifier,
+    onClick: (SignInAction) -> Unit = {},
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("SignInSubLinks"),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onClick(SignInAction.Service)
+                },
+            text = stringResource(id = R.string.terms_of_service),
+            fontSize = 10.sp
+        )
+        Text(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onClick(SignInAction.Privacy)
+                },
+            text = stringResource(id = R.string.privacy_policy),
+            fontSize = 10.sp
+        )
+
+        Text(
+            modifier = Modifier
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onClick(SignInAction.Cookie)
+                },
+            text = stringResource(id = R.string.cookie_policy),
+            fontSize = 10.sp
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -292,6 +318,20 @@ fun SignInMenuPreView() {
 
 @Preview(showBackground = true)
 @Composable
+fun SignMenuOutlinedBtnPreView() {
+    TokitokiTheme {
+        SignMenuOutlinedBtn(
+            text = stringResource(id = R.string.google_btn_text),
+            textColor = LocalColor.current.black,
+            backgroundColor = LocalColor.current.white,
+            iconRes = R.drawable.ic_google,
+            signInAction = SignInAction.LoginWithGoogle,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun SignMenuBtnPreView() {
     TokitokiTheme {
         SignMenuBtn(
@@ -300,5 +340,21 @@ fun SignMenuBtnPreView() {
             backgroundColor = LocalColor.current.blue,
             iconRes = R.drawable.ic_mail
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignInSupportLinkPreView() {
+    TokitokiTheme {
+        SignInSupportLink()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignInSubLinksPreView() {
+    TokitokiTheme {
+        SignInSubLinks()
     }
 }
