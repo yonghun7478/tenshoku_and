@@ -265,7 +265,8 @@ fun SignInSubLinks(
                     onClick(SignInAction.Service)
                 },
             text = stringResource(id = R.string.terms_of_service),
-            fontSize = 10.sp
+            fontSize = 10.sp,
+            color = LocalColor.current.grayColor
         )
         Text(
             modifier = Modifier
@@ -277,7 +278,8 @@ fun SignInSubLinks(
                     onClick(SignInAction.Privacy)
                 },
             text = stringResource(id = R.string.privacy_policy),
-            fontSize = 10.sp
+            fontSize = 10.sp,
+            color = LocalColor.current.grayColor
         )
 
         Text(
@@ -289,7 +291,8 @@ fun SignInSubLinks(
                     onClick(SignInAction.Cookie)
                 },
             text = stringResource(id = R.string.cookie_policy),
-            fontSize = 10.sp
+            fontSize = 10.sp,
+            color = LocalColor.current.grayColor
         )
     }
 }

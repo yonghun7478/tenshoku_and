@@ -1,12 +1,9 @@
 package com.example.tokitoki
 
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
@@ -14,6 +11,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tokitoki.ui.screen.SignInSubLinks
+import com.example.tokitoki.ui.screen.SignInSupportLink
 import com.example.tokitoki.ui.screen.SignMenuBtn
 import com.example.tokitoki.ui.screen.SignMenuOutlinedBtn
 import com.example.tokitoki.ui.screen.TopLogo
@@ -124,5 +123,52 @@ class SignInScreenTest {
 
         composeTestRule.onNodeWithText(activity.resources.getString(R.string.google_btn_text))
             .assertFontSizeIsEqualTo(14.sp)
+    }
+
+    @Test
+    fun supportLinkCorrectly() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                SignInSupportLink()
+            }
+        }
+
+        val color = TokitokiColor()
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.sign_in_new_member_help_title))
+            .assertIsDisplayed()
+            .assertFontSizeIsEqualTo(10.sp)
+            .assertFontColorIsEqualTo(color.blue)
+            .assertTextEquals(composeTestRule.activity.getString(R.string.sign_in_new_member_help_title))
+            .assertFontWeightIsEqualTo(FontWeight.Bold)
+    }
+
+    @Test
+    fun subLinkCorrectly() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                SignInSubLinks()
+            }
+        }
+
+        val color = TokitokiColor()
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.terms_of_service))
+            .assertIsDisplayed()
+            .assertFontSizeIsEqualTo(10.sp)
+            .assertFontColorIsEqualTo(color.grayColor)
+            .assertTextEquals(composeTestRule.activity.getString(R.string.terms_of_service))
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.privacy_policy))
+            .assertIsDisplayed()
+            .assertFontSizeIsEqualTo(10.sp)
+            .assertFontColorIsEqualTo(color.grayColor)
+            .assertTextEquals(composeTestRule.activity.getString(R.string.privacy_policy))
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.cookie_policy))
+            .assertIsDisplayed()
+            .assertFontSizeIsEqualTo(10.sp)
+            .assertFontColorIsEqualTo(color.grayColor)
+            .assertTextEquals(composeTestRule.activity.getString(R.string.cookie_policy))
     }
 }
