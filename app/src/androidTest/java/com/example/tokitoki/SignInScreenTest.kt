@@ -1,12 +1,16 @@
 package com.example.tokitoki
 
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,6 +93,9 @@ class SignInScreenTest {
             .assertFontColorIsEqualTo(color.white)
             .assertBackgroundColor(color.blue)
             .assertHasDrawable(R.drawable.ic_mail)
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.mail_btn_text))
+            .assertFontSizeIsEqualTo(14.sp)
     }
 
     @Test
@@ -114,5 +121,8 @@ class SignInScreenTest {
             .assertFontColorIsEqualTo(color.black)
             .assertBackgroundColor(color.white)
             .assertHasDrawable(R.drawable.ic_google)
+
+        composeTestRule.onNodeWithText(activity.resources.getString(R.string.google_btn_text))
+            .assertFontSizeIsEqualTo(14.sp)
     }
 }

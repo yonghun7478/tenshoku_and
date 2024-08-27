@@ -64,6 +64,8 @@ fun SignInScreen(
             is SignInEvent.ACTION -> {
                 Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
             }
+
+            else -> {}
         }
     }
 }
@@ -180,7 +182,7 @@ fun SignMenuOutlinedBtn(
                 tint = textColor,
                 contentDescription = "SignMenuOutlinedBtnIcon"
             )
-            Text(text = text, color = textColor)
+            Text(text = text, color = textColor, fontSize = 14.sp)
             Spacer(modifier = Modifier.width(1.dp))
         }
     }
@@ -214,7 +216,7 @@ fun SignMenuBtn(
                 tint = textColor,
                 contentDescription = "SignMenuBtnIcon"
             )
-            Text(text = text, color = textColor)
+            Text(text = text, color = textColor, fontSize = 14.sp)
             Spacer(modifier = Modifier.width(1.dp))
         }
     }
