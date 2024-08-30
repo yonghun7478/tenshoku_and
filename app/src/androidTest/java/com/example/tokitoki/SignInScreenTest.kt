@@ -19,7 +19,7 @@ import com.example.tokitoki.ui.screen.TopLogo
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.ui.util.SignInAction
+import com.example.tokitoki.ui.constants.SignInAction
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before

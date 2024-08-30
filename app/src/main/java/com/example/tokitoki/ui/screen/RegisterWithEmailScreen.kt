@@ -1,6 +1,7 @@
 package com.example.tokitoki.ui.screen
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,21 +46,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.RegisterWithEmailAction
+import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
+import com.example.tokitoki.ui.state.RegisterWithEmailEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
-import com.example.tokitoki.ui.viewmodel.RegisterViewModel
+import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 
 @Composable
 fun RegisterWithEmailScreen(
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterWithEmailViewModel = hiltViewModel()
 ) {
-    RegisterWithEmailContents()
+    val uiEvent by viewModel.uiEvent.collectAsState(initial = RegisterWithEmailEvent.NOTHING)
+
+    RegisterWithEmailContents(
+        onClick = {
+            viewModel.clickListener(it)
+        }
+    )
+
+    LaunchedEffect(uiEvent) {
+        when (val currentUiEvent = uiEvent) {
+            RegisterWithEmailEvent.NOTHING -> {
+            }
+
+            is RegisterWithEmailEvent.ACTION -> {
+                when (currentUiEvent.action) {
+                    RegisterWithEmailAction.Submit -> {
+
+                    }
+
+                    else -> {}
+                }
+                Log.d(RegisterWithEmailConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
+            }
+
+            else -> {}
+        }
+    }
 }
 
 @Composable
 fun RegisterWithEmailContents(
     modifier: Modifier = Modifier,
+    onClick: (RegisterWithEmailAction) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -89,7 +125,8 @@ fun RegisterWithEmailContents(
         RegisterWithEmailSubmitBtn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
+                .padding(horizontal = 10.dp),
+            onClick = onClick
         )
     }
 }
@@ -126,6 +163,7 @@ fun RegisterWithEmailTextField(
     modifier: Modifier = Modifier,
 ) {
     var emailInput by rememberSaveable { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
 
     TextField(
         value = emailInput,
@@ -144,20 +182,29 @@ fun RegisterWithEmailTextField(
                 text = stringResource(id = R.string.register_textfield_pressholder)
             )
         },
-        modifier = modifier
+        modifier = modifier.focusRequester(focusRequester)
     )
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
 
 
 @Composable
 fun RegisterWithEmailSubmitBtn(
     modifier: Modifier = Modifier,
+    onClick: (RegisterWithEmailAction) -> Unit = {},
 ) {
+    val focusManager = LocalFocusManager.current
+
     Button(
         modifier = modifier
             .testTag("RegisterWithEmailSubmitBtn"),
         colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
         onClick = {
+            focusManager.clearFocus()
+            onClick(RegisterWithEmailAction.Submit)
         },
     ) {
         Row(

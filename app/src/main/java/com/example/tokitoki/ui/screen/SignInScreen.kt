@@ -40,8 +40,8 @@ import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
-import com.example.tokitoki.ui.util.SignInAction
-import com.example.tokitoki.ui.util.SignInConstants
+import com.example.tokitoki.ui.constants.SignInAction
+import com.example.tokitoki.ui.constants.SignInConstants
 import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
