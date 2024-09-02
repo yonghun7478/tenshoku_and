@@ -27,10 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -51,6 +48,7 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
+import com.example.tokitoki.ui.state.RegisterWithEmailState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
@@ -60,11 +58,13 @@ import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 fun RegisterWithEmailScreen(
     viewModel: RegisterWithEmailViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
     RegisterWithEmailContents(
-        onClick = {
-            viewModel.clickListener(it)
-        }
+        uiState = uiState,
+        onClick = viewModel::clickListener,
+        onEmailChanged = viewModel::onEmailChanged,
+        onDismiss = viewModel::onDismiss,
     )
 
     LaunchedEffect(Unit) {
@@ -76,7 +76,7 @@ fun RegisterWithEmailScreen(
                 is RegisterWithEmailEvent.ACTION -> {
                     when (uiEvent.action) {
                         RegisterWithEmailAction.Submit -> {
-
+                            viewModel.submit(uiState.email)
                         }
 
                         else -> {}
@@ -91,7 +91,10 @@ fun RegisterWithEmailScreen(
 @Composable
 fun RegisterWithEmailContents(
     modifier: Modifier = Modifier,
+    uiState: RegisterWithEmailState = RegisterWithEmailState(),
     onClick: (RegisterWithEmailAction) -> Unit = {},
+    onEmailChanged: (String) -> Unit = {},
+    onDismiss: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -99,9 +102,11 @@ fun RegisterWithEmailContents(
         modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
+                detectTapGestures(
+                    onTap = {
+                        focusManager.clearFocus()
+                    }
+                )
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -120,7 +125,9 @@ fun RegisterWithEmailContents(
         RegisterWithEmailTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
+                .padding(horizontal = 10.dp),
+            email = uiState.email,
+            onEmailChanged = onEmailChanged
         )
         Spacer(modifier = Modifier.height(10.dp))
         RegisterWithEmailSubmitBtn(
@@ -128,6 +135,15 @@ fun RegisterWithEmailContents(
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp),
             onClick = onClick
+        )
+    }
+
+    if (uiState.showDialog) {
+        val errorMsg = stringResource(R.string.validate_error_msg)
+
+        RegisterWithEmailErrorDialog(
+            message = errorMsg,
+            onDismiss = onDismiss
         )
     }
 }
@@ -162,15 +178,14 @@ fun RegisterWithEmailIcon(
 @Composable
 fun RegisterWithEmailTextField(
     modifier: Modifier = Modifier,
+    email: String = "",
+    onEmailChanged: (String) -> Unit = {},
 ) {
-    var emailInput by rememberSaveable { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
     TextField(
-        value = emailInput,
-        onValueChange = {
-            emailInput = it
-        },
+        value = email,
+        onValueChange = onEmailChanged,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = LocalColor.current.blue,
             unfocusedIndicatorColor = LocalColor.current.blue,
@@ -226,10 +241,17 @@ fun RegisterWithEmailErrorDialog(
         onDismissRequest = onDismiss,
         text = { Text(message) },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(id = R.string.register_error_dialog_ok))
+            TextButton(
+                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
+                onClick = onDismiss
+            ) {
+                Text(
+                    color = LocalColor.current.white,
+                    text = stringResource(id = R.string.register_error_dialog_ok)
+                )
             }
-        }
+        },
+        containerColor = LocalColor.current.white,
     )
 }
 

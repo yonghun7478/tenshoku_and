@@ -11,4 +11,5 @@
     <string name="register_btn_title">確認メールを送信</string>
     <string name="register_textfield_pressholder">tokitoki@example.com</string>
     <string name="register_error_dialog_ok">確認</string>
+    <string name="validate_error_msg">正しくないフォマードです。メールを再入力してください。</string>
 </resources>
