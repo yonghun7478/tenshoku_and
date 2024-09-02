@@ -40,12 +40,13 @@ import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
-import com.example.tokitoki.ui.util.SignInAction
-import com.example.tokitoki.ui.util.SignInConstants
-import com.example.tokitoki.viewmodel.SignInViewModel
+import com.example.tokitoki.ui.constants.SignInAction
+import com.example.tokitoki.ui.constants.SignInConstants
+import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
+    registerWithEmailClick: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
@@ -62,6 +63,13 @@ fun SignInScreen(
             }
 
             is SignInEvent.ACTION -> {
+                when (currentUiEvent.action) {
+                    SignInAction.LoginWithEmail -> {
+                        registerWithEmailClick()
+                    }
+
+                    else -> {}
+                }
                 Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
             }
 

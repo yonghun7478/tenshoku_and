@@ -7,4 +7,7 @@
     <string name="terms_of_service">利用規約</string>
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="cookie_policy">クッキーポリシー</string>
+    <string name="register_title">メールアドレスを\n入力してください</string>
+    <string name="register_btn_title">確認メールを送信</string>
+    <string name="register_textfield_pressholder">tokitoki@example.com</string>
 </resources>

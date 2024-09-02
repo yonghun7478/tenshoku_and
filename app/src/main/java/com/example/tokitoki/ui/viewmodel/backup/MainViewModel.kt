@@ -1,4 +1,4 @@
-package com.example.tokitoki.viewmodel.backup
+package com.example.tokitoki.ui.viewmodel.backup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +21,7 @@ import javax.inject.Inject
 import com.example.tokitoki.domain.util.Resource
 import com.example.tokitoki.ui.data.backup.ButtonData
 import com.example.tokitoki.ui.data.backup.ButtonType
-import com.example.tokitoki.ui.converter.UserUiConverter
+import com.example.tokitoki.ui.model.converter.UserUiConverter
 import com.example.tokitoki.ui.state.backup.UserUiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
