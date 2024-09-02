@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -58,7 +60,6 @@ import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 fun RegisterWithEmailScreen(
     viewModel: RegisterWithEmailViewModel = hiltViewModel()
 ) {
-    val uiEvent by viewModel.uiEvent.collectAsState(initial = RegisterWithEmailEvent.NOTHING)
 
     RegisterWithEmailContents(
         onClick = {
@@ -66,23 +67,23 @@ fun RegisterWithEmailScreen(
         }
     )
 
-    LaunchedEffect(uiEvent) {
-        when (val currentUiEvent = uiEvent) {
-            RegisterWithEmailEvent.NOTHING -> {
-            }
-
-            is RegisterWithEmailEvent.ACTION -> {
-                when (currentUiEvent.action) {
-                    RegisterWithEmailAction.Submit -> {
-
-                    }
-
-                    else -> {}
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                RegisterWithEmailEvent.NOTHING -> {
                 }
-                Log.d(RegisterWithEmailConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
-            }
 
-            else -> {}
+                is RegisterWithEmailEvent.ACTION -> {
+                    when (uiEvent.action) {
+                        RegisterWithEmailAction.Submit -> {
+
+                        }
+
+                        else -> {}
+                    }
+                    Log.d(RegisterWithEmailConstants.TAG, "uiEvent.action ${uiEvent.action}")
+                }
+            }
         }
     }
 }
@@ -216,6 +217,22 @@ fun RegisterWithEmailSubmitBtn(
     }
 }
 
+@Composable
+fun RegisterWithEmailErrorDialog(
+    message: String = "",
+    onDismiss: () -> Unit = {}
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = { Text(message) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.register_error_dialog_ok))
+            }
+        }
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun RegisterWithEmailContentsPreView() {
@@ -245,5 +262,13 @@ fun RegisterWithEmailTextFieldPreview() {
 fun RegisterWithEmailSubmitBtnPreview() {
     TokitokiTheme {
         RegisterWithEmailSubmitBtn()
+    }
+}
+
+@Preview
+@Composable
+fun RegisterWithEmailErrorDialogPreview() {
+    TokitokiTheme {
+        RegisterWithEmailErrorDialog()
     }
 }

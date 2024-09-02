@@ -49,7 +49,7 @@ fun SignInScreen(
     registerWithEmailClick: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
+//    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
 
     SignInContent(
         onClick = {
@@ -57,23 +57,23 @@ fun SignInScreen(
         }
     )
 
-    LaunchedEffect(uiEvent) {
-        when (val currentUiEvent = uiEvent) {
-            SignInEvent.NOTHING -> {
-            }
-
-            is SignInEvent.ACTION -> {
-                when (currentUiEvent.action) {
-                    SignInAction.LoginWithEmail -> {
-                        registerWithEmailClick()
-                    }
-
-                    else -> {}
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                SignInEvent.NOTHING -> {
                 }
-                Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
-            }
 
-            else -> {}
+                is SignInEvent.ACTION -> {
+                    when (uiEvent.action) {
+                        SignInAction.LoginWithEmail -> {
+                            registerWithEmailClick()
+                        }
+
+                        else -> {}
+                    }
+                    Log.d(SignInConstants.TAG, "uiEvent.action ${uiEvent.action}")
+                }
+            }
         }
     }
 }
