@@ -48,9 +48,13 @@ class RegisterWithEmailViewModel @Inject constructor() : ViewModel() {
             val isValidEmail = validateEmail(email)
 
             if (isValidEmail) {
-                _uiState.value = RegisterWithEmailState(showDialog = false)
+                _uiState.update {
+                    it.copy(showDialog = false)
+                }
             } else {
-                _uiState.value = RegisterWithEmailState(showDialog = true)
+                _uiState.update {
+                    it.copy(showDialog = true)
+                }
             }
         }
     }
