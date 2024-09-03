@@ -5,7 +5,7 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @Preview(showBackground = true)
 @Composable
-fun MainContentPreView() {
+fun SignInSnapShotTest() {
     TokitokiTheme {
         SignInContent()
     }
