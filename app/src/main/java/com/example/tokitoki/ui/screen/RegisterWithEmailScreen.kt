@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
 import com.example.tokitoki.ui.state.RegisterWithEmailState
 import com.example.tokitoki.ui.theme.LocalColor
@@ -107,7 +108,8 @@ fun RegisterWithEmailContents(
                         focusManager.clearFocus()
                     }
                 )
-            },
+            }
+            .testTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         RegisterWithEmailIcon(
@@ -198,7 +200,9 @@ fun RegisterWithEmailTextField(
                 text = stringResource(id = R.string.register_textfield_pressholder)
             )
         },
-        modifier = modifier.focusRequester(focusRequester)
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .testTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD)
     )
 
     LaunchedEffect(Unit) {
@@ -215,8 +219,7 @@ fun RegisterWithEmailSubmitBtn(
     val focusManager = LocalFocusManager.current
 
     Button(
-        modifier = modifier
-            .testTag("RegisterWithEmailSubmitBtn"),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
         onClick = {
             focusManager.clearFocus()
@@ -238,6 +241,8 @@ fun RegisterWithEmailErrorDialog(
     onDismiss: () -> Unit = {}
 ) {
     AlertDialog(
+        modifier = Modifier
+            .testTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG),
         onDismissRequest = onDismiss,
         text = { Text(message) },
         confirmButton = {

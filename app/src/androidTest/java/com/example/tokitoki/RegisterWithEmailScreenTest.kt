@@ -1,30 +1,14 @@
 package com.example.tokitoki
 
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.tokitoki.backup.assertBackgroundColor
-import com.example.tokitoki.backup.assertFontColorIsEqualTo
-import com.example.tokitoki.backup.assertFontSizeIsEqualTo
-import com.example.tokitoki.backup.assertFontWeightIsEqualTo
-import com.example.tokitoki.backup.assertHasDrawable
-import com.example.tokitoki.ui.screen.SignInSubLinks
-import com.example.tokitoki.ui.screen.SignInSupportLink
-import com.example.tokitoki.ui.screen.SignMenuBtn
-import com.example.tokitoki.ui.screen.SignMenuOutlinedBtn
-import com.example.tokitoki.ui.screen.TopLogo
-import com.example.tokitoki.ui.theme.LocalColor
-import com.example.tokitoki.ui.theme.TokitokiColor
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.ui.constants.SignInAction
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -46,14 +30,34 @@ class RegisterWithEmailScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
-    }
 
-    @Test
-    fun topLogoDisplaysImageAndTextCorrectly() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
             }
         }
+    }
+
+    @Test
+    fun registerWithEmailScreenIsDisplayed() {
+        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+    }
+
+    @Test
+    fun registerWithEmailScreenDialogIsDisplayed() {
+        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
+        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextClearance()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun")
+        composeTestRule.onNodeWithText("yonghun").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG).assertIsDisplayed()
     }
 }
