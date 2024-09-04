@@ -1,11 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.screenshot)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -95,58 +95,70 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    debugImplementation(libs.androidx.ui.tooling)
+    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Compose Option
+    implementation(libs.androidx.activity.compose)
+
+    // Compose Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Hilt
     implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
+
+    // Hilt Option
     implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.android.compiler)
+
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+
+    // Okhttp
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
+
+    // Gson
     implementation(libs.gson)
-    implementation(libs.room)
-    annotationProcessor(libs.room.compiler)
-    kapt(libs.room.kapt)
+
+    // Room
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    // Sqlcipher
     implementation(libs.sqlcipher)
+
+    // Jetpack Security
     implementation(libs.jetpack.security)
 
     // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
-
-    // Add the dependencies for the Crashlytics and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+
+    // SplashScreen
     implementation(libs.splashscreen)
 
-
+    // testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler)
-
-    androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.android.compiler)
-
-    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
-}
-
-kapt {
-    correctErrorTypes = true
 }

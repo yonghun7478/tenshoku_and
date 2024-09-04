@@ -1,4 +1,4 @@
-package com.example.tokitoki
+package com.example.tokitoki.backup
 
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -11,6 +11,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tokitoki.HiltTestActivity
+import com.example.tokitoki.R
 import com.example.tokitoki.ui.screen.SignInSubLinks
 import com.example.tokitoki.ui.screen.SignInSupportLink
 import com.example.tokitoki.ui.screen.SignMenuBtn

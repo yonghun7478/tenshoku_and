@@ -21,8 +21,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +40,7 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.constants.SignInAction
 import com.example.tokitoki.ui.constants.SignInConstants
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
@@ -49,7 +48,7 @@ fun SignInScreen(
     registerWithEmailClick: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
+//    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
 
     SignInContent(
         onClick = {
@@ -57,23 +56,23 @@ fun SignInScreen(
         }
     )
 
-    LaunchedEffect(uiEvent) {
-        when (val currentUiEvent = uiEvent) {
-            SignInEvent.NOTHING -> {
-            }
-
-            is SignInEvent.ACTION -> {
-                when (currentUiEvent.action) {
-                    SignInAction.LoginWithEmail -> {
-                        registerWithEmailClick()
-                    }
-
-                    else -> {}
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                SignInEvent.NOTHING -> {
                 }
-                Log.d(SignInConstants.TAG, "uiEvent.action ${currentUiEvent.action}")
-            }
 
-            else -> {}
+                is SignInEvent.ACTION -> {
+                    when (uiEvent.action) {
+                        SignInAction.LoginWithEmail -> {
+                            registerWithEmailClick()
+                        }
+
+                        else -> {}
+                    }
+                    Log.d(SignInConstants.TAG, "uiEvent.action ${uiEvent.action}")
+                }
+            }
         }
     }
 }
@@ -84,7 +83,9 @@ fun SignInContent(
     onClick: (SignInAction) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(TestTags.SIGN_IN_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopLogo(
@@ -108,7 +109,7 @@ fun TopLogo(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.testTag("TopLogo"),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -137,7 +138,6 @@ fun SignInMenu(
 ) {
     Column(
         modifier = modifier
-            .testTag("SignInMenu")
     ) {
         SignMenuOutlinedBtn(
             modifier = Modifier
@@ -174,7 +174,7 @@ fun SignMenuOutlinedBtn(
     onClick: (SignInAction) -> Unit = {},
 ) {
     OutlinedButton(
-        modifier = modifier.testTag("SignMenuOutlinedBtn"),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         onClick = {
             onClick(signInAction)
@@ -208,7 +208,7 @@ fun SignMenuBtn(
     onClick: (SignInAction) -> Unit = {},
 ) {
     Button(
-        modifier = modifier.testTag("SignMenuBtn"),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         onClick = {
             onClick(signInAction)
@@ -243,8 +243,7 @@ fun SignInSupportLink(
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 onClick(SignInAction.Help)
-            }
-            .testTag("SignInSupportLink"),
+            },
         text = stringResource(id = R.string.sign_in_new_member_help_title),
         color = LocalColor.current.blue,
         fontWeight = FontWeight.Bold,
@@ -259,8 +258,7 @@ fun SignInSubLinks(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .testTag("SignInSubLinks"),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
