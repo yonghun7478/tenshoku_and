@@ -38,7 +38,14 @@ fun TokitokiNavGraph(
             )
         }
         composable(TokitokiDestinations.REGISTER_WITH_EMAIL_ROUTE) {
-            RegisterWithEmailScreen()
+            RegisterWithEmailScreen(
+                registerWithEmailOnClick = {
+                    navAction.navigateToEmailVerification()
+                }
+            )
+        }
+        composable(TokitokiDestinations.EMAIL_VERIFICATION_ROUTE) {
+            EmailVerificationScreen()
         }
     }
 }

@@ -58,8 +58,7 @@ class TokitokiActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             TokitokiTheme {
-                EmailVerificationScreen()
-//                TokitokiNavGraph()
+                TokitokiNavGraph()
             }
         }
     }
