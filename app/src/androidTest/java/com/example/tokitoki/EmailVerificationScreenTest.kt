@@ -40,11 +40,23 @@ class EmailVerificationScreenTest {
 
     @Test
     fun emailVerificationIsDisplayed() {
-
+        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
+        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
     }
 
     @Test
-    fun emailVerificationDialogIsDisplayed() {
-
+    fun emailVerificationTextFieldIsDisplayed() {
+        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
+        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
+        
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
+        composeTestRule.onNodeWithText("123456").assertIsDisplayed()
     }
 }

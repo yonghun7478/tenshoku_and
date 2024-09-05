@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
@@ -153,18 +156,22 @@ fun EmailVerificationTextField(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     text.forEachIndexed { _, char ->
                         EmailVerificationTextFieldContainer(
+                            modifier = Modifier.weight(1f),
                             text = char,
                         )
                     }
                     repeat(6 - text.length) {
                         EmailVerificationTextFieldContainer(
+                            modifier = Modifier.weight(1f),
                             text = ' ',
                         )
                     }
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.focusRequester(focusRequester)
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .testTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD)
         )
 
         EmailVerificationAdviceText(
@@ -208,13 +215,10 @@ private fun EmailVerificationTextFieldContainer(
 
     Card(
         modifier = modifier
-            .size(
-                width = 55.dp,
-                height = 80.dp,
-            )
+            .height(80.dp)
     ) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(
                     color = LocalColor.current.lightGray,
