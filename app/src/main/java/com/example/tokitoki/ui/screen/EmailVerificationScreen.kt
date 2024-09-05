@@ -142,12 +142,12 @@ fun EmailVerificationTextField(
             value = text,
             singleLine = true,
             onValueChange = { newText ->
-                if (newText.length <= 6) {
+                if (newText.length <= 6)
                     text = newText
 
-                    if (newText.length == 6)
-                        focusManager.clearFocus()
-                }
+                if (newText.length == 6)
+                    focusManager.clearFocus()
+
             },
             decorationBox = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -167,15 +167,8 @@ fun EmailVerificationTextField(
             modifier = Modifier.focusRequester(focusRequester)
         )
 
-        Text(
-            modifier = Modifier.padding(top = 10.dp),
-            text = stringResource(R.string.verification_advice1),
-            fontSize = 10.sp
-        )
-        Text(
-            text = stringResource(R.string.verification_advice2),
-            color = LocalColor.current.blue,
-            fontSize = 10.sp
+        EmailVerificationAdviceText(
+            modifier = Modifier
         )
     }
 
@@ -187,6 +180,22 @@ fun EmailVerificationTextField(
         if (text.length == 6) {
             onVerificationComplete()
         }
+    }
+}
+
+@Composable
+fun EmailVerificationAdviceText(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            modifier = Modifier.padding(top = 10.dp),
+            text = stringResource(R.string.verification_advice1),
+            fontSize = 10.sp
+        )
+        Text(
+            text = stringResource(R.string.verification_advice2),
+            color = LocalColor.current.blue,
+            fontSize = 10.sp
+        )
     }
 }
 
