@@ -20,10 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -42,7 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.state.EmailVerificationEvent
+import com.example.tokitoki.ui.state.EmailVerificationState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
@@ -52,13 +54,36 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 fun EmailVerificationScreen(
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
-    EmailVerificationContents()
+    val uiState by viewModel.uiState.collectAsState()
+
+    EmailVerificationContents(
+        uiState = uiState,
+        onPasswordValueChange = viewModel::onPasswordValueChange,
+        emailVerificationAction = viewModel::emailVerificationAction
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                EmailVerificationEvent.NOTHING -> {
+
+                }
+
+                is EmailVerificationEvent.ACTION -> {
+
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun EmailVerificationContents(
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    uiState: EmailVerificationState = EmailVerificationState(),
+    onPasswordValueChange: (String) -> Unit = {},
+    emailVerificationAction: (EmailVerificationAction) -> Unit = {},
+    ) {
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -80,7 +105,10 @@ fun EmailVerificationContents(
             modifier = Modifier.padding(top = 5.dp)
         )
         EmailVerificationTextField(
-            modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp)
+            modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp),
+            password = uiState.password,
+            onPasswordValueChange = onPasswordValueChange,
+            emailVerificationAction = emailVerificationAction,
         )
     }
 }
@@ -134,33 +162,33 @@ fun EmailVerificationText(
 @Composable
 fun EmailVerificationTextField(
     modifier: Modifier = Modifier,
-    onVerificationComplete: () -> Unit = {},
-) {
-    var text by remember { mutableStateOf("") }
+    password: String = "",
+    onPasswordValueChange: (String) -> Unit = {},
+    emailVerificationAction: (EmailVerificationAction) -> Unit = {},
+    ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     Column(modifier = modifier) {
         BasicTextField(
-            value = text,
+            value = password,
             singleLine = true,
             onValueChange = { newText ->
-                if (newText.length <= 6)
-                    text = newText
-
-                if (newText.length == 6)
+                onPasswordValueChange(newText)
+                if (newText.length == 6) {
                     focusManager.clearFocus()
-
+                    emailVerificationAction(EmailVerificationAction.SUBMIT)
+                }
             },
             decorationBox = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    text.forEachIndexed { _, char ->
+                    password.forEachIndexed { _, char ->
                         EmailVerificationTextFieldContainer(
                             modifier = Modifier.weight(1f),
                             text = char,
                         )
                     }
-                    repeat(6 - text.length) {
+                    repeat(6 - password.length) {
                         EmailVerificationTextFieldContainer(
                             modifier = Modifier.weight(1f),
                             text = ' ',
@@ -181,12 +209,6 @@ fun EmailVerificationTextField(
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-    }
-
-    LaunchedEffect(text) {
-        if (text.length == 6) {
-            onVerificationComplete()
-        }
     }
 }
 
