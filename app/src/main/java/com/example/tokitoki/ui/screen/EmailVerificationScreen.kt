@@ -52,6 +52,7 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 
 @Composable
 fun EmailVerificationScreen(
+    onRegisterName: () -> Unit = {},
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -70,7 +71,19 @@ fun EmailVerificationScreen(
                 }
 
                 is EmailVerificationEvent.ACTION -> {
+                    when (uiEvent.action) {
+                        EmailVerificationAction.NOTHING -> {
 
+                        }
+
+                        EmailVerificationAction.SUBMIT -> {
+                            viewModel.validateCode(uiState.code)
+                        }
+
+                        EmailVerificationAction.SUCCESS -> {
+                            onRegisterName()
+                        }
+                    }
                 }
             }
         }
@@ -83,7 +96,7 @@ fun EmailVerificationContents(
     uiState: EmailVerificationState = EmailVerificationState(),
     onPasswordValueChange: (String) -> Unit = {},
     emailVerificationAction: (EmailVerificationAction) -> Unit = {},
-    ) {
+) {
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -106,7 +119,7 @@ fun EmailVerificationContents(
         )
         EmailVerificationTextField(
             modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp),
-            password = uiState.password,
+            password = uiState.code,
             onPasswordValueChange = onPasswordValueChange,
             emailVerificationAction = emailVerificationAction,
         )
@@ -165,7 +178,7 @@ fun EmailVerificationTextField(
     password: String = "",
     onPasswordValueChange: (String) -> Unit = {},
     emailVerificationAction: (EmailVerificationAction) -> Unit = {},
-    ) {
+) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 

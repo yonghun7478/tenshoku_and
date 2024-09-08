@@ -4,6 +4,7 @@ class EmailVerificationConstants {
 }
 
 sealed class EmailVerificationAction {
-    data object Nothing : EmailVerificationAction()
+    data object NOTHING : EmailVerificationAction()
     data object SUBMIT : EmailVerificationAction()
+    data object SUCCESS : EmailVerificationAction()
 }

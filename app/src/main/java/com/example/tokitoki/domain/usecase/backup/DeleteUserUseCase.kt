@@ -1,0 +1,10 @@
+package com.example.tokitoki.domain.usecase.backup
+
+import com.example.tokitoki.domain.repository.UserRepository
+import javax.inject.Inject
+
+class DeleteUserUseCase @Inject constructor(
+    private val userRepository: UserRepository
+) {
+    suspend operator fun invoke(id: Int) = userRepository.deleteUserFromDb(id)
+}
