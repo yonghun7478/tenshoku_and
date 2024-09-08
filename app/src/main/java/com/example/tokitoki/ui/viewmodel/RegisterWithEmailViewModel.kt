@@ -29,33 +29,9 @@ class RegisterWithEmailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun validateEmail(email: String): Boolean {
-        // 이메일 형식을 검증하는 정규 표현식
-        val emailPattern = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
-
-        // 입력된 이메일 문자열이 정규 표현식과 일치하는지 확인
-        return emailPattern.matches(email)
-    }
-
     fun onEmailChanged(email: String) {
         _uiState.update {
             it.copy(email = email)
-        }
-    }
-
-    fun submit(email: String) {
-        viewModelScope.launch {
-            val isValidEmail = validateEmail(email)
-
-            if (isValidEmail) {
-                _uiState.update {
-                    it.copy(showDialog = false)
-                }
-            } else {
-                _uiState.update {
-                    it.copy(showDialog = true)
-                }
-            }
         }
     }
 
@@ -63,5 +39,23 @@ class RegisterWithEmailViewModel @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(showDialog = false)
         }
+    }
+
+    fun validateEmail(email: String): Boolean {
+        // 이메일 형식을 검증하는 정규 표현식
+        val emailPattern = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+
+        // 입력된 이메일 문자열이 정규 표현식과 일치하는지 확인
+        return emailPattern.matches(email)
+    }
+
+    fun showDialog(result: Boolean) {
+        _uiState.update {
+            it.copy(showDialog = result)
+        }
+    }
+
+    fun initState() {
+        _uiState.value = RegisterWithEmailState()
     }
 }

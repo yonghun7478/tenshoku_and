@@ -57,6 +57,7 @@ import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 
 @Composable
 fun RegisterWithEmailScreen(
+    registerWithEmailOnClick: () -> Unit = {},
     viewModel: RegisterWithEmailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -77,7 +78,13 @@ fun RegisterWithEmailScreen(
                 is RegisterWithEmailEvent.ACTION -> {
                     when (uiEvent.action) {
                         RegisterWithEmailAction.Submit -> {
-                            viewModel.submit(uiState.email)
+                            val result = viewModel.validateEmail(uiState.email)
+
+                            if (result) {
+                                viewModel.initState()
+                                registerWithEmailOnClick()
+                            } else
+                                viewModel.showDialog(true)
                         }
 
                         else -> {}
@@ -230,7 +237,10 @@ fun RegisterWithEmailSubmitBtn(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Text(text = stringResource(id = R.string.register_btn_title))
+            Text(
+                color = LocalColor.current.white,
+                text = stringResource(id = R.string.register_btn_title)
+            )
         }
     }
 }
