@@ -39,7 +39,7 @@ fun TokitokiNavGraph(
         }
         composable(TokitokiDestinations.REGISTER_WITH_EMAIL_ROUTE) {
             RegisterWithEmailScreen(
-                registerWithEmailOnClick = {
+                onEmailVerification = {
                     navAction.navigateToEmailVerification()
                 }
             )
