@@ -15,4 +15,6 @@
     <string name="verification_text">認証コードを\n入力してください。</string>
     <string name="verification_advice1">届いたメールに記載されている６桁の数字を入力してください。</string>
     <string name="verification_advice2">メールが届かない。</string>
+    <string name="about_me_title">まず、あなたのことを\n教えてください。</string>
+    <string name="about_me_next">次へ</string>
 </resources>
