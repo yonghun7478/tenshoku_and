@@ -6,6 +6,7 @@ import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
     private val validateAuthCodeUseCase: ValidateAuthCodeUseCase,
 ) : ViewModel() {
