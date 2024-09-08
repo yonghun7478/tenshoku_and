@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:945331839593:android:ef11b2858c520d005e78f8",
+        "mobilesdk_app_id": "1:945331839593:android:b97dd2c354e686a95e78f8",
         "android_client_info": {
-          "package_name": "com.example.tenshoku_and.dev"
+          "package_name": "com.example.tenshoku_and"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:945331839593:android:de8fa02108ef281a5e78f8",
+        "mobilesdk_app_id": "1:945331839593:android:ef11b2858c520d005e78f8",
         "android_client_info": {
-          "package_name": "com.example.tokitoki.dev"
+          "package_name": "com.example.tenshoku_and.dev"
         }
       },
       "oauth_client": [],
