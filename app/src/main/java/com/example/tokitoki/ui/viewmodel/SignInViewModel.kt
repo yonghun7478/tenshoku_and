@@ -15,7 +15,7 @@ class SignInViewModel @Inject constructor() : ViewModel() {
     private val _uiEvent = MutableSharedFlow<SignInEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun clickListener(action: SignInAction) {
+    fun signInAction(action: SignInAction) {
         viewModelScope.launch {
             _uiEvent.emit(SignInEvent.ACTION(action))
         }

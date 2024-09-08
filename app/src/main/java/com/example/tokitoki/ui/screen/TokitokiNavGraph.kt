@@ -32,7 +32,7 @@ fun TokitokiNavGraph(
     ) {
         composable(TokitokiDestinations.SIGN_IN_ROUTE) {
             SignInScreen(
-                registerWithEmailClick = {
+                onRegisterWithEmail = {
                     navAction.navigateToRegisterWithEmail()
                 }
             )

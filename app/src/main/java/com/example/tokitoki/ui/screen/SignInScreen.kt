@@ -45,14 +45,12 @@ import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
-    registerWithEmailClick: () -> Unit = {},
+    onRegisterWithEmail: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-//    val uiEvent by viewModel.uiEvent.collectAsState(initial = SignInEvent.NOTHING)
-
     SignInContent(
-        onClick = {
-            viewModel.clickListener(it)
+        signInAction = {
+            viewModel.signInAction(it)
         }
     )
 
@@ -65,7 +63,7 @@ fun SignInScreen(
                 is SignInEvent.ACTION -> {
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
-                            registerWithEmailClick()
+                            onRegisterWithEmail()
                         }
 
                         else -> {}
@@ -80,7 +78,7 @@ fun SignInScreen(
 @Composable
 fun SignInContent(
     modifier: Modifier = Modifier,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -97,10 +95,10 @@ fun SignInContent(
         SignInMenu(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
-            onClick = onClick
+            signInAction = signInAction
         )
-        SignInSupportLink(modifier = Modifier.padding(top = 24.dp), onClick = onClick)
-        SignInSubLinks(modifier = Modifier.padding(vertical = 12.dp), onClick = onClick)
+        SignInSupportLink(modifier = Modifier.padding(top = 24.dp), signInAction = signInAction)
+        SignInSubLinks(modifier = Modifier.padding(vertical = 12.dp), signInAction = signInAction)
     }
 }
 
@@ -134,7 +132,7 @@ fun TopLogo(
 @Composable
 fun SignInMenu(
     modifier: Modifier = Modifier,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -146,8 +144,7 @@ fun SignInMenu(
             textColor = LocalColor.current.black,
             backgroundColor = LocalColor.current.white,
             iconRes = R.drawable.ic_google,
-            signInAction = SignInAction.LoginWithGoogle,
-            onClick = onClick
+            signInAction = signInAction
         )
 
         SignMenuBtn(
@@ -157,8 +154,7 @@ fun SignInMenu(
             textColor = LocalColor.current.white,
             iconRes = R.drawable.ic_mail,
             backgroundColor = LocalColor.current.blue,
-            signInAction = SignInAction.LoginWithEmail,
-            onClick = onClick
+            signInAction = signInAction
         )
     }
 }
@@ -170,14 +166,13 @@ fun SignMenuOutlinedBtn(
     textColor: Color = LocalColor.current.black,
     backgroundColor: Color = LocalColor.current.white,
     iconRes: Int = -1,
-    signInAction: SignInAction = SignInAction.Nothing,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     OutlinedButton(
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         onClick = {
-            onClick(signInAction)
+            signInAction(SignInAction.LoginWithGoogle)
         },
     ) {
         Row(
@@ -204,14 +199,13 @@ fun SignMenuBtn(
     textColor: Color = LocalColor.current.black,
     backgroundColor: Color = LocalColor.current.white,
     iconRes: Int = -1,
-    signInAction: SignInAction = SignInAction.Nothing,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     Button(
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         onClick = {
-            onClick(signInAction)
+            signInAction(SignInAction.LoginWithEmail)
         },
     ) {
         Row(
@@ -234,7 +228,7 @@ fun SignMenuBtn(
 @Composable
 fun SignInSupportLink(
     modifier: Modifier = Modifier,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     Text(
         modifier = modifier
@@ -242,7 +236,7 @@ fun SignInSupportLink(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) {
-                onClick(SignInAction.Help)
+                signInAction(SignInAction.Help)
             },
         text = stringResource(id = R.string.sign_in_new_member_help_title),
         color = LocalColor.current.blue,
@@ -254,7 +248,7 @@ fun SignInSupportLink(
 @Composable
 fun SignInSubLinks(
     modifier: Modifier = Modifier,
-    onClick: (SignInAction) -> Unit = {},
+    signInAction: (SignInAction) -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -268,7 +262,7 @@ fun SignInSubLinks(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    onClick(SignInAction.Service)
+                    signInAction(SignInAction.Service)
                 },
             text = stringResource(id = R.string.terms_of_service),
             fontSize = 10.sp,
@@ -281,7 +275,7 @@ fun SignInSubLinks(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    onClick(SignInAction.Privacy)
+                    signInAction(SignInAction.Privacy)
                 },
             text = stringResource(id = R.string.privacy_policy),
             fontSize = 10.sp,
@@ -294,7 +288,7 @@ fun SignInSubLinks(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    onClick(SignInAction.Cookie)
+                    signInAction(SignInAction.Cookie)
                 },
             text = stringResource(id = R.string.cookie_policy),
             fontSize = 10.sp,
@@ -336,7 +330,6 @@ fun SignMenuOutlinedBtnPreView() {
             textColor = LocalColor.current.black,
             backgroundColor = LocalColor.current.white,
             iconRes = R.drawable.ic_google,
-            signInAction = SignInAction.LoginWithGoogle,
         )
     }
 }
