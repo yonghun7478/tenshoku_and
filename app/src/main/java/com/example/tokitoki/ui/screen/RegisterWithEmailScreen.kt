@@ -57,19 +57,21 @@ import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 
 @Composable
 fun RegisterWithEmailScreen(
-    registerWithEmailOnClick: () -> Unit = {},
+    onEmailVerification: () -> Unit = {},
     viewModel: RegisterWithEmailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     RegisterWithEmailContents(
         uiState = uiState,
-        onClick = viewModel::clickListener,
+        registerWithEmailAction = viewModel::registerWithEmailAction,
         onEmailChanged = viewModel::onEmailChanged,
-        onDismiss = viewModel::onDismiss,
+        updateShowDialogState = viewModel::updateShowDialogState,
     )
 
     LaunchedEffect(Unit) {
+        viewModel.initState()
+
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 RegisterWithEmailEvent.NOTHING -> {
@@ -81,10 +83,9 @@ fun RegisterWithEmailScreen(
                             val result = viewModel.validateEmail(uiState.email)
 
                             if (result) {
-                                viewModel.initState()
-                                registerWithEmailOnClick()
+                                onEmailVerification()
                             } else
-                                viewModel.showDialog(true)
+                                viewModel.updateShowDialogState(true)
                         }
 
                         else -> {}
@@ -100,9 +101,9 @@ fun RegisterWithEmailScreen(
 fun RegisterWithEmailContents(
     modifier: Modifier = Modifier,
     uiState: RegisterWithEmailState = RegisterWithEmailState(),
-    onClick: (RegisterWithEmailAction) -> Unit = {},
+    registerWithEmailAction: (RegisterWithEmailAction) -> Unit = {},
     onEmailChanged: (String) -> Unit = {},
-    onDismiss: () -> Unit = {},
+    updateShowDialogState: (Boolean) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -143,7 +144,7 @@ fun RegisterWithEmailContents(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp),
-            onClick = onClick
+            registerWithEmailAction = registerWithEmailAction
         )
     }
 
@@ -152,7 +153,7 @@ fun RegisterWithEmailContents(
 
         RegisterWithEmailErrorDialog(
             message = errorMsg,
-            onDismiss = onDismiss
+            updateShowDialogState = updateShowDialogState
         )
     }
 }
@@ -221,7 +222,7 @@ fun RegisterWithEmailTextField(
 @Composable
 fun RegisterWithEmailSubmitBtn(
     modifier: Modifier = Modifier,
-    onClick: (RegisterWithEmailAction) -> Unit = {},
+    registerWithEmailAction: (RegisterWithEmailAction) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -230,7 +231,7 @@ fun RegisterWithEmailSubmitBtn(
         colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
         onClick = {
             focusManager.clearFocus()
-            onClick(RegisterWithEmailAction.Submit)
+            registerWithEmailAction(RegisterWithEmailAction.Submit)
         },
     ) {
         Row(
@@ -248,17 +249,17 @@ fun RegisterWithEmailSubmitBtn(
 @Composable
 fun RegisterWithEmailErrorDialog(
     message: String = "",
-    onDismiss: () -> Unit = {}
+    updateShowDialogState: (Boolean) -> Unit = {}
 ) {
     AlertDialog(
         modifier = Modifier
             .testTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG),
-        onDismissRequest = onDismiss,
+        onDismissRequest = { updateShowDialogState(false) },
         text = { Text(message) },
         confirmButton = {
             TextButton(
                 colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                onClick = onDismiss
+                onClick = { updateShowDialogState(false) }
             ) {
                 Text(
                     color = LocalColor.current.white,
