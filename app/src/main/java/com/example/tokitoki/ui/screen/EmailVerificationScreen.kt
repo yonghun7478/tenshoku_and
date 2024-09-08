@@ -52,7 +52,7 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 
 @Composable
 fun EmailVerificationScreen(
-    onRegisterName: () -> Unit = {},
+    onAboutMeScreen: () -> Unit = {},
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,7 +81,7 @@ fun EmailVerificationScreen(
                         }
 
                         EmailVerificationAction.SUCCESS -> {
-                            onRegisterName()
+                            onAboutMeScreen()
                         }
                     }
                 }

@@ -46,7 +46,14 @@ fun TokitokiNavGraph(
         }
         composable(TokitokiDestinations.EMAIL_VERIFICATION_ROUTE) {
             EmailVerificationScreen(
-                onRegisterName = {
+                onAboutMeScreen = {
+                    navAction.navigateToAboutMe()
+                }
+            )
+        }
+        composable(TokitokiDestinations.ABOUT_ME_ROUTE) {
+            AboutMeScreen(
+                onAboutMeNameScreen = {
                     // navAction code ...
                 }
             )
