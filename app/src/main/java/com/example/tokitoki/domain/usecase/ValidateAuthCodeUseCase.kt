@@ -4,6 +4,6 @@ import javax.inject.Inject
 
 class ValidateAuthCodeUseCase @Inject constructor() {
     suspend operator fun invoke(code: String): Boolean {
-        return true
+        return code == "123456"
     }
 }

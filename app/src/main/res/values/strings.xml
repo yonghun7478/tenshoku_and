@@ -12,6 +12,7 @@
     <string name="register_textfield_pressholder">tokitoki@example.com</string>
     <string name="register_error_dialog_ok">確認</string>
     <string name="validate_error_msg">正しくないフォマードです。メールを再入力してください。</string>
+    <string name="validate_email_code_error_msg">認証番号を再入力してください。</string>
     <string name="verification_text">認証コードを\n入力してください。</string>
     <string name="verification_advice1">届いたメールに記載されている６桁の数字を入力してください。</string>
     <string name="verification_advice2">メールが届かない。</string>
