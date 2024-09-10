@@ -80,7 +80,7 @@ class SignInScreenTest {
                     textColor = LocalColor.current.white,
                     iconRes = R.drawable.ic_mail,
                     backgroundColor = LocalColor.current.blue,
-                    signInAction = SignInAction.LoginWithEmail,
+//                    signInAction = SignInAction.LoginWithEmail,
                 )
             }
         }
@@ -108,7 +108,7 @@ class SignInScreenTest {
                     textColor = LocalColor.current.black,
                     backgroundColor = LocalColor.current.white,
                     iconRes = R.drawable.ic_google,
-                    signInAction = SignInAction.LoginWithGoogle,
+//                    signInAction = SignInAction.LoginWithGoogle,
                 )
             }
         }

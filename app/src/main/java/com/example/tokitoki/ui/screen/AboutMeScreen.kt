@@ -19,12 +19,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.AboutMeAction
+import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.state.AboutMeEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMeViewModel
@@ -41,14 +46,39 @@ fun AboutMeScreen(
     viewModel: AboutMeViewModel = hiltViewModel(),
     onAboutMeNameScreen: () -> Unit = {},
 ) {
-    AboutMeContents()
+    AboutMeContents(
+        aboutMeAction = viewModel::aboutMeAction
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                is AboutMeEvent.NOTHING -> {
+
+                }
+                is AboutMeEvent.ACTION -> {
+                    when (uiEvent.action) {
+                        AboutMeAction.SUBMIT -> {
+                            onAboutMeNameScreen()
+                        }
+
+                        AboutMeAction.NOTHING -> {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun AboutMeContents(
+    aboutMeAction: (AboutMeAction) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
+            .testTag(TestTags.ABOUT_ME_CONTENTS)
     ) {
         StepIcon(
             modifier = Modifier.padding(top = 60.dp, start = 20.dp),
@@ -65,12 +95,18 @@ fun AboutMeContents(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        AboutMeBottomLayout()
+        AboutMeBottomLayout(
+            aboutMeAction = aboutMeAction
+        )
     }
 }
 
 @Composable
-fun StepIcon(modifier: Modifier = Modifier, stepPos: Int, maxStep: Int) {
+fun StepIcon(
+    modifier: Modifier = Modifier,
+    stepPos: Int,
+    maxStep: Int
+) {
 
     val list = remember(maxStep + 1) { MutableList(maxStep + 1) { false } }
     list[stepPos] = true
@@ -123,14 +159,17 @@ fun StepIcon(modifier: Modifier = Modifier, stepPos: Int, maxStep: Int) {
 }
 
 @Composable
-fun AboutMeBottomLayout() {
+fun AboutMeBottomLayout(
+    modifier: Modifier = Modifier,
+    aboutMeAction: (AboutMeAction) -> Unit = {}
+) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val canvasColor = LocalColor.current.blue
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(screenHeight / 4)
     ) {
@@ -149,7 +188,9 @@ fun AboutMeBottomLayout() {
                 .padding(horizontal = 20.dp, vertical = 20.dp)
                 .align(Alignment.BottomCenter),
             colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
-            onClick = { }
+            onClick = {
+                aboutMeAction(AboutMeAction.SUBMIT)
+            }
         ) {
             Text(
                 text = stringResource(R.string.about_me_next),
