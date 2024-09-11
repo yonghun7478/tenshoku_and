@@ -18,4 +18,10 @@
     <string name="verification_advice2">メールが届かない。</string>
     <string name="about_me_title">まず、あなたのことを\n教えてください。</string>
     <string name="about_me_next">次へ</string>
+    <string name="agreement_confirmation_18">私は１８歳以上です。</string>
+    <string name="agreement_confirmation_policy">私はTokiTokiのポリシーに同意します。</string>
+    <string name="agreement_confirmation_policy_link">利用契約・プライバシーポリシーへの同意が必要です。</string>
+    <string name="agreement_confirmation_submit">内容に同意して次へすすむ</string>
+    <string name="validate_agreement_error_msg">利用契約・プライバシーポリシーへのチェックボックスを確認してください。</string>
+
 </resources>

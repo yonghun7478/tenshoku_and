@@ -43,4 +43,17 @@ class AgreementConfirmationViewModel @Inject constructor(
             _uiEvent.emit(AgreementConfirmationEvent.ACTION(action))
         }
     }
+
+    fun validateAgreement(): Boolean {
+        return _uiState.value.isAgeConfirmed && _uiState.value.isPolicyConfirmed
+    }
+
+    fun updateShowDialogState(showDialog: Boolean) {
+        _uiState.update {
+            if(showDialog)
+                it.copy(showDialog = true)
+            else
+                it.copy(showDialog = false)
+        }
+    }
 }
