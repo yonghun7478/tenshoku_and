@@ -55,7 +55,7 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 
 @Composable
 fun EmailVerificationScreen(
-    onAboutMeScreen: () -> Unit = {},
+    onAgreementConfirmationScreen: () -> Unit = {},
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -86,7 +86,7 @@ fun EmailVerificationScreen(
                             var result = viewModel.validateCode(uiState.code)
 
                             if (result)
-                                onAboutMeScreen()
+                                onAgreementConfirmationScreen()
                             else {
                                 viewModel.updateShowDialogState(true)
                             }
