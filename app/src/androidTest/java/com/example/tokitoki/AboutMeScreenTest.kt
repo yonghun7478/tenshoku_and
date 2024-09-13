@@ -17,7 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class EmailVerificationScreenTest {
+class AboutMeScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -39,40 +39,17 @@ class EmailVerificationScreenTest {
     }
 
     @Test
-    fun emailVerificationIsDisplayed() {
+    fun aboutMeScreenIsDisplayed() {
         composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
         composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
 
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
-    }
-
-    @Test
-    fun emailVerificationTextFieldIsDisplayed() {
-        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
-        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
-
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
+
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_CONTENTS).assertIsDisplayed()
-    }
-
-    @Test
-    fun emailVerificationDialogIsDisplayed() {
-        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
-        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
-
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("111111")
-        composeTestRule.onNodeWithText(activity.getString(R.string.validate_email_code_error_msg)).assertIsDisplayed()
     }
 }

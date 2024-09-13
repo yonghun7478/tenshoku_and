@@ -15,9 +15,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,7 +55,7 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 
 @Composable
 fun EmailVerificationScreen(
-    onRegisterName: () -> Unit = {},
+    onAgreementConfirmationScreen: () -> Unit = {},
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -60,10 +63,13 @@ fun EmailVerificationScreen(
     EmailVerificationContents(
         uiState = uiState,
         onPasswordValueChange = viewModel::onPasswordValueChange,
-        emailVerificationAction = viewModel::emailVerificationAction
+        emailVerificationAction = viewModel::emailVerificationAction,
+        updateShowDialogState = viewModel::updateShowDialogState,
     )
 
     LaunchedEffect(Unit) {
+        viewModel.initState()
+
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 EmailVerificationEvent.NOTHING -> {
@@ -77,11 +83,13 @@ fun EmailVerificationScreen(
                         }
 
                         EmailVerificationAction.SUBMIT -> {
-                            viewModel.validateCode(uiState.code)
-                        }
+                            var result = viewModel.validateCode(uiState.code)
 
-                        EmailVerificationAction.SUCCESS -> {
-                            onRegisterName()
+                            if (result)
+                                onAgreementConfirmationScreen()
+                            else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
@@ -96,6 +104,7 @@ fun EmailVerificationContents(
     uiState: EmailVerificationState = EmailVerificationState(),
     onPasswordValueChange: (String) -> Unit = {},
     emailVerificationAction: (EmailVerificationAction) -> Unit = {},
+    updateShowDialogState: (Boolean) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -108,7 +117,7 @@ fun EmailVerificationContents(
                         focusManager.clearFocus()
                     }
                 )
-            },
+            }.testTag(TestTags.EMAIL_VERIFICATION_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         EmailVerificationEmailIcon(
@@ -122,6 +131,15 @@ fun EmailVerificationContents(
             password = uiState.code,
             onPasswordValueChange = onPasswordValueChange,
             emailVerificationAction = emailVerificationAction,
+        )
+    }
+
+    if (uiState.showDialog) {
+        val errorMsg = stringResource(R.string.validate_email_code_error_msg)
+
+        EmailVerificationErrorDialog(
+            message = errorMsg,
+            updateShowDialogState = updateShowDialogState
         )
     }
 }
@@ -268,6 +286,31 @@ private fun EmailVerificationTextFieldContainer(
             )
         }
     }
+}
+
+@Composable
+fun EmailVerificationErrorDialog(
+    message: String = "",
+    updateShowDialogState: (Boolean) -> Unit = {}
+) {
+    AlertDialog(
+        modifier = Modifier
+            .testTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG),
+        onDismissRequest = { updateShowDialogState(false) },
+        text = { Text(message) },
+        confirmButton = {
+            TextButton(
+                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
+                onClick = { updateShowDialogState(false) }
+            ) {
+                Text(
+                    color = LocalColor.current.white,
+                    text = stringResource(id = R.string.register_error_dialog_ok)
+                )
+            }
+        },
+        containerColor = LocalColor.current.white,
+    )
 }
 
 @Preview(showBackground = true)

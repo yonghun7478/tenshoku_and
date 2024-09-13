@@ -12,7 +12,16 @@
     <string name="register_textfield_pressholder">tokitoki@example.com</string>
     <string name="register_error_dialog_ok">確認</string>
     <string name="validate_error_msg">正しくないフォマードです。メールを再入力してください。</string>
+    <string name="validate_email_code_error_msg">認証番号を再入力してください。</string>
     <string name="verification_text">認証コードを\n入力してください。</string>
     <string name="verification_advice1">届いたメールに記載されている６桁の数字を入力してください。</string>
     <string name="verification_advice2">メールが届かない。</string>
+    <string name="about_me_title">まず、あなたのことを\n教えてください。</string>
+    <string name="about_me_next">次へ</string>
+    <string name="agreement_confirmation_18">私は１８歳以上です。</string>
+    <string name="agreement_confirmation_policy">私はTokiTokiのポリシーに同意します。</string>
+    <string name="agreement_confirmation_policy_link">利用契約・プライバシーポリシーへの同意が必要です。</string>
+    <string name="agreement_confirmation_submit">内容に同意して次へすすむ</string>
+    <string name="validate_agreement_error_msg">利用契約・プライバシーポリシーへのチェックボックスを確認してください。</string>
+
 </resources>

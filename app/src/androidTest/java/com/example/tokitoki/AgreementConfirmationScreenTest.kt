@@ -17,7 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class EmailVerificationScreenTest {
+class AgreementConfirmationScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -39,18 +39,7 @@ class EmailVerificationScreenTest {
     }
 
     @Test
-    fun emailVerificationIsDisplayed() {
-        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
-        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
-
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
-    }
-
-    @Test
-    fun emailVerificationTextFieldIsDisplayed() {
+    fun agreementConfirmationIsDisplayed() {
         composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
@@ -60,19 +49,42 @@ class EmailVerificationScreenTest {
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_CONTENTS).assertIsDisplayed()
     }
 
     @Test
-    fun emailVerificationDialogIsDisplayed() {
+    fun agreementConfirmationDialogIsDisplayed() {
         composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
         composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
 
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("111111")
-        composeTestRule.onNodeWithText(activity.getString(R.string.validate_email_code_error_msg)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_CONTENTS).assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(activity.getString(R.string.agreement_confirmation_submit)).performClick()
+        composeTestRule.onNodeWithText(activity.getString(R.string.validate_agreement_error_msg)).assertIsDisplayed()
+    }
+
+    @Test
+    fun agreementConfirmationButtonIsEnable() {
+        composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
+        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
+
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_AGE_CHECKBOX).performClick()
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_POLICY_CHECKBOX).performClick()
+        composeTestRule.onNodeWithText(activity.getString(R.string.agreement_confirmation_submit)).performClick()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_CONTENTS).assertIsDisplayed()
     }
 }

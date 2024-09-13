@@ -49,15 +49,10 @@ class RegisterWithEmailScreenTest {
         composeTestRule.onNodeWithText(activity.getString(R.string.mail_btn_text)).performClick()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun@gmail.com")
-        composeTestRule.onNodeWithText("yonghun@gmail.com").assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
-
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextClearance()
         composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_TEXT_FIELD).performTextInput("yonghun")
         composeTestRule.onNodeWithText("yonghun").assertIsDisplayed()
-
         composeTestRule.onNodeWithText(activity.getString(R.string.register_btn_title)).performClick()
-        composeTestRule.onNodeWithTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG).assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(activity.getString(R.string.validate_error_msg)).assertIsDisplayed()
     }
 }

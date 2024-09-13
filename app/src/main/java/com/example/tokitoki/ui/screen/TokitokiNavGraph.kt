@@ -46,7 +46,22 @@ fun TokitokiNavGraph(
         }
         composable(TokitokiDestinations.EMAIL_VERIFICATION_ROUTE) {
             EmailVerificationScreen(
-                onRegisterName = {
+                onAgreementConfirmationScreen = {
+                    navAction.navigateToAgreementConfirmation()
+                }
+            )
+        }
+        composable(TokitokiDestinations.AGREEMENT_CONFIRMATION_ROUTE) {
+            AgreementConfirmationScreen(
+                onAboutMeScreen = {
+                    // navAction code ...
+                    navAction.navigateToAboutMe()
+                }
+            )
+        }
+        composable(TokitokiDestinations.ABOUT_ME_ROUTE) {
+            AboutMeScreen(
+                onAboutMeNameScreen = {
                     // navAction code ...
                 }
             )
