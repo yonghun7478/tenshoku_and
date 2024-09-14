@@ -66,5 +66,12 @@ fun TokitokiNavGraph(
                 }
             )
         }
+        composable(TokitokiDestinations.ABOUT_ME_GENDER_ROUTE) {
+            AboutMeGenderScreen(
+                onAboutMeBirthDayScreen = {
+                    // navAction code ...
+                }
+            )
+        }
     }
 }
