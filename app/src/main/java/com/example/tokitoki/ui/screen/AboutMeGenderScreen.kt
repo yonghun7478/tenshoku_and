@@ -60,7 +60,7 @@ fun AboutMeGenderScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    AboutMeGenderContent(
+    AboutMeGenderContents(
         uiState = uiState,
         aboutMeGenderAction = viewModel::aboutMeGenderAction,
     )
@@ -112,7 +112,7 @@ fun AboutMeGenderScreen(
 }
 
 @Composable
-fun AboutMeGenderContent(
+fun AboutMeGenderContents(
     uiState: AboutMeGenderState = AboutMeGenderState(),
     aboutMeGenderAction: (AboutMeGenderAction) -> Unit = {}
 ) {
@@ -363,7 +363,7 @@ fun AboutMeGenderErrorDialog(
 fun AboutMeGenderContentPreview() {
     TokitokiTheme {
         val uiState = AboutMeGenderState(selectedGender = Gender.FEMALE)
-        AboutMeGenderContent(uiState = uiState)
+        AboutMeGenderContents(uiState = uiState)
     }
 }
 
