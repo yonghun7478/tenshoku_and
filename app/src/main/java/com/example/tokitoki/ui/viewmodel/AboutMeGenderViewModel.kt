@@ -26,6 +26,10 @@ class AboutMeGenderViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeGenderEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
+    fun init() {
+        _uiState.value = AboutMeGenderState()
+    }
+
     fun onGenderSelected(gender: Gender) {
         _uiState.update { it.copy(selectedGender = gender) }
     }
@@ -33,6 +37,17 @@ class AboutMeGenderViewModel @Inject constructor(
     fun aboutMeGenderAction(action: AboutMeGenderAction) {
         viewModelScope.launch {
             _uiEvent.emit(AboutMeGenderEvent.ACTION(action))
+        }
+    }
+
+    fun checkGender() = _uiState.value.selectedGender != Gender.NONE
+
+    fun updateShowDialogState(showDialog: Boolean) {
+        _uiState.update {
+            if(showDialog)
+                it.copy(showDialog = true)
+            else
+                it.copy(showDialog = false)
         }
     }
 }

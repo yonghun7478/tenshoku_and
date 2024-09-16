@@ -10,4 +10,6 @@ sealed class AboutMeGenderAction {
     data object FEMALE_CLICK : AboutMeGenderAction()
     data object NEXT : AboutMeGenderAction()
     data object PREVIOUS : AboutMeGenderAction()
+    data object DIALOG_DISMISS : AboutMeGenderAction()
+    data object DIALOG_OK : AboutMeGenderAction()
 }

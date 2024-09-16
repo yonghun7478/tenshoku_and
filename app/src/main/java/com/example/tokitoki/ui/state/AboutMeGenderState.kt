@@ -1,9 +1,10 @@
 package com.example.tokitoki.ui.state
 
 data class AboutMeGenderState(
-    val selectedGender: Gender? = null
+    val selectedGender: Gender = Gender.NONE,
+    val showDialog: Boolean = false,
 )
 
 enum class Gender {
-    MALE, FEMALE
+    NONE, MALE, FEMALE
 }
