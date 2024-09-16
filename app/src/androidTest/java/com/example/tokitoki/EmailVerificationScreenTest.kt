@@ -60,7 +60,7 @@ class EmailVerificationScreenTest {
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.EMAIL_VERIFICATION_TEXT_FIELD).performTextInput("123456")
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.AGREEMENT_CONFIRMATION_CONTENTS).assertIsDisplayed()
     }
 
     @Test

@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.constants.AboutMeGenderConstants
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.state.AboutMeGenderEvent
 import com.example.tokitoki.ui.state.AboutMeGenderState
 import com.example.tokitoki.ui.state.Gender
@@ -117,7 +119,9 @@ fun AboutMeGenderContents(
     aboutMeGenderAction: (AboutMeGenderAction) -> Unit = {}
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(TestTags.ABOUT_ME_GENDER_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AboutMeGenderIndicator(
@@ -321,7 +325,8 @@ fun AboutMeGenderNavigationBtn(
                 elevation = 10.dp,
                 shape = CircleShape
             )
-            .size(50.dp),
+            .size(50.dp)
+            .testTag(if (isNext) TestTags.ABOUT_ME_GENDER_NEXT_BTN else TestTags.ABOUT_ME_GENDER_PREVIOUS_BTN),
         colors = ButtonDefaults.buttonColors(containerColor = if (isNext) LocalColor.current.blue else LocalColor.current.lightGray),
         contentPadding = PaddingValues(0.dp)
     ) {
