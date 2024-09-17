@@ -27,6 +27,7 @@
     <string name="about_me_gender_male">男性</string>
     <string name="about_me_gender_female">女性</string>
     <string name="about_me_validate_gender">性別を選択してください。</string>
+    <string name="about_me_validate_birthday">生年月日を選択してください。</string>
 
 
 </resources>

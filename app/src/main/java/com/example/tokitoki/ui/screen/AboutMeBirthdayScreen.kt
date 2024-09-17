@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
+import com.example.tokitoki.ui.state.AboutMeBirthdayEvent
 import com.example.tokitoki.ui.state.AboutMeBirthdayState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
@@ -27,8 +28,44 @@ fun AboutMeBirthdayScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    AboutMeBirthdayContents(
+        uiState = uiState,
+        aboutMeBirthdayAction = viewModel::aboutMeBirthdayAction
+    )
+
     LaunchedEffect(Unit) {
         viewModel.init()
+
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is AboutMeBirthdayEvent.ACTION -> {
+                    when (event.action) {
+                        AboutMeBirthdayAction.DIALOG_DISMISS -> {
+                            viewModel.updateShowDialogState(false)
+                        }
+                        AboutMeBirthdayAction.DIALOG_OK -> {
+                            viewModel.updateShowDialogState(false)
+                        }
+                        AboutMeBirthdayAction.NEXT -> {
+                            if (viewModel.checkBirthday()) {
+                                onAboutMeNameScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
+                        }
+                        AboutMeBirthdayAction.NOTHING -> {
+
+                        }
+                        AboutMeBirthdayAction.PREVIOUS -> {
+                            onAboutMeGenderScreen()
+                        }
+                    }
+                }
+                AboutMeBirthdayEvent.NOTHING -> {
+
+                }
+            }
+        }
     }
 }
 
@@ -38,6 +75,12 @@ fun AboutMeBirthdayContents(
     aboutMeBirthdayAction: (AboutMeBirthdayAction) -> Unit = {}
 ) {
 
+    if (uiState.showDialog) {
+        AboutMeBirthdayErrorDialog(
+            message = stringResource(id = R.string.about_me_validate_birthday),
+            aboutMeBirthdayAction = aboutMeBirthdayAction
+        )
+    }
 }
 
 @Composable

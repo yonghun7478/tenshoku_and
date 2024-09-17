@@ -33,13 +33,13 @@ class AboutMeBirthdayViewModel @Inject constructor(
         _uiState.update { it.copy(birthday = birthday) }
     }
 
-    fun aboutMeGenderAction(action: AboutMeBirthdayAction) {
+    fun aboutMeBirthdayAction(action: AboutMeBirthdayAction) {
         viewModelScope.launch {
             _uiEvent.emit(AboutMeBirthdayEvent.ACTION(action))
         }
     }
 
-    fun checkGender() = _uiState.value.birthday.isNotEmpty()
+    fun checkBirthday() = _uiState.value.birthday.isNotEmpty()
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {

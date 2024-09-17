@@ -81,10 +81,9 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE) {
             AboutMeBirthdayScreen(
                 onAboutMeGenderScreen = {
-                    // navAction code ...
+                    navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
-                    navController.navigateUp()
                 }
             )
         }
