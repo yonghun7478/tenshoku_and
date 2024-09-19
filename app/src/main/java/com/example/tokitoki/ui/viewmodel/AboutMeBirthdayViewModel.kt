@@ -39,7 +39,7 @@ class AboutMeBirthdayViewModel @Inject constructor(
         }
     }
 
-    fun checkBirthday() = _uiState.value.birthday.isNotEmpty()
+    fun checkBirthday() = _uiState.value.birthday.length == 8
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {
