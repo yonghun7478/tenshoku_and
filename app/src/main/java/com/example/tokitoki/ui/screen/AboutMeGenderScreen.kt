@@ -246,7 +246,8 @@ fun AboutMeGenderSelector(
                 .background(color = if (selectedGender == Gender.MALE) LocalColor.current.blue else LocalColor.current.lightGray)
                 .clickable {
                     aboutMeGenderAction(AboutMeGenderAction.MALE_CLICK)
-                },
+                }
+                .testTag(TestTags.ABOUT_ME_GENDER_MALE),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -276,7 +277,8 @@ fun AboutMeGenderSelector(
                 .background(color = if (selectedGender == Gender.FEMALE) LocalColor.current.blue else LocalColor.current.lightGray)
                 .clickable {
                     aboutMeGenderAction(AboutMeGenderAction.FEMALE_CLICK)
-                },
+                }
+                .testTag(TestTags.ABOUT_ME_GENDER_FEMALE),
             contentAlignment = Alignment.Center
         ) {
             Column(

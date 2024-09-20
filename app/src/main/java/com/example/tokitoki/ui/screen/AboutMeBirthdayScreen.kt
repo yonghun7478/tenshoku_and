@@ -125,12 +125,13 @@ fun AboutMeBirthdayContents(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-            detectTapGestures(
-                onTap = {
-                    focusManager.clearFocus()
-                }
-            )
-        },
+                detectTapGestures(
+                    onTap = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
+            .testTag(TestTags.ABOUT_ME_BIRTHDAY_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AboutMeBirthdayIndicator(
@@ -252,19 +253,21 @@ fun AboutMeBirthdayInput(
     modifier: Modifier = Modifier,
     birthday: String = "",
     onBirthdayChanged: (String) -> Unit = {},
-    ) {
+) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     BasicTextField(
-        modifier = modifier.focusRequester(focusRequester),
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .testTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD),
         value = birthday,
         singleLine = true,
         onValueChange = { newText ->
-            if(newText.length <= 8)
+            if (newText.length <= 8)
                 onBirthdayChanged(newText)
 
-            if(newText.length == 8) {
+            if (newText.length == 8) {
                 focusManager.clearFocus()
             }
         },
@@ -345,7 +348,7 @@ fun AboutMeBirthdayNavigationBtn(
                 shape = CircleShape
             )
             .size(50.dp)
-            .testTag(if (isNext) TestTags.ABOUT_ME_GENDER_NEXT_BTN else TestTags.ABOUT_ME_GENDER_PREVIOUS_BTN),
+            .testTag(if (isNext) TestTags.ABOUT_ME_BIRTHDAY_NEXT_BTN else TestTags.ABOUT_ME_BIRTHDAY_PREVIOUS_BTN),
         colors = ButtonDefaults.buttonColors(containerColor = if (isNext) LocalColor.current.blue else LocalColor.current.lightGray),
         contentPadding = PaddingValues(0.dp)
     ) {
