@@ -43,14 +43,20 @@ fun <T> TkBtn(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Icon(
-                modifier = DrawableSemantics.withDrawableId(resId = iconRes),
-                painter = painterResource(id = iconRes),
-                tint = textColor,
-                contentDescription = "SignMenuBtnIcon"
-            )
-            Text(text = text, color = textColor, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(1.dp))
+            if(iconRes != -1) {
+                Icon(
+                    modifier = DrawableSemantics.withDrawableId(resId = iconRes),
+                    painter = painterResource(id = iconRes),
+                    tint = textColor,
+                    contentDescription = "SignMenuBtnIcon"
+                )
+                Text(text = text, color = textColor, fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(1.dp))
+            } else {
+                Spacer(modifier = Modifier.width(1.dp))
+                Text(text = text, color = textColor, fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(1.dp))
+            }
         }
     }
 }

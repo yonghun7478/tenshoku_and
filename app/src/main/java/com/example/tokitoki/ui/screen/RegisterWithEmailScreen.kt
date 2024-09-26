@@ -48,6 +48,7 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
 import com.example.tokitoki.ui.state.RegisterWithEmailState
 import com.example.tokitoki.ui.theme.LocalColor
@@ -140,11 +141,15 @@ fun RegisterWithEmailContents(
             onEmailChanged = onEmailChanged
         )
         Spacer(modifier = Modifier.height(10.dp))
-        RegisterWithEmailSubmitBtn(
+        TkBtn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp),
-            registerWithEmailAction = registerWithEmailAction
+            text = stringResource(R.string.register_btn_title),
+            textColor = LocalColor.current.white,
+            backgroundColor = LocalColor.current.blue,
+            action = registerWithEmailAction,
+            actionParam = RegisterWithEmailAction.Submit
         )
     }
 
@@ -218,34 +223,6 @@ fun RegisterWithEmailTextField(
     }
 }
 
-
-@Composable
-fun RegisterWithEmailSubmitBtn(
-    modifier: Modifier = Modifier,
-    registerWithEmailAction: (RegisterWithEmailAction) -> Unit = {},
-) {
-    val focusManager = LocalFocusManager.current
-
-    Button(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-        onClick = {
-            focusManager.clearFocus()
-            registerWithEmailAction(RegisterWithEmailAction.Submit)
-        },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                color = LocalColor.current.white,
-                text = stringResource(id = R.string.register_btn_title)
-            )
-        }
-    }
-}
-
 @Composable
 fun RegisterWithEmailErrorDialog(
     message: String = "",
@@ -292,14 +269,6 @@ fun RegisterWithEmailIconPreview() {
 fun RegisterWithEmailTextFieldPreview() {
     TokitokiTheme {
         RegisterWithEmailTextField()
-    }
-}
-
-@Preview
-@Composable
-fun RegisterWithEmailSubmitBtnPreview() {
-    TokitokiTheme {
-        RegisterWithEmailSubmitBtn()
     }
 }
 
