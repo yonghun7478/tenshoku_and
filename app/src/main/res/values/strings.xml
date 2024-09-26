@@ -23,5 +23,12 @@
     <string name="agreement_confirmation_policy_link">利用契約・プライバシーポリシーへの同意が必要です。</string>
     <string name="agreement_confirmation_submit">内容に同意して次へすすむ</string>
     <string name="validate_agreement_error_msg">利用契約・プライバシーポリシーへのチェックボックスを確認してください。</string>
+    <string name="about_me_gender_title">あなたの性別を\n教えてください</string>
+    <string name="about_me_gender_male">男性</string>
+    <string name="about_me_gender_female">女性</string>
+    <string name="about_me_validate_gender">性別を選択してください。</string>
+    <string name="about_me_validate_birthday">生年月日を選択してください。</string>
+    <string name="about_me_birthday_title">あなたの誕生日を\n教えてください</string>
+    <string name="about_me_birthday_sub_title">登録後、修正することはできません</string>
 
 </resources>

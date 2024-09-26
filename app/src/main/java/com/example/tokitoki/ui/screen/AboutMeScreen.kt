@@ -44,7 +44,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeViewModel
 @Composable
 fun AboutMeScreen(
     viewModel: AboutMeViewModel = hiltViewModel(),
-    onAboutMeNameScreen: () -> Unit = {},
+    onAboutMeGenderScreen: () -> Unit = {},
 ) {
     AboutMeContents(
         aboutMeAction = viewModel::aboutMeAction
@@ -59,7 +59,7 @@ fun AboutMeScreen(
                 is AboutMeEvent.ACTION -> {
                     when (uiEvent.action) {
                         AboutMeAction.SUBMIT -> {
-                            onAboutMeNameScreen()
+                            onAboutMeGenderScreen()
                         }
 
                         AboutMeAction.NOTHING -> {
