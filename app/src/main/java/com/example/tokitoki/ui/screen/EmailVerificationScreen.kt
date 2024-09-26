@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkRoundedIcon
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
 import com.example.tokitoki.ui.theme.LocalColor
@@ -120,7 +121,7 @@ fun EmailVerificationContents(
             }.testTag(TestTags.EMAIL_VERIFICATION_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        EmailVerificationEmailIcon(
+        TkRoundedIcon(
             modifier = Modifier.padding(top = 70.dp)
         )
         EmailVerificationText(
@@ -140,33 +141,6 @@ fun EmailVerificationContents(
         EmailVerificationErrorDialog(
             message = errorMsg,
             updateShowDialogState = updateShowDialogState
-        )
-    }
-}
-
-@Composable
-fun EmailVerificationEmailIcon(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .size(60.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        LocalColor.current.blue,
-                        LocalColor.current.white
-                    )
-                ),
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            modifier = DrawableSemantics.withDrawableId(resId = R.drawable.ic_mail),
-            painter = painterResource(id = R.drawable.ic_mail),
-            tint = LocalColor.current.white,
-            contentDescription = "RegisterWithEmailIcon"
         )
     }
 }
