@@ -52,6 +52,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBottomArrowNavigation
+import com.example.tokitoki.ui.screen.components.buttons.TkIndicator
+import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.AboutMeBirthdayEvent
 import com.example.tokitoki.ui.state.AboutMeBirthdayState
 import com.example.tokitoki.ui.theme.LocalColor
@@ -134,7 +137,7 @@ fun AboutMeBirthdayContents(
             .testTag(TestTags.ABOUT_ME_BIRTHDAY_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AboutMeBirthdayIndicator(
+        TkIndicator(
             modifier = Modifier.padding(top = 30.dp),
             total = 20,
             current = 2
@@ -149,80 +152,19 @@ fun AboutMeBirthdayContents(
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        AboutMeBirthdayBottomMenu(
+        TkBottomArrowNavigation(
             modifier = Modifier.padding(10.dp),
-            aboutMeBirthdayAction = aboutMeBirthdayAction
+            action = aboutMeBirthdayAction,
+            previousActionParam = AboutMeBirthdayAction.PREVIOUS,
+            nextActionParam = AboutMeBirthdayAction.NEXT
         )
     }
 
     if (uiState.showDialog) {
-        AboutMeBirthdayErrorDialog(
-            message = stringResource(id = R.string.about_me_validate_birthday),
-            aboutMeBirthdayAction = aboutMeBirthdayAction
+        TkAlertDialog(
+            message = stringResource(R.string.about_me_validate_birthday),
+            onDismissRequest = { aboutMeBirthdayAction(AboutMeBirthdayAction.DIALOG_OK) },
         )
-    }
-}
-
-@Composable
-fun AboutMeBirthdayIndicator(
-    modifier: Modifier = Modifier,
-    total: Int = 0,
-    current: Int = 0,
-    circleSize: Int = 6,
-    activeCircleSize: Int = 25,
-    spaceSize: Int = 5
-) {
-    var offset = 0f
-    var centerPos = 0
-    if (total % 2 == 0) {
-        centerPos = total / 2
-        offset = ((spaceSize / 2) + (circleSize / 2)).toFloat()
-    } else {
-        centerPos = (total + 1) / 2
-    }
-
-    if (current > centerPos) {
-        offset += (circleSize + spaceSize) * (centerPos - current).toFloat() - circleSize / 2
-    } else if (current < centerPos) {
-        offset += (circleSize + spaceSize) * (centerPos - current).toFloat() + circleSize / 2
-    }
-
-
-    Row(
-        modifier = modifier.offset(x = offset.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        for (i in 1..total) {
-            if (i == current) {
-                Box(
-                    modifier = Modifier
-                        .size(activeCircleSize.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    LocalColor.current.blue,
-                                    LocalColor.current.white
-                                )
-                            ),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(circleSize.dp)
-                        .clip(CircleShape)
-                        .background(
-                            color = LocalColor.current.lightGray,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                )
-            }
-
-            if (i != total)
-                Spacer(modifier = Modifier.width(spaceSize.dp))
-        }
     }
 }
 
@@ -320,69 +262,6 @@ private fun AboutMeBirthdayTextFieldContainer(
         )
     }
 
-}
-
-@Composable
-fun AboutMeBirthdayBottomMenu(
-    modifier: Modifier = Modifier,
-    aboutMeBirthdayAction: (AboutMeBirthdayAction) -> Unit = {},
-) {
-    Row(modifier = modifier) {
-        AboutMeBirthdayNavigationBtn(isNext = false, aboutMeBirthdayAction = aboutMeBirthdayAction)
-        Spacer(modifier = Modifier.weight(1f))
-        AboutMeBirthdayNavigationBtn(isNext = true, aboutMeBirthdayAction = aboutMeBirthdayAction)
-    }
-}
-
-@Composable
-fun AboutMeBirthdayNavigationBtn(
-    isNext: Boolean = false,
-    aboutMeBirthdayAction: (AboutMeBirthdayAction) -> Unit = {},
-) {
-    Button(
-        onClick = { aboutMeBirthdayAction(if (isNext) AboutMeBirthdayAction.NEXT else AboutMeBirthdayAction.PREVIOUS) },
-        modifier = Modifier
-            .clip(CircleShape)
-            .shadow(
-                elevation = 10.dp,
-                shape = CircleShape
-            )
-            .size(50.dp)
-            .testTag(if (isNext) TestTags.ABOUT_ME_BIRTHDAY_NEXT_BTN else TestTags.ABOUT_ME_BIRTHDAY_PREVIOUS_BTN),
-        colors = ButtonDefaults.buttonColors(containerColor = if (isNext) LocalColor.current.blue else LocalColor.current.lightGray),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Icon(
-            modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = if (isNext) R.drawable.baseline_keyboard_arrow_right_24 else R.drawable.baseline_keyboard_arrow_left_24),
-            contentDescription = "Next",
-            tint = if (isNext) LocalColor.current.white else LocalColor.current.black,
-        )
-    }
-}
-
-@Composable
-fun AboutMeBirthdayErrorDialog(
-    message: String = "",
-    aboutMeBirthdayAction: (AboutMeBirthdayAction) -> Unit = {}
-) {
-    AlertDialog(
-        modifier = Modifier,
-        onDismissRequest = { aboutMeBirthdayAction(AboutMeBirthdayAction.DIALOG_DISMISS) },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                onClick = { aboutMeBirthdayAction(AboutMeBirthdayAction.DIALOG_OK) }
-            ) {
-                Text(
-                    color = LocalColor.current.white,
-                    text = stringResource(id = R.string.register_error_dialog_ok)
-                )
-            }
-        },
-        containerColor = LocalColor.current.white,
-    )
 }
 
 @Preview(showBackground = true)
