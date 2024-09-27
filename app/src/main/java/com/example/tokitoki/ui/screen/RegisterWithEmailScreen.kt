@@ -37,7 +37,7 @@ import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
-import com.example.tokitoki.ui.screen.components.buttons.TkRoundedIcon
+import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
 import com.example.tokitoki.ui.state.RegisterWithEmailState

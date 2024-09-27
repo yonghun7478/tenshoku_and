@@ -1,4 +1,4 @@
-package com.example.tokitoki.ui.screen.components.buttons
+package com.example.tokitoki.ui.screen.components.icons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
