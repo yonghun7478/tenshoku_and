@@ -1,7 +1,6 @@
 package com.example.tokitoki.ui.screen
 
 import androidx.navigation.NavHostController
-import com.example.tokitoki.ui.screen.TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_SCREEN
