@@ -36,8 +36,8 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.constants.AboutMeGenderConstants
 import com.example.tokitoki.ui.constants.TestTags
-import com.example.tokitoki.ui.screen.components.buttons.TkBottomArrowNavigation
-import com.example.tokitoki.ui.screen.components.buttons.TkIndicator
+import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
+import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.AboutMeGenderEvent
 import com.example.tokitoki.ui.state.AboutMeGenderState

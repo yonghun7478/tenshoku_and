@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
 import com.example.tokitoki.ui.constants.TestTags
-import com.example.tokitoki.ui.screen.components.buttons.TkBottomArrowNavigation
-import com.example.tokitoki.ui.screen.components.buttons.TkIndicator
+import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
+import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.AboutMeBirthdayEvent
 import com.example.tokitoki.ui.state.AboutMeBirthdayState

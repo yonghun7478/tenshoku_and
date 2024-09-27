@@ -26,7 +26,7 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeAction
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
-import com.example.tokitoki.ui.screen.components.buttons.TkStepIcon
+import com.example.tokitoki.ui.screen.components.icons.TkStepIcon
 import com.example.tokitoki.ui.state.AboutMeEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme

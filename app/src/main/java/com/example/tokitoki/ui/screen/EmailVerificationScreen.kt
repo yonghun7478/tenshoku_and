@@ -41,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.constants.TestTags
-import com.example.tokitoki.ui.screen.components.buttons.TkRoundedIcon
+import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
 import com.example.tokitoki.ui.theme.LocalColor
