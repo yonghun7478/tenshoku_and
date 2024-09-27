@@ -13,11 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,6 +35,8 @@ import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.constants.SignInAction
 import com.example.tokitoki.ui.constants.SignInConstants
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
+import com.example.tokitoki.ui.screen.components.buttons.TkOutlineBtn
 import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
@@ -137,92 +133,28 @@ fun SignInMenu(
     Column(
         modifier = modifier
     ) {
-        SignMenuOutlinedBtn(
+        TkOutlineBtn(
             modifier = Modifier
                 .fillMaxWidth(),
             text = stringResource(id = R.string.google_btn_text),
             textColor = LocalColor.current.black,
             backgroundColor = LocalColor.current.white,
             iconRes = R.drawable.ic_google,
-            signInAction = signInAction
+            action = signInAction,
+            actionParam = SignInAction.LoginWithGoogle
         )
 
-        SignMenuBtn(
+        TkBtn(
             modifier = Modifier
                 .fillMaxWidth(),
             text = stringResource(id = R.string.mail_btn_text),
             textColor = LocalColor.current.white,
             iconRes = R.drawable.ic_mail,
             backgroundColor = LocalColor.current.blue,
-            signInAction = signInAction
+            action = signInAction,
+            actionParam = SignInAction.LoginWithEmail
         )
     }
-}
-
-@Composable
-fun SignMenuOutlinedBtn(
-    modifier: Modifier = Modifier,
-    text: String = "",
-    textColor: Color = LocalColor.current.black,
-    backgroundColor: Color = LocalColor.current.white,
-    iconRes: Int = -1,
-    signInAction: (SignInAction) -> Unit = {},
-) {
-    OutlinedButton(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-        onClick = {
-            signInAction(SignInAction.LoginWithGoogle)
-        },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Icon(
-                modifier = DrawableSemantics.withDrawableId(resId = iconRes),
-                painter = painterResource(id = iconRes),
-                tint = textColor,
-                contentDescription = "SignMenuOutlinedBtnIcon"
-            )
-            Text(text = text, color = textColor, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(1.dp))
-        }
-    }
-
-}
-
-@Composable
-fun SignMenuBtn(
-    modifier: Modifier = Modifier,
-    text: String = "",
-    textColor: Color = LocalColor.current.black,
-    backgroundColor: Color = LocalColor.current.white,
-    iconRes: Int = -1,
-    signInAction: (SignInAction) -> Unit = {},
-) {
-    Button(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-        onClick = {
-            signInAction(SignInAction.LoginWithEmail)
-        },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Icon(
-                modifier = DrawableSemantics.withDrawableId(resId = iconRes),
-                painter = painterResource(id = iconRes),
-                tint = textColor,
-                contentDescription = "SignMenuBtnIcon"
-            )
-            Text(text = text, color = textColor, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(1.dp))
-        }
-    }
-
 }
 
 @Composable
@@ -318,32 +250,6 @@ fun TopLogoPreView() {
 fun SignInMenuPreView() {
     TokitokiTheme {
         SignInMenu()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SignMenuOutlinedBtnPreView() {
-    TokitokiTheme {
-        SignMenuOutlinedBtn(
-            text = stringResource(id = R.string.google_btn_text),
-            textColor = LocalColor.current.black,
-            backgroundColor = LocalColor.current.white,
-            iconRes = R.drawable.ic_google,
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SignMenuBtnPreView() {
-    TokitokiTheme {
-        SignMenuBtn(
-            text = "メールアドレスでサインイン",
-            textColor = LocalColor.current.white,
-            backgroundColor = LocalColor.current.blue,
-            iconRes = R.drawable.ic_mail
-        )
     }
 }
 

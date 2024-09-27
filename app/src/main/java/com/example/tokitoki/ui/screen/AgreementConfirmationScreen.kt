@@ -12,13 +12,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,6 +34,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AgreementConfirmationAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
+import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.AgreementConfirmationEvent
 import com.example.tokitoki.ui.state.AgreementConfirmationState
 import com.example.tokitoki.ui.theme.LocalColor
@@ -130,9 +128,9 @@ fun AgreementConfirmationContents(
     }
 
     if (uiState.showDialog) {
-        AgreementConfirmationErrorDialog(
+        TkAlertDialog(
             message = stringResource(R.string.validate_agreement_error_msg),
-            agreementConfirmationAction = agreementConfirmationAction
+            onDismissRequest = { agreementConfirmationAction(AgreementConfirmationAction.DIALOG_OK) },
         )
     }
 }
@@ -260,46 +258,17 @@ fun AgreementConfirmationBottom(
             color = LocalColor.current.blue
         )
 
-        Button(
+        TkBtn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-            onClick = {
-                agreementConfirmationAction(AgreementConfirmationAction.SUBMIT)
-            }
-        ) {
-            Text(
-                text = stringResource(R.string.agreement_confirmation_submit),
-                color = LocalColor.current.white,
-                fontSize = 16.sp,
-            )
-        }
+            text = stringResource(R.string.agreement_confirmation_submit),
+            textColor = LocalColor.current.white,
+            backgroundColor = LocalColor.current.blue,
+            action = agreementConfirmationAction,
+            actionParam = AgreementConfirmationAction.SUBMIT
+        )
     }
-}
-
-@Composable
-fun AgreementConfirmationErrorDialog(
-    message: String = "",
-    agreementConfirmationAction: (AgreementConfirmationAction) -> Unit = {}
-) {
-    AlertDialog(
-        modifier = Modifier,
-        onDismissRequest = { agreementConfirmationAction(AgreementConfirmationAction.DIALOG_DISMISS) },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                onClick = { agreementConfirmationAction(AgreementConfirmationAction.DIALOG_OK) }
-            ) {
-                Text(
-                    color = LocalColor.current.white,
-                    text = stringResource(id = R.string.register_error_dialog_ok)
-                )
-            }
-        },
-        containerColor = LocalColor.current.white,
-    )
 }
 
 @Preview(showBackground = true)

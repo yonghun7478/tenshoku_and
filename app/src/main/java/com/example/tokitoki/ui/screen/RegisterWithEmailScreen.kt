@@ -2,25 +2,15 @@ package com.example.tokitoki.ui.screen
 
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -32,12 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,11 +36,13 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.constants.RegisterWithEmailConstants
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
+import com.example.tokitoki.ui.screen.components.buttons.TkRoundedIcon
+import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
 import com.example.tokitoki.ui.state.RegisterWithEmailState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.RegisterWithEmailViewModel
 
 @Composable
@@ -120,9 +110,14 @@ fun RegisterWithEmailContents(
             .testTag(TestTags.REGISTER_WITH_EMAIL_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        RegisterWithEmailIcon(
+        TkRoundedIcon(
             modifier = Modifier
-                .padding(top = 100.dp)
+                .padding(top = 100.dp),
+            iconRes = R.drawable.ic_mail,
+            size = 50.dp,
+            colors = listOf(LocalColor.current.blue, LocalColor.current.white),
+            shape = CircleShape,
+            iconTint = LocalColor.current.white
         )
         Spacer(modifier = modifier.height(20.dp))
         Text(
@@ -140,47 +135,24 @@ fun RegisterWithEmailContents(
             onEmailChanged = onEmailChanged
         )
         Spacer(modifier = Modifier.height(10.dp))
-        RegisterWithEmailSubmitBtn(
+        TkBtn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp),
-            registerWithEmailAction = registerWithEmailAction
+            text = stringResource(R.string.register_btn_title),
+            textColor = LocalColor.current.white,
+            backgroundColor = LocalColor.current.blue,
+            action = registerWithEmailAction,
+            actionParam = RegisterWithEmailAction.Submit
         )
     }
 
     if (uiState.showDialog) {
         val errorMsg = stringResource(R.string.validate_error_msg)
 
-        RegisterWithEmailErrorDialog(
+        TkAlertDialog(
             message = errorMsg,
-            updateShowDialogState = updateShowDialogState
-        )
-    }
-}
-
-@Composable
-fun RegisterWithEmailIcon(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .size(50.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        LocalColor.current.blue,
-                        LocalColor.current.white
-                    )
-                ),
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            modifier = DrawableSemantics.withDrawableId(resId = R.drawable.ic_mail),
-            painter = painterResource(id = R.drawable.ic_mail),
-            tint = LocalColor.current.white,
-            contentDescription = "RegisterWithEmailIcon"
+            onDismissRequest = { updateShowDialogState(false) }
         )
     }
 }
@@ -218,59 +190,6 @@ fun RegisterWithEmailTextField(
     }
 }
 
-
-@Composable
-fun RegisterWithEmailSubmitBtn(
-    modifier: Modifier = Modifier,
-    registerWithEmailAction: (RegisterWithEmailAction) -> Unit = {},
-) {
-    val focusManager = LocalFocusManager.current
-
-    Button(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-        onClick = {
-            focusManager.clearFocus()
-            registerWithEmailAction(RegisterWithEmailAction.Submit)
-        },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                color = LocalColor.current.white,
-                text = stringResource(id = R.string.register_btn_title)
-            )
-        }
-    }
-}
-
-@Composable
-fun RegisterWithEmailErrorDialog(
-    message: String = "",
-    updateShowDialogState: (Boolean) -> Unit = {}
-) {
-    AlertDialog(
-        modifier = Modifier
-            .testTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG),
-        onDismissRequest = { updateShowDialogState(false) },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                onClick = { updateShowDialogState(false) }
-            ) {
-                Text(
-                    color = LocalColor.current.white,
-                    text = stringResource(id = R.string.register_error_dialog_ok)
-                )
-            }
-        },
-        containerColor = LocalColor.current.white,
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun RegisterWithEmailContentsPreView() {
@@ -281,32 +200,8 @@ fun RegisterWithEmailContentsPreView() {
 
 @Preview
 @Composable
-fun RegisterWithEmailIconPreview() {
-    TokitokiTheme {
-        RegisterWithEmailIcon()
-    }
-}
-
-@Preview
-@Composable
 fun RegisterWithEmailTextFieldPreview() {
     TokitokiTheme {
         RegisterWithEmailTextField()
-    }
-}
-
-@Preview
-@Composable
-fun RegisterWithEmailSubmitBtnPreview() {
-    TokitokiTheme {
-        RegisterWithEmailSubmitBtn()
-    }
-}
-
-@Preview
-@Composable
-fun RegisterWithEmailErrorDialogPreview() {
-    TokitokiTheme {
-        RegisterWithEmailErrorDialog()
     }
 }

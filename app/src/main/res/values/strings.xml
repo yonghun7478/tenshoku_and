@@ -30,5 +30,4 @@
     <string name="about_me_validate_birthday">生年月日を選択してください。</string>
     <string name="about_me_birthday_title">あなたの誕生日を\n教えてください</string>
     <string name="about_me_birthday_sub_title">登録後、修正することはできません</string>
-
 </resources>
