@@ -115,7 +115,7 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenBackBtnClicked() {
+    fun aboutMeBirthdayScreenErrorDialogIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)

@@ -83,7 +83,7 @@ class AboutMeNameScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenNextIsClicked() {
+    fun aboutMeNameScreenNextBtnIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
@@ -95,7 +95,7 @@ class AboutMeNameScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenPreviousIsClicked() {
+    fun aboutMeNameScreenPreviousBtnIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
@@ -107,24 +107,24 @@ class AboutMeNameScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenTextFieldIsDisplayed() {
+    fun aboutMeNameScreenTextFieldIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
-        val value = composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).fetchSemanticsNode().config[EditableText]
-        assertEquals("19911211", value.toString())
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).performTextInput("yongyong")
+        val value = composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).fetchSemanticsNode().config[EditableText]
+        assertEquals("yongyong", value.toString())
     }
 
     @Test
-    fun aboutMeBirthdayScreenBackBtnClicked() {
+    fun aboutMeNameScreenErrorDialogIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
