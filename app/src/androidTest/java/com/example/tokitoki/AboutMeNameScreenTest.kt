@@ -20,7 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class AboutMeBirthdayScreenTest {
+class AboutMeNameScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -36,7 +36,7 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenIsDisplayed() {
+    fun aboutMeNameScreenIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
@@ -73,14 +73,20 @@ class AboutMeBirthdayScreenTest {
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_CONTENTS).assertIsDisplayed()
     }
 
     @Test
-    fun aboutMeBirthdayScreenNextIsClicked() {
+    fun aboutMeNameScreenNextBtnIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
@@ -89,10 +95,10 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenPreviousIsClicked() {
+    fun aboutMeNameScreenPreviousBtnIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
@@ -101,24 +107,24 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenTextFieldIsDisplayed() {
+    fun aboutMeNameScreenTextFieldIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
-        val value = composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).fetchSemanticsNode().config[EditableText]
-        assertEquals("19911211", value.toString())
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).performTextInput("yongyong")
+        val value = composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).fetchSemanticsNode().config[EditableText]
+        assertEquals("yongyong", value.toString())
     }
 
     @Test
-    fun aboutMeBirthdayScreenErrorDialogIsDisplayed() {
+    fun aboutMeNameScreenErrorDialogIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 

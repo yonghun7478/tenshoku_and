@@ -51,7 +51,7 @@ fun <T> TkBottomArrowNavigationBtn(
                 shape = CircleShape
             )
             .size(50.dp)
-            .testTag(if (isNext) TestTags.ABOUT_ME_GENDER_NEXT_BTN else TestTags.ABOUT_ME_GENDER_PREVIOUS_BTN),
+            .testTag(if (isNext) TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN else TestTags.TK_BOTTOM_ARROR_NAVIGATION_PREVIOUS_BTN),
         colors = ButtonDefaults.buttonColors(containerColor = if (isNext) LocalColor.current.blue else LocalColor.current.lightGray),
         contentPadding = PaddingValues(0.dp)
     ) {

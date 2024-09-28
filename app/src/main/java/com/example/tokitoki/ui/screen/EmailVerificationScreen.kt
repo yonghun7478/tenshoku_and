@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
@@ -78,7 +79,7 @@ fun EmailVerificationScreen(
                         }
 
                         EmailVerificationAction.SUBMIT -> {
-                            var result = viewModel.validateCode(uiState.code)
+                            val result = viewModel.validateCode(uiState.code)
 
                             if (result)
                                 onAgreementConfirmationScreen()
@@ -132,9 +133,9 @@ fun EmailVerificationContents(
     if (uiState.showDialog) {
         val errorMsg = stringResource(R.string.validate_email_code_error_msg)
 
-        EmailVerificationErrorDialog(
+        TkAlertDialog(
             message = errorMsg,
-            updateShowDialogState = updateShowDialogState
+            onDismissRequest = { updateShowDialogState(false) },
         )
     }
 }
@@ -254,31 +255,6 @@ private fun EmailVerificationTextFieldContainer(
             )
         }
     }
-}
-
-@Composable
-fun EmailVerificationErrorDialog(
-    message: String = "",
-    updateShowDialogState: (Boolean) -> Unit = {}
-) {
-    AlertDialog(
-        modifier = Modifier
-            .testTag(TestTags.REGISTER_WITH_EMAIL_ERROR_DIALOG),
-        onDismissRequest = { updateShowDialogState(false) },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                onClick = { updateShowDialogState(false) }
-            ) {
-                Text(
-                    color = LocalColor.current.white,
-                    text = stringResource(id = R.string.register_error_dialog_ok)
-                )
-            }
-        },
-        containerColor = LocalColor.current.white,
-    )
 }
 
 @Preview(showBackground = true)

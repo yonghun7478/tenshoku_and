@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,7 +19,6 @@ fun TokitokiNavGraph(
     navAction: TokitokiNavigationActions = remember(navController) {
         TokitokiNavigationActions(navController)
     },
-    modifier: Modifier = Modifier,
 ) {
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
@@ -28,7 +26,6 @@ fun TokitokiNavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
     ) {
         composable(TokitokiDestinations.SIGN_IN_ROUTE) {
             SignInScreen(
@@ -84,6 +81,26 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
+                    navAction.navigateToAboutMeName()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_NAME_ROUTE) {
+            AboutMeNameScreen(
+                onAboutMeBirthdayScreen = {
+                    navController.navigateUp()
+                },
+                onAboutMeSecondScreen = {
+                    navAction.navigateToAboutMeSecond()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_SECOND_ROUTE) {
+            AboutMeSecondScreen(
+                onAboutMeInterestScreen = {
+
                 }
             )
         }

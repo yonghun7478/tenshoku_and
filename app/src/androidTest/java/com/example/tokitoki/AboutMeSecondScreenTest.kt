@@ -1,6 +1,5 @@
 package com.example.tokitoki
 
-import androidx.compose.ui.semantics.SemanticsProperties.EditableText
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,13 +13,12 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class AboutMeBirthdayScreenTest {
+class AboutMeSecondScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -36,7 +34,7 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenIsDisplayed() {
+    fun aboutMeSecondScreenIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
@@ -73,58 +71,31 @@ class AboutMeBirthdayScreenTest {
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_CONTENTS).assertIsDisplayed()
-    }
-
-    @Test
-    fun aboutMeBirthdayScreenNextIsClicked() {
-        composeTestRule.setContent {
-            TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
-            }
-        }
-
-        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
-    }
-
-    @Test
-    fun aboutMeBirthdayScreenPreviousIsClicked() {
-        composeTestRule.setContent {
-            TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
-            }
-        }
-
-        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_PREVIOUS_BTN).isDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_PREVIOUS_BTN).performClick()
-    }
-
-    @Test
-    fun aboutMeBirthdayScreenTextFieldIsDisplayed() {
-        composeTestRule.setContent {
-            TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
-            }
-        }
-
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
-        val value = composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).fetchSemanticsNode().config[EditableText]
-        assertEquals("19911211", value.toString())
-    }
-
-    @Test
-    fun aboutMeBirthdayScreenErrorDialogIsDisplayed() {
-        composeTestRule.setContent {
-            TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
-            }
-        }
 
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
-        composeTestRule.onNodeWithText("確認").isDisplayed()
-        composeTestRule.onNodeWithText("確認").performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_CONTENTS).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).performTextInput("yongyong")
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_SECOND_CONTENTS).assertIsDisplayed()
+    }
+
+    @Test
+    fun aboutMeScreenBtnIsClicked() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_SECOND_ROUTE)
+            }
+        }
+        composeTestRule.onNodeWithText("次へ").assertIsDisplayed()
+        composeTestRule.onNodeWithText("次へ").performClick()
     }
 }

@@ -88,10 +88,6 @@ fun AboutMeGenderScreen(
 
                         }
 
-                        AboutMeGenderAction.DIALOG_DISMISS -> {
-                            viewModel.updateShowDialogState(false)
-                        }
-
                         AboutMeGenderAction.DIALOG_OK -> {
                             viewModel.updateShowDialogState(false)
                         }
