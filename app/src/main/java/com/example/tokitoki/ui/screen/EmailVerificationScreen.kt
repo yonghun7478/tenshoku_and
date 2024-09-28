@@ -78,7 +78,7 @@ fun EmailVerificationScreen(
                         }
 
                         EmailVerificationAction.SUBMIT -> {
-                            var result = viewModel.validateCode(uiState.code)
+                            val result = viewModel.validateCode(uiState.code)
 
                             if (result)
                                 onAgreementConfirmationScreen()

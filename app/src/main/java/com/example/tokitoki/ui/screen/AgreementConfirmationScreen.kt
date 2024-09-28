@@ -86,10 +86,6 @@ fun AgreementConfirmationScreen(
                                 viewModel.updateShowDialogState(true)
                         }
 
-                        AgreementConfirmationAction.DIALOG_DISMISS -> viewModel.updateShowDialogState(
-                            false
-                        )
-
                         AgreementConfirmationAction.DIALOG_OK -> viewModel.updateShowDialogState(
                             false
                         )

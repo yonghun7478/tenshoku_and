@@ -35,6 +35,7 @@ import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
+import com.example.tokitoki.ui.state.AboutMeNameEvent
 import com.example.tokitoki.ui.state.AboutMeNameState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
@@ -58,7 +59,19 @@ fun AboutMeNameScreen(
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
+            when(event) {
+                is AboutMeNameEvent.ACTION -> {
+                    when(event.action) {
+                        AboutMeNameAction.DIALOG_OK -> {}
+                        AboutMeNameAction.NEXT -> {}
+                        AboutMeNameAction.NOTHING -> {}
+                        AboutMeNameAction.PREVIOUS -> {}
+                    }
+                }
+                AboutMeNameEvent.NOTHING -> {
 
+                }
+            }
         }
     }
 }

@@ -67,10 +67,6 @@ fun AboutMeBirthdayScreen(
             when (event) {
                 is AboutMeBirthdayEvent.ACTION -> {
                     when (event.action) {
-                        AboutMeBirthdayAction.DIALOG_DISMISS -> {
-                            viewModel.updateShowDialogState(false)
-                        }
-
                         AboutMeBirthdayAction.DIALOG_OK -> {
                             viewModel.updateShowDialogState(false)
                         }
