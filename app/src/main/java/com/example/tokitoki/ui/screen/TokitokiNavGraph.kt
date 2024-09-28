@@ -92,6 +92,14 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeSecondScreen = {
+                    navAction.navigateToAboutMeSecond()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_SECOND_ROUTE) {
+            AboutMeSecondScreen(
+                onAboutMeInterestScreen = {
 
                 }
             )

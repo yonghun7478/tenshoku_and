@@ -33,4 +33,5 @@
     <string name="about_me_validate_name">氏名を入力してください。</string>
     <string name="about_me_name_title">あなたの氏名を\n決めましょう</string>
     <string name="about_me_name_pressholder">氏名を入力してください</string>
+    <string name="about_me_second_title">あなたが\nどんな人ですかもう少し\n教えてください</string>
 </resources>
