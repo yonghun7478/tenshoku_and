@@ -59,15 +59,28 @@ fun AboutMeNameScreen(
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
-            when(event) {
+            when (event) {
                 is AboutMeNameEvent.ACTION -> {
-                    when(event.action) {
-                        AboutMeNameAction.DIALOG_OK -> {}
-                        AboutMeNameAction.NEXT -> {}
+                    when (event.action) {
+                        AboutMeNameAction.DIALOG_OK -> {
+                            viewModel.updateShowDialogState(false)
+                        }
+
+                        AboutMeNameAction.NEXT -> {
+                            if (viewModel.checkName()) {
+                                onAboutMeSecondScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
+                        }
+
                         AboutMeNameAction.NOTHING -> {}
-                        AboutMeNameAction.PREVIOUS -> {}
+                        AboutMeNameAction.PREVIOUS -> {
+                            onAboutMeBirthdayScreen()
+                        }
                     }
                 }
+
                 AboutMeNameEvent.NOTHING -> {
 
                 }

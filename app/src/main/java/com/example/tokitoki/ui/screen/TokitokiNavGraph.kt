@@ -81,6 +81,18 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
+                    navAction.navigateToAboutMeName()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_NAME_ROUTE) {
+            AboutMeNameScreen(
+                onAboutMeBirthdayScreen = {
+                    navController.navigateUp()
+                },
+                onAboutMeSecondScreen = {
+
                 }
             )
         }

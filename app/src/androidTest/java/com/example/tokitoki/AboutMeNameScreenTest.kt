@@ -20,7 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class AboutMeBirthdayScreenTest {
+class AboutMeNameScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -36,7 +36,7 @@ class AboutMeBirthdayScreenTest {
     }
 
     @Test
-    fun aboutMeBirthdayScreenIsDisplayed() {
+    fun aboutMeNameScreenIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
@@ -73,14 +73,20 @@ class AboutMeBirthdayScreenTest {
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_CONTENTS).assertIsDisplayed()
     }
 
     @Test
     fun aboutMeBirthdayScreenNextIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 
@@ -92,7 +98,7 @@ class AboutMeBirthdayScreenTest {
     fun aboutMeBirthdayScreenPreviousIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_NAME_ROUTE)
             }
         }
 

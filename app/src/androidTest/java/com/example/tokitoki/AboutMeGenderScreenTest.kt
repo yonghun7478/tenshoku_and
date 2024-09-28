@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.TokitokiDestinations
@@ -84,8 +83,8 @@ class AboutMeGenderScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_NEXT_BTN).isDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_NEXT_BTN).performClick()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
         composeTestRule.onNodeWithText("確認").isDisplayed()
         composeTestRule.onNodeWithText("確認").performClick()
@@ -100,7 +99,19 @@ class AboutMeGenderScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_PREVIOUS_BTN).isDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_PREVIOUS_BTN).performClick()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_PREVIOUS_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_PREVIOUS_BTN).performClick()
+    }
+
+    @Test
+    fun aboutMeGenderScreenNextBtnClicked() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_GENDER_ROUTE)
+            }
+        }
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
     }
 }
