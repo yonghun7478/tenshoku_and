@@ -100,6 +100,17 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.ABOUT_ME_SECOND_ROUTE) {
             AboutMeSecondScreen(
                 onAboutMeInterestScreen = {
+                    navAction.navigateToAboutMeInterest()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE) {
+            AboutMeInterestScreen(
+                onAboutMeSecondScreen = {
+
+                },
+                onAboutMeThirdScreen = {
 
                 }
             )

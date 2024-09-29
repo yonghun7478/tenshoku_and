@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.screen
 import androidx.navigation.NavHostController
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_INTEREST_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_NAME_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_SECOND_SCREEN
@@ -21,9 +22,10 @@ private object TokitokiScreens {
     const val ABOUT_ME_BIRTHDAY_SCREEN = "AboutMeBirthdayScreen"
     const val ABOUT_ME_NAME_SCREEN = "AboutMeNameScreen"
     const val ABOUT_ME_SECOND_SCREEN = "AboutMeSecondScreen"
+    const val ABOUT_ME_INTEREST_SCREEN = "AboutMeInterestScreen"
 }
 
-object TokitokiArgs{
+object TokitokiArgs {
 }
 
 object TokitokiDestinations {
@@ -36,31 +38,43 @@ object TokitokiDestinations {
     const val ABOUT_ME_BIRTHDAY_ROUTE = ABOUT_ME_BIRTHDAY_SCREEN
     const val ABOUT_ME_NAME_ROUTE = ABOUT_ME_NAME_SCREEN
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
+    const val ABOUT_ME_INTEREST_ROUTE = ABOUT_ME_INTEREST_SCREEN
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
     fun navigateToRegisterWithEmail() {
         navController.navigate(REGISTER_WITH_EMAIL_SCREEN)
     }
+
     fun navigateToEmailVerification() {
         navController.navigate(EMAIL_VERIFICATION_SCREEN)
     }
+
     fun navigateToAgreementConfirmation() {
         navController.navigate(AGREEMENT_CONFIRMATION_SCREEN)
     }
+
     fun navigateToAboutMe() {
         navController.navigate(ABOUT_ME_SCREEN)
     }
+
     fun navigateToAboutMeGender() {
         navController.navigate(ABOUT_ME_GENDER_SCREEN)
     }
+
     fun navigateToAboutMeBirthday() {
         navController.navigate(ABOUT_ME_BIRTHDAY_SCREEN)
     }
+
     fun navigateToAboutMeName() {
         navController.navigate(ABOUT_ME_NAME_SCREEN)
     }
+
     fun navigateToAboutMeSecond() {
         navController.navigate(ABOUT_ME_SECOND_SCREEN)
+    }
+
+    fun navigateToAboutMeInterest() {
+        navController.navigate(ABOUT_ME_INTEREST_SCREEN)
     }
 }
