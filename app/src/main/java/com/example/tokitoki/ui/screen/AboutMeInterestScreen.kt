@@ -1,14 +1,18 @@
 package com.example.tokitoki.ui.screen
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,9 +21,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,14 +55,17 @@ import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
+import com.example.tokitoki.ui.model.InterestItemUiModel
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
 import com.example.tokitoki.ui.state.AboutMeInterestState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMeInterestViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeInterestScreen(
     onAboutMeSecondScreen: () -> Unit = {},
@@ -60,13 +73,18 @@ fun AboutMeInterestScreen(
     viewModel: AboutMeInterestViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { 3 }
 
     AboutMeInterestContents(
         uiState = uiState,
+        tabs = viewModel.tabs,
+        coroutineScope = coroutineScope,
+        pagerState = pagerState,
         aboutMeInterestAction = viewModel::aboutMeInterestAction,
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(true) {
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
@@ -87,21 +105,38 @@ fun AboutMeInterestScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeInterestContents(
     uiState: AboutMeInterestState = AboutMeInterestState(),
+    tabs: List<String> = listOf("趣味", "ライフスタイル", "価値観"),
+    pagerState: PagerState,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    coroutineScope: CoroutineScope,
 ) {
     Column(
-        modifier = Modifier.background(
-            color = LocalColor.current.white
-        )
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = LocalColor.current.white)
     ) {
         TkRoundedIcon(
             iconRes = R.drawable.baseline_kitesurfing_24
         )
         AboutMeInterestTitle()
-        HorizontalPagerWithTabs()
+        AboutMeInterestPagerTab(
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+            tabs = tabs,
+            aboutMeInterestAction = aboutMeInterestAction
+        )
+        AboutMeInterestPager(
+            modifier = Modifier.weight(1f),
+            pagerState = pagerState,
+            hobbyList = uiState.hobbyList,
+            lifeStyleList = uiState.lifeStyleList,
+            valuesList = uiState.valuesList,
+            coroutineScope = coroutineScope
+        )
     }
 }
 
@@ -132,65 +167,25 @@ fun AboutMeInterestTitle(
     }
 }
 
-@Composable
-fun AboutMeInterestItem(
-    modifier: Modifier = Modifier,
-    drawableId: Int = R.drawable.dokushou,
-    text: String = "test"
-) {
-    val colorStops = arrayOf(
-        0.1f to Color.Transparent,
-        1f to Color.Black,
-    )
-
-    Box {
-        Image(
-            painter = painterResource(drawableId),
-            contentDescription = "",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(30.dp))
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.5f)
-                .background(Brush.verticalGradient(colorStops = colorStops))
-                .align(Alignment.BottomCenter)
-        )
-
-        Text(
-            text = text,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
-            color = LocalColor.current.white,
-            fontSize = 20.sp,
-        )
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HorizontalPagerWithTabs() {
-    val pagerState = rememberPagerState { 3 }
-    val coroutineScope = rememberCoroutineScope()
-
-    // 탭 제목
-    val tabs = listOf("취미", "라이프타일", "가치관")
-    val tabWidth = 1f / tabs.size
-
-    // 화면의 너비에 따라 탭 너비를 동적으로 계산
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+fun AboutMeInterestPagerTab(
+    modifier: Modifier = Modifier,
+    tabs: List<String> = listOf("趣味", "ライフスタイル", "価値観"),
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val tabWidth = maxWidth / tabs.size
 
-        // 현재 페이지에 따른 인디케이터 위치 애니메이션
-        val indicatorOffset by animateDpAsState(targetValue = pagerState.currentPage * tabWidth)
+        val indicatorOffset by animateDpAsState(
+            targetValue = pagerState.currentPage * tabWidth,
+            label = "",
+            animationSpec = spring(stiffness = Spring.StiffnessLow)
+        )
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Row로 탭 UI 생성
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,13 +196,13 @@ fun HorizontalPagerWithTabs() {
                 tabs.forEachIndexed { index, title ->
                     Box(
                         modifier = Modifier
-                            .weight(1f) // 각 탭을 동일하게 1/3로 나눔
+                            .weight(1f)
                             .clickable(
-                                indication = null, // Ripple 효과 제거
-                                interactionSource = remember { MutableInteractionSource() } // 클릭 상호작용 소스 (빈 값으로 설정)
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
                             ) {
                                 coroutineScope.launch {
-                                    pagerState.animateScrollToPage(index) // 탭 클릭 시 해당 페이지로 이동
+                                    pagerState.animateScrollToPage(index)
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -222,66 +217,183 @@ fun HorizontalPagerWithTabs() {
                 }
             }
 
-            // 애니메이션 인디케이터 (탭 밑)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(2.dp)
             ) {
-                // 인디케이터 박스
                 Box(
                     modifier = Modifier
-                        .offset(x = indicatorOffset) // 애니메이션으로 인디케이터 이동
-                        .width(tabWidth) // 각 탭의 너비에 맞게 인디케이터 너비 설정
+                        .offset(x = indicatorOffset)
+                        .width(tabWidth)
                         .height(2.dp)
-                        .background(LocalColor.current.blue) // 인디케이터 색상
+                        .background(LocalColor.current.blue)
                 )
-            }
-
-            // HorizontalPager로 페이지 구성
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> HobbyPage()         // 첫 번째 페이지: 취미
-                    1 -> LifestylePage()     // 두 번째 페이지: 라이프스타일
-                    2 -> ValuesPage()        // 세 번째 페이지: 가치관
-                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HobbyPage() {
-    // 취미 페이지의 내용
-    Box(modifier = Modifier.fillMaxSize()) {
-        Text(text = "취미 입력")
+fun AboutMeInterestPager(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState,
+    hobbyList: List<InterestItemUiModel> = listOf(),
+    lifeStyleList: List<InterestItemUiModel> = listOf(),
+    valuesList: List<InterestItemUiModel> = listOf(),
+    coroutineScope: CoroutineScope
+) {
+    HorizontalPager(
+        state = pagerState,
+        modifier = modifier
+    ) { page ->
+        when (page) {
+            0 -> AboutMeInterestHobbyPage(
+                hobbyList = hobbyList
+            )
+
+            1 -> AboutMeInterestLifestylePage(
+                lifeStyleList = lifeStyleList
+            )
+
+            2 -> AboutMeInterestValuesPage(
+                valuesList = valuesList
+            )
+        }
     }
 }
 
 @Composable
-fun LifestylePage() {
-    // 라이프스타일 페이지의 내용
-    Box(modifier = Modifier.fillMaxSize()) {
-        Text(text = "라이프스타일 입력")
+fun AboutMeInterestHobbyPage(
+    modifier: Modifier = Modifier,
+    hobbyList: List<InterestItemUiModel> = listOf()
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(hobbyList) { item ->
+            AboutMeInterestGridItem(
+                modifier = Modifier.padding(4.dp),
+                title = item.title,
+            )
+        }
     }
 }
 
 @Composable
-fun ValuesPage() {
+fun AboutMeInterestLifestylePage(
+    modifier: Modifier = Modifier,
+    lifeStyleList: List<InterestItemUiModel> = listOf()
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(text = "lifestyle")
+    }
+}
+
+@Composable
+fun AboutMeInterestValuesPage(
+    modifier: Modifier = Modifier,
+    valuesList: List<InterestItemUiModel> = listOf()
+) {
     // 가치관 페이지의 내용
     Box(modifier = Modifier.fillMaxSize()) {
-        Text(text = "가치관 입력")
+        Text(text = "kachikan")
     }
 }
 
+@Composable
+fun AboutMeInterestGridItem(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    drawableId: Int = R.drawable.dokushou,
+    showBadge: Boolean = false,
+    badgeNum: Int = 0,
+) {
+    val colorStops = arrayOf(
+        0.1f to Color.Transparent,
+        1f to Color.Black,
+    )
+
+    BoxWithConstraints(
+        modifier = modifier
+            .clip(RoundedCornerShape(30.dp))
+            .then(
+                if (showBadge) {
+                    Modifier.border(
+                        width = 4.dp,
+                        color = LocalColor.current.blue,
+                        shape = RoundedCornerShape(30.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            )
+            .border(
+                width = 4.dp,
+                color = LocalColor.current.blue,
+                shape = RoundedCornerShape(30.dp)
+            ),
+    ) {
+        Image(
+            painter = painterResource(drawableId),
+            contentDescription = "",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .aspectRatio(1f)
+        )
+
+        if (showBadge) {
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .size(maxWidth / 5)
+                    .clip(CircleShape)
+                    .background(LocalColor.current.blue)
+                    .align(Alignment.TopEnd)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "$badgeNum",
+                    fontSize = 13.sp,
+                    color = LocalColor.current.white
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.5f)
+                .background(Brush.verticalGradient(colorStops = colorStops))
+                .align(Alignment.BottomCenter)
+        )
+
+        Text(
+            text = title,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 20.dp),
+            color = LocalColor.current.white,
+            fontSize = 20.sp,
+        )
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
 fun AboutMeInterestContentsPreview() {
+    val coroutineScope = rememberCoroutineScope()
+
     TokitokiTheme {
-        AboutMeInterestContents()
+        AboutMeInterestContents(
+            pagerState = rememberPagerState { 3 },
+            coroutineScope = coroutineScope
+        )
     }
 }
 
@@ -289,13 +401,8 @@ fun AboutMeInterestContentsPreview() {
 @Composable
 fun AboutMeInterestItemPreview() {
     TokitokiTheme {
-        AboutMeInterestItem()
+        AboutMeInterestGridItem(
+            showBadge = true
+        )
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewHorizontalPagerWithTabs() {
-    HorizontalPagerWithTabs()
 }
