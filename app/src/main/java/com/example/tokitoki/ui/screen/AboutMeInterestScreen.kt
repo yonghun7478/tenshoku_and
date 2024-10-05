@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.model.InterestItemUiModel
@@ -272,12 +273,13 @@ fun AboutMeInterestHobbyPage(
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(16.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         items(hobbyList) { item ->
             AboutMeInterestGridItem(
                 modifier = Modifier.padding(4.dp),
                 title = item.title,
+                url = item.url
             )
         }
     }
@@ -288,7 +290,7 @@ fun AboutMeInterestLifestylePage(
     modifier: Modifier = Modifier,
     lifeStyleList: List<InterestItemUiModel> = listOf()
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Text(text = "lifestyle")
     }
 }
@@ -299,7 +301,7 @@ fun AboutMeInterestValuesPage(
     valuesList: List<InterestItemUiModel> = listOf()
 ) {
     // 가치관 페이지의 내용
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Text(text = "kachikan")
     }
 }
@@ -308,7 +310,7 @@ fun AboutMeInterestValuesPage(
 fun AboutMeInterestGridItem(
     modifier: Modifier = Modifier,
     title: String = "",
-    drawableId: Int = R.drawable.dokushou,
+    url: String = "",
     showBadge: Boolean = false,
     badgeNum: Int = 0,
 ) {
@@ -337,12 +339,12 @@ fun AboutMeInterestGridItem(
                 shape = RoundedCornerShape(30.dp)
             ),
     ) {
-        Image(
-            painter = painterResource(drawableId),
+        AsyncImage(
+            model = url,
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .aspectRatio(1f)
+                .aspectRatio(1f),
         )
 
         if (showBadge) {
@@ -402,6 +404,7 @@ fun AboutMeInterestContentsPreview() {
 fun AboutMeInterestItemPreview() {
     TokitokiTheme {
         AboutMeInterestGridItem(
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             showBadge = true
         )
     }
