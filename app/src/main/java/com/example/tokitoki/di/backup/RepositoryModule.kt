@@ -1,4 +1,4 @@
-package com.example.tokitoki.di
+package com.example.tokitoki.di.backup
 
 import com.example.tokitoki.data.repository.UserRepositoryImpl
 import com.example.tokitoki.domain.repository.UserRepository

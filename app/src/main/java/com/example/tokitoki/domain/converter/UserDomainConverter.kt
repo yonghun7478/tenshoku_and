@@ -1,6 +1,6 @@
 package com.example.tokitoki.domain.converter
 
-import com.example.tokitoki.data.local.UserEntity
+import com.example.tokitoki.data.local.backup.UserEntity
 import com.example.tokitoki.data.model.AddressResponse
 import com.example.tokitoki.data.model.CompanyResponse
 import com.example.tokitoki.data.model.GeoResponse
