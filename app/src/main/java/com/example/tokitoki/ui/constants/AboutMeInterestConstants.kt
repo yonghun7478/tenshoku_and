@@ -9,5 +9,5 @@ sealed class AboutMeInterestAction {
     data object NEXT : AboutMeInterestAction()
     data object PREVIOUS : AboutMeInterestAction()
     data object DIALOG_OK : AboutMeInterestAction()
-    data object CLICK_INTEREST : AboutMeInterestAction()
+    data class SelectedTab(val index: Int) : AboutMeInterestAction()
 }

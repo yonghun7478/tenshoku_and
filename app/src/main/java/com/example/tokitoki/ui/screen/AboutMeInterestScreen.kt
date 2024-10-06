@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -92,7 +90,9 @@ fun AboutMeInterestScreen(
             when (event) {
                 is AboutMeInterestEvent.ACTION -> {
                     when (event.action) {
-                        AboutMeInterestAction.CLICK_INTEREST -> {}
+                        is AboutMeInterestAction.SelectedTab -> {
+                            pagerState.animateScrollToPage(event.action.index)
+                        }
                         AboutMeInterestAction.DIALOG_OK -> {}
                         AboutMeInterestAction.NEXT -> {}
                         AboutMeInterestAction.NOTHING -> {}
@@ -203,7 +203,7 @@ fun AboutMeInterestPagerTab(
                                 interactionSource = remember { MutableInteractionSource() }
                             ) {
                                 coroutineScope.launch {
-                                    pagerState.animateScrollToPage(index)
+                                    aboutMeInterestAction(AboutMeInterestAction.SelectedTab(index))
                                 }
                             },
                         contentAlignment = Alignment.Center
