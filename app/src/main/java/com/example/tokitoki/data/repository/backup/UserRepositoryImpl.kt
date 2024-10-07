@@ -1,4 +1,4 @@
-package com.example.tokitoki.data.repository
+package com.example.tokitoki.data.repository.backup
 
 import com.example.tokitoki.data.local.backup.LocalUserDao
 import com.example.tokitoki.data.local.backup.LocalUserEntity

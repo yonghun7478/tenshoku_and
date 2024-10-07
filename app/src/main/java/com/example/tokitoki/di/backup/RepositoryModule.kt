@@ -1,6 +1,6 @@
 package com.example.tokitoki.di.backup
 
-import com.example.tokitoki.data.repository.UserRepositoryImpl
+import com.example.tokitoki.data.repository.backup.UserRepositoryImpl
 import com.example.tokitoki.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module

@@ -25,8 +25,6 @@ class AboutMeInterestViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeInterestEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    val tabs: List<String> = listOf("趣味", "ライフスタイル", "価値観")
-
     fun init() {
         _uiState.value = AboutMeInterestState()
     }

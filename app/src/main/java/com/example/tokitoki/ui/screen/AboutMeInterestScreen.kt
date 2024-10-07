@@ -77,7 +77,6 @@ fun AboutMeInterestScreen(
 
     AboutMeInterestContents(
         uiState = uiState,
-        tabs = viewModel.tabs,
         coroutineScope = coroutineScope,
         pagerState = pagerState,
         aboutMeInterestAction = viewModel::aboutMeInterestAction,
@@ -110,7 +109,6 @@ fun AboutMeInterestScreen(
 @Composable
 fun AboutMeInterestContents(
     uiState: AboutMeInterestState = AboutMeInterestState(),
-    tabs: List<String> = listOf("趣味", "ライフスタイル", "価値観"),
     pagerState: PagerState,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
     coroutineScope: CoroutineScope,
@@ -127,7 +125,7 @@ fun AboutMeInterestContents(
         AboutMeInterestPagerTab(
             pagerState = pagerState,
             coroutineScope = coroutineScope,
-            tabs = tabs,
+            tabs = uiState.categoryList,
             aboutMeInterestAction = aboutMeInterestAction
         )
         AboutMeInterestPager(

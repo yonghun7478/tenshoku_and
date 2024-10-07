@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
     )],
     indices = [Index(value = ["categoryId"])]
 )
-data class UserInterestsEntity(
+data class UserInterestEntity(
     @PrimaryKey val id: Int,
     val title: String,
     val url: String,
