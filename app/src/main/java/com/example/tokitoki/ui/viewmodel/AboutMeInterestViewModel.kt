@@ -2,7 +2,12 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
+import com.example.tokitoki.domain.usecase.GetUserInterestsUseCase
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
+import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.ui.model.converter.CategoryUiConverter
+import com.example.tokitoki.ui.model.converter.UserInterestUiConverter
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
 import com.example.tokitoki.ui.state.AboutMeInterestState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +21,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AboutMeInterestViewModel @Inject constructor(
+class AboutMeInterestViewModel
+@Inject constructor(
+    private val getUserInterestsUseCase: GetUserInterestsUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeInterestState())
@@ -25,8 +33,24 @@ class AboutMeInterestViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeInterestEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init() {
-        _uiState.value = AboutMeInterestState()
+    suspend fun init() {
+        val domainCategories = getCategoriesUseCase()
+        val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
+
+        val userInterestsByCategory = mutableMapOf<String, List<UserInterestItem>>()
+        domainCategories.forEach { category ->
+            val userInterests = getUserInterestsUseCase(category.id)
+                .map { UserInterestUiConverter.domainToUi(it) }
+
+            userInterestsByCategory[category.title] = userInterests
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                categoryList = uiCategories,
+                userInterestsByCategory = userInterestsByCategory
+            )
+        }
     }
 
     fun aboutMeInterestAction(action: AboutMeInterestAction) {
@@ -37,7 +61,7 @@ class AboutMeInterestViewModel @Inject constructor(
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {
-            if(showDialog)
+            if (showDialog)
                 it.copy(showDialog = true)
             else
                 it.copy(showDialog = false)

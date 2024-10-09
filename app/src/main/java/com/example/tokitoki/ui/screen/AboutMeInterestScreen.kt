@@ -11,8 +11,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,9 +22,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -54,7 +53,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
-import com.example.tokitoki.ui.model.InterestItemUiModel
+import com.example.tokitoki.ui.model.CategoryItem
+import com.example.tokitoki.ui.model.UserInterestItem
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
 import com.example.tokitoki.ui.state.AboutMeInterestState
@@ -73,7 +73,11 @@ fun AboutMeInterestScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState { 3 }
+
+    val pagerState = rememberPagerState {
+        if (uiState.categoryList.isNotEmpty()) uiState.categoryList.size else 1
+    }
+
 
     AboutMeInterestContents(
         uiState = uiState,
@@ -92,6 +96,7 @@ fun AboutMeInterestScreen(
                         is AboutMeInterestAction.SelectedTab -> {
                             pagerState.animateScrollToPage(event.action.index)
                         }
+
                         AboutMeInterestAction.DIALOG_OK -> {}
                         AboutMeInterestAction.NEXT -> {}
                         AboutMeInterestAction.NOTHING -> {}
@@ -130,10 +135,8 @@ fun AboutMeInterestContents(
         )
         AboutMeInterestPager(
             modifier = Modifier.weight(1f),
+            uiState = uiState,
             pagerState = pagerState,
-            hobbyList = uiState.hobbyList,
-            lifeStyleList = uiState.lifeStyleList,
-            valuesList = uiState.valuesList,
             coroutineScope = coroutineScope
         )
     }
@@ -170,7 +173,11 @@ fun AboutMeInterestTitle(
 @Composable
 fun AboutMeInterestPagerTab(
     modifier: Modifier = Modifier,
-    tabs: List<String> = listOf("趣味", "ライフスタイル", "価値観"),
+    tabs: List<CategoryItem> = listOf(
+        CategoryItem(0, "趣味"),
+        CategoryItem(1, "ライフスタイル"),
+        CategoryItem(2, "価値観")
+    ),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
@@ -192,7 +199,7 @@ fun AboutMeInterestPagerTab(
                     .height(40.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                tabs.forEachIndexed { index, title ->
+                tabs.forEachIndexed { index, categoryItem ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -207,7 +214,7 @@ fun AboutMeInterestPagerTab(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = title,
+                            text = categoryItem.title,
                             fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal,
                             color = if (pagerState.currentPage == index) LocalColor.current.blue else Color.LightGray,
                             fontSize = 15.sp
@@ -237,70 +244,59 @@ fun AboutMeInterestPagerTab(
 @Composable
 fun AboutMeInterestPager(
     modifier: Modifier = Modifier,
+    uiState: AboutMeInterestState = AboutMeInterestState(),
     pagerState: PagerState,
-    hobbyList: List<InterestItemUiModel> = listOf(),
-    lifeStyleList: List<InterestItemUiModel> = listOf(),
-    valuesList: List<InterestItemUiModel> = listOf(),
     coroutineScope: CoroutineScope
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = modifier
     ) { page ->
-        when (page) {
-            0 -> AboutMeInterestHobbyPage(
-                hobbyList = hobbyList
-            )
+        // 현재 페이지의 카테고리 이름을 가져옴
+        val currentCategoryTitle: String = uiState.categoryList[page].title
 
-            1 -> AboutMeInterestLifestylePage(
-                lifeStyleList = lifeStyleList
-            )
+        // 해당 카테고리의 관심사 리스트를 가져옴, 없으면 빈 리스트
+        val currentInterestList =
+            uiState.userInterestsByCategory[currentCategoryTitle] ?: emptyList()
 
-            2 -> AboutMeInterestValuesPage(
-                valuesList = valuesList
-            )
+
+        // 각 카테고리별 페이지 표시
+        AboutMeInterestPage(
+            categoryTitle = currentCategoryTitle,
+            interestList = currentInterestList
+        )
+    }
+}
+
+@Composable
+fun AboutMeInterestPage(
+    categoryTitle: String,
+    interestList: List<UserInterestItem>
+) {
+    // 공통 UI 또는 레이아웃 설정
+    Column {
+        Text(
+            text = categoryTitle,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        LazyColumn {
+            items(interestList) { interest ->
+                InterestItemRow(interest) // 공통 관심사 항목 UI
+            }
         }
     }
 }
 
 @Composable
-fun AboutMeInterestHobbyPage(
-    modifier: Modifier = Modifier,
-    hobbyList: List<InterestItemUiModel> = listOf()
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(16.dp),
-        modifier = modifier.fillMaxSize()
-    ) {
-        items(hobbyList) { item ->
-            AboutMeInterestGridItem(
-                modifier = Modifier.padding(4.dp),
-                title = item.title,
-                url = item.url
-            )
-        }
-    }
-}
-
-@Composable
-fun AboutMeInterestLifestylePage(
-    modifier: Modifier = Modifier,
-    lifeStyleList: List<InterestItemUiModel> = listOf()
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Text(text = "lifestyle")
-    }
-}
-
-@Composable
-fun AboutMeInterestValuesPage(
-    modifier: Modifier = Modifier,
-    valuesList: List<InterestItemUiModel> = listOf()
-) {
-    // 가치관 페이지의 내용
-    Box(modifier = modifier.fillMaxSize()) {
-        Text(text = "kachikan")
+fun InterestItemRow(interest: UserInterestItem) {
+    // 관심사 항목을 나타내는 UI 요소 (공통으로 사용할 수 있음)
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)) {
+        Text(text = interest.title, modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = interest.url)
     }
 }
 
