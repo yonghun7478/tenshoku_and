@@ -47,6 +47,7 @@ class AboutMeInterestViewModel
 
         _uiState.update { currentState ->
             currentState.copy(
+                isInitialized = true,
                 categoryList = uiCategories,
                 userInterestsByCategory = userInterestsByCategory
             )

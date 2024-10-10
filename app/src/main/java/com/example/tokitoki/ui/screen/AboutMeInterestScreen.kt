@@ -75,16 +75,17 @@ fun AboutMeInterestScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState {
-        if (uiState.categoryList.isNotEmpty()) uiState.categoryList.size else 1
+        if (uiState.isInitialized) uiState.categoryList.size else 1
     }
 
-
-    AboutMeInterestContents(
-        uiState = uiState,
-        coroutineScope = coroutineScope,
-        pagerState = pagerState,
-        aboutMeInterestAction = viewModel::aboutMeInterestAction,
-    )
+    if (uiState.isInitialized) {
+        AboutMeInterestContents(
+            uiState = uiState,
+            coroutineScope = coroutineScope,
+            pagerState = pagerState,
+            aboutMeInterestAction = viewModel::aboutMeInterestAction,
+        )
+    }
 
     LaunchedEffect(true) {
         viewModel.init()
@@ -128,20 +129,18 @@ fun AboutMeInterestContents(
         )
         AboutMeInterestTitle()
 
-        if(uiState.categoryList.isNotEmpty()) {
-            AboutMeInterestPagerTab(
-                pagerState = pagerState,
-                coroutineScope = coroutineScope,
-                tabs = uiState.categoryList,
-                aboutMeInterestAction = aboutMeInterestAction
-            )
-            AboutMeInterestPager(
-                modifier = Modifier.weight(1f),
-                uiState = uiState,
-                pagerState = pagerState,
-                coroutineScope = coroutineScope
-            )
-        }
+        AboutMeInterestPagerTab(
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+            tabs = uiState.categoryList,
+            aboutMeInterestAction = aboutMeInterestAction
+        )
+        AboutMeInterestPager(
+            modifier = Modifier.weight(1f),
+            uiState = uiState,
+            pagerState = pagerState,
+            coroutineScope = coroutineScope
+        )
     }
 }
 
@@ -294,9 +293,11 @@ fun AboutMeInterestPage(
 @Composable
 fun InterestItemRow(interest: UserInterestItem) {
     // 관심사 항목을 나타내는 UI 요소 (공통으로 사용할 수 있음)
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
         Text(text = interest.title, modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = interest.url)
