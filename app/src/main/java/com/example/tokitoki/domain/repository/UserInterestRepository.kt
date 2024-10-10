@@ -1,7 +1,8 @@
 package com.example.tokitoki.domain.repository
 
-import com.example.tokitoki.data.local.UserInterestWithCategory
+import com.example.tokitoki.domain.model.UserInterest
+
 
 interface UserInterestRepository {
-    suspend fun getUserInterests(categoryId : Int): List<UserInterestWithCategory>
+    suspend fun getUserInterests(categoryId : Int): List<UserInterest>
 }

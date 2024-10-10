@@ -16,5 +16,5 @@ interface UserInterestDao {
                 "INNER JOIN categories ON categories.id = user_interests.categoryId " +
                 "WHERE categories.id = :categoryId"
     )
-    suspend fun getUserInterestsWithCategory(categoryId: Int): List<UserInterestWithCategory>
+    suspend fun getUserInterestsWithCategory(categoryId: Int): List<UserInterestWithCategoryEntity>
 }

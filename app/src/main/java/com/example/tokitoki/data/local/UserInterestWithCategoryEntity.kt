@@ -1,6 +1,6 @@
 package com.example.tokitoki.data.local
 
-data class UserInterestWithCategory(
+data class UserInterestWithCategoryEntity(
     val interestId: Int,
     val interestTitle: String,
     val interestUrl: String,

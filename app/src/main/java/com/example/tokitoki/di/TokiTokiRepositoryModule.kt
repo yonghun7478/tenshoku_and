@@ -1,5 +1,8 @@
 package com.example.tokitoki.di
 
+import com.example.tokitoki.data.repository.CategoryRepositoryImpl
+import com.example.tokitoki.data.repository.UserInterestRepositoryImpl
+import com.example.tokitoki.domain.repository.CategoryRepository
 import com.example.tokitoki.domain.repository.UserInterestRepository
 import dagger.Binds
 import dagger.Module
@@ -14,6 +17,12 @@ abstract class TokiTokiRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUserInterestRepository(
-        userRepositoryImpl: UserInterestRepository
+        userRepositoryImpl: UserInterestRepositoryImpl
     ): UserInterestRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCategoryRepository(
+        categoryRepositoryImpl: CategoryRepositoryImpl
+    ): CategoryRepository
 }
