@@ -127,18 +127,21 @@ fun AboutMeInterestContents(
             iconRes = R.drawable.baseline_kitesurfing_24
         )
         AboutMeInterestTitle()
-        AboutMeInterestPagerTab(
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            tabs = uiState.categoryList,
-            aboutMeInterestAction = aboutMeInterestAction
-        )
-        AboutMeInterestPager(
-            modifier = Modifier.weight(1f),
-            uiState = uiState,
-            pagerState = pagerState,
-            coroutineScope = coroutineScope
-        )
+
+        if(uiState.categoryList.isNotEmpty()) {
+            AboutMeInterestPagerTab(
+                pagerState = pagerState,
+                coroutineScope = coroutineScope,
+                tabs = uiState.categoryList,
+                aboutMeInterestAction = aboutMeInterestAction
+            )
+            AboutMeInterestPager(
+                modifier = Modifier.weight(1f),
+                uiState = uiState,
+                pagerState = pagerState,
+                coroutineScope = coroutineScope
+            )
+        }
     }
 }
 
