@@ -74,15 +74,16 @@ class AboutMeInterestViewModel
             _uiState.value.userInterestsByCategory[categoryTitle]?.toMutableList() ?: return
 
         if (index in updatedCategoryList.indices) {
-            val selectedItem = updatedCategoryList[index].copy(
-                showBadge = !updatedCategoryList[index].showBadge
-            )
-
-            var clickedItemCount = if(selectedItem.showBadge) {
+            var clickedItemCount = if (!updatedCategoryList[index].showBadge) {
                 _uiState.value.clickedItemCount + 1
             } else {
                 _uiState.value.clickedItemCount - 1
             }
+
+            val selectedItem = updatedCategoryList[index].copy(
+                showBadge = !updatedCategoryList[index].showBadge,
+                badgeNum = clickedItemCount
+            )
 
             updatedCategoryList[index] = selectedItem
             val updatedMap = _uiState.value.userInterestsByCategory.toMutableMap().apply {
