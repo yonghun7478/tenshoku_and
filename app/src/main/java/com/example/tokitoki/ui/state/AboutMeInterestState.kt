@@ -7,5 +7,6 @@ data class AboutMeInterestState(
     val showDialog: Boolean = false,
     val userInterestsByCategory: Map<String, List<UserInterestItem>> = emptyMap(),
     val categoryList: List<CategoryItem> = listOf(),
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    val clickedItemCount: Int = 0
 )

@@ -68,4 +68,30 @@ class AboutMeInterestViewModel
                 it.copy(showDialog = false)
         }
     }
+
+    fun updateGridItem(categoryTitle: String, index: Int) {
+        val updatedCategoryList =
+            _uiState.value.userInterestsByCategory[categoryTitle]?.toMutableList() ?: return
+
+        if (index in updatedCategoryList.indices) {
+            val selectedItem = updatedCategoryList[index].copy(
+                showBadge = !updatedCategoryList[index].showBadge
+            )
+
+            var clickedItemCount = if(selectedItem.showBadge) {
+                _uiState.value.clickedItemCount + 1
+            } else {
+                _uiState.value.clickedItemCount - 1
+            }
+
+            updatedCategoryList[index] = selectedItem
+            val updatedMap = _uiState.value.userInterestsByCategory.toMutableMap().apply {
+                put(categoryTitle, updatedCategoryList)
+            }
+
+            _uiState.update {
+                it.copy(userInterestsByCategory = updatedMap, clickedItemCount = clickedItemCount)
+            }
+        }
+    }
 }

@@ -4,15 +4,17 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +24,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -42,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,7 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.model.CategoryItem
@@ -102,6 +108,9 @@ fun AboutMeInterestScreen(
                         AboutMeInterestAction.NEXT -> {}
                         AboutMeInterestAction.NOTHING -> {}
                         AboutMeInterestAction.PREVIOUS -> {}
+                        is AboutMeInterestAction.ITEM_CLICKED -> {
+                            viewModel.updateGridItem(event.action.category, event.action.index)
+                        }
                     }
                 }
 
@@ -139,7 +148,8 @@ fun AboutMeInterestContents(
             modifier = Modifier.weight(1f),
             uiState = uiState,
             pagerState = pagerState,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            aboutMeInterestAction = aboutMeInterestAction
         )
     }
 }
@@ -248,7 +258,8 @@ fun AboutMeInterestPager(
     modifier: Modifier = Modifier,
     uiState: AboutMeInterestState = AboutMeInterestState(),
     pagerState: PagerState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
 ) {
     HorizontalPager(
         state = pagerState,
@@ -265,7 +276,8 @@ fun AboutMeInterestPager(
         // 각 카테고리별 페이지 표시
         AboutMeInterestPage(
             categoryTitle = currentCategoryTitle,
-            interestList = currentInterestList
+            interestList = currentInterestList,
+            aboutMeInterestAction = aboutMeInterestAction
         )
     }
 }
@@ -273,57 +285,61 @@ fun AboutMeInterestPager(
 @Composable
 fun AboutMeInterestPage(
     categoryTitle: String,
-    interestList: List<UserInterestItem>
+    interestList: List<UserInterestItem>,
+    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
 ) {
-    // 공통 UI 또는 레이아웃 설정
-    Column {
-        Text(
-            text = categoryTitle,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        LazyColumn {
-            items(interestList) { interest ->
-                InterestItemRow(interest) // 공통 관심사 항목 UI
-            }
-        }
-    }
-}
-
-@Composable
-fun InterestItemRow(interest: UserInterestItem) {
-    // 관심사 항목을 나타내는 UI 요소 (공통으로 사용할 수 있음)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3), // 3개의 열을 고정
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp), // 항목 간의 세로 간격
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // 항목 간의 가로 간격
     ) {
-        Text(text = interest.title, modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = interest.url)
+        itemsIndexed(interestList) { index, interest ->
+            AboutMeInterestGridItem(
+                index = index,
+                title = interest.title,
+                categoryTitle = categoryTitle,
+                url = interest.url,
+                showBadge = interest.showBadge,
+                badgeNum = interest.badgeNum,
+                aboutMeInterestAction = aboutMeInterestAction
+            )
+        }
     }
 }
 
 @Composable
 fun AboutMeInterestGridItem(
     modifier: Modifier = Modifier,
+    categoryTitle: String = "",
+    index: Int = 0,
     title: String = "",
     url: String = "",
     showBadge: Boolean = false,
     badgeNum: Int = 0,
+    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
 ) {
     val colorStops = arrayOf(
         0.1f to Color.Transparent,
         1f to Color.Black,
     )
 
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .error(R.drawable.no_image_icon) // 로드 실패 시 로컬 이미지
+            .build()
+    )
+
     BoxWithConstraints(
         modifier = modifier
             .clip(RoundedCornerShape(30.dp))
+            .aspectRatio(1f)
             .then(
                 if (showBadge) {
                     Modifier.border(
-                        width = 4.dp,
+                        width = 2.dp,
                         color = LocalColor.current.blue,
                         shape = RoundedCornerShape(30.dp)
                     )
@@ -331,54 +347,67 @@ fun AboutMeInterestGridItem(
                     Modifier
                 }
             )
-            .border(
-                width = 4.dp,
-                color = LocalColor.current.blue,
-                shape = RoundedCornerShape(30.dp)
+            .then(
+                if (painter.state is AsyncImagePainter.State.Success)
+                    Modifier.clickable {
+                        aboutMeInterestAction(
+                            AboutMeInterestAction.ITEM_CLICKED(
+                                categoryTitle,
+                                index
+                            )
+                        )
+                    }
+                else
+                    Modifier
             ),
     ) {
-        AsyncImage(
-            model = url,
-            contentDescription = "",
+        Image(
+            painter = painter,
+            contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .aspectRatio(1f),
+            modifier = Modifier.aspectRatio(1f)
         )
 
-        if (showBadge) {
+        if (painter.state is AsyncImagePainter.State.Success) {
             Box(
                 modifier = Modifier
-                    .padding(10.dp)
-                    .size(maxWidth / 5)
-                    .clip(CircleShape)
-                    .background(LocalColor.current.blue)
-                    .align(Alignment.TopEnd)
-            ) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = "$badgeNum",
-                    fontSize = 13.sp,
-                    color = LocalColor.current.white
-                )
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f)
+                    .background(Brush.verticalGradient(colorStops = colorStops))
+                    .align(Alignment.BottomCenter)
+            )
+
+
+            // Badge 표시
+            if (showBadge) {
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(maxWidth / 5)
+                        .clip(CircleShape)
+                        .background(LocalColor.current.blue)
+                        .align(Alignment.TopEnd)
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "$badgeNum",
+                        fontSize = 13.sp,
+                        color = LocalColor.current.white
+                    )
+                }
             }
+
+            // 텍스트 표시 (그라데이션 위에 위치)
+            Text(
+                text = title,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 5.dp),
+                color = LocalColor.current.white,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.5f)
-                .background(Brush.verticalGradient(colorStops = colorStops))
-                .align(Alignment.BottomCenter)
-        )
-
-        Text(
-            text = title,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
-            color = LocalColor.current.white,
-            fontSize = 20.sp,
-        )
     }
 }
 

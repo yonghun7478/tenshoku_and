@@ -5,5 +5,7 @@ data class UserInterestItem(
     val categoryId: String = "",
     val title: String = "",
     val url: String = "",
-    val desc: String = ""
+    val desc: String = "",
+    val showBadge: Boolean = false,
+    val badgeNum: Int = 0,
 )

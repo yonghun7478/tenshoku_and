@@ -16,8 +16,8 @@ class UserInterestRepositoryImpl @Inject constructor(
         if(categoryId == 1) {
             userInterestEntities = listOf(
                 // 趣味 (Hobby) 카테고리
-                UserInterestWithCategoryEntity(interestId = 1, interestTitle = "Hobby Activity 1", interestUrl = "https://example.com/hobby1", categoryId = 1, categoryTitle = "趣味"),
-                UserInterestWithCategoryEntity(interestId = 2, interestTitle = "Hobby Activity 2", interestUrl = "https://example.com/hobby2", categoryId = 1, categoryTitle = "趣味"),
+                UserInterestWithCategoryEntity(interestId = 1, interestTitle = "ヨガ", interestUrl = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg", categoryId = 1, categoryTitle = "趣味"),
+                UserInterestWithCategoryEntity(interestId = 2, interestTitle = "Hobby Activity 2", interestUrl = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg", categoryId = 1, categoryTitle = "趣味"),
                 UserInterestWithCategoryEntity(interestId = 3, interestTitle = "Hobby Adventure", interestUrl = "https://example.com/hobby3", categoryId = 1, categoryTitle = "趣味"),
                 UserInterestWithCategoryEntity(interestId = 4, interestTitle = "Hobby Crafting", interestUrl = "https://example.com/hobby4", categoryId = 1, categoryTitle = "趣味"),
                 UserInterestWithCategoryEntity(interestId = 5, interestTitle = "Hobby Gaming", interestUrl = "https://example.com/hobby5", categoryId = 1, categoryTitle = "趣味"),
