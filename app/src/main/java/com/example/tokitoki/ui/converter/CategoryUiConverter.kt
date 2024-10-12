@@ -1,4 +1,4 @@
-package com.example.tokitoki.ui.model.converter
+package com.example.tokitoki.ui.converter
 
 import com.example.tokitoki.domain.model.Category
 import com.example.tokitoki.ui.model.CategoryItem

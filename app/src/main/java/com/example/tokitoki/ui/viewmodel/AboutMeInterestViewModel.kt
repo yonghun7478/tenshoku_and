@@ -6,8 +6,8 @@ import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetUserInterestsUseCase
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.model.UserInterestItem
-import com.example.tokitoki.ui.model.converter.CategoryUiConverter
-import com.example.tokitoki.ui.model.converter.UserInterestUiConverter
+import com.example.tokitoki.ui.converter.CategoryUiConverter
+import com.example.tokitoki.ui.converter.UserInterestUiConverter
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
 import com.example.tokitoki.ui.state.AboutMeInterestState
 import dagger.hilt.android.lifecycle.HiltViewModel
