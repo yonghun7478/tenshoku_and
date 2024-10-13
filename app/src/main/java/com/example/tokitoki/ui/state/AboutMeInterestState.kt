@@ -8,5 +8,4 @@ data class AboutMeInterestState(
     val userInterestsByCategory: Map<String, List<UserInterestItem>> = emptyMap(),
     val categoryList: List<CategoryItem> = listOf(),
     val isInitialized: Boolean = false,
-    val clickedItemCount: Int = 0
 )

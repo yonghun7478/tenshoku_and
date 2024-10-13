@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -302,7 +303,6 @@ fun AboutMeInterestPage(
                 categoryTitle = categoryTitle,
                 url = interest.url,
                 showBadge = interest.showBadge,
-                badgeNum = interest.badgeNum,
                 aboutMeInterestAction = aboutMeInterestAction
             )
         }
@@ -317,7 +317,6 @@ fun AboutMeInterestGridItem(
     title: String = "",
     url: String = "",
     showBadge: Boolean = false,
-    badgeNum: Int = 0,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
 ) {
     val colorStops = arrayOf(
@@ -347,19 +346,17 @@ fun AboutMeInterestGridItem(
                     Modifier
                 }
             )
-            .then(
-                if (painter.state is AsyncImagePainter.State.Success)
-                    Modifier.clickable {
-                        aboutMeInterestAction(
-                            AboutMeInterestAction.ITEM_CLICKED(
-                                categoryTitle,
-                                index
-                            )
-                        )
-                    }
-                else
-                    Modifier
-            ),
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                aboutMeInterestAction(
+                    AboutMeInterestAction.ITEM_CLICKED(
+                        categoryTitle,
+                        index
+                    )
+                )
+            },
     ) {
         Image(
             painter = painter,
@@ -388,11 +385,11 @@ fun AboutMeInterestGridItem(
                         .background(LocalColor.current.blue)
                         .align(Alignment.TopEnd)
                 ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "$badgeNum",
-                        fontSize = 13.sp,
-                        color = LocalColor.current.white
+                    Image(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        painter = painterResource(id = R.drawable.baseline_check_24),
+                        contentDescription = "",
                     )
                 }
             }

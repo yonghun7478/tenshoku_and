@@ -7,5 +7,4 @@ data class UserInterestItem(
     val url: String = "",
     val desc: String = "",
     val showBadge: Boolean = false,
-    val badgeNum: Int = 0,
 )
