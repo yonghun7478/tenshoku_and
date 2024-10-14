@@ -59,9 +59,11 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.model.CategoryItem
 import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
 import com.example.tokitoki.ui.state.AboutMeInterestState
@@ -106,9 +108,13 @@ fun AboutMeInterestScreen(
                         }
 
                         AboutMeInterestAction.DIALOG_OK -> {}
-                        AboutMeInterestAction.NEXT -> {}
+                        AboutMeInterestAction.NEXT -> {
+
+                        }
                         AboutMeInterestAction.NOTHING -> {}
-                        AboutMeInterestAction.PREVIOUS -> {}
+                        AboutMeInterestAction.PREVIOUS -> {
+                            onAboutMeSecondScreen()
+                        }
                         is AboutMeInterestAction.ITEM_CLICKED -> {
                             viewModel.updateGridItem(event.action.category, event.action.index)
                         }
@@ -129,28 +135,47 @@ fun AboutMeInterestContents(
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
     coroutineScope: CoroutineScope,
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(color = LocalColor.current.white)
     ) {
-        TkRoundedIcon(
-            iconRes = R.drawable.baseline_kitesurfing_24
-        )
-        AboutMeInterestTitle()
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TkRoundedIcon(
+                modifier = Modifier.padding(top = 30.dp),
+                iconRes = R.drawable.baseline_kitesurfing_24
+            )
+            AboutMeInterestTitle(
+                modifier = Modifier.padding(top = 10.dp)
+            )
 
-        AboutMeInterestPagerTab(
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            tabs = uiState.categoryList,
-            aboutMeInterestAction = aboutMeInterestAction
-        )
-        AboutMeInterestPager(
-            modifier = Modifier.weight(1f),
-            uiState = uiState,
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            aboutMeInterestAction = aboutMeInterestAction
+            AboutMeInterestPagerTab(
+                modifier = Modifier.padding(top = 30.dp),
+                pagerState = pagerState,
+                coroutineScope = coroutineScope,
+                tabs = uiState.categoryList,
+                aboutMeInterestAction = aboutMeInterestAction
+            )
+            AboutMeInterestPager(
+                modifier = Modifier.weight(1f),
+                uiState = uiState,
+                pagerState = pagerState,
+                coroutineScope = coroutineScope,
+                aboutMeInterestAction = aboutMeInterestAction
+            )
+        }
+
+        TkBottomArrowNavigation(
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.BottomCenter),
+            action = aboutMeInterestAction,
+            previousActionParam = AboutMeInterestAction.PREVIOUS,
+            nextActionParam = AboutMeInterestAction.NEXT
         )
     }
 }
@@ -164,7 +189,6 @@ fun AboutMeInterestTitle(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            modifier = Modifier.padding(top = 10.dp),
             text = stringResource(R.string.about_me_interest_title1),
             fontSize = 15.sp
         )
@@ -208,13 +232,13 @@ fun AboutMeInterestPagerTab(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
-                    .height(40.dp),
+                    .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 tabs.forEachIndexed { index, categoryItem ->
                     Box(
                         modifier = Modifier
+                            .height(35.dp)
                             .weight(1f)
                             .clickable(
                                 indication = null,
