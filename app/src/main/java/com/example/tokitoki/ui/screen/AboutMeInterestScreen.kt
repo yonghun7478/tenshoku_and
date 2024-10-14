@@ -415,8 +415,125 @@ fun AboutMeInterestGridItem(
 fun AboutMeInterestContentsPreview() {
     val coroutineScope = rememberCoroutineScope()
 
+    val testCategotyList = listOf(
+        CategoryItem(0, "趣味"),
+        CategoryItem(1, "ライフスタイル"),
+        CategoryItem(2, "価値観")
+    )
+
+    val hobbyItem = listOf(
+        // 趣味 (Hobby) 카테고리
+        UserInterestItem(
+            id = 1,
+            title = "ヨガ",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 1
+        ),
+        UserInterestItem(
+            id = 2,
+            title = "Hobby Activity 2",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 1
+        ),
+        UserInterestItem(
+            id = 3,
+            title = "Hobby Adventure",
+            url = "https://example.com/hobby3",
+            categoryId = 1
+        ),
+        UserInterestItem(
+            id = 4,
+            title = "Hobby Crafting",
+            url = "https://example.com/hobby4",
+            categoryId = 1
+        ),
+        UserInterestItem(
+            id = 5,
+            title = "Hobby Gaming",
+            url = "https://example.com/hobby5",
+            categoryId = 1
+        ),
+    )
+
+    val lifeStyleItem = listOf(
+        // 趣味 (Hobby) 카테고리
+        UserInterestItem(
+            id = 1,
+            title = "ヨガ",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 2
+        ),
+        UserInterestItem(
+            id = 2,
+            title = "Hobby Activity 2",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 2
+        ),
+        UserInterestItem(
+            id = 3,
+            title = "Hobby Adventure",
+            url = "https://example.com/hobby3",
+            categoryId = 2
+        ),
+        UserInterestItem(
+            id = 4,
+            title = "Hobby Crafting",
+            url = "https://example.com/hobby4",
+            categoryId = 2
+        ),
+        UserInterestItem(
+            id = 5,
+            title = "Hobby Gaming",
+            url = "https://example.com/hobby5",
+            categoryId = 2
+        ),
+    )
+
+    val kachikanItem = listOf(
+        // 趣味 (Hobby) 카테고리
+        UserInterestItem(
+            id = 1,
+            title = "ヨガ",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 3
+        ),
+        UserInterestItem(
+            id = 2,
+            title = "Hobby Activity 2",
+            url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+            categoryId = 3
+        ),
+        UserInterestItem(
+            id = 3,
+            title = "Hobby Adventure",
+            url = "https://example.com/hobby3",
+            categoryId = 3
+        ),
+        UserInterestItem(
+            id = 4,
+            title = "Hobby Crafting",
+            url = "https://example.com/hobby4",
+            categoryId = 3
+        ),
+        UserInterestItem(
+            id = 5,
+            title = "Hobby Gaming",
+            url = "https://example.com/hobby5",
+            categoryId = 3
+        ),
+    )
+
+    val userInterests =
+        mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
+
+    val uiState = AboutMeInterestState(
+        categoryList = testCategotyList,
+        userInterestsByCategory = userInterests
+    )
+
     TokitokiTheme {
         AboutMeInterestContents(
+            uiState = uiState,
             pagerState = rememberPagerState { 3 },
             coroutineScope = coroutineScope
         )
