@@ -394,12 +394,18 @@ fun AboutMeInterestGridItem(
         true  // 로컬 이미지는 항상 성공으로 간주
     }
 
+    val isImageError = if (painter is AsyncImagePainter) {
+        painter.state is AsyncImagePainter.State.Error  // 네트워크 이미지는 로딩 실패 여부 확인
+    } else {
+        false  // 로컬 이미지는 실패하지 않음
+    }
+
     BoxWithConstraints(
         modifier = modifier
             .clip(RoundedCornerShape(30.dp))
             .aspectRatio(1f)
             .then(
-                if (showBadge) {
+                if (showBadge && !isImageError) {
                     Modifier.border(
                         width = 2.dp,
                         color = LocalColor.current.blue,

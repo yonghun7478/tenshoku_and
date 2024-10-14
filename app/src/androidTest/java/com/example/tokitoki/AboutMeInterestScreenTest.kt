@@ -8,10 +8,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.TokitokiDestinations
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -87,5 +90,85 @@ class AboutMeInterestScreenTest {
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_SECOND_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithText("次へ").performClick()
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_INTEREST_CONTENTS).assertIsDisplayed()
+    }
+
+    @Test
+    fun aboutMeInterestScreenShowDialog() {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+            }
+        }
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
+
+        composeTestRule.onNodeWithText("確認").isDisplayed()
+        composeTestRule.onNodeWithText("確認").performClick()
+    }
+
+    @Test
+    fun aboutMeInterestScreenClickItem() = runBlocking {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+            }
+        }
+
+        // "ヨガ1" 텍스트를 가진 아이템이 화면에 표시되는지 확인
+        composeTestRule.onNodeWithText("ヨガ1").assertIsDisplayed()
+
+        // "ヨガ1" 아이템을 클릭
+        composeTestRule.onNodeWithText("ヨガ1").performClick()
+
+        // UI가 안정 상태가 될 때까지 기다림
+        composeTestRule.awaitIdle()
+    }
+
+    @Test
+    fun aboutMeInterestScreenGoNextScreen() = runBlocking {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+            }
+        }
+
+        composeTestRule.onNodeWithText("ヨガ1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("ヨガ1").performClick()
+
+        composeTestRule.onNodeWithText("ヨガ2").assertIsDisplayed()
+        composeTestRule.onNodeWithText("ヨガ2").performClick()
+
+        composeTestRule.onNodeWithText("ヨガ3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("ヨガ3").performClick()
+
+        // UI가 안정 상태가 될 때까지 기다림
+        composeTestRule.awaitIdle()
+
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
+
+        composeTestRule.onNodeWithText("確認")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun aboutMeInterestScreenTabSelected() = runBlocking {
+        composeTestRule.setContent {
+            TokitokiTheme {
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+            }
+        }
+
+        composeTestRule.onNodeWithText("ライフスタイル").assertIsDisplayed()
+        composeTestRule.onNodeWithText("ライフスタイル").performClick()
+
+        composeTestRule.awaitIdle()
+
+        composeTestRule.onNodeWithText("価値観").assertIsDisplayed()
+        composeTestRule.onNodeWithText("価値観").performClick()
+
+        // UI가 안정 상태가 될 때까지 기다림
+        composeTestRule.awaitIdle()
     }
 }
