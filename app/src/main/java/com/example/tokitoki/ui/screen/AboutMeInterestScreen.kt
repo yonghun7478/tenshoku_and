@@ -572,10 +572,16 @@ fun AboutMeInterestContentsPreview() {
         userInterestsByCategory = userInterests
     )
 
+    val pagerState = rememberPagerState(
+        initialPage = 1
+    ) {
+        3
+    }
+
     TokitokiTheme {
         AboutMeInterestContents(
             uiState = uiState,
-            pagerState = rememberPagerState { 3 },
+            pagerState = pagerState,
             coroutineScope = coroutineScope
         )
     }
