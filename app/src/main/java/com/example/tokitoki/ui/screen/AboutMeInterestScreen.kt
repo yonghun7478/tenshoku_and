@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,8 +60,8 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tokitoki.R
-import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.model.CategoryItem
 import com.example.tokitoki.ui.model.UserInterestItem
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
@@ -150,6 +151,7 @@ fun AboutMeInterestContents(
         modifier = Modifier
             .fillMaxSize()
             .background(color = LocalColor.current.white)
+            .testTag(TestTags.ABOUT_ME_INTEREST_CONTENTS)
     ) {
         Column(
             modifier = Modifier
