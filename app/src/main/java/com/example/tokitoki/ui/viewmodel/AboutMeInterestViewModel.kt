@@ -23,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AboutMeInterestViewModel
 @Inject constructor(
+    private val isTest: Boolean,
     private val getUserInterestsUseCase: GetUserInterestsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : ViewModel() {
@@ -32,6 +33,10 @@ class AboutMeInterestViewModel
 
     private val _uiEvent = MutableSharedFlow<AboutMeInterestEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
+
+    fun getIsTest(): Boolean {
+        return isTest
+    }
 
     suspend fun init() {
         val domainCategories = getCategoriesUseCase()

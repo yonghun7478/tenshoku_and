@@ -95,6 +95,7 @@ fun AboutMeInterestScreen(
             coroutineScope = coroutineScope,
             pagerState = pagerState,
             aboutMeInterestAction = viewModel::aboutMeInterestAction,
+            isTest = viewModel.getIsTest()
         )
     }
 
@@ -374,12 +375,24 @@ fun AboutMeInterestGridItem(
         1f to Color.Black,
     )
 
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(url)
-            .error(R.drawable.no_image_icon) // 로드 실패 시 로컬 이미지
-            .build()
-    )
+    // 이미지 로더를 테스트 환경에 맞게 설정
+    val painter = if (isTest) {
+        painterResource(R.drawable.couple_1) // 테스트용 로컬 이미지
+    } else {
+        rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(url)
+                .error(R.drawable.no_image_icon) // 이미지 로드 실패 시 대체 이미지
+                .build()
+        )
+    }
+
+    // 이미지 로드 성공 여부를 확인 (테스트일 경우 성공 처리)
+    val isImageLoaded = if (painter is AsyncImagePainter) {
+        painter.state is AsyncImagePainter.State.Success  // 네트워크 이미지는 로딩 성공 여부 확인
+    } else {
+        true  // 로컬 이미지는 항상 성공으로 간주
+    }
 
     BoxWithConstraints(
         modifier = modifier
@@ -401,21 +414,21 @@ fun AboutMeInterestGridItem(
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 aboutMeInterestAction(
-                    AboutMeInterestAction.ITEM_CLICKED(
-                        categoryTitle,
-                        index
-                    )
+                    AboutMeInterestAction.ITEM_CLICKED(categoryTitle, index)
                 )
-            },
+            }
     ) {
+        // 이미지 표시
         Image(
-            painter = if (!isTest) painter else painterResource(R.drawable.couple_1),
+            painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.aspectRatio(1f)
         )
 
-        if (painter.state is AsyncImagePainter.State.Success || isTest) {
+        // 이미지가 성공적으로 로드되었을 때만 그라데이션 및 텍스트 표시
+        if (isImageLoaded) {
+            // 이미지 아래 그라데이션 처리
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -423,7 +436,6 @@ fun AboutMeInterestGridItem(
                     .background(Brush.verticalGradient(colorStops = colorStops))
                     .align(Alignment.BottomCenter)
             )
-
 
             // Badge 표시
             if (showBadge) {
@@ -436,15 +448,14 @@ fun AboutMeInterestGridItem(
                         .align(Alignment.TopEnd)
                 ) {
                     Image(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         painter = painterResource(id = R.drawable.baseline_check_24),
                         contentDescription = "",
                     )
                 }
             }
 
-            // 텍스트 표시 (그라데이션 위에 위치)
+            // 타이틀 텍스트 표시
             Text(
                 text = title,
                 modifier = Modifier
