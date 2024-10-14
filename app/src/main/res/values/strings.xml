@@ -37,4 +37,6 @@
     <string name="about_me_interest_title1">あなたらしさが伝わるものを</string>
     <string name="about_me_interest_title2">3つ以上選びましょう</string>
     <string name="about_me_interest_title3">後から変更できます</string>
+    <string name="validate_about_me_interest">アイテムを３つ以上を選択してください。</string>
+
 </resources>

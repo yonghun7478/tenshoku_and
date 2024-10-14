@@ -63,6 +63,7 @@ import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.model.CategoryItem
 import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.AboutMeInterestEvent
@@ -107,14 +108,23 @@ fun AboutMeInterestScreen(
                             pagerState.animateScrollToPage(event.action.index)
                         }
 
-                        AboutMeInterestAction.DIALOG_OK -> {}
-                        AboutMeInterestAction.NEXT -> {
-
+                        AboutMeInterestAction.DIALOG_OK -> {
+                            viewModel.updateShowDialogState(false)
                         }
+
+                        AboutMeInterestAction.NEXT -> {
+                            if (viewModel.checkInterests()) {
+                                onAboutMeThirdScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
+                        }
+
                         AboutMeInterestAction.NOTHING -> {}
                         AboutMeInterestAction.PREVIOUS -> {
                             onAboutMeSecondScreen()
                         }
+
                         is AboutMeInterestAction.ITEM_CLICKED -> {
                             viewModel.updateGridItem(event.action.category, event.action.index)
                         }
@@ -177,6 +187,13 @@ fun AboutMeInterestContents(
             previousActionParam = AboutMeInterestAction.PREVIOUS,
             nextActionParam = AboutMeInterestAction.NEXT
         )
+
+        if (uiState.showDialog) {
+            TkAlertDialog(
+                message = stringResource(R.string.validate_about_me_interest),
+                onDismissRequest = { aboutMeInterestAction(AboutMeInterestAction.DIALOG_OK) },
+            )
+        }
     }
 }
 

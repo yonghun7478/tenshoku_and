@@ -88,4 +88,11 @@ class AboutMeInterestViewModel
             }
         }
     }
+
+    fun checkInterests(): Boolean {
+        val selectedInterests = _uiState.value.userInterestsByCategory.values.flatten()
+            .filter { it.showBadge }
+
+        return selectedInterests.size > 2
+    }
 }
