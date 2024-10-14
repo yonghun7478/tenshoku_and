@@ -144,6 +144,7 @@ fun AboutMeInterestContents(
     pagerState: PagerState,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
     coroutineScope: CoroutineScope,
+    isTest: Boolean = false
 ) {
     Box(
         modifier = Modifier
@@ -175,7 +176,8 @@ fun AboutMeInterestContents(
                 uiState = uiState,
                 pagerState = pagerState,
                 coroutineScope = coroutineScope,
-                aboutMeInterestAction = aboutMeInterestAction
+                aboutMeInterestAction = aboutMeInterestAction,
+                isTest = isTest
             )
         }
 
@@ -302,6 +304,7 @@ fun AboutMeInterestPager(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    isTest: Boolean = false
 ) {
     HorizontalPager(
         state = pagerState,
@@ -319,7 +322,8 @@ fun AboutMeInterestPager(
         AboutMeInterestPage(
             categoryTitle = currentCategoryTitle,
             interestList = currentInterestList,
-            aboutMeInterestAction = aboutMeInterestAction
+            aboutMeInterestAction = aboutMeInterestAction,
+            isTest = isTest
         )
     }
 }
@@ -329,6 +333,7 @@ fun AboutMeInterestPage(
     categoryTitle: String,
     interestList: List<UserInterestItem>,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    isTest: Boolean = false
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3), // 3개의 열을 고정
@@ -344,7 +349,8 @@ fun AboutMeInterestPage(
                 categoryTitle = categoryTitle,
                 url = interest.url,
                 showBadge = interest.showBadge,
-                aboutMeInterestAction = aboutMeInterestAction
+                aboutMeInterestAction = aboutMeInterestAction,
+                isTest = isTest
             )
         }
     }
@@ -359,6 +365,7 @@ fun AboutMeInterestGridItem(
     url: String = "",
     showBadge: Boolean = false,
     aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    isTest: Boolean = false
 ) {
     val colorStops = arrayOf(
         0.1f to Color.Transparent,
@@ -400,13 +407,13 @@ fun AboutMeInterestGridItem(
             },
     ) {
         Image(
-            painter = painter,
+            painter = if (!isTest) painter else painterResource(R.drawable.couple_1),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.aspectRatio(1f)
         )
 
-        if (painter.state is AsyncImagePainter.State.Success) {
+        if (painter.state is AsyncImagePainter.State.Success || isTest) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -502,13 +509,15 @@ fun AboutMeInterestContentsPreview() {
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 2
+            categoryId = 2,
+            showBadge = true
         ),
         UserInterestItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 2
+            categoryId = 2,
+            showBadge = true
         ),
         UserInterestItem(
             id = 3,
@@ -582,7 +591,8 @@ fun AboutMeInterestContentsPreview() {
         AboutMeInterestContents(
             uiState = uiState,
             pagerState = pagerState,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            isTest = true
         )
     }
 }
