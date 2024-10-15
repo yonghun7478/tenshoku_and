@@ -1,4 +1,4 @@
-package com.example.tokitoki.fake
+package com.example.tokitoki.fake.di
 
 import com.example.tokitoki.di.IsTestModule
 import dagger.Module
