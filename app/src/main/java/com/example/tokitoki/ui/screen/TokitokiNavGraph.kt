@@ -111,6 +111,14 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeThirdScreen = {
+                    navAction.navigateToAboutMeThird()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ABOUT_ME_THIRD_ROUTE) {
+            AboutMeThirdScreen(
+                onAboutMeThumbnailScreen = {
 
                 }
             )
