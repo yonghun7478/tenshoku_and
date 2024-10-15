@@ -1,7 +1,6 @@
-package com.example.tokitoki.ui.model.converter
+package com.example.tokitoki.ui.model.backup
 
 import com.example.tokitoki.domain.model.User
-import com.example.tokitoki.ui.model.backup.UserUiModel
 
 object UserUiConverter {
     fun domainUserToUser(user: User): UserUiModel {

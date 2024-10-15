@@ -1,9 +1,9 @@
-package com.example.tokitoki.data.repository
+package com.example.tokitoki.data.repository.backup
 
-import com.example.tokitoki.data.local.LocalUserDao
-import com.example.tokitoki.data.local.LocalUserEntity
-import com.example.tokitoki.data.local.UserDao
-import com.example.tokitoki.data.local.UserPreferences
+import com.example.tokitoki.data.local.backup.LocalUserDao
+import com.example.tokitoki.data.local.backup.LocalUserEntity
+import com.example.tokitoki.data.local.backup.UserDao
+import com.example.tokitoki.data.local.backup.UserPreferences
 import com.example.tokitoki.data.remote.UserApiService
 import com.example.tokitoki.domain.converter.UserDomainConverter
 import com.example.tokitoki.domain.model.User

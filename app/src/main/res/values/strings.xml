@@ -34,4 +34,10 @@
     <string name="about_me_name_title">あなたの氏名を\n決めましょう</string>
     <string name="about_me_name_pressholder">氏名を入力してください</string>
     <string name="about_me_second_title">あなたが\nどんな人ですかもう少し\n教えてください</string>
+    <string name="about_me_interest_title1">あなたらしさが伝わるものを</string>
+    <string name="about_me_interest_title2">3つ以上選びましょう</string>
+    <string name="about_me_interest_title3">後から変更できます</string>
+    <string name="validate_about_me_interest">アイテムを３つ以上を選択してください。</string>
+    <string name="about_me_third_title">最後に\n写真と自己紹介文を\n設定しましょう。</string>
+
 </resources>

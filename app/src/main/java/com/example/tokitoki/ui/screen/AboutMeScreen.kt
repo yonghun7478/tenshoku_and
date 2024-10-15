@@ -76,7 +76,7 @@ fun AboutMeContents(
         TkStepIcon(
             modifier = Modifier.padding(top = 60.dp, start = 20.dp),
             1,
-            4
+            3
         )
 
         Text(
