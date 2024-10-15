@@ -340,7 +340,9 @@ fun AboutMeInterestPage(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3), // 3개의 열을 고정
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(TestTags.ABOUT_ME_INTEREST_PAGE),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp), // 항목 간의 세로 간격
         horizontalArrangement = Arrangement.spacedBy(8.dp) // 항목 간의 가로 간격

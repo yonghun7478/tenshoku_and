@@ -13,7 +13,6 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -70,11 +69,13 @@ class AboutMeInterestScreenTest {
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_MALE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_GENDER_MALE).performClick()
 
-        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD).performTextInput("19911211")
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD)
+            .performTextInput("19911211")
 
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
@@ -82,7 +83,8 @@ class AboutMeInterestScreenTest {
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_CONTENTS).assertIsDisplayed()
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD).performTextInput("yongyong")
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_NAME_TEXT_FIELD)
+            .performTextInput("yongyong")
 
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).isDisplayed()
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
