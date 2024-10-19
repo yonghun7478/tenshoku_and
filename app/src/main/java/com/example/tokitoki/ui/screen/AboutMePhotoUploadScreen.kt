@@ -1,6 +1,11 @@
 package com.example.tokitoki.ui.screen
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +20,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,15 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
 import com.example.tokitoki.ui.constants.AgreementConfirmationAction
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
+import com.example.tokitoki.ui.state.AboutMePhotoUploadEvent
 import com.example.tokitoki.ui.state.Gender
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.AboutMePhotoUploadViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun AboutMePhotoUploadScreen(
@@ -51,9 +61,35 @@ fun AboutMePhotoUploadScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+
+        }
+
     AboutMePhotoUploadContents(
         aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction
     )
+
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is AboutMePhotoUploadEvent.ACTION -> {
+                    when (event.action) {
+                        AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+
+                        AboutMePhotoUploadAction.NOTHING -> {}
+                        AboutMePhotoUploadAction.SUBMIT -> {}
+                    }
+
+                }
+
+                AboutMePhotoUploadEvent.NOTHING -> {}
+            }
+        }
+    }
 }
 
 @Composable
@@ -75,7 +111,8 @@ fun AboutMePhotoUploadContents(
         )
 
         AboutMePhotoUploadInputBox(
-            modifier = Modifier.padding(top = 40.dp)
+            modifier = Modifier.padding(top = 40.dp),
+            aboutMePhotoUploadAction = aboutMePhotoUploadAction
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -109,8 +146,9 @@ fun AboutMePhotoUploadTitle(
 
 @Composable
 fun AboutMePhotoUploadInputBox(
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
+    ) {
     val grayColor = LocalColor.current.lightGray
 
     Box(
@@ -134,6 +172,11 @@ fun AboutMePhotoUploadInputBox(
                     ),
                     cornerRadius = CornerRadius.Zero // 원하는 경우 모서리 둥글기 설정 가능
                 )
+            }.clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_INPUT_BOX)
             }
     ) {
         Column(

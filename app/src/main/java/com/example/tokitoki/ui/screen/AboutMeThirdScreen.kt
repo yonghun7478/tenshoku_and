@@ -35,7 +35,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeThirdViewModel
 @Composable
 fun AboutMeThirdScreen(
     viewModel: AboutMeThirdViewModel = hiltViewModel(),
-    onAboutMeThumbnailScreen: () -> Unit = {},
+    onAboutMePhotoUploadScreen: () -> Unit = {},
 ) {
     AboutMeThirdContents(
         aboutMeThirdAction = viewModel::aboutMeThirdAction
@@ -51,7 +51,7 @@ fun AboutMeThirdScreen(
                 is AboutMeThirdEvent.ACTION -> {
                     when (uiEvent.action) {
                         AboutMeThirdAction.SUBMIT -> {
-                            onAboutMeThumbnailScreen()
+                            onAboutMePhotoUploadScreen()
                         }
 
                         AboutMeThirdAction.NOTHING -> {
