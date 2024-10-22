@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -40,18 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
-import com.example.tokitoki.ui.constants.AboutMeInterestAction
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
-import com.example.tokitoki.ui.constants.AgreementConfirmationAction
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.state.AboutMePhotoUploadEvent
-import com.example.tokitoki.ui.state.Gender
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.AboutMePhotoUploadViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun AboutMePhotoUploadScreen(
@@ -203,7 +196,6 @@ fun AboutMePhotoUploadInputBox(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
