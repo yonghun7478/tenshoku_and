@@ -1,19 +1,7 @@
 package com.example.tokitoki.ui.screen
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,11 +11,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -35,20 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,13 +39,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
+import com.example.tokitoki.ui.screen.components.dialog.TkBottomDialog
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.state.AboutMePhotoUploadEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMePhotoUploadViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlin.math.log
 
 @Composable
 fun AboutMePhotoUploadScreen(
@@ -76,15 +54,15 @@ fun AboutMePhotoUploadScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val pickMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-
-        }
+//    val pickMedia =
+//        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+//
+//        }
 
     AboutMePhotoUploadContents(
+        showBottomDialog = uiState.showBottomDialog,
         aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction
     )
-
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -92,11 +70,15 @@ fun AboutMePhotoUploadScreen(
                 is AboutMePhotoUploadEvent.ACTION -> {
                     when (event.action) {
                         AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
-                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            viewModel.updateShowBottomDialogState(true)
+//                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         }
 
                         AboutMePhotoUploadAction.NOTHING -> {}
                         AboutMePhotoUploadAction.SUBMIT -> {}
+                        AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG -> {
+                            viewModel.updateShowBottomDialogState(false)
+                        }
                     }
 
                 }
@@ -109,10 +91,9 @@ fun AboutMePhotoUploadScreen(
 
 @Composable
 fun AboutMePhotoUploadContents(
+    showBottomDialog: Boolean = false,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-
     Box {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -147,16 +128,14 @@ fun AboutMePhotoUploadContents(
             )
         }
 
-        MyScreen(
-            showDialog = showDialog,
+        TkBottomDialog(
+            isVisible = showBottomDialog,
             onDismiss = {
-                showDialog = false
+                aboutMePhotoUploadAction(AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG)
+            }, {
+                AboutMePhotoUploadBottomDialogContent()
             }
         )
-
-        Button(onClick = { showDialog = true }) {
-            Text("Show Bottom Sheet Dialog")
-        }
     }
 
 }
@@ -236,85 +215,18 @@ fun AboutMePhotoUploadInputBox(
 }
 
 @Composable
-fun CustomBottomSheetDialog(
-    isVisible: Boolean,
-    onDismiss: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    var contentHeight by remember { mutableStateOf(0.dp) } // 콘텐츠 높이 저장
-    val density = LocalDensity.current // 밀도 가져오기
-
-    // 애니메이션 처리할 y 위치 상태
-    val offsetY by animateDpAsState(
-        targetValue = if (isVisible) 0.dp else contentHeight + 30.dp,
-        animationSpec = tween(durationMillis = 500)
-    )
-
-    val backgroundAlpha by animateFloatAsState(
-        targetValue = if (isVisible) 0.5f else 0f,
-        animationSpec = tween(durationMillis = 500)
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize()
+fun AboutMePhotoUploadBottomDialogContent() {
+    Column(
+        modifier = Modifier.height(400.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = backgroundAlpha))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onDismiss() }
-        )
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .offset(y = offsetY)
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                )
-                .padding(16.dp)
-                .onGloballyPositioned { layoutCoordinates ->
-                    // contentHeight를 실제 콘텐츠의 높이로 설정
-
-                    contentHeight = with(density) {
-                        layoutCoordinates.size.height.toDp()
-                    }
-                }
-        ) {
-            content()
+        Text("커스텀 Bottom Sheet 다이얼로그")
+        Button(onClick = { /* 확인 로직 */ }) {
+            Text("확인")
         }
-    }
-
-}
-
-@Composable
-fun MyScreen(
-    showDialog: Boolean = false,
-    onDismiss: () -> Unit = {}
-) {
-
-    CustomBottomSheetDialog(
-        isVisible = showDialog,
-        onDismiss = onDismiss
-    ) {
-        Column(
-            modifier = Modifier.height(400.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text("커스텀 Bottom Sheet 다이얼로그")
-            Button(onClick = { /* 확인 로직 */ }) {
-                Text("확인")
-            }
-            Button(onClick = { }) {
-                Text("취소")
-            }
+        Button(onClick = { }) {
+            Text("취소")
         }
     }
 }
@@ -331,6 +243,6 @@ fun AboutMePhotoUploadContentsPreview() {
 @Composable
 fun MyScreenPreview() {
     TokitokiTheme {
-        MyScreen()
+        AboutMePhotoUploadBottomDialogContent()
     }
 }

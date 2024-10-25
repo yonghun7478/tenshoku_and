@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +32,24 @@ class AboutMePhotoUploadViewModel @Inject constructor(
     fun aboutMePhotoUploadAction(action: AboutMePhotoUploadAction) {
         viewModelScope.launch {
             _uiEvent.emit(AboutMePhotoUploadEvent.ACTION(action))
+        }
+    }
+
+    fun updateShowDialogState(showDialog: Boolean) {
+        _uiState.update {
+            if(showDialog)
+                it.copy(showDialog = true)
+            else
+                it.copy(showDialog = false)
+        }
+    }
+
+    fun updateShowBottomDialogState(showBottomDialog: Boolean) {
+        _uiState.update {
+            if(showBottomDialog)
+                it.copy(showBottomDialog = true)
+            else
+                it.copy(showBottomDialog = false)
         }
     }
 }
