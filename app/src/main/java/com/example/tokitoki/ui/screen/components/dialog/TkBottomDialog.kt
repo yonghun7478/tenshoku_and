@@ -1,12 +1,15 @@
 package com.example.tokitoki.ui.screen.components.dialog
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -19,11 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -39,6 +44,16 @@ fun TkBottomDialog(
     val offsetY = remember { Animatable(0f) }
     val backgroundAlpha = remember { Animatable(0f) }
     var contentAlpha by remember { mutableFloatStateOf(0f) } // 초기 렌더링에서 다이얼로그를 숨김
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val dragState = rememberDraggableState { delta ->
+        coroutineScope.launch {
+            val newOffset =
+                (offsetY.value + delta).coerceIn(0f, with(density) { dialogHeight.toPx() })
+            offsetY.snapTo(newOffset)
+        }
+    }
 
     LaunchedEffect(isVisible, dialogHeight) {
         if (isVisible) {
@@ -58,7 +73,7 @@ fun TkBottomDialog(
             // 다이얼로그가 사라질 때 애니메이션 후 설정 초기화
             val offsetJob = launch {
                 offsetY.animateTo(
-                    with(density) { dialogHeight.toPx() + 30f },
+                    with(density) { dialogHeight.toPx() },
                     animationSpec = tween(durationMillis = 500)
                 )
             }
@@ -88,7 +103,7 @@ fun TkBottomDialog(
                     ) { onDismiss() }
             )
 
-            BoxWithConstraints(
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .offset(y = with(density) { offsetY.value.toDp() })
@@ -99,20 +114,25 @@ fun TkBottomDialog(
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
                     .padding(16.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onDismiss() }
-            ) {
-                val maxContentHeight = maxHeight
-
-                // LaunchedEffect로 초기 위치 설정
-                LaunchedEffect(maxContentHeight) {
-                    if (maxContentHeight > 0.dp) {
-                        dialogHeight = maxContentHeight
+                    .draggable(
+                        state = dragState,
+                        orientation = Orientation.Vertical,
+                        onDragStopped = {
+                            if (offsetY.value > with(density) { dialogHeight.toPx() } / 2) {
+                                onDismiss()
+                            } else {
+                                offsetY.animateTo(
+                                    0f,
+                                    animationSpec = tween(durationMillis = 300)
+                                )
+                            }
+                        }
+                    )
+                    .onGloballyPositioned { coordinates ->
+                        dialogHeight = with(density) { coordinates.size.height.toDp() }
+                        Log.d("CYHH", "Actual content height: $dialogHeight")
                     }
-                }
-
+            ) {
                 content()
             }
         }
