@@ -1,9 +1,9 @@
 package com.example.tokitoki.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +11,14 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,9 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -215,18 +223,95 @@ fun AboutMePhotoUploadInputBox(
 }
 
 @Composable
-fun AboutMePhotoUploadBottomDialogContent() {
+fun AboutMePhotoUploadBottomDialogContent(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier.height(400.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.fillMaxWidth(),
     ) {
-        Text("커스텀 Bottom Sheet 다이얼로그")
-        Button(onClick = { /* 확인 로직 */ }) {
-            Text("확인")
+        Text(
+            text = "引目写真で雰囲気を伝えましょう"
+        )
+
+        Text(
+            text = "他の人に取られた写真にしましょう"
+        )
+
+        Text(
+            text = "自分以外の人が映っている場合は、モザイクなどでわからないようにしましょう"
+        )
+
+        Button(
+            modifier = modifier,
+            colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
+            onClick = {
+            },
+        ) {
+            Text(
+                text = "ライブラリから選ぶ",
+                color = LocalColor.current.black
+            )
         }
-        Button(onClick = { }) {
-            Text("취소")
+
+        Button(
+            modifier = modifier,
+            colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
+            onClick = {
+            },
+        ) {
+            Text(
+                text = "写真を取る",
+                color = LocalColor.current.black
+            )
+        }
+
+    }
+}
+
+@Composable
+fun AboutMePhotoUploadExampleImg(
+    modifier: Modifier = Modifier,
+    isOk: Boolean = false
+) {
+    Box(
+        modifier = modifier
+            .padding(5.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(0.8f)
+                .clip(RoundedCornerShape(30.dp))
+        ) {
+            Image(
+                modifier = Modifier
+                    .fillMaxSize(),
+                painter = painterResource(id = R.drawable.man_example),
+                contentScale = ContentScale.Crop,
+                contentDescription = "",
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .offset(x = -5.dp, y = -5.dp)
+                .shadow(
+                    elevation = 10.dp,
+                    shape = CircleShape
+                )
+                .clip(CircleShape)
+                .background(LocalColor.current.white)
+                .align(alignment = Alignment.TopStart)
+        ) {
+            Icon(
+                modifier = Modifier
+                    .align(alignment = Alignment.Center)
+                    .size(25.dp),
+                painter = painterResource(id = if (isOk) R.drawable.baseline_check_circle_outline_24 else R.drawable.baseline_remove_circle_outline_24),
+                tint = if (isOk) LocalColor.current.blue else Color.Red,
+                contentDescription = ""
+            )
         }
     }
 }
@@ -241,8 +326,24 @@ fun AboutMePhotoUploadContentsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun MyScreenPreview() {
+fun AboutMePhotoUploadBottomDialogContentPreview() {
     TokitokiTheme {
         AboutMePhotoUploadBottomDialogContent()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMePhotoUploadExampleImgPreview() {
+    TokitokiTheme {
+        Column {
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier.width(120.dp),
+                isOk = true
+            )
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier.width(120.dp)
+            )
+        }
     }
 }
