@@ -40,6 +40,7 @@ fun TkBottomDialog(
     content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current // 밀도 가져오기
+    val bufferPadding = 30.dp
     var dialogHeight by remember { mutableStateOf(0.dp) } // 콘텐츠 높이 저장
     val offsetY = remember { Animatable(0f) }
     val backgroundAlpha = remember { Animatable(0f) }
@@ -59,7 +60,7 @@ fun TkBottomDialog(
         if (isVisible) {
             if (dialogHeight > 0.dp) {
                 // 초기 설정: 다이얼로그를 화면 아래로 배치하고 보이지 않게 설정
-                offsetY.snapTo(with(density) { dialogHeight.toPx() })
+                offsetY.snapTo(with(density) { dialogHeight.toPx() + bufferPadding.toPx() })
                 contentAlpha = 1f // 다이얼로그를 화면에 보이게 함
 
                 launch {
@@ -73,7 +74,7 @@ fun TkBottomDialog(
             // 다이얼로그가 사라질 때 애니메이션 후 설정 초기화
             val offsetJob = launch {
                 offsetY.animateTo(
-                    with(density) { dialogHeight.toPx() },
+                    with(density) { dialogHeight.toPx() + bufferPadding.toPx() },
                     animationSpec = tween(durationMillis = 500)
                 )
             }
