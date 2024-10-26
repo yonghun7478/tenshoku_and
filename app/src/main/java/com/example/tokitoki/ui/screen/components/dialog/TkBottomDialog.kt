@@ -118,7 +118,7 @@ fun TkBottomDialog(
                         state = dragState,
                         orientation = Orientation.Vertical,
                         onDragStopped = {
-                            if (offsetY.value > with(density) { dialogHeight.toPx() } / 2) {
+                            if (offsetY.value > with(density) { dialogHeight.toPx() } / 4) {
                                 onDismiss()
                             } else {
                                 offsetY.animateTo(
