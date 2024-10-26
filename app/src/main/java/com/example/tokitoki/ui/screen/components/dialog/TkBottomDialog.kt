@@ -64,10 +64,10 @@ fun TkBottomDialog(
                 contentAlpha = 1f // 다이얼로그를 화면에 보이게 함
 
                 launch {
-                    offsetY.animateTo(0f, animationSpec = tween(durationMillis = 500))
+                    offsetY.animateTo(0f, animationSpec = tween(durationMillis = 300))
                 }
                 launch {
-                    backgroundAlpha.animateTo(0.5f, animationSpec = tween(durationMillis = 500))
+                    backgroundAlpha.animateTo(0.5f, animationSpec = tween(durationMillis = 300))
                 }
             }
         } else {
@@ -75,11 +75,11 @@ fun TkBottomDialog(
             val offsetJob = launch {
                 offsetY.animateTo(
                     with(density) { dialogHeight.toPx() + bufferPadding.toPx() },
-                    animationSpec = tween(durationMillis = 500)
+                    animationSpec = tween(durationMillis = 300)
                 )
             }
             val alphaJob = launch {
-                backgroundAlpha.animateTo(0f, animationSpec = tween(durationMillis = 500))
+                backgroundAlpha.animateTo(0f, animationSpec = tween(durationMillis = 300))
             }
             offsetJob.join()
             alphaJob.join()
@@ -118,8 +118,10 @@ fun TkBottomDialog(
                     .draggable(
                         state = dragState,
                         orientation = Orientation.Vertical,
-                        onDragStopped = {
-                            if (offsetY.value > with(density) { dialogHeight.toPx() } / 4) {
+                        onDragStopped = { velocity ->
+                            val thresholdVelocity = 1500f
+
+                            if (velocity > thresholdVelocity) {
                                 onDismiss()
                             } else {
                                 offsetY.animateTo(
