@@ -64,11 +64,6 @@ fun AboutMePhotoUploadScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-//    val pickMedia =
-//        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-//
-//        }
-
     AboutMePhotoUploadContents(
         showBottomDialog = uiState.showBottomDialog,
         aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction
@@ -81,13 +76,17 @@ fun AboutMePhotoUploadScreen(
                     when (event.action) {
                         AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
                             viewModel.updateShowBottomDialogState(true)
-//                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         }
 
                         AboutMePhotoUploadAction.NOTHING -> {}
                         AboutMePhotoUploadAction.SUBMIT -> {}
                         AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG -> {
                             viewModel.updateShowBottomDialogState(false)
+                        }
+
+                        AboutMePhotoUploadAction.CLICK_LIBRARY -> {}
+                        AboutMePhotoUploadAction.CLICK_TAKE_PICTURE -> {
+
                         }
                     }
 
@@ -143,7 +142,9 @@ fun AboutMePhotoUploadContents(
             onDismiss = {
                 aboutMePhotoUploadAction(AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG)
             }, {
-                AboutMePhotoUploadBottomDialogContent()
+                AboutMePhotoUploadBottomDialogContent(
+                    aboutMePhotoUploadAction = aboutMePhotoUploadAction
+                )
             }
         )
     }
@@ -226,8 +227,9 @@ fun AboutMePhotoUploadInputBox(
 
 @Composable
 fun AboutMePhotoUploadBottomDialogContent(
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
+    ) {
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -305,6 +307,7 @@ fun AboutMePhotoUploadBottomDialogContent(
                 .padding(top = 10.dp, start = 5.dp, end = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
             onClick = {
+                aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_LIBRARY)
             },
         ) {
             Text(
@@ -319,6 +322,7 @@ fun AboutMePhotoUploadBottomDialogContent(
                 .padding(top = 2.dp, start = 5.dp, end = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
             onClick = {
+                aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_TAKE_PICTURE)
             },
         ) {
             Text(
