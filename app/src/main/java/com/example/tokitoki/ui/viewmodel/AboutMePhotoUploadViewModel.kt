@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
@@ -51,5 +52,9 @@ class AboutMePhotoUploadViewModel @Inject constructor(
             else
                 it.copy(showBottomDialog = false)
         }
+    }
+
+    fun updateCapturedImageUri(uri: Uri) {
+        _uiState.update { it.copy(capturedImageUri = uri) }
     }
 }

@@ -1,5 +1,11 @@
 package com.example.tokitoki.ui.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +52,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberImagePainter
+import com.example.tokitoki.BuildConfig
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
@@ -55,6 +66,8 @@ import com.example.tokitoki.ui.state.AboutMePhotoUploadEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMePhotoUploadViewModel
+import com.example.tokitoki.utils.createImageFile
+import java.util.Objects
 
 @Composable
 fun AboutMePhotoUploadScreen(
@@ -64,9 +77,34 @@ fun AboutMePhotoUploadScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val context = LocalContext.current
+    val file = context.createImageFile()
+    val uri = FileProvider.getUriForFile(
+        Objects.requireNonNull(context),
+        BuildConfig.APPLICATION_ID + ".provider", file
+    )
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+            viewModel.updateCapturedImageUri(uri)
+            viewModel.updateShowBottomDialogState(false)
+        }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+            cameraLauncher.launch(uri)
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     AboutMePhotoUploadContents(
         showBottomDialog = uiState.showBottomDialog,
-        aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction
+        aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction,
+        capturedImageUri = uiState.capturedImageUri
     )
 
     LaunchedEffect(Unit) {
@@ -74,8 +112,12 @@ fun AboutMePhotoUploadScreen(
             when (event) {
                 is AboutMePhotoUploadEvent.ACTION -> {
                     when (event.action) {
-                        AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
-                            viewModel.updateShowBottomDialogState(true)
+                        is AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
+                            if(event.action.hasPicture) {
+
+                            } else {
+                                viewModel.updateShowBottomDialogState(true)
+                            }
                         }
 
                         AboutMePhotoUploadAction.NOTHING -> {}
@@ -86,6 +128,17 @@ fun AboutMePhotoUploadScreen(
 
                         AboutMePhotoUploadAction.CLICK_LIBRARY -> {}
                         AboutMePhotoUploadAction.CLICK_TAKE_PICTURE -> {
+                            val permissionCheckResult =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA
+                                )
+                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                cameraLauncher.launch(uri)
+                            } else {
+                                // Request a permission
+                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
 
                         }
                     }
@@ -102,6 +155,7 @@ fun AboutMePhotoUploadScreen(
 fun AboutMePhotoUploadContents(
     showBottomDialog: Boolean = false,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
+    capturedImageUri: Uri = Uri.EMPTY
 ) {
     Box {
         Column(
@@ -120,7 +174,8 @@ fun AboutMePhotoUploadContents(
 
             AboutMePhotoUploadInputBox(
                 modifier = Modifier.padding(top = 40.dp),
-                aboutMePhotoUploadAction = aboutMePhotoUploadAction
+                aboutMePhotoUploadAction = aboutMePhotoUploadAction,
+                capturedImageUri = capturedImageUri
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -167,60 +222,78 @@ fun AboutMePhotoUploadTitle(
 @Composable
 fun AboutMePhotoUploadInputBox(
     modifier: Modifier = Modifier,
+    capturedImageUri: Uri = Uri.EMPTY,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
 ) {
     val grayColor = LocalColor.current.lightGray
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth(0.4f)
-            .aspectRatio(0.7f)
-            .drawWithContent {
-                drawContent()
 
-                val strokeWidth = 2.dp.toPx()
-                val dashLength = 5.dp.toPx()
-                val gapLength = 5.dp.toPx()
+    if (capturedImageUri.path?.isNotEmpty() == true) {
+        Image(
+            modifier = modifier
+                .fillMaxWidth(0.4f)
+                .aspectRatio(0.7f)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_INPUT_BOX(true))
+                },
+            painter = rememberImagePainter(capturedImageUri),
+            contentDescription = null
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .fillMaxWidth(0.4f)
+                .aspectRatio(0.7f)
+                .drawWithContent {
+                    drawContent()
 
-                drawRoundRect(
-                    color = grayColor, // 원하는 테두리 색상
-                    style = Stroke(
-                        width = strokeWidth,
-                        pathEffect = PathEffect.dashPathEffect(
-                            floatArrayOf(dashLength, gapLength), 0f
-                        )
-                    ),
-                    cornerRadius = CornerRadius.Zero // 원하는 경우 모서리 둥글기 설정 가능
+                    val strokeWidth = 2.dp.toPx()
+                    val dashLength = 5.dp.toPx()
+                    val gapLength = 5.dp.toPx()
+
+                    drawRoundRect(
+                        color = grayColor, // 원하는 테두리 색상
+                        style = Stroke(
+                            width = strokeWidth,
+                            pathEffect = PathEffect.dashPathEffect(
+                                floatArrayOf(dashLength, gapLength), 0f
+                            )
+                        ),
+                        cornerRadius = CornerRadius.Zero // 원하는 경우 모서리 둥글기 설정 가능
+                    )
+                }
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_INPUT_BOX(false))
+                }
+        ) {
+            Column(
+                modifier = Modifier.align(alignment = Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.about_me_photo_upload_input_title),
+                    textAlign = TextAlign.Center,
+                    fontSize = 10.sp,
+                    lineHeight = 13.sp,
+                )
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Icon(
+                    modifier = modifier
+                        .clip(CircleShape)
+                        .background(color = LocalColor.current.blue),
+                    painter = painterResource(id = R.drawable.baseline_add_24),
+                    tint = LocalColor.current.white,
+                    contentDescription = ""
                 )
             }
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_INPUT_BOX)
-            }
-    ) {
-        Column(
-            modifier = Modifier.align(alignment = Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.about_me_photo_upload_input_title),
-                textAlign = TextAlign.Center,
-                fontSize = 10.sp,
-                lineHeight = 13.sp,
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Icon(
-                modifier = modifier
-                    .clip(CircleShape)
-                    .background(color = LocalColor.current.blue),
-                painter = painterResource(id = R.drawable.baseline_add_24),
-                tint = LocalColor.current.white,
-                contentDescription = ""
-            )
         }
     }
 }
@@ -229,7 +302,7 @@ fun AboutMePhotoUploadInputBox(
 fun AboutMePhotoUploadBottomDialogContent(
     modifier: Modifier = Modifier,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
-    ) {
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
