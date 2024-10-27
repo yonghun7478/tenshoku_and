@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -84,6 +85,14 @@ fun AboutMePhotoUploadScreen(
         BuildConfig.APPLICATION_ID + ".provider", file
     )
 
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uriParam ->
+            uriParam?.let {
+                viewModel.updateCapturedImageUri(it)
+                viewModel.updateShowBottomDialogState(false)
+            }
+        }
+
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
             viewModel.updateCapturedImageUri(uri)
@@ -113,7 +122,7 @@ fun AboutMePhotoUploadScreen(
                 is AboutMePhotoUploadEvent.ACTION -> {
                     when (event.action) {
                         is AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
-                            if(event.action.hasPicture) {
+                            if (event.action.hasPicture) {
 
                             } else {
                                 viewModel.updateShowBottomDialogState(true)
@@ -126,7 +135,10 @@ fun AboutMePhotoUploadScreen(
                             viewModel.updateShowBottomDialogState(false)
                         }
 
-                        AboutMePhotoUploadAction.CLICK_LIBRARY -> {}
+                        AboutMePhotoUploadAction.CLICK_LIBRARY -> {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+
                         AboutMePhotoUploadAction.CLICK_TAKE_PICTURE -> {
                             val permissionCheckResult =
                                 ContextCompat.checkSelfPermission(
@@ -173,7 +185,8 @@ fun AboutMePhotoUploadContents(
             )
 
             AboutMePhotoUploadInputBox(
-                modifier = Modifier.padding(top = 40.dp),
+                modifier = Modifier
+                    .padding(top = 40.dp),
                 aboutMePhotoUploadAction = aboutMePhotoUploadAction,
                 capturedImageUri = capturedImageUri
             )
