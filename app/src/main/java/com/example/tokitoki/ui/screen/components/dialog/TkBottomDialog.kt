@@ -112,7 +112,6 @@ fun TkBottomDialog(
                     .wrapContentHeight()
                     .background(
                         color = Color.White,
-                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
                     .padding(16.dp)
                     .draggable(

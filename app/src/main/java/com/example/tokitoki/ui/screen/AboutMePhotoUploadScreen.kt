@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -230,19 +232,77 @@ fun AboutMePhotoUploadBottomDialogContent(
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "引目写真で雰囲気を伝えましょう"
+            modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+            text = "引目写真で雰囲気を伝えましょう",
+            fontSize = 13.sp
         )
 
-        Text(
-            text = "他の人に取られた写真にしましょう"
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+        ) {
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = true
+            )
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = true
+            )
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = false
+            )
+        }
 
         Text(
-            text = "自分以外の人が映っている場合は、モザイクなどでわからないようにしましょう"
+            modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+            text = "他の人に取られた写真にしましょう",
+            fontSize = 13.sp
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+        ) {
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = true
+            )
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = true
+            )
+            AboutMePhotoUploadExampleImg(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                isOk = false
+            )
+        }
+
+        Text(
+            modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+            text = "*自分以外の人が映っている場合は、モザイクなどでわからないようにしましょう",
+            fontSize = 8.sp
         )
 
         Button(
-            modifier = modifier,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, start = 5.dp, end = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
             onClick = {
             },
@@ -254,7 +314,9 @@ fun AboutMePhotoUploadBottomDialogContent(
         }
 
         Button(
-            modifier = modifier,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp, start = 5.dp, end = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
             onClick = {
             },
@@ -265,6 +327,7 @@ fun AboutMePhotoUploadBottomDialogContent(
             )
         }
 
+        Spacer(modifier = Modifier.height(10.dp))
     }
 }
 
@@ -273,10 +336,14 @@ fun AboutMePhotoUploadExampleImg(
     modifier: Modifier = Modifier,
     isOk: Boolean = false
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .padding(5.dp)
     ) {
+        // maxWidth를 사용하여 아이콘 크기와 위치를 부모 크기의 비율로 설정
+        val iconSize = maxWidth * 0.3f // 예: 부모 너비의 10%
+        val iconOffset = maxWidth * -0.05f // 예: 부모 너비의 -5%만큼 오프셋
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -294,8 +361,8 @@ fun AboutMePhotoUploadExampleImg(
 
         Box(
             modifier = Modifier
-                .size(30.dp)
-                .offset(x = -5.dp, y = -5.dp)
+                .size(iconSize) // 퍼센트 기반 크기 적용
+                .offset(x = iconOffset, y = iconOffset)
                 .shadow(
                     elevation = 10.dp,
                     shape = CircleShape
@@ -307,7 +374,7 @@ fun AboutMePhotoUploadExampleImg(
             Icon(
                 modifier = Modifier
                     .align(alignment = Alignment.Center)
-                    .size(25.dp),
+                    .size(iconSize * 0.83f), // 내부 아이콘을 상위 아이콘 크기의 83%로 설정
                 painter = painterResource(id = if (isOk) R.drawable.baseline_check_circle_outline_24 else R.drawable.baseline_remove_circle_outline_24),
                 tint = if (isOk) LocalColor.current.blue else Color.Red,
                 contentDescription = ""
@@ -315,6 +382,7 @@ fun AboutMePhotoUploadExampleImg(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
