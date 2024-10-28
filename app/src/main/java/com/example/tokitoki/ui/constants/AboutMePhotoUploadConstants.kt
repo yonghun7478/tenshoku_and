@@ -10,4 +10,5 @@ sealed class AboutMePhotoUploadAction {
     data object DISSMISS_BOTTIOM_DIALOG : AboutMePhotoUploadAction()
     data object CLICK_LIBRARY : AboutMePhotoUploadAction()
     data object CLICK_TAKE_PICTURE : AboutMePhotoUploadAction()
+    data object CLICK_DELETE_PICTURE : AboutMePhotoUploadAction()
 }

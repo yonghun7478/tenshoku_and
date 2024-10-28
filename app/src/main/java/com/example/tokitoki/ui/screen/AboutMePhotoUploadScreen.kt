@@ -122,11 +122,7 @@ fun AboutMePhotoUploadScreen(
                 is AboutMePhotoUploadEvent.ACTION -> {
                     when (event.action) {
                         is AboutMePhotoUploadAction.CLICK_INPUT_BOX -> {
-                            if (event.action.hasPicture) {
-
-                            } else {
-                                viewModel.updateShowBottomDialogState(true)
-                            }
+                            viewModel.updateShowBottomDialogState(true)
                         }
 
                         AboutMePhotoUploadAction.NOTHING -> {}
@@ -152,6 +148,11 @@ fun AboutMePhotoUploadScreen(
                                 permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
 
+                        }
+
+                        AboutMePhotoUploadAction.CLICK_DELETE_PICTURE -> {
+                            viewModel.updateCapturedImageUri(uri = Uri.EMPTY)
+                            viewModel.updateShowBottomDialogState(false)
                         }
                     }
 
@@ -211,7 +212,8 @@ fun AboutMePhotoUploadContents(
                 aboutMePhotoUploadAction(AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG)
             }, {
                 AboutMePhotoUploadBottomDialogContent(
-                    aboutMePhotoUploadAction = aboutMePhotoUploadAction
+                    aboutMePhotoUploadAction = aboutMePhotoUploadAction,
+                    showDeleteBtn = capturedImageUri.path?.isNotEmpty() == true
                 )
             }
         )
@@ -239,7 +241,6 @@ fun AboutMePhotoUploadInputBox(
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
 ) {
     val grayColor = LocalColor.current.lightGray
-
 
     if (capturedImageUri.path?.isNotEmpty() == true) {
         Image(
@@ -314,6 +315,7 @@ fun AboutMePhotoUploadInputBox(
 @Composable
 fun AboutMePhotoUploadBottomDialogContent(
     modifier: Modifier = Modifier,
+    showDeleteBtn: Boolean = false,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
 ) {
     Column(
@@ -415,6 +417,23 @@ fun AboutMePhotoUploadBottomDialogContent(
                 text = "写真を取る",
                 color = LocalColor.current.black
             )
+        }
+
+        if(showDeleteBtn) {
+            Button(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 2.dp, start = 5.dp, end = 5.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.lightGray),
+                onClick = {
+                    aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_DELETE_PICTURE)
+                },
+            ) {
+                Text(
+                    text = "削除する",
+                    color = LocalColor.current.black
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(10.dp))
