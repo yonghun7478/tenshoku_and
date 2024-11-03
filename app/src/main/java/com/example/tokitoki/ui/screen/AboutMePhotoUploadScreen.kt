@@ -34,7 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.BuildConfig
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
@@ -68,7 +70,7 @@ import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMePhotoUploadViewModel
 import com.example.tokitoki.utils.createImageFile
-import java.util.Objects
+import java.io.File
 
 @Composable
 fun AboutMePhotoUploadScreen(
@@ -79,34 +81,43 @@ fun AboutMePhotoUploadScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
-    val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        BuildConfig.APPLICATION_ID + ".provider", file
-    )
 
-    val pickMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uriParam ->
-            uriParam?.let {
-                viewModel.updateCapturedImageUri(it)
-                viewModel.updateShowBottomDialogState(false)
-            }
-        }
+    var file by remember { mutableStateOf<File?>(null) }
+    var uri by remember { mutableStateOf<Uri?>(null) }
+
+    val hasCameraPermission = {
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
     val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            viewModel.updateCapturedImageUri(uri)
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                uri?.let {
+                    viewModel.updateCapturedImageUri(it)
+                }
+            }
             viewModel.updateShowBottomDialogState(false)
         }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
         if (it) {
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
+            uri?.let { cameraLauncher.launch(it) }
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uriFromPicker: Uri? ->
+        uriFromPicker?.let {
+            viewModel.updateCapturedImageUri(it)
+            viewModel.updateShowBottomDialogState(false)
         }
     }
 
@@ -132,22 +143,28 @@ fun AboutMePhotoUploadScreen(
                         }
 
                         AboutMePhotoUploadAction.CLICK_LIBRARY -> {
-                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         }
 
                         AboutMePhotoUploadAction.CLICK_TAKE_PICTURE -> {
-                            val permissionCheckResult =
-                                ContextCompat.checkSelfPermission(
+                            file = context.createImageFile()
+                            file?.let {
+                                uri = FileProvider.getUriForFile(
                                     context,
-                                    Manifest.permission.CAMERA
+                                    BuildConfig.APPLICATION_ID + ".provider",
+                                    it
                                 )
-                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                                cameraLauncher.launch(uri)
-                            } else {
-                                // Request a permission
-                                permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
 
+                            if (hasCameraPermission()) {
+                                uri?.let { cameraLauncher.launch(it) }
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
                         }
 
                         AboutMePhotoUploadAction.CLICK_DELETE_PICTURE -> {
@@ -155,7 +172,6 @@ fun AboutMePhotoUploadScreen(
                             viewModel.updateShowBottomDialogState(false)
                         }
                     }
-
                 }
 
                 AboutMePhotoUploadEvent.NOTHING -> {}
@@ -253,8 +269,9 @@ fun AboutMePhotoUploadInputBox(
                 ) {
                     aboutMePhotoUploadAction(AboutMePhotoUploadAction.CLICK_INPUT_BOX(true))
                 },
-            painter = rememberImagePainter(capturedImageUri),
-            contentDescription = null
+            painter = rememberAsyncImagePainter(capturedImageUri),
+            contentDescription = null,
+            contentScale = ContentScale.Crop
         )
     } else {
         Box(
@@ -419,7 +436,7 @@ fun AboutMePhotoUploadBottomDialogContent(
             )
         }
 
-        if(showDeleteBtn) {
+        if (showDeleteBtn) {
             Button(
                 modifier = modifier
                     .fillMaxWidth()
