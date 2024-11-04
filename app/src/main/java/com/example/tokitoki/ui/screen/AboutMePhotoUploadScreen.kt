@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +63,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.BuildConfig
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMePhotoUploadAction
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.dialog.TkBottomDialog
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
@@ -186,7 +188,9 @@ fun AboutMePhotoUploadContents(
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
     capturedImageUri: Uri = Uri.EMPTY
 ) {
-    Box {
+    Box(
+        modifier = Modifier.testTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_CONTENTS)
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -203,7 +207,8 @@ fun AboutMePhotoUploadContents(
 
             AboutMePhotoUploadInputBox(
                 modifier = Modifier
-                    .padding(top = 40.dp),
+                    .padding(top = 40.dp)
+                    .testTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_UPLOAD_INPUT_BOX),
                 aboutMePhotoUploadAction = aboutMePhotoUploadAction,
                 capturedImageUri = capturedImageUri
             )
@@ -228,6 +233,7 @@ fun AboutMePhotoUploadContents(
                 aboutMePhotoUploadAction(AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG)
             }, {
                 AboutMePhotoUploadBottomDialogContent(
+                    modifier = Modifier.testTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_UPLOAD_BOTTOM_CONTENTS),
                     aboutMePhotoUploadAction = aboutMePhotoUploadAction,
                     showDeleteBtn = capturedImageUri.path?.isNotEmpty() == true
                 )
