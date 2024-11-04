@@ -19,7 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class AboutMePhotoUploadScreenTest {
+class AboutMeThirdScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -35,7 +35,7 @@ class AboutMePhotoUploadScreenTest {
     }
 
     @Test
-    fun aboutMePhotoUploadScreenIsDisplayed() = runBlocking {
+    fun aboutMeThirdScreenIsDisplayed() = runBlocking {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
@@ -109,28 +109,18 @@ class AboutMePhotoUploadScreenTest {
         composeTestRule.onNodeWithTag(TestTags.TK_BOTTOM_ARROR_NAVIGATION_NEXT_BTN).performClick()
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_THIRD_CONTENTS).assertIsDisplayed()
-        composeTestRule.onNodeWithText("次へ").performClick()
-
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_CONTENTS).assertIsDisplayed()
 
         return@runBlocking
     }
 
     @Test
-    fun aboutMePhotoUploadScreenBottomDialogClick() = runBlocking {
+    fun aboutMeThirdScreenBtnIsClicked() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_THIRD_ROUTE)
             }
         }
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_UPLOAD_INPUT_BOX).isDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_UPLOAD_PHOTO_UPLOAD_INPUT_BOX)
-            .performClick()
-
-        composeTestRule.awaitIdle()
-
-        composeTestRule.onNodeWithText("引目写真で雰囲気を伝えましょう").assertIsDisplayed()
-
-        return@runBlocking
+        composeTestRule.onNodeWithText("次へ").assertIsDisplayed()
+        composeTestRule.onNodeWithText("次へ").performClick()
     }
 }
