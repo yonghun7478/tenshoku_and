@@ -118,8 +118,19 @@ fun TokitokiNavGraph(
 
         composable(TokitokiDestinations.ABOUT_ME_THIRD_ROUTE) {
             AboutMeThirdScreen(
-                onAboutMeThumbnailScreen = {
+                onAboutMePhotoUploadScreen = {
+                    navAction.navigateToAboutMePhotoUpload()
+                }
+            )
+        }
 
+        composable(TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE) {
+            AboutMePhotoUploadScreen(
+                onAboutMeProfInputScreen = {
+
+                },
+                onAboutMeThirdScreen = {
+                    navController.navigateUp()
                 }
             )
         }

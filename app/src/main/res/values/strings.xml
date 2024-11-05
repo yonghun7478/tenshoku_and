@@ -39,5 +39,6 @@
     <string name="about_me_interest_title3">後から変更できます</string>
     <string name="validate_about_me_interest">アイテムを３つ以上を選択してください。</string>
     <string name="about_me_third_title">最後に\n写真と自己紹介文を\n設定しましょう。</string>
-
+    <string name="about_me_photo_upload_title">あなたの写真を\n登録しましょう</string>
+    <string name="about_me_photo_upload_input_title">顔がわかる\n写真</string>
 </resources>
