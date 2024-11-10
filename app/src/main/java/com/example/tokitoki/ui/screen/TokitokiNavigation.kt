@@ -6,6 +6,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_INTEREST_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_NAME_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_PHOTO_UPLOAD_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_PROF_INPUT_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_SECOND_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_THIRD_SCREEN
@@ -27,6 +28,7 @@ private object TokitokiScreens {
     const val ABOUT_ME_INTEREST_SCREEN = "AboutMeInterestScreen"
     const val ABOUT_ME_THIRD_SCREEN = "AboutMeThirdScreen"
     const val ABOUT_ME_PHOTO_UPLOAD_SCREEN = "AboutMePhotoUploadScreen"
+    const val ABOUT_ME_PROF_INPUT_SCREEN = "AboutMeProfInputScreen"
 }
 
 object TokitokiArgs {
@@ -45,6 +47,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_INTEREST_ROUTE = ABOUT_ME_INTEREST_SCREEN
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
+    const val ABOUT_ME_PROF_INPUT_ROUTE = ABOUT_ME_PROF_INPUT_SCREEN
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -90,5 +93,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToAboutMePhotoUpload() {
         navController.navigate(ABOUT_ME_PHOTO_UPLOAD_SCREEN)
+    }
+
+    fun navigateToAboutMeProfInput() {
+        navController.navigate(ABOUT_ME_PROF_INPUT_SCREEN)
     }
 }
