@@ -1,15 +1,30 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.data.local.CategoryDao
+import com.example.tokitoki.data.local.CategoryEntity
 import com.example.tokitoki.data.local.UserInterestDao
 import com.example.tokitoki.data.local.UserInterestWithCategoryEntity
+import com.example.tokitoki.domain.converter.CategoryConverter
 import com.example.tokitoki.domain.converter.UserInterestConverter
+import com.example.tokitoki.domain.model.Category
 import com.example.tokitoki.domain.model.UserInterest
 import com.example.tokitoki.domain.repository.UserInterestRepository
 import javax.inject.Inject
 
 class UserInterestRepositoryImpl @Inject constructor(
+    private val categoryDao: CategoryDao,
     private val userInterestDao: UserInterestDao
 ) : UserInterestRepository {
+
+    override suspend fun getCategories(): List<Category> {
+        val categoryEntities = listOf(
+            CategoryEntity(id = 1, title = "趣味"),          // "Hobby"
+            CategoryEntity(id = 2, title = "ライフスタイル"),  // "Lifestyle"
+            CategoryEntity(id = 3, title = "価値観")          // "Values"
+        )
+        return categoryEntities.map { CategoryConverter.dataToDomain(it) }
+    }
+
     override suspend fun getUserInterests(categoryId: Int): List<UserInterest> {
 //        val userInterestEntities = userInterestDao.getUserInterestsWithCategory(categoryId)
         var userInterestEntities = emptyList<UserInterestWithCategoryEntity>()

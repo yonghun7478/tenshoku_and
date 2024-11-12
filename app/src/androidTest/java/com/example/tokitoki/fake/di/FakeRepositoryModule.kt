@@ -1,8 +1,6 @@
 package com.example.tokitoki.fake.di
 
-import com.example.tokitoki.data.repository.CategoryRepositoryImpl
 import com.example.tokitoki.di.TokiTokiRepositoryModule
-import com.example.tokitoki.domain.repository.CategoryRepository
 import com.example.tokitoki.domain.repository.UserInterestRepository
 import com.example.tokitoki.fake.repo.FakeUserInterestRepositoryImpl
 import dagger.Binds
@@ -23,10 +21,4 @@ abstract class FakeRepositoryModule {
     abstract fun bindFakeUserInterestRepository(
         fakeUserRepositoryImpl: FakeUserInterestRepositoryImpl
     ): UserInterestRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindFakeCategoryRepository(
-        categoryRepositoryImpl: CategoryRepositoryImpl
-    ): CategoryRepository
 }
