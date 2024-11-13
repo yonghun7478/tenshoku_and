@@ -209,6 +209,10 @@ fun AboutMeProfileInputContentsPreview() {
 
     val pagerState: PagerState = rememberPagerState { 3 }
 
+    LaunchedEffect(Unit) {
+        pagerState.scrollToPage(2)
+    }
+
     TokitokiTheme {
         AboutMeProfInputContents(
             pagerState = pagerState,
