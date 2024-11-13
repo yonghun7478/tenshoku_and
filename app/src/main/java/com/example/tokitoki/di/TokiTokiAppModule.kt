@@ -3,6 +3,7 @@ package com.example.tokitoki.di
 import android.content.Context
 import androidx.room.Room
 import com.example.tokitoki.data.local.CategoryDao
+import com.example.tokitoki.data.local.MySelfSentenceDao
 import com.example.tokitoki.data.local.TokiTokiCondDatabase
 import com.example.tokitoki.data.local.UserInterestDao
 import dagger.Module
@@ -41,5 +42,11 @@ object TokiTokiAppModule {
     @Singleton
     fun provideCategoryDao(tokiTokiCondDatabase: TokiTokiCondDatabase): CategoryDao {
         return tokiTokiCondDatabase.categoryDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMySelfSentenceDao(tokiTokiCondDatabase: TokiTokiCondDatabase): MySelfSentenceDao {
+        return tokiTokiCondDatabase.myselfSentenceDao()
     }
 }
