@@ -139,7 +139,9 @@ fun AboutMePhotoUploadScreen(
                         }
 
                         AboutMePhotoUploadAction.NOTHING -> {}
-                        AboutMePhotoUploadAction.SUBMIT -> {}
+                        AboutMePhotoUploadAction.SUBMIT -> {
+                            onAboutMeProfInputScreen()
+                        }
                         AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG -> {
                             viewModel.updateShowBottomDialogState(false)
                         }
