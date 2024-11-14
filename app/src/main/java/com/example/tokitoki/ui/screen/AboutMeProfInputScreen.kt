@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.ui.constants.AboutMeProfInputAction
+import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.model.MySelfSentenceItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
@@ -75,7 +77,8 @@ fun AboutMeProfInputContents(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .testTag(TestTags.ABOUT_ME_PROF_INPUT_CONTENTS),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TkIndicator(
@@ -138,7 +141,8 @@ fun AboutMeProfInputMySelf(
         HorizontalPager(
             modifier = modifier
                 .fillMaxSize()
-                .weight(1f),
+                .weight(1f)
+                .testTag(TestTags.ABOUT_ME_PROF_INPUT_MY_SELF_PAGER),
             state = pagerState
         ) { page ->
 
