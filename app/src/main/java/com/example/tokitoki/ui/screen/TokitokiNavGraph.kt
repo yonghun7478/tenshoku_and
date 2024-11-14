@@ -145,5 +145,12 @@ fun TokitokiNavGraph(
                 }
             )
         }
+
+        composable(TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE) {
+            AboutMeMyProfileScreen(
+                onIntroduceLikePageScreen = {},
+                onAboutMeProfInputScreen = {}
+            )
+        }
     }
 }
