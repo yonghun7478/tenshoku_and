@@ -181,8 +181,9 @@ fun AboutMeMyProfileNameItem(
 @Composable
 fun AboutMeMyProfileMyTag(
     modifier: Modifier = Modifier,
-    myTagItems: List<MyTagItem> = listOf()
-) {
+    myTagItems: List<MyTagItem> = listOf(),
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    ) {
     // TODO: 7個以上はすべてを見るをみせる
     // TODO: すべて見るを押下したら画面遷移するように、
     Column(
@@ -207,6 +208,19 @@ fun AboutMeMyProfileMyTag(
 
         for (item in myTagItems) {
             AboutMeMyProfileMyTagItem(tagTitle = item.title, categoryTitle = item.categoryTitle)
+        }
+
+        if (myTagItems.size > 6) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                text = "すべて見る",
+                textColor = LocalColor.current.blue,
+                backgroundColor = LocalColor.current.white,
+                action = aboutMeMyProfileAction,
+                actionParam = AboutMeMyProfileAction.SUBETE_MIRU
+            )
         }
     }
 }
@@ -260,7 +274,7 @@ fun AboutMeMyProfileMyTagItem(
 @Composable
 fun AboutMeMyProfileSelfIntroItem(
     modifier: Modifier = Modifier,
-    mySelfSentence:String = ""
+    mySelfSentence: String = ""
 ) {
     Column(
         modifier = modifier

@@ -46,6 +46,31 @@ class AboutMeMyProfileViewModel
                     url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
                     categoryTitle = "テストカテゴリー3"
                 ),
+                MyTagItem(
+                    title = "テストタグ3",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    categoryTitle = "テストカテゴリー3"
+                ),
+                MyTagItem(
+                    title = "テストタグ3",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    categoryTitle = "テストカテゴリー3"
+                ),
+                MyTagItem(
+                    title = "テストタグ3",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    categoryTitle = "テストカテゴリー3"
+                ),
+                MyTagItem(
+                    title = "テストタグ3",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    categoryTitle = "テストカテゴリー3"
+                ),
+                MyTagItem(
+                    title = "テストタグ3",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    categoryTitle = "テストカテゴリー3"
+                ),
             ),
             mySelfSentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat sapien quis turpis luctus, id convallis mauris malesuada. Ut tincidunt sapien risus, sit amet accumsan elit varius ut. Sed condimentum malesuada ultricies. In hac habitasse platea dictumst."
         )
