@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.screen
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,8 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
+import com.example.tokitoki.ui.model.MyProfileItem
+import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
@@ -46,9 +50,13 @@ fun AboutMeMyProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    AboutMeMyProfileContents()
+    AboutMeMyProfileContents(
+        myProfileItem = uiState.myProfileItem,
+    )
 
     LaunchedEffect(Unit) {
+        viewModel.init()
+
         viewModel.uiEvent.collect { event ->
 
         }
@@ -58,6 +66,7 @@ fun AboutMeMyProfileScreen(
 @Composable
 fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
+    myProfileItem: MyProfileItem = MyProfileItem()
 ) {
     Column {
         Column(
@@ -67,16 +76,25 @@ fun AboutMeMyProfileContents(
                 .background(LocalColor.current.lightGray)
                 .weight(1f)
         ) {
-            AboutMeMyProfilePicItem()
-            AboutMeMyProfileNameItem()
+            AboutMeMyProfilePicItem(
+                thumbnailImageUri = myProfileItem.thumbnailImageUri
+            )
+            AboutMeMyProfileNameItem(
+                name = myProfileItem.name,
+                age = myProfileItem.age,
+            )
             AboutMeMyProfileMyTag(
-                modifier = Modifier.padding(top = 7.dp)
+                modifier = Modifier.padding(top = 7.dp),
+                myTagItems = myProfileItem.myTagItems
             )
             AboutMeMyProfileSelfIntroItem(
-                modifier = Modifier.padding(top = 7.dp)
+                modifier = Modifier.padding(top = 7.dp),
+                mySelfSentence = myProfileItem.mySelfSentence
             )
             AboutMeMyProfileProf(
-                modifier = Modifier.padding(top = 7.dp, bottom = 7.dp)
+                modifier = Modifier.padding(top = 7.dp, bottom = 7.dp),
+                name = myProfileItem.name,
+                age = myProfileItem.age
             )
         }
         AboutMeMyProfileBottomMenu()
@@ -86,7 +104,13 @@ fun AboutMeMyProfileContents(
 @Composable
 fun AboutMeMyProfilePicItem(
     modifier: Modifier = Modifier,
+    thumbnailImageUri: Uri = Uri.EMPTY
 ) {
+    val painter = if (thumbnailImageUri.path?.isNotEmpty() == true) {
+        rememberAsyncImagePainter(thumbnailImageUri) // 직접 사용
+    } else {
+        painterResource(id = R.drawable.profile_sample) // 직접 사용
+    }
     // TODO:後にボタンを追加したい
     // TODO:DBからデータを持ってくる予定
     Box(
@@ -98,7 +122,7 @@ fun AboutMeMyProfilePicItem(
         Image(
             modifier = Modifier
                 .fillMaxSize(),
-            painter = painterResource(id = R.drawable.profile_sample),
+            painter = painter,
             contentScale = ContentScale.Crop,
             contentDescription = "",
         )
@@ -108,6 +132,8 @@ fun AboutMeMyProfilePicItem(
 @Composable
 fun AboutMeMyProfileNameItem(
     modifier: Modifier = Modifier,
+    name: String = "",
+    age: String = ""
 ) {
     // TODO: 名前と年齢持ってくる
     Column(
@@ -122,12 +148,12 @@ fun AboutMeMyProfileNameItem(
             color = LocalColor.current.red
         )
         Text(
-            text = "yonghun",
+            text = name,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "32歳",
+            text = "${age}歳",
             fontSize = 20.sp,
         )
         Row(
@@ -155,6 +181,7 @@ fun AboutMeMyProfileNameItem(
 @Composable
 fun AboutMeMyProfileMyTag(
     modifier: Modifier = Modifier,
+    myTagItems: List<MyTagItem> = listOf()
 ) {
     // TODO: 7個以上はすべてを見るをみせる
     // TODO: すべて見るを押下したら画面遷移するように、
@@ -178,15 +205,17 @@ fun AboutMeMyProfileMyTag(
             fontSize = 15.sp
         )
 
-        AboutMeMyProfileMyTagItem()
-        AboutMeMyProfileMyTagItem()
-        AboutMeMyProfileMyTagItem()
+        for (item in myTagItems) {
+            AboutMeMyProfileMyTagItem(tagTitle = item.title, categoryTitle = item.categoryTitle)
+        }
     }
 }
 
 @Composable
 fun AboutMeMyProfileMyTagItem(
     modifier: Modifier = Modifier,
+    tagTitle: String = "",
+    categoryTitle: String = ""
 ) {
     Row(
         modifier = modifier
@@ -215,13 +244,13 @@ fun AboutMeMyProfileMyTagItem(
             modifier = Modifier.padding(start = 10.dp),
         ) {
             Text(
-                text = "title",
+                text = tagTitle,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
 
             Text(
-                text = "category name",
+                text = categoryTitle,
                 fontSize = 15.sp
             )
         }
@@ -231,6 +260,7 @@ fun AboutMeMyProfileMyTagItem(
 @Composable
 fun AboutMeMyProfileSelfIntroItem(
     modifier: Modifier = Modifier,
+    mySelfSentence:String = ""
 ) {
     Column(
         modifier = modifier
@@ -253,7 +283,7 @@ fun AboutMeMyProfileSelfIntroItem(
         )
 
         Text(
-            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            text = mySelfSentence,
             fontSize = 13.sp
         )
     }
@@ -262,6 +292,8 @@ fun AboutMeMyProfileSelfIntroItem(
 @Composable
 fun AboutMeMyProfileProf(
     modifier: Modifier = Modifier,
+    name: String = "",
+    age: String = ""
 ) {
     // 基本情報
     // 　ニックネーム
@@ -286,13 +318,18 @@ fun AboutMeMyProfileProf(
             fontSize = 15.sp
         )
 
-        AboutMeMyProfileProfBaseItem()
+        AboutMeMyProfileProfBaseItem(
+            name = name,
+            age = age
+        )
     }
 }
 
 @Composable
 fun AboutMeMyProfileProfBaseItem(
     modifier: Modifier = Modifier,
+    name: String = "",
+    age: String = ""
 ) {
     Column(
         modifier = Modifier
@@ -320,7 +357,7 @@ fun AboutMeMyProfileProfBaseItem(
             Text(
                 modifier = Modifier
                     .weight(1f),
-                text = "yonghun",
+                text = name,
                 fontSize = 11.sp
             )
         }
@@ -340,7 +377,7 @@ fun AboutMeMyProfileProfBaseItem(
             Text(
                 modifier = Modifier
                     .weight(1f),
-                text = "３３歳",
+                text = "${age}歳",
                 fontSize = 11.sp
             )
         }
