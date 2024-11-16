@@ -5,11 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,11 +69,14 @@ fun AboutMeMyProfileContents(
         ) {
             AboutMeMyProfilePicItem()
             AboutMeMyProfileNameItem()
+            AboutMeMyProfileMyTag(
+                modifier = Modifier.padding(top = 7.dp)
+            )
             AboutMeMyProfileSelfIntroItem(
                 modifier = Modifier.padding(top = 7.dp)
             )
-            AboutMeMyProfileProfItem(
-                modifier = Modifier.padding(top = 7.dp)
+            AboutMeMyProfileProf(
+                modifier = Modifier.padding(top = 7.dp, bottom = 7.dp)
             )
         }
         AboutMeMyProfileBottomMenu()
@@ -83,6 +88,7 @@ fun AboutMeMyProfilePicItem(
     modifier: Modifier = Modifier,
 ) {
     // TODO:後にボタンを追加したい
+    // TODO:DBからデータを持ってくる予定
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -103,6 +109,7 @@ fun AboutMeMyProfilePicItem(
 fun AboutMeMyProfileNameItem(
     modifier: Modifier = Modifier,
 ) {
+    // TODO: 名前と年齢持ってくる
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -146,6 +153,82 @@ fun AboutMeMyProfileNameItem(
 }
 
 @Composable
+fun AboutMeMyProfileMyTag(
+    modifier: Modifier = Modifier,
+) {
+    // TODO: 7個以上はすべてを見るをみせる
+    // TODO: すべて見るを押下したら画面遷移するように、
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(
+                RoundedCornerShape(
+                    topEnd = 30.dp,
+                    topStart = 30.dp,
+                    bottomEnd = 30.dp,
+                    bottomStart = 30.dp
+                )
+            )
+            .background(color = LocalColor.current.white)
+            .padding(20.dp)
+    ) {
+        Text(
+            text = "マイタグ",
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp
+        )
+
+        AboutMeMyProfileMyTagItem()
+        AboutMeMyProfileMyTagItem()
+        AboutMeMyProfileMyTagItem()
+    }
+}
+
+@Composable
+fun AboutMeMyProfileMyTagItem(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.profile_sample),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(80.dp)
+                .aspectRatio(1f)
+                .clip(
+                    RoundedCornerShape(
+                        topEnd = 10.dp,
+                        topStart = 10.dp,
+                        bottomEnd = 10.dp,
+                        bottomStart = 10.dp
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.padding(start = 10.dp),
+        ) {
+            Text(
+                text = "title",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = "category name",
+                fontSize = 15.sp
+            )
+        }
+    }
+}
+
+@Composable
 fun AboutMeMyProfileSelfIntroItem(
     modifier: Modifier = Modifier,
 ) {
@@ -177,9 +260,12 @@ fun AboutMeMyProfileSelfIntroItem(
 }
 
 @Composable
-fun AboutMeMyProfileProfItem(
+fun AboutMeMyProfileProf(
     modifier: Modifier = Modifier,
 ) {
+    // 基本情報
+    // 　ニックネーム
+    //　　年齢
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -199,6 +285,66 @@ fun AboutMeMyProfileProfItem(
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp
         )
+
+        AboutMeMyProfileProfBaseItem()
+    }
+}
+
+@Composable
+fun AboutMeMyProfileProfBaseItem(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+    ) {
+        Text(
+            text = "基本情報",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = "名前",
+                fontSize = 11.sp,
+                color = LocalColor.current.grayColor
+            )
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = "yonghun",
+                fontSize = 11.sp
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = "年齢",
+                fontSize = 11.sp,
+                color = LocalColor.current.grayColor
+            )
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = "３３歳",
+                fontSize = 11.sp
+            )
+        }
+
     }
 }
 
@@ -254,6 +400,23 @@ fun AboutMeMyProfileImagePreview() {
 
 @Preview(showBackground = true)
 @Composable
+fun AboutMeMyProfileMyTagPreview() {
+    TokitokiTheme {
+        AboutMeMyProfileMyTag()
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMeMyProfileMyTagItemPreview() {
+    TokitokiTheme {
+        AboutMeMyProfileMyTagItem()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun AboutMeMyProfileSelfIntroItemPreview() {
     TokitokiTheme {
         AboutMeMyProfileSelfIntroItem()
@@ -264,7 +427,15 @@ fun AboutMeMyProfileSelfIntroItemPreview() {
 @Composable
 fun AboutMeMyProfileProfItemPreview() {
     TokitokiTheme {
-        AboutMeMyProfileProfItem()
+        AboutMeMyProfileProf()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMeMyProfileProfBaseItemPreview() {
+    TokitokiTheme {
+        AboutMeMyProfileProfBaseItem()
     }
 }
 
