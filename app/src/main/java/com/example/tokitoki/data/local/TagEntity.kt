@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "user_interests",
+    tableName = "tags",
     foreignKeys = [ForeignKey(
         entity = CategoryEntity::class,
         parentColumns = ["id"],
@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
     )],
     indices = [Index(value = ["categoryId"])]
 )
-data class UserInterestEntity(
+data class TagEntity(
     @PrimaryKey val id: Int,
     val title: String,
     val url: String,

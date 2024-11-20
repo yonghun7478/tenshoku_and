@@ -35,7 +35,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeSecondViewModel
 @Composable
 fun AboutMeSecondScreen(
     viewModel: AboutMeSecondViewModel = hiltViewModel(),
-    onAboutMeInterestScreen: () -> Unit = {},
+    onAboutMeTagScreen: () -> Unit = {},
 ) {
     AboutMeSecondContents(
         aboutMeSecondAction = viewModel::aboutMeSecondAction
@@ -51,7 +51,7 @@ fun AboutMeSecondScreen(
                 is AboutMeSecondEvent.ACTION -> {
                     when (uiEvent.action) {
                         AboutMeSecondAction.SUBMIT -> {
-                            onAboutMeInterestScreen()
+                            onAboutMeTagScreen()
                         }
 
                         AboutMeSecondAction.NOTHING -> {

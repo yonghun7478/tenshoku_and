@@ -60,27 +60,27 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tokitoki.R
-import com.example.tokitoki.ui.constants.AboutMeInterestAction
+import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.model.CategoryItem
-import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
-import com.example.tokitoki.ui.state.AboutMeInterestEvent
-import com.example.tokitoki.ui.state.AboutMeInterestState
+import com.example.tokitoki.ui.state.AboutMeTagEvent
+import com.example.tokitoki.ui.state.AboutMeTagState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
-import com.example.tokitoki.ui.viewmodel.AboutMeInterestViewModel
+import com.example.tokitoki.ui.viewmodel.AboutMeTagViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutMeInterestScreen(
+fun AboutMeTagScreen(
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
-    viewModel: AboutMeInterestViewModel = hiltViewModel()
+    viewModel: AboutMeTagViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -90,11 +90,11 @@ fun AboutMeInterestScreen(
     }
 
     if (uiState.isInitialized) {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             coroutineScope = coroutineScope,
             pagerState = pagerState,
-            aboutMeInterestAction = viewModel::aboutMeInterestAction,
+            aboutMeTagAction = viewModel::aboutMeTagAction,
             isTest = viewModel.getIsTest()
         )
     }
@@ -104,36 +104,36 @@ fun AboutMeInterestScreen(
 
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is AboutMeInterestEvent.ACTION -> {
+                is AboutMeTagEvent.ACTION -> {
                     when (event.action) {
-                        is AboutMeInterestAction.SelectedTab -> {
+                        is AboutMeTagAction.SelectedTab -> {
                             pagerState.animateScrollToPage(event.action.index)
                         }
 
-                        AboutMeInterestAction.DIALOG_OK -> {
+                        AboutMeTagAction.DIALOG_OK -> {
                             viewModel.updateShowDialogState(false)
                         }
 
-                        AboutMeInterestAction.NEXT -> {
-                            if (viewModel.checkInterests()) {
+                        AboutMeTagAction.NEXT -> {
+                            if (viewModel.checkTags()) {
                                 onAboutMeThirdScreen()
                             } else {
                                 viewModel.updateShowDialogState(true)
                             }
                         }
 
-                        AboutMeInterestAction.NOTHING -> {}
-                        AboutMeInterestAction.PREVIOUS -> {
+                        AboutMeTagAction.NOTHING -> {}
+                        AboutMeTagAction.PREVIOUS -> {
                             onAboutMeSecondScreen()
                         }
 
-                        is AboutMeInterestAction.ITEM_CLICKED -> {
+                        is AboutMeTagAction.ITEM_CLICKED -> {
                             viewModel.updateGridItem(event.action.category, event.action.index)
                         }
                     }
                 }
 
-                AboutMeInterestEvent.NOTHING -> {}
+                AboutMeTagEvent.NOTHING -> {}
             }
         }
     }
@@ -141,10 +141,10 @@ fun AboutMeInterestScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutMeInterestContents(
-    uiState: AboutMeInterestState = AboutMeInterestState(),
+fun AboutMeTagContents(
+    uiState: AboutMeTagState = AboutMeTagState(),
     pagerState: PagerState,
-    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     coroutineScope: CoroutineScope,
     isTest: Boolean = false
 ) {
@@ -152,7 +152,7 @@ fun AboutMeInterestContents(
         modifier = Modifier
             .fillMaxSize()
             .background(color = LocalColor.current.white)
-            .testTag(TestTags.ABOUT_ME_INTEREST_CONTENTS)
+            .testTag(TestTags.ABOUT_ME_TAG_CONTENTS)
     ) {
         Column(
             modifier = Modifier
@@ -163,23 +163,23 @@ fun AboutMeInterestContents(
                 modifier = Modifier.padding(top = 30.dp),
                 iconRes = R.drawable.baseline_kitesurfing_24
             )
-            AboutMeInterestTitle(
+            AboutMeTagTitle(
                 modifier = Modifier.padding(top = 10.dp)
             )
 
-            AboutMeInterestPagerTab(
+            AboutMeTagPagerTab(
                 modifier = Modifier.padding(top = 30.dp),
                 pagerState = pagerState,
                 coroutineScope = coroutineScope,
                 tabs = uiState.categoryList,
-                aboutMeInterestAction = aboutMeInterestAction
+                aboutMeTagAction = aboutMeTagAction
             )
-            AboutMeInterestPager(
+            AboutMeTagPager(
                 modifier = Modifier.weight(1f),
                 uiState = uiState,
                 pagerState = pagerState,
                 coroutineScope = coroutineScope,
-                aboutMeInterestAction = aboutMeInterestAction,
+                aboutMeTagAction = aboutMeTagAction,
                 isTest = isTest
             )
         }
@@ -188,22 +188,22 @@ fun AboutMeInterestContents(
             modifier = Modifier
                 .padding(10.dp)
                 .align(Alignment.BottomCenter),
-            action = aboutMeInterestAction,
-            previousActionParam = AboutMeInterestAction.PREVIOUS,
-            nextActionParam = AboutMeInterestAction.NEXT
+            action = aboutMeTagAction,
+            previousActionParam = AboutMeTagAction.PREVIOUS,
+            nextActionParam = AboutMeTagAction.NEXT
         )
 
         if (uiState.showDialog) {
             TkAlertDialog(
-                message = stringResource(R.string.validate_about_me_interest),
-                onDismissRequest = { aboutMeInterestAction(AboutMeInterestAction.DIALOG_OK) },
+                message = stringResource(R.string.validate_about_me_tag),
+                onDismissRequest = { aboutMeTagAction(AboutMeTagAction.DIALOG_OK) },
             )
         }
     }
 }
 
 @Composable
-fun AboutMeInterestTitle(
+fun AboutMeTagTitle(
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -211,18 +211,18 @@ fun AboutMeInterestTitle(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.about_me_interest_title1),
+            text = stringResource(R.string.about_me_tag_title1),
             fontSize = 15.sp
         )
         Text(
-            text = stringResource(R.string.about_me_interest_title2),
+            text = stringResource(R.string.about_me_tag_title2),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
             modifier = Modifier.padding(top = 10.dp),
-            text = stringResource(R.string.about_me_interest_title3),
+            text = stringResource(R.string.about_me_tag_title3),
             fontSize = 10.sp
         )
     }
@@ -230,7 +230,7 @@ fun AboutMeInterestTitle(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutMeInterestPagerTab(
+fun AboutMeTagPagerTab(
     modifier: Modifier = Modifier,
     tabs: List<CategoryItem> = listOf(
         CategoryItem(0, "趣味"),
@@ -239,7 +239,7 @@ fun AboutMeInterestPagerTab(
     ),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
-    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val tabWidth = maxWidth / tabs.size
@@ -267,7 +267,7 @@ fun AboutMeInterestPagerTab(
                                 interactionSource = remember { MutableInteractionSource() }
                             ) {
                                 coroutineScope.launch {
-                                    aboutMeInterestAction(AboutMeInterestAction.SelectedTab(index))
+                                    aboutMeTagAction(AboutMeTagAction.SelectedTab(index))
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -301,12 +301,12 @@ fun AboutMeInterestPagerTab(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AboutMeInterestPager(
+fun AboutMeTagPager(
     modifier: Modifier = Modifier,
-    uiState: AboutMeInterestState = AboutMeInterestState(),
+    uiState: AboutMeTagState = AboutMeTagState(),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
-    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     isTest: Boolean = false
 ) {
     HorizontalPager(
@@ -317,44 +317,44 @@ fun AboutMeInterestPager(
         val currentCategoryTitle: String = uiState.categoryList[page].title
 
         // 해당 카테고리의 관심사 리스트를 가져옴, 없으면 빈 리스트
-        val currentInterestList =
-            uiState.userInterestsByCategory[currentCategoryTitle] ?: emptyList()
+        val currentTagList =
+            uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
 
 
         // 각 카테고리별 페이지 표시
-        AboutMeInterestPage(
+        AboutMeTagPage(
             categoryTitle = currentCategoryTitle,
-            interestList = currentInterestList,
-            aboutMeInterestAction = aboutMeInterestAction,
+            TagList = currentTagList,
+            aboutMeTagAction = aboutMeTagAction,
             isTest = isTest
         )
     }
 }
 
 @Composable
-fun AboutMeInterestPage(
+fun AboutMeTagPage(
     categoryTitle: String,
-    interestList: List<UserInterestItem>,
-    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    TagList: List<TagItem>,
+    aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     isTest: Boolean = false
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3), // 3개의 열을 고정
         modifier = Modifier
             .fillMaxSize()
-            .testTag(TestTags.ABOUT_ME_INTEREST_PAGE),
+            .testTag(TestTags.ABOUT_ME_TAG_PAGE),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp), // 항목 간의 세로 간격
         horizontalArrangement = Arrangement.spacedBy(8.dp) // 항목 간의 가로 간격
     ) {
-        itemsIndexed(interestList) { index, interest ->
-            AboutMeInterestGridItem(
+        itemsIndexed(TagList) { index, Tag ->
+            AboutMeTagGridItem(
                 index = index,
-                title = interest.title,
+                title = Tag.title,
                 categoryTitle = categoryTitle,
-                url = interest.url,
-                showBadge = interest.showBadge,
-                aboutMeInterestAction = aboutMeInterestAction,
+                url = Tag.url,
+                showBadge = Tag.showBadge,
+                aboutMeTagAction = aboutMeTagAction,
                 isTest = isTest
             )
         }
@@ -362,14 +362,14 @@ fun AboutMeInterestPage(
 }
 
 @Composable
-fun AboutMeInterestGridItem(
+fun AboutMeTagGridItem(
     modifier: Modifier = Modifier,
     categoryTitle: String = "",
     index: Int = 0,
     title: String = "",
     url: String = "",
     showBadge: Boolean = false,
-    aboutMeInterestAction: (AboutMeInterestAction) -> Unit = {},
+    aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     isTest: Boolean = false
 ) {
     val colorStops = arrayOf(
@@ -421,8 +421,8 @@ fun AboutMeInterestGridItem(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) {
-                aboutMeInterestAction(
-                    AboutMeInterestAction.ITEM_CLICKED(categoryTitle, index)
+                aboutMeTagAction(
+                    AboutMeTagAction.ITEM_CLICKED(categoryTitle, index)
                 )
             }
     ) {
@@ -481,7 +481,7 @@ fun AboutMeInterestGridItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterestContentsPreview() {
+fun AboutMeTagContentsPreview() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -492,31 +492,31 @@ fun AboutMeInterestContentsPreview() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -526,33 +526,33 @@ fun AboutMeInterestContentsPreview() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2,
             showBadge = true
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2,
             showBadge = true
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -562,31 +562,31 @@ fun AboutMeInterestContentsPreview() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -594,12 +594,12 @@ fun AboutMeInterestContentsPreview() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests
+        tagsByCategory = tags
     )
 
     val pagerState = rememberPagerState(
@@ -609,7 +609,7 @@ fun AboutMeInterestContentsPreview() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
@@ -620,9 +620,9 @@ fun AboutMeInterestContentsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterestItemPreview() {
+fun AboutMeTagItemPreview() {
     TokitokiTheme {
-        AboutMeInterestGridItem(
+        AboutMeTagGridItem(
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             showBadge = true
         )

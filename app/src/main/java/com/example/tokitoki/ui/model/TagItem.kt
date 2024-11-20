@@ -1,6 +1,6 @@
 package com.example.tokitoki.ui.model
 
-data class UserInterestItem(
+data class TagItem(
     val id: Int = 0,
     val categoryId: Int = 0,
     val title: String = "",

@@ -1,13 +1,13 @@
 package com.example.tokitoki.domain.usecase
 
 import com.example.tokitoki.domain.model.Category
-import com.example.tokitoki.domain.repository.UserInterestRepository
+import com.example.tokitoki.domain.repository.TagRepository
 import javax.inject.Inject
 
 class GetCategoriesUseCase @Inject constructor(
-    private val userInterestRepository: UserInterestRepository
+    private val tagRepository: TagRepository
 ) {
     suspend operator fun invoke(): List<Category> {
-        return userInterestRepository.getCategories()
+        return tagRepository.getCategories()
     }
 }

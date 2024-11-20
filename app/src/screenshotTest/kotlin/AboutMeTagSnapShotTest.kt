@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tokitoki.ui.model.CategoryItem
-import com.example.tokitoki.ui.model.UserInterestItem
-import com.example.tokitoki.ui.screen.AboutMeInterestContents
-import com.example.tokitoki.ui.state.AboutMeInterestState
+import com.example.tokitoki.ui.model.TagItem
+import com.example.tokitoki.ui.screen.AboutMeTagContents
+import com.example.tokitoki.ui.state.AboutMeTagState
 import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterest1SnapShotTest() {
+fun AboutMeTag1SnapShotTest() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -23,31 +23,31 @@ fun AboutMeInterest1SnapShotTest() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -57,31 +57,31 @@ fun AboutMeInterest1SnapShotTest() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -91,31 +91,31 @@ fun AboutMeInterest1SnapShotTest() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -123,12 +123,12 @@ fun AboutMeInterest1SnapShotTest() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests
+        tagsByCategory = tags
     )
 
     val pagerState = rememberPagerState(
@@ -138,7 +138,7 @@ fun AboutMeInterest1SnapShotTest() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
@@ -150,7 +150,7 @@ fun AboutMeInterest1SnapShotTest() {
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterest2SnapShotTest() {
+fun AboutMeTag2SnapShotTest() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -161,31 +161,31 @@ fun AboutMeInterest2SnapShotTest() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -195,31 +195,31 @@ fun AboutMeInterest2SnapShotTest() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -229,31 +229,31 @@ fun AboutMeInterest2SnapShotTest() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -261,12 +261,12 @@ fun AboutMeInterest2SnapShotTest() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests
+        tagsByCategory = tags
     )
 
     val pagerState = rememberPagerState(
@@ -276,7 +276,7 @@ fun AboutMeInterest2SnapShotTest() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
@@ -288,7 +288,7 @@ fun AboutMeInterest2SnapShotTest() {
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterest3SnapShotTest() {
+fun AboutMeTag3SnapShotTest() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -299,31 +299,31 @@ fun AboutMeInterest3SnapShotTest() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -333,31 +333,31 @@ fun AboutMeInterest3SnapShotTest() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -367,31 +367,31 @@ fun AboutMeInterest3SnapShotTest() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -399,12 +399,12 @@ fun AboutMeInterest3SnapShotTest() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests
+        tagsByCategory = tags
     )
 
     val pagerState = rememberPagerState(
@@ -414,7 +414,7 @@ fun AboutMeInterest3SnapShotTest() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
@@ -426,7 +426,7 @@ fun AboutMeInterest3SnapShotTest() {
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterestCheckedItemSnapShotTest() {
+fun AboutMeTagCheckedItemSnapShotTest() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -437,34 +437,34 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
             showBadge = true
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
             showBadge = true
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
             showBadge = true
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -474,31 +474,31 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2,
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -508,31 +508,31 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3,
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -540,12 +540,12 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests
+        tagsByCategory = tags
     )
 
     val pagerState = rememberPagerState(
@@ -555,7 +555,7 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
@@ -567,7 +567,7 @@ fun AboutMeInterestCheckedItemSnapShotTest() {
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
+fun AboutMeTagIsDisplayedDialogSnapShotTest() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
@@ -578,31 +578,31 @@ fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
 
     val hobbyItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 1,
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 1
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -612,31 +612,31 @@ fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
 
     val lifeStyleItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2,
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 2
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -646,31 +646,31 @@ fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
 
     val kachikanItem = listOf(
         // 趣味 (Hobby) 카테고리
-        UserInterestItem(
+        TagItem(
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3,
         ),
-        UserInterestItem(
+        TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
             categoryId = 3
         ),
-        UserInterestItem(
+        TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
@@ -678,12 +678,12 @@ fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
         ),
     )
 
-    val userInterests =
+    val tags =
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
-    val uiState = AboutMeInterestState(
+    val uiState = AboutMeTagState(
         categoryList = testCategotyList,
-        userInterestsByCategory = userInterests,
+        tagsByCategory = tags,
         showDialog = true
     )
 
@@ -694,7 +694,7 @@ fun AboutMeInterestIsDisplayedDialogSnapShotTest() {
     }
 
     TokitokiTheme {
-        AboutMeInterestContents(
+        AboutMeTagContents(
             uiState = uiState,
             pagerState = pagerState,
             coroutineScope = coroutineScope,

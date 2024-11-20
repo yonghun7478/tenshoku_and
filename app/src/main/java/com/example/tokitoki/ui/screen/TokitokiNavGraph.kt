@@ -99,14 +99,14 @@ fun TokitokiNavGraph(
 
         composable(TokitokiDestinations.ABOUT_ME_SECOND_ROUTE) {
             AboutMeSecondScreen(
-                onAboutMeInterestScreen = {
-                    navAction.navigateToAboutMeInterest()
+                onAboutMeTagScreen = {
+                    navAction.navigateToAboutMeTag()
                 }
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE) {
-            AboutMeInterestScreen(
+        composable(TokitokiDestinations.ABOUT_ME_TAG_ROUTE) {
+            AboutMeTagScreen(
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },

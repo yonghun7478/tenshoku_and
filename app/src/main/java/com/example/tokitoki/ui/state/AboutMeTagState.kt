@@ -1,11 +1,11 @@
 package com.example.tokitoki.ui.state
 
 import com.example.tokitoki.ui.model.CategoryItem
-import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.ui.model.TagItem
 
-data class AboutMeInterestState(
+data class AboutMeTagState(
     val showDialog: Boolean = false,
-    val userInterestsByCategory: Map<String, List<UserInterestItem>> = emptyMap(),
+    val tagsByCategory: Map<String, List<TagItem>> = emptyMap(),
     val categoryList: List<CategoryItem> = listOf(),
     val isInitialized: Boolean = false,
 )

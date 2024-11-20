@@ -19,7 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class AboutMeInterestScreenTest {
+class AboutMeTagScreenTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -35,7 +35,7 @@ class AboutMeInterestScreenTest {
     }
 
     @Test
-    fun aboutMeInterestScreenIsDisplayed() {
+    fun aboutMeTagScreenIsDisplayed() {
         composeTestRule.setContent {
             TokitokiTheme {
                 TokitokiNavGraph()
@@ -91,14 +91,14 @@ class AboutMeInterestScreenTest {
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_SECOND_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithText("次へ").performClick()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_INTEREST_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_TAG_CONTENTS).assertIsDisplayed()
     }
 
     @Test
-    fun aboutMeInterestScreenShowDialog() {
+    fun aboutMeTagScreenShowDialog() {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_TAG_ROUTE)
             }
         }
 
@@ -110,10 +110,10 @@ class AboutMeInterestScreenTest {
     }
 
     @Test
-    fun aboutMeInterestScreenClickItem() = runBlocking {
+    fun aboutMeTagScreenClickItem() = runBlocking {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_TAG_ROUTE)
             }
         }
 
@@ -128,10 +128,10 @@ class AboutMeInterestScreenTest {
     }
 
     @Test
-    fun aboutMeInterestScreenGoNextScreen() = runBlocking {
+    fun aboutMeTagScreenGoNextScreen() = runBlocking {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_TAG_ROUTE)
             }
         }
 
@@ -155,10 +155,10 @@ class AboutMeInterestScreenTest {
     }
 
     @Test
-    fun aboutMeInterestScreenTabSelected() = runBlocking {
+    fun aboutMeTagScreenTabSelected() = runBlocking {
         composeTestRule.setContent {
             TokitokiTheme {
-                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE)
+                TokitokiNavGraph(startDestination = TokitokiDestinations.ABOUT_ME_TAG_ROUTE)
             }
         }
 

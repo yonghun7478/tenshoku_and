@@ -3,13 +3,13 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
-import com.example.tokitoki.domain.usecase.GetUserInterestsUseCase
-import com.example.tokitoki.ui.constants.AboutMeInterestAction
-import com.example.tokitoki.ui.model.UserInterestItem
+import com.example.tokitoki.domain.usecase.GetTagUseCase
+import com.example.tokitoki.ui.constants.AboutMeTagAction
+import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.converter.CategoryUiConverter
-import com.example.tokitoki.ui.converter.UserInterestUiConverter
-import com.example.tokitoki.ui.state.AboutMeInterestEvent
-import com.example.tokitoki.ui.state.AboutMeInterestState
+import com.example.tokitoki.ui.converter.TagUiConverter
+import com.example.tokitoki.ui.state.AboutMeTagEvent
+import com.example.tokitoki.ui.state.AboutMeTagState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,17 +21,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AboutMeInterestViewModel
+class AboutMeTagViewModel
 @Inject constructor(
     private val isTest: Boolean,
-    private val getUserInterestsUseCase: GetUserInterestsUseCase,
+    private val getTagUseCase: GetTagUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AboutMeInterestState())
-    val uiState: StateFlow<AboutMeInterestState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(AboutMeTagState())
+    val uiState: StateFlow<AboutMeTagState> = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<AboutMeInterestEvent>()
+    private val _uiEvent = MutableSharedFlow<AboutMeTagEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     fun getIsTest(): Boolean {
@@ -42,26 +42,26 @@ class AboutMeInterestViewModel
         val domainCategories = getCategoriesUseCase()
         val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
 
-        val userInterestsByCategory = mutableMapOf<String, List<UserInterestItem>>()
+        val tagsByCategory = mutableMapOf<String, List<TagItem>>()
         domainCategories.forEach { category ->
-            val userInterests = getUserInterestsUseCase(category.id)
-                .map { UserInterestUiConverter.domainToUi(it) }
+            val tags = getTagUseCase(category.id)
+                .map { TagUiConverter.domainToUi(it) }
 
-            userInterestsByCategory[category.title] = userInterests
+            tagsByCategory[category.title] = tags
         }
 
         _uiState.update { currentState ->
             currentState.copy(
                 isInitialized = true,
                 categoryList = uiCategories,
-                userInterestsByCategory = userInterestsByCategory
+                tagsByCategory = tagsByCategory
             )
         }
     }
 
-    fun aboutMeInterestAction(action: AboutMeInterestAction) {
+    fun aboutMeTagAction(action: AboutMeTagAction) {
         viewModelScope.launch {
-            _uiEvent.emit(AboutMeInterestEvent.ACTION(action))
+            _uiEvent.emit(AboutMeTagEvent.ACTION(action))
         }
     }
 
@@ -76,7 +76,7 @@ class AboutMeInterestViewModel
 
     fun updateGridItem(categoryTitle: String, index: Int) {
         val updatedCategoryList =
-            _uiState.value.userInterestsByCategory[categoryTitle]?.toMutableList() ?: return
+            _uiState.value.tagsByCategory[categoryTitle]?.toMutableList() ?: return
 
         if (index in updatedCategoryList.indices) {
             val selectedItem = updatedCategoryList[index].copy(
@@ -84,20 +84,20 @@ class AboutMeInterestViewModel
             )
 
             updatedCategoryList[index] = selectedItem
-            val updatedMap = _uiState.value.userInterestsByCategory.toMutableMap().apply {
+            val updatedMap = _uiState.value.tagsByCategory.toMutableMap().apply {
                 put(categoryTitle, updatedCategoryList)
             }
 
             _uiState.update {
-                it.copy(userInterestsByCategory = updatedMap)
+                it.copy(tagsByCategory = updatedMap)
             }
         }
     }
 
-    fun checkInterests(): Boolean {
-        val selectedInterests = _uiState.value.userInterestsByCategory.values.flatten()
+    fun checkTags(): Boolean {
+        val selectedTags = _uiState.value.tagsByCategory.values.flatten()
             .filter { it.showBadge }
 
-        return selectedInterests.size > 2
+        return selectedTags.size > 2
     }
 }

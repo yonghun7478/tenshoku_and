@@ -3,10 +3,10 @@ package com.example.tokitoki.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [CategoryEntity::class, UserInterestEntity::class, MySelfSentenceEntity::class], version = 1, exportSchema = false)
+@Database(entities = [CategoryEntity::class, TagEntity::class, MySelfSentenceEntity::class], version = 1, exportSchema = false)
 abstract class TokiTokiCondDatabase : RoomDatabase() {
 
-    abstract fun userInterestDao(): UserInterestDao
+    abstract fun tagDao(): TagDao
     abstract fun categoryDao(): CategoryDao
     abstract fun myselfSentenceDao(): MySelfSentenceDao
 

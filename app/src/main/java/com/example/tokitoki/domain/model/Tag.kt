@@ -1,6 +1,6 @@
 package com.example.tokitoki.domain.model
 
-data class UserInterest(
+data class Tag(
     val id: Int,
     val title: String,
     val url: String,

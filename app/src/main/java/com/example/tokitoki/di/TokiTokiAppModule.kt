@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.example.tokitoki.data.local.CategoryDao
 import com.example.tokitoki.data.local.MySelfSentenceDao
 import com.example.tokitoki.data.local.TokiTokiCondDatabase
-import com.example.tokitoki.data.local.UserInterestDao
+import com.example.tokitoki.data.local.TagDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,8 +34,8 @@ object TokiTokiAppModule {
 
     @Provides
     @Singleton
-    fun provideUserInterestDao(tokiTokiCondDatabase: TokiTokiCondDatabase): UserInterestDao {
-        return tokiTokiCondDatabase.userInterestDao()
+    fun provideTagDao(tokiTokiCondDatabase: TokiTokiCondDatabase): TagDao {
+        return tokiTokiCondDatabase.tagDao()
     }
 
     @Provides
