@@ -1,4 +1,4 @@
-package com.example.tokitoki.data.local.backup
+package com.example.tokitoki.data.local
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
