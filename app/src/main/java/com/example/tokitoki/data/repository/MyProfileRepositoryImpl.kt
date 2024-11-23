@@ -1,7 +1,9 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.local.MyProfileDao
+import com.example.tokitoki.data.local.MyProfileEntity
 import com.example.tokitoki.data.local.MyTagDao
+import com.example.tokitoki.data.local.MyTagEntity
 import com.example.tokitoki.domain.converter.MyProfileConverter
 import com.example.tokitoki.domain.converter.MyTagConverter
 import com.example.tokitoki.domain.model.MyProfile
@@ -15,7 +17,23 @@ class MyProfileRepositoryImpl @Inject constructor(
 ) : MyProfileRepository {
 
     override suspend fun getUserProfile(): MyProfile? {
-        return myProfileDao.getProfile()?.let { MyProfileConverter.entityToDomain(it) }
+
+        val myProfileEntity = MyProfileEntity(
+            name = "yonghun",
+            age = "33",
+            thumbnailImageUri = "Uri.EMPTY",
+            mySelfSentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat sapien quis turpis luctus, id convallis mauris malesuada. Ut tincidunt sapien risus, sit amet accumsan elit varius ut. Sed condimentum malesuada ultricies. In hac habitasse platea dictumst."
+        )
+
+        val myProfile: MyProfile = MyProfile().copy(
+            name = myProfileEntity.name,
+            age = myProfileEntity.age.toInt(),
+            thumbnailImageUri = myProfileEntity.thumbnailImageUri,
+            mySelfSentence = myProfileEntity.mySelfSentence
+        )
+
+        return myProfile ?: MyProfile()
+//        return myProfileDao.getProfile()?.let { MyProfileConverter.entityToDomain(it) }
     }
 
     override suspend fun saveUserProfile(profile: MyProfile) {
@@ -58,7 +76,13 @@ class MyProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserTagsAsDomain(): List<MyTag> {
-        return myTagDao.getAllMyTags().map { MyTagConverter.entityToDomain(it) }
+        val myTagEntities = listOf(
+            MyTagEntity(tagId = 1),
+            MyTagEntity(tagId = 2),
+            MyTagEntity(tagId = 3)
+        )
+        return myTagEntities.map { MyTagConverter.entityToDomain(it) }
+//        return myTagDao.getAllMyTags().map { MyTagConverter.entityToDomain(it) }
     }
 
     override suspend fun clearUserTags() {

@@ -2,8 +2,8 @@ package com.example.tokitoki.domain.model
 
 data class MyProfile(
     val id: Int = 0, // 단일 사용자이므로 항상 0일 것으로 보임
-    val name: String,
-    val age: Int,
-    val thumbnailImageUri: String,
-    val mySelfSentence: String
+    val name: String = "",
+    val age: Int= 0,
+    val thumbnailImageUri: String = "",
+    val mySelfSentence: String = ""
 )

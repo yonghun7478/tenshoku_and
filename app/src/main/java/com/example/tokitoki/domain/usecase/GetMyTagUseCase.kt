@@ -9,6 +9,6 @@ class GetMyTagUseCase @Inject constructor(
     private val myProfileRepository: MyProfileRepository
 ) {
     suspend operator fun invoke(): List<MyTag> {
-        return listOf(MyTag(tagId = 1), MyTag(tagId = 2), MyTag(tagId = 3))
+        return myProfileRepository.getUserTagsAsDomain()
     }
 }

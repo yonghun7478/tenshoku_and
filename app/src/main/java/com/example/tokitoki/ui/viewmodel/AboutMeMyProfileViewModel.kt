@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
-import com.example.tokitoki.ui.model.MyProfileItem
+import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
 import com.example.tokitoki.ui.state.AboutMeMyProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,11 +30,16 @@ class AboutMeMyProfileViewModel
     val uiEvent = _uiEvent.asSharedFlow()
 
     suspend fun init() {
+        val myProfile = getMyProfileUseCase()
+        val myTag = getMyTagUseCase()
+        val tag = getTagByTagIdUseCase(myTag.map { it.tagId })
+
+        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, tag)
 
         _uiState.update { currentState ->
             currentState.copy(
                 isInitialized = true,
-                myProfileItem = MyProfileItem(),
+                myProfileItem = myProfileItem,
             )
         }
     }
