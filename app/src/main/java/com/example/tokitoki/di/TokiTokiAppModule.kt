@@ -8,6 +8,8 @@ import com.example.tokitoki.data.local.TokiTokiCondDatabase
 import com.example.tokitoki.data.local.TagDao
 import com.example.tokitoki.data.local.TokiTokiLocalDatabase
 import com.example.tokitoki.data.local.EncryptionHelper
+import com.example.tokitoki.data.local.MyProfileDao
+import com.example.tokitoki.data.local.MyTagDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +40,24 @@ object TokiTokiAppModule {
 
     @Provides
     @Singleton
+    fun provideTagDao(tokiTokiCondDatabase: TokiTokiCondDatabase): TagDao {
+        return tokiTokiCondDatabase.tagDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryDao(tokiTokiCondDatabase: TokiTokiCondDatabase): CategoryDao {
+        return tokiTokiCondDatabase.categoryDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMySelfSentenceDao(tokiTokiCondDatabase: TokiTokiCondDatabase): MySelfSentenceDao {
+        return tokiTokiCondDatabase.myselfSentenceDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideTokiTokiLocalDatabase(
         @ApplicationContext context: Context,
         encryptionHelper: EncryptionHelper
@@ -55,19 +75,13 @@ object TokiTokiAppModule {
 
     @Provides
     @Singleton
-    fun provideTagDao(tokiTokiCondDatabase: TokiTokiCondDatabase): TagDao {
-        return tokiTokiCondDatabase.tagDao()
+    fun provideMyProfileDao(tokiTokiLocalDatabase: TokiTokiLocalDatabase): MyProfileDao {
+        return tokiTokiLocalDatabase.myProfileDao()
     }
 
     @Provides
     @Singleton
-    fun provideCategoryDao(tokiTokiCondDatabase: TokiTokiCondDatabase): CategoryDao {
-        return tokiTokiCondDatabase.categoryDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideMySelfSentenceDao(tokiTokiCondDatabase: TokiTokiCondDatabase): MySelfSentenceDao {
-        return tokiTokiCondDatabase.myselfSentenceDao()
+    fun provideMyTagDao(tokiTokiLocalDatabase: TokiTokiLocalDatabase): MyTagDao {
+        return tokiTokiLocalDatabase.myTagDao()
     }
 }

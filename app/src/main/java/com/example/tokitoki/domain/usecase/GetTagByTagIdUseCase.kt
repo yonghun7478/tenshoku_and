@@ -4,10 +4,10 @@ import com.example.tokitoki.domain.model.Tag
 import com.example.tokitoki.domain.repository.TagRepository
 import javax.inject.Inject
 
-class GetTagUseCase @Inject constructor(
+class GetTagByTagIdUseCase @Inject constructor(
     private val tagRepository: TagRepository
 ) {
-    suspend operator fun invoke(categoryId: Int): List<Tag> {
-        return tagRepository.getTags(categoryId)
+    suspend operator fun invoke(ids:List<Int>): List<Tag> {
+        return tagRepository.getTags(ids)
     }
 }

@@ -1,7 +1,9 @@
 package com.example.tokitoki.di
 
+import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
 import com.example.tokitoki.data.repository.TagRepositoryImpl
+import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
 import com.example.tokitoki.domain.repository.TagRepository
 import dagger.Binds
@@ -25,4 +27,10 @@ abstract class TokiTokiRepositoryModule {
     abstract fun bindMySelfSentenceRepository(
         mySelfSentenceRepositoryImpl: MySelfSentenceRepositoryImpl
     ): MySelfSentenceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMyProfileRepository(
+        myProfileRepositoryImpl: MyProfileRepositoryImpl
+    ): MyProfileRepository
 }

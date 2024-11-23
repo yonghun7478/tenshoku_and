@@ -93,4 +93,8 @@ class TagRepositoryImpl @Inject constructor(
 
         return tagEntities.map { TagConverter.dataToDomain(it) }
     }
+
+    override suspend fun getTags(tagIds: List<Int>): List<Tag> {
+        return tagDao.getTagsByIds(tagIds).map { TagConverter.dataToDomain(it) }
+    }
 }

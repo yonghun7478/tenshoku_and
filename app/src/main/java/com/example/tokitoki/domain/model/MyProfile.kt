@@ -1,17 +1,9 @@
 package com.example.tokitoki.domain.model
 
-import android.net.Uri
-
 data class MyProfile(
-    val name: String = "",
-    val age: String = "",
-    val thumbnailImageUri: Uri = Uri.EMPTY,
-    val myTagItems: List<MyTag> = listOf(),
-    val mySelfSentence: String = "",
-)
-
-data class MyTag(
-    val title: String = "",
-    val url: String = "",
-    val categoryTitle: String = "",
+    val id: Int = 0, // 단일 사용자이므로 항상 0일 것으로 보임
+    val name: String,
+    val age: Int,
+    val thumbnailImageUri: String,
+    val mySelfSentence: String
 )
