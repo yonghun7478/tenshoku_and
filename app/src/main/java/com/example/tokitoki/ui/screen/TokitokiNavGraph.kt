@@ -140,8 +140,8 @@ fun TokitokiNavGraph(
                 onAboutMePhotoUploadScreen = {
                     navController.navigateUp()
                 },
-                onAboutMeProfScreen = {
-
+                onAboutMeMyProfileScreen = {
+                    navAction.navigateToAboutMeMyProfile()
                 }
             )
         }

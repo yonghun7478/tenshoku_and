@@ -1,7 +1,9 @@
 package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
+import com.example.tokitoki.ui.constants.AboutMeProfInputAction
 import com.example.tokitoki.ui.converter.MySelfSentenceUiConverter
 import com.example.tokitoki.ui.state.AboutMeProfInputEvent
 import com.example.tokitoki.ui.state.AboutMeProfInputState
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +36,12 @@ class AboutMeProfInputViewModel
                 isInitialized = true,
                 myselfSentenceList = sentenceList,
             )
+        }
+    }
+
+    fun aboutMeProfInputAction(action: AboutMeProfInputAction) {
+        viewModelScope.launch {
+            _uiEvent.emit(AboutMeProfInputEvent.ACTION(action))
         }
     }
 }

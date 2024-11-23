@@ -34,6 +34,7 @@ import com.example.tokitoki.ui.model.MySelfSentenceItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.screen.components.etc.TkWormIndicator
+import com.example.tokitoki.ui.state.AboutMeProfInputEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMeProfInputViewModel
@@ -42,7 +43,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeProfInputViewModel
 @Composable
 fun AboutMeProfInputScreen(
     onAboutMePhotoUploadScreen: () -> Unit = {},
-    onAboutMeProfScreen: () -> Unit = {},
+    onAboutMeMyProfileScreen: () -> Unit = {},
     viewModel: AboutMeProfInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -54,7 +55,8 @@ fun AboutMeProfInputScreen(
     if (uiState.isInitialized) {
         AboutMeProfInputContents(
             pagerState = pagerState,
-            itemList = uiState.myselfSentenceList
+            itemList = uiState.myselfSentenceList,
+            aboutMeProfInputAction = viewModel::aboutMeProfInputAction
         )
     }
 
@@ -62,7 +64,20 @@ fun AboutMeProfInputScreen(
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
+            when (event) {
+                is AboutMeProfInputEvent.ACTION -> {
+                    when (event.action) {
+                        AboutMeProfInputAction.SUBMIT -> {
+                            onAboutMeMyProfileScreen()
+                        }
 
+                        else -> {}
+                    }
+
+                }
+
+                AboutMeProfInputEvent.NOTHING -> {}
+            }
         }
     }
 }
