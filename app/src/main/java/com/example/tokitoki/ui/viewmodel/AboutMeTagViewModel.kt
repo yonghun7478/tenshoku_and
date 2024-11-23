@@ -3,7 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
-import com.example.tokitoki.domain.usecase.GetMyTagByCategoryIdUseCase
+import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.converter.CategoryUiConverter
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class AboutMeTagViewModel
 @Inject constructor(
     private val isTest: Boolean,
-    private val getMyTagByCategoryIdUseCase: GetMyTagByCategoryIdUseCase,
+    private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : ViewModel() {
 
@@ -44,7 +44,7 @@ class AboutMeTagViewModel
 
         val tagsByCategory = mutableMapOf<String, List<TagItem>>()
         domainCategories.forEach { category ->
-            val tags = getMyTagByCategoryIdUseCase(category.id)
+            val tags = getTagByCategoryIdUseCase(category.id)
                 .map { TagUiConverter.domainToUi(it) }
 
             tagsByCategory[category.title] = tags

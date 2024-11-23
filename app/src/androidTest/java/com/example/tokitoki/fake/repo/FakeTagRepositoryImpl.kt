@@ -298,4 +298,8 @@ class FakeTagRepositoryImpl @Inject constructor(
 
         return tagEntities.map { TagConverter.dataToDomain(it) }
     }
+
+    override suspend fun getTags(tagIds: List<Int>): List<Tag> {
+        return emptyList()
+    }
 }
