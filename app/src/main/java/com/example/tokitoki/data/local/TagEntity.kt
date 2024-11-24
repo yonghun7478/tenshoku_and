@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
     indices = [Index(value = ["categoryId"])]
 )
 data class TagEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0, // 자동 증가
     val title: String,
     val url: String,
     val categoryId: Int
