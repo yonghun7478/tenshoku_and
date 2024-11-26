@@ -19,7 +19,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "CONDITION_DB_VERSION_CODE", "\"1.0.0\"")
+        buildConfigField("String", "CONDITION_DB_VERSION_CODE", "\"1.0.1\"")
 
         testInstrumentationRunner = "com.example.tokitoki.CustomTestRunner"
         vectorDrawables {

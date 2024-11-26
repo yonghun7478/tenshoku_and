@@ -5,10 +5,14 @@ import com.example.tokitoki.domain.repository.MyProfileRepository
 
 import javax.inject.Inject
 
-class GetMyTagUseCase @Inject constructor(
+interface GetMyTagUseCase {
+    suspend operator fun invoke(): List<MyTag>
+}
+
+class GetMyTagUseCaseImpl @Inject constructor(
     private val myProfileRepository: MyProfileRepository
-) {
-    suspend operator fun invoke(): List<MyTag> {
+) : GetMyTagUseCase {
+    override suspend operator fun invoke(): List<MyTag> {
         return myProfileRepository.getUserTagsAsDomain()
     }
 }

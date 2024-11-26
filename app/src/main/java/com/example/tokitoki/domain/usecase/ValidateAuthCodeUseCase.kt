@@ -2,8 +2,12 @@ package com.example.tokitoki.domain.usecase
 
 import javax.inject.Inject
 
-class ValidateAuthCodeUseCase @Inject constructor() {
-    suspend operator fun invoke(code: String): Boolean {
+interface ValidateAuthCodeUseCase {
+    suspend operator fun invoke(code: String): Boolean
+}
+
+class ValidateAuthCodeUseCaseImpl @Inject constructor() : ValidateAuthCodeUseCase {
+    override suspend operator fun invoke(code: String): Boolean {
         return code == "123456"
     }
 }

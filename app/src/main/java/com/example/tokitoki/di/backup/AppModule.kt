@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.tokitoki.data.local.backup.AppDatabase
 import com.example.tokitoki.data.local.backup.AppLocalDatabase
-import com.example.tokitoki.data.local.EncryptionHelper
+import com.example.tokitoki.data.utils.EncryptionHelper
 import com.example.tokitoki.data.local.backup.LocalUserDao
 import com.example.tokitoki.data.local.backup.UserDao
 import com.example.tokitoki.data.local.backup.UserPreferences

@@ -7,9 +7,10 @@ import com.example.tokitoki.data.local.MySelfSentenceDao
 import com.example.tokitoki.data.local.TokiTokiCondDatabase
 import com.example.tokitoki.data.local.TagDao
 import com.example.tokitoki.data.local.TokiTokiLocalDatabase
-import com.example.tokitoki.data.local.EncryptionHelper
+import com.example.tokitoki.data.utils.EncryptionHelper
 import com.example.tokitoki.data.local.MyProfileDao
 import com.example.tokitoki.data.local.MyTagDao
+import com.example.tokitoki.data.utils.DatabaseManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -83,5 +84,14 @@ object TokiTokiAppModule {
     @Singleton
     fun provideMyTagDao(tokiTokiLocalDatabase: TokiTokiLocalDatabase): MyTagDao {
         return tokiTokiLocalDatabase.myTagDao()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideDatabaseManager(
+        @ApplicationContext context: Context
+    ): DatabaseManager {
+        return DatabaseManager(context)
     }
 }

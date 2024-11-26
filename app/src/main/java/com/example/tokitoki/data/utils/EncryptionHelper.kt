@@ -1,4 +1,4 @@
-package com.example.tokitoki.data.local
+package com.example.tokitoki.data.utils
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
