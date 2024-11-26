@@ -11,6 +11,6 @@ abstract class TokiTokiCondDatabase : RoomDatabase() {
     abstract fun myselfSentenceDao(): MySelfSentenceDao
 
     companion object {
-        const val DATABASE_NAME = "tokitoki_cond_database"
+        const val DATABASE_NAME = "tokitoki_cond_database.db"
     }
 }

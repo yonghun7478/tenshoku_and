@@ -1,6 +1,7 @@
 package com.example.tokitoki.data.repository
 
 import android.content.Context
+import com.example.tokitoki.BuildConfig
 import com.example.tokitoki.domain.repository.AppVersionRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -11,7 +12,7 @@ class AppVersionRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AppVersionRepository {
     override fun getCurrentDbVersion(): String {
-        return "1.0.0" // Gradle 변수에서 가져오는 방식으로 변경 가능
+        return BuildConfig.CONDITION_DB_VERSION_CODE
     }
 
     override suspend fun downloadDbFromServer(): String {

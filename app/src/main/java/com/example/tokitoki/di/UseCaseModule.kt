@@ -12,6 +12,8 @@ import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCaseImpl
+import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
+import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
 import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
@@ -73,4 +75,10 @@ abstract class UseCaseModule {
     abstract fun bindValidateEmailFormatUseCase(
         impl: ValidateEmailFormatUseCaseImpl
     ): ValidateEmailFormatUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateDatabaseUseCase(
+        impl: UpdateDatabaseUseCaseImpl
+    ): UpdateDatabaseUseCase
 }
