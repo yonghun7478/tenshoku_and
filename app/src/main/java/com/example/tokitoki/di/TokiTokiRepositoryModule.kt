@@ -1,10 +1,10 @@
 package com.example.tokitoki.di
 
-import com.example.tokitoki.data.repository.AppVersionRepositoryImpl
+import com.example.tokitoki.data.repository.DbRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
 import com.example.tokitoki.data.repository.TagRepositoryImpl
-import com.example.tokitoki.domain.repository.AppVersionRepository
+import com.example.tokitoki.domain.repository.DbRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
 import com.example.tokitoki.domain.repository.TagRepository
@@ -38,7 +38,7 @@ abstract class TokiTokiRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAppVersionRepository(
-        appVersionRepositoryImpl: AppVersionRepositoryImpl
-    ): AppVersionRepository
+    abstract fun bindDbRepository(
+        dbRepositoryImpl: DbRepositoryImpl
+    ): DbRepository
 }

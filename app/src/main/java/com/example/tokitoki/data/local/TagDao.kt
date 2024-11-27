@@ -31,4 +31,7 @@ interface TagDao {
                 "WHERE tags.id IN (:tagIds)"
     )
     suspend fun getTagsByIds(tagIds: List<Int>): List<TagWithCategoryEntity>
+
+    @Query("SELECT COUNT(*) FROM tags")
+    suspend fun getRowCount(): Int
 }

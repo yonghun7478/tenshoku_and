@@ -1,7 +1,7 @@
 package com.example.tokitoki.domain.usecase
 
 import com.example.tokitoki.data.utils.DatabaseManager
-import com.example.tokitoki.domain.repository.AppVersionRepository
+import com.example.tokitoki.domain.repository.DbRepository
 import javax.inject.Inject
 
 interface UpdateDatabaseUseCase {
@@ -9,34 +9,33 @@ interface UpdateDatabaseUseCase {
 }
 
 class UpdateDatabaseUseCaseImpl @Inject constructor(
-    private val repository: AppVersionRepository,
+    private val dbRepository: DbRepository,
     private val databaseManager: DatabaseManager,
 ) : UpdateDatabaseUseCase {
     override suspend operator fun invoke(): Boolean {
         return try {
-            // 1. 현재 앱의 데이터베이스 버전 확인
-            val currentDbVersion = repository.getCurrentDbVersion()
+            // 데이터베이스가 비어 있는지 확인
+            val isEmpty = dbRepository.isDatabaseEmpty()
 
-            // 2. 서버에 선언된 DB 버전 가져오기
+            // 현재 DB 버전 확인
+            val currentDbVersion = dbRepository.getCurrentDbVersion()
+
+            // 서버에서 최신 DB 버전 확인 (Mock 데이터)
             val latestDbVersion = getLatestDbVersion()
 
-            // 3. 버전 비교
-            if (isVersionNewer(latestDbVersion, currentDbVersion)) {
-                // 서버에서 새 데이터베이스 파일 다운로드
-                val serverDbPath = repository.downloadDbFromServer()
-
-                // 서버 DB로 교체
+            // 데이터가 없거나 버전이 낮으면 업데이트 수행
+            if (isEmpty || isVersionNewer(latestDbVersion, currentDbVersion)) {
+                val serverDbPath = dbRepository.downloadDbFromServer()
                 databaseManager.replaceDatabase(serverDbPath)
             } else {
-                // Gradle DB가 최신이므로 에셋 DB로 교체
                 databaseManager.replaceDatabaseWithAssets()
             }
 
-            true // 성공
+            true // 업데이트 성공
         } catch (e: Exception) {
             databaseManager.replaceDatabaseWithAssets()
             e.printStackTrace()
-            false // 실패
+            false // 업데이트 실패
         }
     }
 

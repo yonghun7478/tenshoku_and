@@ -2,15 +2,21 @@ package com.example.tokitoki.data.repository
 
 import android.content.Context
 import com.example.tokitoki.BuildConfig
-import com.example.tokitoki.domain.repository.AppVersionRepository
+import com.example.tokitoki.data.local.CategoryDao
+import com.example.tokitoki.data.local.MySelfSentenceDao
+import com.example.tokitoki.data.local.TagDao
+import com.example.tokitoki.domain.repository.DbRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 
-class AppVersionRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
-) : AppVersionRepository {
+class DbRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val tagDao: TagDao,
+    private val myselfSentenceDao: MySelfSentenceDao,
+    private val categoryDao: CategoryDao,
+) : DbRepository {
     override fun getCurrentDbVersion(): String {
         return BuildConfig.CONDITION_DB_VERSION_CODE
     }
@@ -38,5 +44,11 @@ class AppVersionRepositoryImpl @Inject constructor(
             e.printStackTrace()
             throw IOException("Failed to copy database from assets: ${e.message}")
         }
+    }
+
+    override suspend fun isDatabaseEmpty(): Boolean {
+        return tagDao.getRowCount() == 0 &&
+                myselfSentenceDao.getRowCount() == 0 &&
+                categoryDao.getRowCount() == 0
     }
 }
