@@ -14,26 +14,22 @@ class UpdateDatabaseUseCaseImpl @Inject constructor(
 ) : UpdateDatabaseUseCase {
     override suspend operator fun invoke(): Boolean {
         return try {
-            // 데이터베이스가 비어 있는지 확인
-            val isEmpty = dbRepository.isDatabaseEmpty()
-
-            // 현재 DB 버전 확인
             val currentDbVersion = dbRepository.getCurrentDbVersion()
-
-            // 서버에서 최신 DB 버전 확인 (Mock 데이터)
+            val assetDbVersion = dbRepository.getAssetDbVersion()
             val latestDbVersion = getLatestDbVersion()
 
-            // 데이터가 없거나 버전이 낮으면 업데이트 수행
-            if (isEmpty || isVersionNewer(latestDbVersion, currentDbVersion)) {
-                val serverDbPath = dbRepository.downloadDbFromServer()
-                databaseManager.replaceDatabase(serverDbPath)
-            } else {
-                databaseManager.replaceDatabaseWithAssets()
+            if (isVersionNewer(latestDbVersion, currentDbVersion)) {
+                dbRepository.setCurrentDbVersion(latestDbVersion)
+                if (latestDbVersion == assetDbVersion) {
+                    databaseManager.replaceDatabaseWithAssets()
+                } else {
+                    val serverDbPath = dbRepository.downloadDbFromServer()
+                    databaseManager.replaceDatabase(serverDbPath)
+                }
             }
-
             true // 업데이트 성공
         } catch (e: Exception) {
-            databaseManager.replaceDatabaseWithAssets()
+            dbRepository.setCurrentDbVersion("0.0.0")
             e.printStackTrace()
             false // 업데이트 실패
         }
@@ -43,7 +39,7 @@ class UpdateDatabaseUseCaseImpl @Inject constructor(
      * 서버에 정의된 DB 버전을 가져옵니다.
      */
     private fun getLatestDbVersion(): String {
-        return  "2.0.0"
+        return "2.0.0"
     }
 
     /**

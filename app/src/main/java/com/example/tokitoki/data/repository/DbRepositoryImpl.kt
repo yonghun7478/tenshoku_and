@@ -3,6 +3,7 @@ package com.example.tokitoki.data.repository
 import android.content.Context
 import com.example.tokitoki.BuildConfig
 import com.example.tokitoki.data.local.CategoryDao
+import com.example.tokitoki.data.local.DbVersionPreferences
 import com.example.tokitoki.data.local.MySelfSentenceDao
 import com.example.tokitoki.data.local.TagDao
 import com.example.tokitoki.domain.repository.DbRepository
@@ -16,9 +17,18 @@ class DbRepositoryImpl @Inject constructor(
     private val tagDao: TagDao,
     private val myselfSentenceDao: MySelfSentenceDao,
     private val categoryDao: CategoryDao,
+    private val dbVersionPreferences: DbVersionPreferences
 ) : DbRepository {
-    override fun getCurrentDbVersion(): String {
+    override fun getAssetDbVersion(): String {
         return BuildConfig.CONDITION_DB_VERSION_CODE
+    }
+
+    override fun getCurrentDbVersion(): String {
+        return dbVersionPreferences.getDbVersion() ?: "0.0.0"
+    }
+
+    override fun setCurrentDbVersion(version: String) {
+        dbVersionPreferences.saveDbVersion(version)
     }
 
     override suspend fun downloadDbFromServer(): String {

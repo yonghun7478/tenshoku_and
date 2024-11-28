@@ -3,6 +3,8 @@ package com.example.tokitoki.di
 import android.content.Context
 import androidx.room.Room
 import com.example.tokitoki.data.local.CategoryDao
+import com.example.tokitoki.data.local.DbVersionPreferences
+import com.example.tokitoki.data.local.DbVersionPreferencesImpl
 import com.example.tokitoki.data.local.MySelfSentenceDao
 import com.example.tokitoki.data.local.TokiTokiCondDatabase
 import com.example.tokitoki.data.local.TagDao
@@ -93,5 +95,13 @@ object TokiTokiAppModule {
         @ApplicationContext context: Context
     ): DatabaseManager {
         return DatabaseManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDbVersionPreferences(
+        @ApplicationContext context: Context
+    ): DbVersionPreferences {
+        return DbVersionPreferencesImpl(context)
     }
 }
