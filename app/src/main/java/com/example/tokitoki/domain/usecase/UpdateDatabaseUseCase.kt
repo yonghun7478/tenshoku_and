@@ -21,10 +21,10 @@ class UpdateDatabaseUseCaseImpl @Inject constructor(
             if (isVersionNewer(latestDbVersion, currentDbVersion)) {
                 dbRepository.setCurrentDbVersion(latestDbVersion)
                 if (latestDbVersion == assetDbVersion) {
-                    databaseManager.replaceDatabaseWithAssets()
+                    databaseManager.replaceDatabaseFileWithAssets()
                 } else {
                     val serverDbPath = dbRepository.downloadDbFromServer()
-                    databaseManager.replaceDatabase(serverDbPath)
+                    databaseManager.replaceDatabaseFile(serverDbPath)
                 }
             }
             true // 업데이트 성공

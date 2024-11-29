@@ -33,30 +33,28 @@ object TokiTokiAppModule {
 
     @Provides
     @Singleton
-    fun provideTokiTokiCondDatabase(@ApplicationContext context: Context): TokiTokiCondDatabase {
-        return Room.databaseBuilder(
-            context,
-            TokiTokiCondDatabase::class.java,
-            TokiTokiCondDatabase.DATABASE_NAME
-        ).build()
+    fun provideDatabaseManager(
+        @ApplicationContext context: Context
+    ): DatabaseManager {
+        return DatabaseManager(context)
     }
 
     @Provides
     @Singleton
-    fun provideTagDao(tokiTokiCondDatabase: TokiTokiCondDatabase): TagDao {
-        return tokiTokiCondDatabase.tagDao()
+    fun provideTagDao(databaseManager: DatabaseManager): TagDao {
+        return databaseManager.getTagDao()
     }
 
     @Provides
     @Singleton
-    fun provideCategoryDao(tokiTokiCondDatabase: TokiTokiCondDatabase): CategoryDao {
-        return tokiTokiCondDatabase.categoryDao()
+    fun provideCategoryDao(databaseManager: DatabaseManager): CategoryDao {
+        return databaseManager.getCategoryDao()
     }
 
     @Provides
     @Singleton
-    fun provideMySelfSentenceDao(tokiTokiCondDatabase: TokiTokiCondDatabase): MySelfSentenceDao {
-        return tokiTokiCondDatabase.myselfSentenceDao()
+    fun provideMySelfSentenceDao(databaseManager: DatabaseManager): MySelfSentenceDao {
+        return databaseManager.getMySelfSentenceDao()
     }
 
     @Provides
@@ -86,15 +84,6 @@ object TokiTokiAppModule {
     @Singleton
     fun provideMyTagDao(tokiTokiLocalDatabase: TokiTokiLocalDatabase): MyTagDao {
         return tokiTokiLocalDatabase.myTagDao()
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideDatabaseManager(
-        @ApplicationContext context: Context
-    ): DatabaseManager {
-        return DatabaseManager(context)
     }
 
     @Provides
