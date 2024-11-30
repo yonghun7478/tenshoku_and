@@ -27,8 +27,6 @@ class TokitokiViewModel @Inject constructor(
     init {
         val retryHelper = RetryHelper()
         viewModelScope.launch {
-
-
             val success = retryHelper.retry {
                 val databaseUpdated = updateDatabaseUseCase()
 

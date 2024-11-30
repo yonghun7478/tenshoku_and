@@ -1,10 +1,6 @@
 package com.example.tokitoki.data.utils
 
 import android.content.Context
-import androidx.room.Room
-import com.example.tokitoki.data.local.CategoryDao
-import com.example.tokitoki.data.local.MySelfSentenceDao
-import com.example.tokitoki.data.local.TagDao
 import com.example.tokitoki.data.local.TokiTokiCondDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -16,7 +12,6 @@ class DatabaseManager @Inject constructor(
 ) {
     private var tokiTokiCondDatabase: TokiTokiCondDatabase? = null
     private val databaseName = "tokitoki_cond_database.db" // 데이터베이스 이름
-    private var curDbPath = ""
 
     /**
      * Replace the database with a file from the given path.
@@ -29,7 +24,6 @@ class DatabaseManager @Inject constructor(
         try {
             if (dbPath.exists()) dbPath.delete()
             newDbFile.copyTo(dbPath, overwrite = true)
-            curDbPath = newDbPath
         } catch (e: Exception) {
             e.printStackTrace()
             throw IOException("Failed to replace database: ${e.message}")
@@ -52,35 +46,9 @@ class DatabaseManager @Inject constructor(
                     input.copyTo(output)
                 }
             }
-            curDbPath = dbPath.absolutePath
         } catch (e: Exception) {
             e.printStackTrace()
             throw IOException("Failed to replace database with assets: ${e.message}")
         }
     }
-
-    fun initializeDatabase(customPath: String) {
-        // 커스텀 경로에 파일이 없으면 예외 처리
-        val databaseFile = File(customPath)
-        if (!databaseFile.exists()) {
-            throw IllegalArgumentException("Database file does not exist at path: $customPath")
-        }
-
-        // Room 데이터베이스 생성
-        tokiTokiCondDatabase = Room.databaseBuilder(
-            context,
-            TokiTokiCondDatabase::class.java,
-            databaseFile.name // 데이터베이스 이름은 파일명으로 지정
-        ).createFromFile(databaseFile) // 커스텀 경로 지정
-            .build()
-    }
-
-    fun getDatabase(): TokiTokiCondDatabase {
-        return tokiTokiCondDatabase
-            ?: throw IllegalStateException("Database is not initialized. Call initializeDatabase first.")
-    }
-
-    fun getTagDao(): TagDao = getDatabase().tagDao()
-    fun getCategoryDao(): CategoryDao = getDatabase().categoryDao()
-    fun getMySelfSentenceDao(): MySelfSentenceDao = getDatabase().myselfSentenceDao()
 }
