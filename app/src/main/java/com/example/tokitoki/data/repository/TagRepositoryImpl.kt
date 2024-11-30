@@ -7,6 +7,8 @@ import com.example.tokitoki.domain.converter.TagConverter
 import com.example.tokitoki.domain.model.Category
 import com.example.tokitoki.domain.model.Tag
 import com.example.tokitoki.domain.repository.TagRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
@@ -15,14 +17,20 @@ class TagRepositoryImpl @Inject constructor(
 ) : TagRepository {
 
     override suspend fun getCategories(): List<Category> {
-        return categoryDao.getCategories().map { CategoryConverter.dataToDomain(it) }
+        return withContext(Dispatchers.IO) {
+            categoryDao.getCategories().map { CategoryConverter.dataToDomain(it) }
+        }
     }
 
     override suspend fun getTags(categoryId: Int): List<Tag> {
-        return tagDao.getTagsWithCategory(categoryId).map { TagConverter.dataToDomain(it) }
+        return withContext(Dispatchers.IO) {
+            tagDao.getTagsWithCategory(categoryId).map { TagConverter.dataToDomain(it) }
+        }
     }
 
     override suspend fun getTags(tagIds: List<Int>): List<Tag> {
-        return tagDao.getTagsByIds(tagIds).map { TagConverter.dataToDomain(it) }
+        return withContext(Dispatchers.IO) {
+            tagDao.getTagsByIds(tagIds).map { TagConverter.dataToDomain(it) }
+        }
     }
 }
