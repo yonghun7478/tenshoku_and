@@ -52,12 +52,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeTagAction
@@ -86,18 +88,16 @@ fun AboutMeTagScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState {
-        if (uiState.isInitialized) uiState.categoryList.size else 1
+        uiState.categoryList.size
     }
 
-    if (uiState.isInitialized) {
-        AboutMeTagContents(
-            uiState = uiState,
-            coroutineScope = coroutineScope,
-            pagerState = pagerState,
-            aboutMeTagAction = viewModel::aboutMeTagAction,
-            isTest = viewModel.getIsTest()
-        )
-    }
+    AboutMeTagContents(
+        uiState = uiState,
+        coroutineScope = coroutineScope,
+        pagerState = pagerState,
+        aboutMeTagAction = viewModel::aboutMeTagAction,
+        isTest = viewModel.getIsTest()
+    )
 
     LaunchedEffect(true) {
         viewModel.init()
@@ -232,17 +232,13 @@ fun AboutMeTagTitle(
 @Composable
 fun AboutMeTagPagerTab(
     modifier: Modifier = Modifier,
-    tabs: List<CategoryItem> = listOf(
-        CategoryItem(0, "趣味"),
-        CategoryItem(1, "ライフスタイル"),
-        CategoryItem(2, "価値観")
-    ),
+    tabs: List<CategoryItem> = listOf(),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val tabWidth = maxWidth / tabs.size
+        val tabWidth: Dp = if (tabs.isNotEmpty()) maxWidth / tabs.size else 0.dp
 
         val indicatorOffset by animateDpAsState(
             targetValue = pagerState.currentPage * tabWidth,
@@ -314,17 +310,17 @@ fun AboutMeTagPager(
         modifier = modifier
     ) { page ->
         // 현재 페이지의 카테고리 이름을 가져옴
-        val currentCategoryTitle: String = uiState.categoryList[page].title
+        val currentCategoryTitle: String = uiState.categoryList.getOrNull(page)?.title ?: ""
 
         // 해당 카테고리의 관심사 리스트를 가져옴, 없으면 빈 리스트
-        val currentTagList =
+        val currentTagList: List<TagItem> =
             uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
 
 
         // 각 카테고리별 페이지 표시
         AboutMeTagPage(
             categoryTitle = currentCategoryTitle,
-            TagList = currentTagList,
+            tagList = currentTagList,
             aboutMeTagAction = aboutMeTagAction,
             isTest = isTest
         )
@@ -334,7 +330,7 @@ fun AboutMeTagPager(
 @Composable
 fun AboutMeTagPage(
     categoryTitle: String,
-    TagList: List<TagItem>,
+    tagList: List<TagItem>,
     aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     isTest: Boolean = false
 ) {
@@ -347,13 +343,13 @@ fun AboutMeTagPage(
         verticalArrangement = Arrangement.spacedBy(8.dp), // 항목 간의 세로 간격
         horizontalArrangement = Arrangement.spacedBy(8.dp) // 항목 간의 가로 간격
     ) {
-        itemsIndexed(TagList) { index, Tag ->
+        itemsIndexed(tagList) { index, tag ->
             AboutMeTagGridItem(
                 index = index,
-                title = Tag.title,
+                title = tag.title,
                 categoryTitle = categoryTitle,
-                url = Tag.url,
-                showBadge = Tag.showBadge,
+                url = tag.url,
+                showBadge = tag.showBadge,
                 aboutMeTagAction = aboutMeTagAction,
                 isTest = isTest
             )
@@ -385,6 +381,9 @@ fun AboutMeTagGridItem(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(url)
                 .error(R.drawable.no_image_icon) // 이미지 로드 실패 시 대체 이미지
+                .diskCachePolicy(CachePolicy.ENABLED) // 디스크 캐시 활성화
+                .memoryCachePolicy(CachePolicy.ENABLED) // 메모리 캐시 활성화
+                .crossfade(true) // 부드러운 전환 애니메이션
                 .build()
         )
     }

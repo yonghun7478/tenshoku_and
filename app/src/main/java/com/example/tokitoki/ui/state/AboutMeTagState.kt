@@ -7,5 +7,4 @@ data class AboutMeTagState(
     val showDialog: Boolean = false,
     val tagsByCategory: Map<String, List<TagItem>> = emptyMap(),
     val categoryList: List<CategoryItem> = listOf(),
-    val isInitialized: Boolean = false,
 )

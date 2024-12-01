@@ -43,6 +43,7 @@ class AboutMeTagViewModel
         val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
 
         val tagsByCategory = mutableMapOf<String, List<TagItem>>()
+
         domainCategories.forEach { category ->
             val tags = getTagByCategoryIdUseCase(category.id)
                 .map { TagUiConverter.domainToUi(it) }
@@ -52,7 +53,6 @@ class AboutMeTagViewModel
 
         _uiState.update { currentState ->
             currentState.copy(
-                isInitialized = true,
                 categoryList = uiCategories,
                 tagsByCategory = tagsByCategory
             )
