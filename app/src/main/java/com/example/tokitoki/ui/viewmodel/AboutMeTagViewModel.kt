@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
+import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.converter.CategoryUiConverter
@@ -26,6 +27,7 @@ class AboutMeTagViewModel
     private val isTest: Boolean,
     private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val setMyTagUseCase: SetMyTagUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeTagState())
@@ -94,10 +96,29 @@ class AboutMeTagViewModel
         }
     }
 
-    fun checkTags(): Boolean {
+    suspend fun checkTags(): Boolean {
         val selectedTags = _uiState.value.tagsByCategory.values.flatten()
             .filter { it.showBadge }
 
-        return selectedTags.size > 2
+        if (selectedTags.size > 2) {
+            // 1. 필터링: showBadge가 true인 태그만 추출
+            val filteredTags = _uiState.value.tagsByCategory
+                .values
+                .flatten()
+                .filter { it.showBadge }
+
+            val domainMyTags = filteredTags.map { TagUiConverter.uiToDomain(it) }
+
+            val result = setMyTagUseCase(domainMyTags)
+
+            if (result.isSuccess) {
+                println("result $result")
+                return true
+            } else {
+                return false
+            }
+        }
+
+        return false
     }
 }

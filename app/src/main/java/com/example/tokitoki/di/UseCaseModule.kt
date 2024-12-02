@@ -16,6 +16,8 @@ import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.SetMyTagUseCase
+import com.example.tokitoki.domain.usecase.SetMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetNameUseCase
 import com.example.tokitoki.domain.usecase.SetNameUseCaseImpl
 import com.example.tokitoki.domain.usecase.UpdateAgeUseCase
@@ -113,4 +115,10 @@ abstract class UseCaseModule {
     abstract fun bindSetNameUseCase(
         impl: SetNameUseCaseImpl
     ): SetNameUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSetMyTagUseCase(
+        impl: SetMyTagUseCaseImpl
+    ): SetMyTagUseCase
 }
