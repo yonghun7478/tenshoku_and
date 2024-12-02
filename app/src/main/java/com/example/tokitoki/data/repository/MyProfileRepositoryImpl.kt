@@ -17,24 +17,7 @@ class MyProfileRepositoryImpl @Inject constructor(
 ) : MyProfileRepository {
 
     override suspend fun getUserProfile(): MyProfile? {
-
-        val myProfileEntity = MyProfileEntity(
-            name = "yonghun",
-            age = "33",
-            thumbnailImageUri = "Uri.EMPTY",
-            mySelfSentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat sapien quis turpis luctus, id convallis mauris malesuada. Ut tincidunt sapien risus, sit amet accumsan elit varius ut. Sed condimentum malesuada ultricies. In hac habitasse platea dictumst.",
-            isMale = true
-        )
-
-        val myProfile: MyProfile = MyProfile().copy(
-            name = myProfileEntity.name,
-            age = myProfileEntity.age,
-            thumbnailImageUri = myProfileEntity.thumbnailImageUri,
-            mySelfSentence = myProfileEntity.mySelfSentence
-        )
-
-        return myProfile ?: MyProfile()
-//        return myProfileDao.getProfile()?.let { MyProfileConverter.entityToDomain(it) }
+        return myProfileDao.getProfile()?.let { MyProfileConverter.entityToDomain(it) }
     }
 
     override suspend fun saveUserProfile(profile: MyProfile) {
@@ -45,8 +28,12 @@ class MyProfileRepositoryImpl @Inject constructor(
         myProfileDao.updateName(name)
     }
 
-    override suspend fun updateUserAge(age: Int) {
-        myProfileDao.updateAge(age.toString())
+    override suspend fun updateUserAge(age: String) {
+        myProfileDao.updateAge(age)
+    }
+
+    override suspend fun updateGender(isMale: Boolean) {
+        myProfileDao.updateGender(isMale)
     }
 
     override suspend fun updateThumbnailImage(uri: String) {

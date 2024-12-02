@@ -2,6 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.model.MyProfile
+import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.ui.constants.AboutMeGenderAction
 import com.example.tokitoki.ui.state.AboutMeGenderEvent
 import com.example.tokitoki.ui.state.AboutMeGenderState
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AboutMeGenderViewModel @Inject constructor(
+    private val myProfileRepository: MyProfileRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeGenderState())
@@ -40,11 +43,19 @@ class AboutMeGenderViewModel @Inject constructor(
         }
     }
 
-    fun checkGender() = _uiState.value.selectedGender != Gender.NONE
+    fun checkGender(): Boolean {
+        if (_uiState.value.selectedGender != Gender.NONE) {
+            viewModelScope.launch {
+                myProfileRepository.saveUserProfile(MyProfile(isMale = _uiState.value.selectedGender == Gender.MALE))
+            }
+            return true
+        }
+        return false
+    }
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {
-            if(showDialog)
+            if (showDialog)
                 it.copy(showDialog = true)
             else
                 it.copy(showDialog = false)

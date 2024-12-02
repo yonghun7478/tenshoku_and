@@ -29,6 +29,9 @@ interface MyProfileDao {
     @Query("UPDATE my_profile SET mySelfSentence = :sentence WHERE id = :id")
     suspend fun updateMySelfSentence(sentence: String, id: Int = 0)
 
+    @Query("UPDATE my_profile SET isMale = :isMale WHERE id = :id")
+    suspend fun updateGender(isMale: Boolean, id: Int = 0)
+
     // 4. 프로필 삭제 (초기화)
     @Query("DELETE FROM my_profile WHERE id = :id")
     suspend fun deleteProfile(id: Int = 0)
