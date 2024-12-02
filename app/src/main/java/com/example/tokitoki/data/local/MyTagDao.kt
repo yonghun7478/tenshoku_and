@@ -13,7 +13,7 @@ interface MyTagDao {
     suspend fun insertMyTag(myTag: MyTagEntity): Long
 
     // 특정 태그 삭제 (userId는 항상 0)
-    @Query("DELETE FROM my_tags WHERE userId = 0 AND tagId = :tagId")
+    @Query("DELETE FROM my_tags WHERE tagId = :tagId")
     suspend fun deleteMyTag(tagId: Int)
 
     // my_tags 테이블에서 모든 tagId 가져오기
@@ -25,6 +25,6 @@ interface MyTagDao {
     suspend fun getAllMyTags(): List<MyTagEntity>
 
     // 전체 태그 삭제 (userId는 항상 0)
-    @Query("DELETE FROM my_tags WHERE userId = 0")
+    @Query("DELETE FROM my_tags")
     suspend fun deleteAllTagsForUser()
 }

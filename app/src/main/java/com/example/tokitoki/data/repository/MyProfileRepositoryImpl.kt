@@ -22,12 +22,13 @@ class MyProfileRepositoryImpl @Inject constructor(
             name = "yonghun",
             age = "33",
             thumbnailImageUri = "Uri.EMPTY",
-            mySelfSentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat sapien quis turpis luctus, id convallis mauris malesuada. Ut tincidunt sapien risus, sit amet accumsan elit varius ut. Sed condimentum malesuada ultricies. In hac habitasse platea dictumst."
+            mySelfSentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat sapien quis turpis luctus, id convallis mauris malesuada. Ut tincidunt sapien risus, sit amet accumsan elit varius ut. Sed condimentum malesuada ultricies. In hac habitasse platea dictumst.",
+            isMale = true
         )
 
         val myProfile: MyProfile = MyProfile().copy(
             name = myProfileEntity.name,
-            age = myProfileEntity.age.toInt(),
+            age = myProfileEntity.age,
             thumbnailImageUri = myProfileEntity.thumbnailImageUri,
             mySelfSentence = myProfileEntity.mySelfSentence
         )
