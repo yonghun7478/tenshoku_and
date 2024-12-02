@@ -1,5 +1,7 @@
 package com.example.tokitoki.di
 
+import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
+import com.example.tokitoki.domain.usecase.CalculateAgeUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
@@ -14,6 +16,8 @@ import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.UpdateAgeUseCase
+import com.example.tokitoki.domain.usecase.UpdateAgeUseCaseImpl
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
@@ -89,4 +93,16 @@ abstract class UseCaseModule {
     abstract fun bindSetMyProfileUseCase(
         impl: SetMyProfileUseCaseImpl
     ): SetMyProfileUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindCalculateAgeUseCase(
+        impl: CalculateAgeUseCaseImpl
+    ): CalculateAgeUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateAgeUseCase(
+        impl: UpdateAgeUseCaseImpl
+    ): UpdateAgeUseCase
 }

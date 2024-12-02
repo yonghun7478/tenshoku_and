@@ -2,6 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
+import com.example.tokitoki.domain.usecase.UpdateAgeUseCase
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
 import com.example.tokitoki.ui.state.AboutMeBirthdayEvent
 import com.example.tokitoki.ui.state.AboutMeBirthdayState
@@ -17,6 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AboutMeBirthdayViewModel @Inject constructor(
+    private val updateAgeUseCase: UpdateAgeUseCase,
+    private val calculateAgeUseCase: CalculateAgeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeBirthdayState())
@@ -39,11 +43,21 @@ class AboutMeBirthdayViewModel @Inject constructor(
         }
     }
 
-    fun checkBirthday() = _uiState.value.birthday.length == 8
+    fun checkBirthday(): Boolean {
+        if (_uiState.value.birthday.length == 8) {
+            viewModelScope.launch {
+                val result = calculateAgeUseCase.invoke(_uiState.value.birthday)
+                val myProfile = updateAgeUseCase.invoke(result.getOrNull() ?: "")
+                println("myProfile $myProfile")
+            }
+            return true
+        }
+        return false
+    }
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {
-            if(showDialog)
+            if (showDialog)
                 it.copy(showDialog = true)
             else
                 it.copy(showDialog = false)
