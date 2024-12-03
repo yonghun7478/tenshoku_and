@@ -36,10 +36,6 @@ class MyProfileRepositoryImpl @Inject constructor(
         myProfileDao.updateGender(isMale)
     }
 
-    override suspend fun updateThumbnailImage(uri: String) {
-        myProfileDao.updateThumbnailImage(uri)
-    }
-
     override suspend fun updateMySelfSentence(sentence: String) {
         myProfileDao.updateMySelfSentence(sentence)
     }

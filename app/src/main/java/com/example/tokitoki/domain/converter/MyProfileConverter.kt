@@ -12,7 +12,6 @@ object MyProfileConverter {
             name = entity.name,
             age = entity.age, // String -> Int 변환, 기본값 0
             isMale = entity.isMale,
-            thumbnailImageUri = entity.thumbnailImageUri,
             mySelfSentence = entity.mySelfSentence
         )
     }
@@ -24,7 +23,6 @@ object MyProfileConverter {
             name = domain.name,
             age = domain.age, // Int -> String 변환
             isMale = domain.isMale,
-            thumbnailImageUri = domain.thumbnailImageUri,
             mySelfSentence = domain.mySelfSentence
         )
     }

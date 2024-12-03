@@ -23,9 +23,6 @@ interface MyProfileDao {
     @Query("UPDATE my_profile SET age = :age WHERE id = :id")
     suspend fun updateAge(age: String, id: Int = 0)
 
-    @Query("UPDATE my_profile SET thumbnailImageUri = :uri WHERE id = :id")
-    suspend fun updateThumbnailImage(uri: String, id: Int = 0)
-
     @Query("UPDATE my_profile SET mySelfSentence = :sentence WHERE id = :id")
     suspend fun updateMySelfSentence(sentence: String, id: Int = 0)
 

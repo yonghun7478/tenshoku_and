@@ -9,6 +9,5 @@ data class MyProfileEntity(
     val name: String,
     val age: String,
     val isMale: Boolean,
-    val thumbnailImageUri: String,
     val mySelfSentence: String
 )
