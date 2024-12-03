@@ -5,6 +5,5 @@ data class MyProfile(
     val name: String = "",
     val age: String = "",
     val isMale: Boolean = false,
-    val thumbnailImageUri: String = "",
     val mySelfSentence: String = ""
 )

@@ -77,7 +77,7 @@ fun AboutMeMyProfileContents(
                 .weight(1f)
         ) {
             AboutMeMyProfilePicItem(
-                thumbnailImageUri = myProfileItem.thumbnailImageUri
+                thumbnailImageUri = Uri.EMPTY
             )
             AboutMeMyProfileNameItem(
                 name = myProfileItem.name,

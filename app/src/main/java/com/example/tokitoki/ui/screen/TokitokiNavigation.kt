@@ -1,6 +1,8 @@
 package com.example.tokitoki.ui.screen
 
+import android.net.Uri
 import androidx.navigation.NavHostController
+import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -34,6 +36,7 @@ private object TokitokiScreens {
 }
 
 object TokitokiArgs {
+    const val URI = "uri"
 }
 
 object TokitokiDestinations {
@@ -49,7 +52,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_TAG_ROUTE = ABOUT_ME_TAG_SCREEN
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
-    const val ABOUT_ME_PROF_INPUT_ROUTE = ABOUT_ME_PROF_INPUT_SCREEN
+    const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}"
     const val ABOUT_ME_MY_PROFILE_ROUTE = ABOUT_ME_MY_PROFILE_SCREEN
 }
 
@@ -98,8 +101,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_PHOTO_UPLOAD_SCREEN)
     }
 
-    fun navigateToAboutMeProfInput() {
-        navController.navigate(ABOUT_ME_PROF_INPUT_SCREEN)
+    fun navigateToAboutMeProfInput(uri: Uri) {
+        navController.navigate("$ABOUT_ME_PROF_INPUT_SCREEN?$URI=${Uri.encode(uri.toString())}")
     }
 
     fun navigateToAboutMeMyProfile() {

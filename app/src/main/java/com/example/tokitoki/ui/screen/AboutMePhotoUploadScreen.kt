@@ -77,7 +77,7 @@ import java.io.File
 @Composable
 fun AboutMePhotoUploadScreen(
     onAboutMeThirdScreen: () -> Unit = {},
-    onAboutMeProfInputScreen: () -> Unit = {},
+    onAboutMeProfInputScreen: (uri: Uri) -> Unit = {},
     viewModel: AboutMePhotoUploadViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -140,8 +140,9 @@ fun AboutMePhotoUploadScreen(
 
                         AboutMePhotoUploadAction.NOTHING -> {}
                         AboutMePhotoUploadAction.SUBMIT -> {
-                            onAboutMeProfInputScreen()
+                            onAboutMeProfInputScreen(uiState.capturedImageUri)
                         }
+
                         AboutMePhotoUploadAction.DISSMISS_BOTTIOM_DIALOG -> {
                             viewModel.updateShowBottomDialogState(false)
                         }

@@ -5,7 +5,6 @@ import android.net.Uri
 data class MyProfileItem(
     val name: String = "",
     val age: String = "",
-    val thumbnailImageUri: Uri = Uri.EMPTY,
     val myTagItems: List<MyTagItem> = listOf(),
     val mySelfSentence: String = "",
 )

@@ -1,6 +1,5 @@
 package com.example.tokitoki.ui.converter
 
-import android.net.Uri
 import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.model.Tag
 import com.example.tokitoki.ui.model.MyProfileItem
@@ -10,8 +9,7 @@ object MyProfileUiConverter {
     fun domainToUi(profile: MyProfile, tags: List<Tag>): MyProfileItem {
         return MyProfileItem(
             name = profile.name,
-            age = profile.age.toString(),
-            thumbnailImageUri = Uri.EMPTY,
+            age = profile.age,
             mySelfSentence = profile.mySelfSentence,
             myTagItems = tags.map { tag ->
                 MyTagItem(
