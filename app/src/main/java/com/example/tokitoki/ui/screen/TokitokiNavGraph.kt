@@ -151,13 +151,21 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeMyProfileScreen = {
-                    navAction.navigateToAboutMeMyProfile()
+                    navAction.navigateToAboutMeMyProfile(uri)
                 }
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uri = Uri.parse(Uri.decode(uriString))
+
             AboutMeMyProfileScreen(
+                uri = uri,
                 onIntroduceLikePageScreen = {},
                 onAboutMeProfInputScreen = {}
             )

@@ -44,6 +44,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 
 @Composable
 fun AboutMeMyProfileScreen(
+    uri: Uri = Uri.EMPTY,
     onAboutMeProfInputScreen: () -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
@@ -51,6 +52,7 @@ fun AboutMeMyProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     AboutMeMyProfileContents(
+        uri = uri,
         myProfileItem = uiState.myProfileItem,
     )
 
@@ -66,6 +68,7 @@ fun AboutMeMyProfileScreen(
 @Composable
 fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
+    uri: Uri = Uri.EMPTY,
     myProfileItem: MyProfileItem = MyProfileItem()
 ) {
     Column {
@@ -77,7 +80,7 @@ fun AboutMeMyProfileContents(
                 .weight(1f)
         ) {
             AboutMeMyProfilePicItem(
-                thumbnailImageUri = Uri.EMPTY
+                thumbnailImageUri = uri
             )
             AboutMeMyProfileNameItem(
                 name = myProfileItem.name,
@@ -109,7 +112,7 @@ fun AboutMeMyProfilePicItem(
     val painter = if (thumbnailImageUri.path?.isNotEmpty() == true) {
         rememberAsyncImagePainter(thumbnailImageUri) // 직접 사용
     } else {
-        painterResource(id = R.drawable.profile_sample) // 직접 사용
+        painterResource(id = R.drawable.no_image_2) // 직접 사용
     }
     // TODO:後にボタンを追加したい
     // TODO:DBからデータを持ってくる予定

@@ -53,7 +53,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}"
-    const val ABOUT_ME_MY_PROFILE_ROUTE = ABOUT_ME_MY_PROFILE_SCREEN
+    const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -105,7 +105,7 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate("$ABOUT_ME_PROF_INPUT_SCREEN?$URI=${Uri.encode(uri.toString())}")
     }
 
-    fun navigateToAboutMeMyProfile() {
-        navController.navigate(ABOUT_ME_MY_PROFILE_SCREEN)
+    fun navigateToAboutMeMyProfile(uri: Uri) {
+        navController.navigate("$ABOUT_ME_MY_PROFILE_SCREEN?$URI=${Uri.encode(uri.toString())}")
     }
 }
