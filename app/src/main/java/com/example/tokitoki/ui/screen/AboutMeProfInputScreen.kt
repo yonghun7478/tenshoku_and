@@ -66,6 +66,7 @@ fun AboutMeProfInputScreen(
                 is AboutMeProfInputEvent.ACTION -> {
                     when (event.action) {
                         AboutMeProfInputAction.SUBMIT -> {
+                            viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].sentence)
                             onAboutMeMyProfileScreen()
                         }
 

@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
+import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCase
 import com.example.tokitoki.ui.constants.AboutMeProfInputAction
 import com.example.tokitoki.ui.converter.MySelfSentenceUiConverter
 import com.example.tokitoki.ui.state.AboutMeProfInputEvent
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class AboutMeProfInputViewModel
 @Inject constructor(
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
+    private val setMySelfSentenceUseCase: SetMySelfSentenceUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeProfInputState())
     val uiState: StateFlow<AboutMeProfInputState> = _uiState.asStateFlow()
@@ -36,6 +38,10 @@ class AboutMeProfInputViewModel
                 myselfSentenceList = sentenceList,
             )
         }
+    }
+
+    suspend fun saveMySelfSentence(sentence: String) {
+        setMySelfSentenceUseCase(sentence)
     }
 
     fun aboutMeProfInputAction(action: AboutMeProfInputAction) {
