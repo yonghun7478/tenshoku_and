@@ -166,8 +166,12 @@ fun TokitokiNavGraph(
 
             AboutMeMyProfileScreen(
                 uri = uri,
-                onIntroduceLikePageScreen = {},
-                onAboutMeProfInputScreen = {}
+                onAboutMeProfInputScreen = {
+                    navController.navigateUp()
+                },
+                onIntroduceLikePageScreen = {
+
+                },
             )
         }
     }

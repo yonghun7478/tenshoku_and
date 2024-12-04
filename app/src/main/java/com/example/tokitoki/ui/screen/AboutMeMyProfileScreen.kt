@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
@@ -186,7 +187,7 @@ fun AboutMeMyProfileMyTag(
     modifier: Modifier = Modifier,
     myTagItems: List<MyTagItem> = listOf(),
     aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
-    ) {
+) {
     // TODO: 7個以上はすべてを見るをみせる
     // TODO: すべて見るを押下したら画面遷移するように、
     Column(
@@ -210,7 +211,11 @@ fun AboutMeMyProfileMyTag(
         )
 
         for (item in myTagItems) {
-            AboutMeMyProfileMyTagItem(tagTitle = item.title, categoryTitle = item.categoryTitle)
+            AboutMeMyProfileMyTagItem(
+                tagTitle = item.title,
+                categoryTitle = item.categoryTitle,
+                url = item.url
+            )
         }
 
         if (myTagItems.size > 6) {
@@ -232,7 +237,8 @@ fun AboutMeMyProfileMyTag(
 fun AboutMeMyProfileMyTagItem(
     modifier: Modifier = Modifier,
     tagTitle: String = "",
-    categoryTitle: String = ""
+    categoryTitle: String = "",
+    url: String = ""
 ) {
     Row(
         modifier = modifier
@@ -240,8 +246,8 @@ fun AboutMeMyProfileMyTagItem(
             .padding(top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(R.drawable.profile_sample),
+        AsyncImage(
+            model = url,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier

@@ -38,7 +38,6 @@ class AboutMeMyProfileViewModel
 
         _uiState.update { currentState ->
             currentState.copy(
-                isInitialized = true,
                 myProfileItem = myProfileItem,
             )
         }
