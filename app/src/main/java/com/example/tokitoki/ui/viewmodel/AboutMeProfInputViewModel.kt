@@ -33,7 +33,6 @@ class AboutMeProfInputViewModel
 
         _uiState.update {
             it.copy(
-                isInitialized = true,
                 myselfSentenceList = sentenceList,
             )
         }

@@ -49,16 +49,14 @@ fun AboutMeProfInputScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val pagerState = rememberPagerState {
-        if (uiState.isInitialized) uiState.myselfSentenceList.size else 1
+        uiState.myselfSentenceList.size
     }
 
-    if (uiState.isInitialized) {
-        AboutMeProfInputContents(
-            pagerState = pagerState,
-            itemList = uiState.myselfSentenceList,
-            aboutMeProfInputAction = viewModel::aboutMeProfInputAction
-        )
-    }
+    AboutMeProfInputContents(
+        pagerState = pagerState,
+        itemList = uiState.myselfSentenceList,
+        aboutMeProfInputAction = viewModel::aboutMeProfInputAction
+    )
 
     LaunchedEffect(Unit) {
         viewModel.init()
