@@ -41,6 +41,7 @@ import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.model.MyProfileItem
 import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
+import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
@@ -49,6 +50,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
     onAboutMeProfInputScreen: () -> Unit = {},
+    onAboutMeNameScreen: () -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -64,7 +66,46 @@ fun AboutMeMyProfileScreen(
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
-            println("CYHH ${event}")
+            when (event) {
+                is AboutMeMyProfileEvent.NOTHING -> {
+
+                }
+
+                is AboutMeMyProfileEvent.ACTION -> {
+                    when (event.action) {
+                        AboutMeMyProfileAction.SUBMIT -> {
+                        }
+
+                        AboutMeMyProfileAction.CHECK_EVERYTHING -> {
+
+                        }
+
+                        AboutMeMyProfileAction.FIX_BIRTHDAY -> {
+
+                        }
+
+                        AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE -> {
+
+                        }
+
+                        AboutMeMyProfileAction.FIX_MY_TAG -> {
+
+                        }
+
+                        AboutMeMyProfileAction.FIX_NAME -> {
+                            onAboutMeNameScreen()
+                        }
+
+                        AboutMeMyProfileAction.FIX_PICTURE -> {
+
+                        }
+
+                        AboutMeMyProfileAction.NOTHING -> {
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

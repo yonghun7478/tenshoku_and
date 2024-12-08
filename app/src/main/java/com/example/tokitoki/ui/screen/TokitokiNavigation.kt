@@ -81,7 +81,7 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_BIRTHDAY_SCREEN)
     }
 
-    fun navigateToAboutMeName() {
+    fun navigateToAboutMeName(name: String) {
         navController.navigate(ABOUT_ME_NAME_SCREEN)
     }
 
