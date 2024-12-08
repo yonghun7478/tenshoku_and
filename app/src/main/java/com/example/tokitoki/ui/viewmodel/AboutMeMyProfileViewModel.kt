@@ -1,9 +1,11 @@
 package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
+import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
 import com.example.tokitoki.ui.state.AboutMeMyProfileState
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,6 +43,12 @@ class AboutMeMyProfileViewModel
             currentState.copy(
                 myProfileItem = myProfileItem,
             )
+        }
+    }
+
+    fun aboutMeMyProfileAction(action: AboutMeMyProfileAction) {
+        viewModelScope.launch {
+            _uiEvent.emit(AboutMeMyProfileEvent.ACTION(action))
         }
     }
 }

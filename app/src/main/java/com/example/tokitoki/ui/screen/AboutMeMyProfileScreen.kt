@@ -3,6 +3,8 @@ package com.example.tokitoki.ui.screen
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,13 +57,14 @@ fun AboutMeMyProfileScreen(
     AboutMeMyProfileContents(
         uri = uri,
         myProfileItem = uiState.myProfileItem,
+        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
     )
 
     LaunchedEffect(Unit) {
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
-
+            println("CYHH ${event}")
         }
     }
 }
@@ -70,7 +73,8 @@ fun AboutMeMyProfileScreen(
 fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
     uri: Uri = Uri.EMPTY,
-    myProfileItem: MyProfileItem = MyProfileItem()
+    myProfileItem: MyProfileItem = MyProfileItem(),
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
 ) {
     Column {
         Column(
@@ -81,24 +85,29 @@ fun AboutMeMyProfileContents(
                 .weight(1f)
         ) {
             AboutMeMyProfilePicItem(
-                thumbnailImageUri = uri
+                thumbnailImageUri = uri,
+                aboutMeMyProfileAction = aboutMeMyProfileAction
             )
             AboutMeMyProfileNameItem(
                 name = myProfileItem.name,
                 age = myProfileItem.age,
+                aboutMeMyProfileAction = aboutMeMyProfileAction
             )
             AboutMeMyProfileMyTag(
                 modifier = Modifier.padding(top = 7.dp),
-                myTagItems = myProfileItem.myTagItems
+                myTagItems = myProfileItem.myTagItems,
+                aboutMeMyProfileAction = aboutMeMyProfileAction
             )
             AboutMeMyProfileSelfIntroItem(
                 modifier = Modifier.padding(top = 7.dp),
-                mySelfSentence = myProfileItem.mySelfSentence
+                mySelfSentence = myProfileItem.mySelfSentence,
+                aboutMeMyProfileAction = aboutMeMyProfileAction
             )
             AboutMeMyProfileProf(
                 modifier = Modifier.padding(top = 7.dp, bottom = 7.dp),
                 name = myProfileItem.name,
-                age = myProfileItem.age
+                age = myProfileItem.age,
+                aboutMeMyProfileAction = aboutMeMyProfileAction
             )
         }
         AboutMeMyProfileBottomMenu()
@@ -108,7 +117,8 @@ fun AboutMeMyProfileContents(
 @Composable
 fun AboutMeMyProfilePicItem(
     modifier: Modifier = Modifier,
-    thumbnailImageUri: Uri = Uri.EMPTY
+    thumbnailImageUri: Uri = Uri.EMPTY,
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
 ) {
     val painter = if (thumbnailImageUri.path?.isNotEmpty() == true) {
         rememberAsyncImagePainter(thumbnailImageUri) // 직접 사용
@@ -130,6 +140,18 @@ fun AboutMeMyProfilePicItem(
             contentScale = ContentScale.Crop,
             contentDescription = "",
         )
+
+        TkBtn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .align(Alignment.BottomCenter),
+            backgroundColor = LocalColor.current.blue,
+            text = "写真編集",
+            textColor = LocalColor.current.white,
+            action = aboutMeMyProfileAction,
+            actionParam = AboutMeMyProfileAction.FIX_PICTURE
+        )
     }
 }
 
@@ -137,7 +159,8 @@ fun AboutMeMyProfilePicItem(
 fun AboutMeMyProfileNameItem(
     modifier: Modifier = Modifier,
     name: String = "",
-    age: String = ""
+    age: String = "",
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
 ) {
     // TODO: 名前と年齢持ってくる
     Column(
@@ -151,15 +174,53 @@ fun AboutMeMyProfileNameItem(
             fontSize = 10.sp,
             color = LocalColor.current.red
         )
-        Text(
-            text = name,
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "${age}歳",
-            fontSize = 20.sp,
-        )
+        Row(
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = name,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_NAME)
+                },
+                text = "編集",
+                fontSize = 12.sp,
+                color = LocalColor.current.grayColor
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "${age}歳",
+                fontSize = 20.sp,
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_BIRTHDAY)
+                },
+                text = "編集",
+                fontSize = 12.sp,
+                color = LocalColor.current.grayColor
+            )
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,11 +265,29 @@ fun AboutMeMyProfileMyTag(
             .background(color = LocalColor.current.white)
             .padding(20.dp)
     ) {
-        Text(
-            text = "マイタグ",
-            fontWeight = FontWeight.Bold,
-            fontSize = 15.sp
-        )
+        Row(
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "マイタグ",
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_MY_TAG)
+                },
+                text = "編集",
+                fontSize = 12.sp,
+                color = LocalColor.current.grayColor
+            )
+        }
 
         for (item in myTagItems) {
             AboutMeMyProfileMyTagItem(
@@ -227,7 +306,7 @@ fun AboutMeMyProfileMyTag(
                 textColor = LocalColor.current.blue,
                 backgroundColor = LocalColor.current.white,
                 action = aboutMeMyProfileAction,
-                actionParam = AboutMeMyProfileAction.SUBETE_MIRU
+                actionParam = AboutMeMyProfileAction.CHECK_EVERYTHING
             )
         }
     }
@@ -283,7 +362,8 @@ fun AboutMeMyProfileMyTagItem(
 @Composable
 fun AboutMeMyProfileSelfIntroItem(
     modifier: Modifier = Modifier,
-    mySelfSentence: String = ""
+    mySelfSentence: String = "",
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -299,11 +379,29 @@ fun AboutMeMyProfileSelfIntroItem(
             .background(color = LocalColor.current.white)
             .padding(20.dp)
     ) {
-        Text(
-            text = "自己紹介",
-            fontWeight = FontWeight.Bold,
-            fontSize = 15.sp
-        )
+        Row(
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "自己紹介",
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE)
+                },
+                text = "編集",
+                fontSize = 12.sp,
+                color = LocalColor.current.grayColor
+            )
+        }
 
         Text(
             text = mySelfSentence,
@@ -316,7 +414,8 @@ fun AboutMeMyProfileSelfIntroItem(
 fun AboutMeMyProfileProf(
     modifier: Modifier = Modifier,
     name: String = "",
-    age: String = ""
+    age: String = "",
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
 ) {
     // 基本情報
     // 　ニックネーム
@@ -343,7 +442,8 @@ fun AboutMeMyProfileProf(
 
         AboutMeMyProfileProfBaseItem(
             name = name,
-            age = age
+            age = age,
+            aboutMeMyProfileAction = aboutMeMyProfileAction
         )
     }
 }
@@ -352,7 +452,8 @@ fun AboutMeMyProfileProf(
 fun AboutMeMyProfileProfBaseItem(
     modifier: Modifier = Modifier,
     name: String = "",
-    age: String = ""
+    age: String = "",
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -365,46 +466,79 @@ fun AboutMeMyProfileProfBaseItem(
             fontWeight = FontWeight.Bold
         )
 
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp)
         ) {
+            Row {
+                Text(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = "名前",
+                    fontSize = 11.sp,
+                    color = LocalColor.current.grayColor
+                )
+
+                Text(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = name,
+                    fontSize = 11.sp
+                )
+            }
+
+
             Text(
                 modifier = Modifier
-                    .weight(1f),
-                text = "名前",
-                fontSize = 11.sp,
+                    .align(Alignment.CenterEnd)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_NAME)
+                    },
+                text = "編集",
+                fontSize = 12.sp,
                 color = LocalColor.current.grayColor
-            )
-            Text(
-                modifier = Modifier
-                    .weight(1f),
-                text = name,
-                fontSize = 11.sp
             )
         }
 
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp)
         ) {
+            Row {
+                Text(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = "年齢",
+                    fontSize = 11.sp,
+                    color = LocalColor.current.grayColor
+                )
+                Text(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = "${age}歳",
+                    fontSize = 11.sp
+                )
+            }
+
             Text(
                 modifier = Modifier
-                    .weight(1f),
-                text = "年齢",
-                fontSize = 11.sp,
+                    .align(Alignment.CenterEnd)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        aboutMeMyProfileAction(AboutMeMyProfileAction.FIX_BIRTHDAY)
+                    },
+                text = "編集",
+                fontSize = 12.sp,
                 color = LocalColor.current.grayColor
             )
-            Text(
-                modifier = Modifier
-                    .weight(1f),
-                text = "${age}歳",
-                fontSize = 11.sp
-            )
         }
-
     }
 }
 
@@ -427,17 +561,6 @@ fun AboutMeMyProfileBottomMenu(
             backgroundColor = LocalColor.current.blue,
             action = aboutMeMyProfileAction,
             actionParam = AboutMeMyProfileAction.SUBMIT
-        )
-
-        TkBtn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 5.dp),
-            text = "自己紹介文を編集する",
-            textColor = LocalColor.current.blue,
-            backgroundColor = LocalColor.current.white,
-            action = aboutMeMyProfileAction,
-            actionParam = AboutMeMyProfileAction.FIX_PROFILE_INFO
         )
     }
 }
