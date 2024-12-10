@@ -89,8 +89,15 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_NAME_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_NAME_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.NAME) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val name = backStackEntry.arguments?.getString(TokitokiArgs.NAME) ?: ""
+
             AboutMeNameScreen(
+                name = name,
                 onAboutMeBirthdayScreen = {
                     navController.navigateUp()
                 },
@@ -170,7 +177,7 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
-                    navAction.navigateToAboutMeName()
+                    navAction.navigateToAboutMeName(it)
                 },
                 onIntroduceLikePageScreen = {
 

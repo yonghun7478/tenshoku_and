@@ -50,7 +50,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
     onAboutMeProfInputScreen: () -> Unit = {},
-    onAboutMeNameScreen: () -> Unit = {},
+    onAboutMeNameScreen: (String) -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -93,7 +93,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {
-                            onAboutMeNameScreen()
+                            onAboutMeNameScreen(viewModel.uiState.value.myProfileItem.name)
                         }
 
                         AboutMeMyProfileAction.FIX_PICTURE -> {

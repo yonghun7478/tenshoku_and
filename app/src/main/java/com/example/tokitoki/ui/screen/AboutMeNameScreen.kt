@@ -43,6 +43,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeNameViewModel
 
 @Composable
 fun AboutMeNameScreen(
+    name: String = "",
     onAboutMeBirthdayScreen: () -> Unit = {},
     onAboutMeSecondScreen: () -> Unit = {},
     viewModel: AboutMeNameViewModel = hiltViewModel()
@@ -56,7 +57,7 @@ fun AboutMeNameScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(name)
 
         viewModel.uiEvent.collect { event ->
             when (event) {

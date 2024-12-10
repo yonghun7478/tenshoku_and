@@ -27,8 +27,8 @@ class AboutMeNameViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeNameEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init() {
-        _uiState.value = AboutMeNameState()
+    fun init(name: String) {
+        _uiState.value = AboutMeNameState(name = name)
     }
 
     fun onNameChanged(name: String) {
