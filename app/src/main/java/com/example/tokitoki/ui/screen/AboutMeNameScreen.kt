@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeNameAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
@@ -50,6 +51,7 @@ fun AboutMeNameScreen(
     name: String = "",
     onAboutMeBirthdayScreen: () -> Unit = {},
     onAboutMeSecondScreen: () -> Unit = {},
+    onPrevScreen: () -> Unit = {},
     viewModel: AboutMeNameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -82,6 +84,14 @@ fun AboutMeNameScreen(
                         AboutMeNameAction.NOTHING -> {}
                         AboutMeNameAction.PREVIOUS -> {
                             onAboutMeBirthdayScreen()
+                        }
+
+                        AboutMeNameAction.EDIT_OK -> {
+                            if (viewModel.checkName()) {
+                                onPrevScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
@@ -136,12 +146,26 @@ fun AboutMeNameContents(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TkBottomArrowNavigation(
-            modifier = Modifier.padding(all = 10.dp),
-            action = aboutMeNameAction,
-            nextActionParam = AboutMeNameAction.NEXT,
-            previousActionParam = AboutMeNameAction.PREVIOUS,
-        )
+        if (uiState.isEditMode) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                text = "修正する",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeNameAction,
+                actionParam = AboutMeNameAction.EDIT_OK
+            )
+        } else {
+            TkBottomArrowNavigation(
+                modifier = Modifier.padding(all = 10.dp),
+                action = aboutMeNameAction,
+                nextActionParam = AboutMeNameAction.NEXT,
+                previousActionParam = AboutMeNameAction.PREVIOUS,
+            )
+        }
+
     }
 
     if (uiState.showDialog) {
@@ -233,5 +257,14 @@ fun AboutMeNameTextField(
 fun AboutMeNameContentsPreview() {
     TokitokiTheme {
         AboutMeNameContents()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMeNameContentsEditModePreview() {
+    TokitokiTheme {
+        val uiState = AboutMeNameState(isEditMode = true)
+        AboutMeNameContents(uiState = uiState)
     }
 }

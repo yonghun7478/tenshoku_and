@@ -28,7 +28,7 @@ class AboutMeNameViewModel @Inject constructor(
     val uiEvent = _uiEvent.asSharedFlow()
 
     fun init(name: String) {
-        _uiState.value = AboutMeNameState(name = name)
+        _uiState.value = AboutMeNameState(name = name, isEditMode = name.isNotEmpty())
     }
 
     fun onNameChanged(name: String) {
