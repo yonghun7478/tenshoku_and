@@ -15,7 +15,6 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.screen.TokitokiNavGraph
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -94,7 +93,7 @@ class AboutMeProfInputScreenTest {
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_SECOND_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithText("次へ").performClick()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_INTEREST_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_TAG_CONTENTS).assertIsDisplayed()
 
         composeTestRule.onNodeWithText("ヨガ1").assertIsDisplayed()
         composeTestRule.onNodeWithText("ヨガ1").performClick()

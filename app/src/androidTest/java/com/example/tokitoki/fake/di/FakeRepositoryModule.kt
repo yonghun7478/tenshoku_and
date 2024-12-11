@@ -3,8 +3,8 @@ package com.example.tokitoki.fake.di
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
 import com.example.tokitoki.di.TokiTokiRepositoryModule
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
-import com.example.tokitoki.domain.repository.UserInterestRepository
-import com.example.tokitoki.fake.repo.FakeUserInterestRepositoryImpl
+import com.example.tokitoki.domain.repository.TagRepository
+import com.example.tokitoki.fake.repo.FakeTagRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.components.SingletonComponent
@@ -20,9 +20,9 @@ import javax.inject.Singleton
 abstract class FakeRepositoryModule {
     @Binds
     @Singleton
-    abstract fun bindFakeUserInterestRepository(
-        fakeUserRepositoryImpl: FakeUserInterestRepositoryImpl
-    ): UserInterestRepository
+    abstract fun bindFakeTagRepository(
+        fakeTagRepositoryImpl: FakeTagRepositoryImpl
+    ): TagRepository
 
     @Binds
     @Singleton

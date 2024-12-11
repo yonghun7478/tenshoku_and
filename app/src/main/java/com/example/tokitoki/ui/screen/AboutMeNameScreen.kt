@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -23,7 +25,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeNameAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
@@ -43,8 +48,10 @@ import com.example.tokitoki.ui.viewmodel.AboutMeNameViewModel
 
 @Composable
 fun AboutMeNameScreen(
+    name: String = "",
     onAboutMeBirthdayScreen: () -> Unit = {},
     onAboutMeSecondScreen: () -> Unit = {},
+    onPrevScreen: () -> Unit = {},
     viewModel: AboutMeNameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -56,7 +63,7 @@ fun AboutMeNameScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(name)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -77,6 +84,14 @@ fun AboutMeNameScreen(
                         AboutMeNameAction.NOTHING -> {}
                         AboutMeNameAction.PREVIOUS -> {
                             onAboutMeBirthdayScreen()
+                        }
+
+                        AboutMeNameAction.EDIT_OK -> {
+                            if (viewModel.checkName()) {
+                                onPrevScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
@@ -131,12 +146,26 @@ fun AboutMeNameContents(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TkBottomArrowNavigation(
-            modifier = Modifier.padding(all = 10.dp),
-            action = aboutMeNameAction,
-            nextActionParam = AboutMeNameAction.NEXT,
-            previousActionParam = AboutMeNameAction.PREVIOUS,
-        )
+        if (uiState.isEditMode) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                text = "修正する",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeNameAction,
+                actionParam = AboutMeNameAction.EDIT_OK
+            )
+        } else {
+            TkBottomArrowNavigation(
+                modifier = Modifier.padding(all = 10.dp),
+                action = aboutMeNameAction,
+                nextActionParam = AboutMeNameAction.NEXT,
+                previousActionParam = AboutMeNameAction.PREVIOUS,
+            )
+        }
+
     }
 
     if (uiState.showDialog) {
@@ -177,9 +206,30 @@ fun AboutMeNameTextField(
 ) {
     val focusRequester = remember { FocusRequester() }
 
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = name,
+                selection = TextRange(name.length) // 커서를 기본적으로 끝으로 설정
+            )
+        )
+    }
+
+    LaunchedEffect(name) {
+        if (name != textFieldValue.text) { // 불필요한 업데이트 방지
+            textFieldValue = TextFieldValue(
+                text = name,
+                selection = TextRange(name.length) // 커서를 끝으로 설정
+            )
+        }
+    }
+
     TextField(
-        value = name,
-        onValueChange = onNameChanged,
+        value = textFieldValue,
+        onValueChange = {
+            textFieldValue = it
+            onNameChanged(it.text)
+        },
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = LocalColor.current.blue,
             unfocusedIndicatorColor = LocalColor.current.blue,
@@ -207,5 +257,14 @@ fun AboutMeNameTextField(
 fun AboutMeNameContentsPreview() {
     TokitokiTheme {
         AboutMeNameContents()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMeNameContentsEditModePreview() {
+    TokitokiTheme {
+        val uiState = AboutMeNameState(isEditMode = true)
+        AboutMeNameContents(uiState = uiState)
     }
 }

@@ -1,9 +1,13 @@
 package com.example.tokitoki.ui.screen
 
+import android.net.Uri
 import androidx.navigation.NavHostController
+import com.example.tokitoki.ui.screen.TokitokiArgs.NAME
+import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
-import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_INTEREST_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_MY_PROFILE_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_NAME_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_PHOTO_UPLOAD_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_PROF_INPUT_SCREEN
@@ -25,13 +29,16 @@ private object TokitokiScreens {
     const val ABOUT_ME_BIRTHDAY_SCREEN = "AboutMeBirthdayScreen"
     const val ABOUT_ME_NAME_SCREEN = "AboutMeNameScreen"
     const val ABOUT_ME_SECOND_SCREEN = "AboutMeSecondScreen"
-    const val ABOUT_ME_INTEREST_SCREEN = "AboutMeInterestScreen"
+    const val ABOUT_ME_TAG_SCREEN = "AboutMeTagScreen"
     const val ABOUT_ME_THIRD_SCREEN = "AboutMeThirdScreen"
     const val ABOUT_ME_PHOTO_UPLOAD_SCREEN = "AboutMePhotoUploadScreen"
     const val ABOUT_ME_PROF_INPUT_SCREEN = "AboutMeProfInputScreen"
+    const val ABOUT_ME_MY_PROFILE_SCREEN = "AboutMeMyProfileScreen"
 }
 
 object TokitokiArgs {
+    const val URI = "uri"
+    const val NAME = "name"
 }
 
 object TokitokiDestinations {
@@ -42,12 +49,13 @@ object TokitokiDestinations {
     const val ABOUT_ME_ROUTE = ABOUT_ME_SCREEN
     const val ABOUT_ME_GENDER_ROUTE = ABOUT_ME_GENDER_SCREEN
     const val ABOUT_ME_BIRTHDAY_ROUTE = ABOUT_ME_BIRTHDAY_SCREEN
-    const val ABOUT_ME_NAME_ROUTE = ABOUT_ME_NAME_SCREEN
+    const val ABOUT_ME_NAME_ROUTE = "$ABOUT_ME_NAME_SCREEN?$NAME={$NAME}"
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
-    const val ABOUT_ME_INTEREST_ROUTE = ABOUT_ME_INTEREST_SCREEN
+    const val ABOUT_ME_TAG_ROUTE = ABOUT_ME_TAG_SCREEN
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
-    const val ABOUT_ME_PROF_INPUT_ROUTE = ABOUT_ME_PROF_INPUT_SCREEN
+    const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}"
+    const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -75,16 +83,16 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_BIRTHDAY_SCREEN)
     }
 
-    fun navigateToAboutMeName() {
-        navController.navigate(ABOUT_ME_NAME_SCREEN)
+    fun navigateToAboutMeName(name: String = "") {
+        navController.navigate("$ABOUT_ME_NAME_SCREEN?$NAME=${name}")
     }
 
     fun navigateToAboutMeSecond() {
         navController.navigate(ABOUT_ME_SECOND_SCREEN)
     }
 
-    fun navigateToAboutMeInterest() {
-        navController.navigate(ABOUT_ME_INTEREST_SCREEN)
+    fun navigateToAboutMeTag() {
+        navController.navigate(ABOUT_ME_TAG_SCREEN)
     }
 
     fun navigateToAboutMeThird() {
@@ -95,7 +103,11 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_PHOTO_UPLOAD_SCREEN)
     }
 
-    fun navigateToAboutMeProfInput() {
-        navController.navigate(ABOUT_ME_PROF_INPUT_SCREEN)
+    fun navigateToAboutMeProfInput(uri: Uri) {
+        navController.navigate("$ABOUT_ME_PROF_INPUT_SCREEN?$URI=${Uri.encode(uri.toString())}")
+    }
+
+    fun navigateToAboutMeMyProfile(uri: Uri) {
+        navController.navigate("$ABOUT_ME_MY_PROFILE_SCREEN?$URI=${Uri.encode(uri.toString())}")
     }
 }

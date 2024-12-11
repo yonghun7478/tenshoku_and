@@ -4,10 +4,14 @@ import com.example.tokitoki.domain.model.MySelfSentence
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
 import javax.inject.Inject
 
-class GetMySelfSentenceUseCase @Inject constructor(
+interface GetMySelfSentenceUseCase {
+    suspend operator fun invoke(): List<MySelfSentence>
+}
+
+class GetMySelfSentenceUseCaseImpl @Inject constructor(
     private val myselfSentenceRepository: MySelfSentenceRepository
-) {
-    suspend operator fun invoke(): List<MySelfSentence> {
+) : GetMySelfSentenceUseCase {
+    override suspend operator fun invoke(): List<MySelfSentence> {
         return myselfSentenceRepository.getAllSentences()
     }
 }

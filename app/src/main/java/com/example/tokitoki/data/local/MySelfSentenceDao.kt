@@ -7,4 +7,7 @@ import androidx.room.Query
 interface MySelfSentenceDao {
     @Query("SELECT * FROM myself_sentence_item")
     suspend fun getAllSentences(): List<MySelfSentenceEntity>
+
+    @Query("SELECT COUNT(*) FROM myself_sentence_item")
+    suspend fun getRowCount(): Int
 }

@@ -34,6 +34,7 @@ import com.example.tokitoki.ui.model.MySelfSentenceItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.screen.components.etc.TkWormIndicator
+import com.example.tokitoki.ui.state.AboutMeProfInputEvent
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.AboutMeProfInputViewModel
@@ -42,27 +43,40 @@ import com.example.tokitoki.ui.viewmodel.AboutMeProfInputViewModel
 @Composable
 fun AboutMeProfInputScreen(
     onAboutMePhotoUploadScreen: () -> Unit = {},
-    onAboutMeProfScreen: () -> Unit = {},
+    onAboutMeMyProfileScreen: () -> Unit = {},
     viewModel: AboutMeProfInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     val pagerState = rememberPagerState {
-        if (uiState.isInitialized) uiState.myselfSentenceList.size else 1
+        uiState.myselfSentenceList.size
     }
 
-    if (uiState.isInitialized) {
-        AboutMeProfInputContents(
-            pagerState = pagerState,
-            itemList = uiState.myselfSentenceList
-        )
-    }
+    AboutMeProfInputContents(
+        pagerState = pagerState,
+        itemList = uiState.myselfSentenceList,
+        aboutMeProfInputAction = viewModel::aboutMeProfInputAction
+    )
 
     LaunchedEffect(Unit) {
         viewModel.init()
 
         viewModel.uiEvent.collect { event ->
+            when (event) {
+                is AboutMeProfInputEvent.ACTION -> {
+                    when (event.action) {
+                        AboutMeProfInputAction.SUBMIT -> {
+                            viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].sentence)
+                            onAboutMeMyProfileScreen()
+                        }
 
+                        else -> {}
+                    }
+
+                }
+
+                AboutMeProfInputEvent.NOTHING -> {}
+            }
         }
     }
 }

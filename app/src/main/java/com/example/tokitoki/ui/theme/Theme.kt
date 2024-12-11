@@ -41,6 +41,8 @@ data class TokitokiColor(
     val black: Color = Color(0xFF000000),
     val blue: Color = Color(0xFF36C2CE),
     val lightGray: Color = Color(0xFFEEEEEE),
+    val green: Color = Color(0xFF7CFC00),
+    val red: Color = Color(0xFFFF0000),
     )
 
 val LocalColor =

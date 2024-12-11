@@ -91,7 +91,7 @@ class AboutMeThirdScreenTest {
 
         composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_SECOND_CONTENTS).assertIsDisplayed()
         composeTestRule.onNodeWithText("次へ").performClick()
-        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_INTEREST_CONTENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ABOUT_ME_TAG_CONTENTS).assertIsDisplayed()
 
         composeTestRule.onNodeWithText("ヨガ1").assertIsDisplayed()
         composeTestRule.onNodeWithText("ヨガ1").performClick()

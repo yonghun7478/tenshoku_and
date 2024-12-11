@@ -1,14 +1,17 @@
 package com.example.tokitoki.ui.screen
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -86,27 +89,37 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_NAME_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_NAME_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.NAME) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val name = backStackEntry.arguments?.getString(TokitokiArgs.NAME) ?: ""
+
             AboutMeNameScreen(
+                name = name,
                 onAboutMeBirthdayScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeSecondScreen = {
                     navAction.navigateToAboutMeSecond()
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
 
         composable(TokitokiDestinations.ABOUT_ME_SECOND_ROUTE) {
             AboutMeSecondScreen(
-                onAboutMeInterestScreen = {
-                    navAction.navigateToAboutMeInterest()
+                onAboutMeTagScreen = {
+                    navAction.navigateToAboutMeTag()
                 }
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_INTEREST_ROUTE) {
-            AboutMeInterestScreen(
+        composable(TokitokiDestinations.ABOUT_ME_TAG_ROUTE) {
+            AboutMeTagScreen(
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },
@@ -127,7 +140,7 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE) {
             AboutMePhotoUploadScreen(
                 onAboutMeProfInputScreen = {
-                    navAction.navigateToAboutMeProfInput()
+                    navAction.navigateToAboutMeProfInput(it)
                 },
                 onAboutMeThirdScreen = {
                     navController.navigateUp()
@@ -135,14 +148,43 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_PROF_INPUT_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_PROF_INPUT_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uri = Uri.parse(Uri.decode(uriString))
+
             AboutMeProfInputScreen(
                 onAboutMePhotoUploadScreen = {
                     navController.navigateUp()
                 },
-                onAboutMeProfScreen = {
-
+                onAboutMeMyProfileScreen = {
+                    navAction.navigateToAboutMeMyProfile(uri)
                 }
+            )
+        }
+
+        composable(
+            TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uri = Uri.parse(Uri.decode(uriString))
+
+            AboutMeMyProfileScreen(
+                uri = uri,
+                onAboutMeProfInputScreen = {
+                    navController.navigateUp()
+                },
+                onAboutMeNameScreen = {
+                    navAction.navigateToAboutMeName(it)
+                },
+                onIntroduceLikePageScreen = {
+
+                },
             )
         }
     }
