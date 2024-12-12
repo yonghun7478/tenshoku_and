@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.navigation.NavHostController
 import com.example.tokitoki.ui.screen.TokitokiArgs.BIRTHDAY
 import com.example.tokitoki.ui.screen.TokitokiArgs.NAME
+import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
@@ -41,6 +42,7 @@ object TokitokiArgs {
     const val URI = "uri"
     const val NAME = "name"
     const val BIRTHDAY = "birthday"
+    const val TAG_IDS = "tagIds"
 }
 
 object TokitokiDestinations {
@@ -53,7 +55,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_BIRTHDAY_ROUTE = "$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY={$BIRTHDAY}"
     const val ABOUT_ME_NAME_ROUTE = "$ABOUT_ME_NAME_SCREEN?$NAME={$NAME}"
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
-    const val ABOUT_ME_TAG_ROUTE = ABOUT_ME_TAG_SCREEN
+    const val ABOUT_ME_TAG_ROUTE = "$ABOUT_ME_TAG_SCREEN?$TAG_IDS={$TAG_IDS}"
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}"
@@ -93,8 +95,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_SECOND_SCREEN)
     }
 
-    fun navigateToAboutMeTag() {
-        navController.navigate(ABOUT_ME_TAG_SCREEN)
+    fun navigateToAboutMeTag(tagIds: List<Int> = listOf()) {
+        val tagIdsString = tagIds.joinToString(",") // "1,2,3"
+        navController.navigate("$ABOUT_ME_TAG_SCREEN?$TAG_IDS=${tagIdsString}")
     }
 
     fun navigateToAboutMeThird() {

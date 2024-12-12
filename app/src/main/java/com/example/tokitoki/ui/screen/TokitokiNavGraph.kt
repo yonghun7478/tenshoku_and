@@ -128,8 +128,15 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_TAG_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_TAG_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType })
+        ) { backStackEntry ->
+            val tagIdsString = backStackEntry.arguments?.getString(TokitokiArgs.TAG_IDS) ?: ""
+            val tagIds = tagIdsString.split(",").mapNotNull { it.toIntOrNull() }
+
             AboutMeTagScreen(
+                tagIds = tagIds,
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },
@@ -194,6 +201,9 @@ fun TokitokiNavGraph(
                 },
                 onAboutMeBirthDayScreen = {
                     navAction.navigateToAboutMeBirthday(it)
+                },
+                onAboutMeTagScreen = { tagIds ->
+                    navAction.navigateToAboutMeTag(tagIds)
                 },
                 onIntroduceLikePageScreen = {
 

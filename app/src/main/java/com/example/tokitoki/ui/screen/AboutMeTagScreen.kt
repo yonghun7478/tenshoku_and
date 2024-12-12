@@ -80,6 +80,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeTagScreen(
+    tagIds: List<Int> = listOf(),
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
     viewModel: AboutMeTagViewModel = hiltViewModel()

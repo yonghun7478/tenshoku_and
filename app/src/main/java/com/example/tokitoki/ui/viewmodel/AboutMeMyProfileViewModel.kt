@@ -59,4 +59,10 @@ class AboutMeMyProfileViewModel
         val myProfile = getMyProfileUseCase()
         return myProfile.birthDay
     }
+
+    suspend fun getMyTagIds(): List<Int> {
+        val myTag = getMyTagUseCase()
+        val tagIds = myTag.map { tag -> tag.tagId }
+        return tagIds
+    }
 }
