@@ -332,7 +332,7 @@ fun AboutMeMyProfileMyTag(
             )
         }
 
-        for (item in myTagItems) {
+        for (item in myTagItems.take(6)) {
             AboutMeMyProfileMyTagItem(
                 tagTitle = item.title,
                 categoryTitle = item.categoryTitle,

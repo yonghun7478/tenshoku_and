@@ -59,13 +59,7 @@ class MyProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserTagsAsDomain(): List<MyTag> {
-        val myTagEntities = listOf(
-            MyTagEntity(tagId = 1),
-            MyTagEntity(tagId = 2),
-            MyTagEntity(tagId = 3)
-        )
-        return myTagEntities.map { MyTagConverter.entityToDomain(it) }
-//        return myTagDao.getAllMyTags().map { MyTagConverter.entityToDomain(it) }
+        return myTagDao.getAllMyTags().map { MyTagConverter.entityToDomain(it) }
     }
 
     override suspend fun clearUserTags() {
