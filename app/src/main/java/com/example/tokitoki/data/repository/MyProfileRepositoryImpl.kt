@@ -1,7 +1,6 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.local.MyProfileDao
-import com.example.tokitoki.data.local.MyProfileEntity
 import com.example.tokitoki.data.local.MyTagDao
 import com.example.tokitoki.data.local.MyTagEntity
 import com.example.tokitoki.domain.converter.MyProfileConverter
@@ -28,8 +27,8 @@ class MyProfileRepositoryImpl @Inject constructor(
         myProfileDao.updateName(name)
     }
 
-    override suspend fun updateUserAge(age: String) {
-        myProfileDao.updateAge(age)
+    override suspend fun updateUserBirthday(birthDay: String) {
+        myProfileDao.updateBirthDay(birthDay)
     }
 
     override suspend fun updateGender(isMale: Boolean) {

@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
@@ -25,6 +26,7 @@ class AboutMeMyProfileViewModel
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val getMyTagUseCase: GetMyTagUseCase,
     private val getTagByTagIdUseCase: GetTagByTagIdUseCase,
+    private val calculateAgeUseCase: CalculateAgeUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
@@ -34,10 +36,11 @@ class AboutMeMyProfileViewModel
 
     suspend fun init() {
         val myProfile = getMyProfileUseCase()
+        val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
         val myTag = getMyTagUseCase()
         val tag = getTagByTagIdUseCase(myTag.map { it.tagId })
 
-        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, tag)
+        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, age, tag)
 
         _uiState.update { currentState ->
             currentState.copy(
@@ -50,5 +53,10 @@ class AboutMeMyProfileViewModel
         viewModelScope.launch {
             _uiEvent.emit(AboutMeMyProfileEvent.ACTION(action))
         }
+    }
+
+    suspend fun getBirthDay(): String {
+        val myProfile = getMyProfileUseCase()
+        return myProfile.birthDay
     }
 }

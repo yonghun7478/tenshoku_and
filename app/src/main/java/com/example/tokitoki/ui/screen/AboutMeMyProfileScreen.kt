@@ -82,7 +82,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_BIRTHDAY -> {
-                            onAboutMeBirthDayScreen(viewModel.uiState.value.myProfileItem.age)
+                            onAboutMeBirthDayScreen(viewModel.getBirthDay())
                         }
 
                         AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE -> {

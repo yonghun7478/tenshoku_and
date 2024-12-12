@@ -20,8 +20,8 @@ interface MyProfileDao {
     @Query("UPDATE my_profile SET name = :name WHERE id = :id")
     suspend fun updateName(name: String, id: Int = 0)
 
-    @Query("UPDATE my_profile SET age = :age WHERE id = :id")
-    suspend fun updateAge(age: String, id: Int = 0)
+    @Query("UPDATE my_profile SET birthDay = :birthDay WHERE id = :id")
+    suspend fun updateBirthDay(birthDay: String, id: Int = 0)
 
     @Query("UPDATE my_profile SET mySelfSentence = :sentence WHERE id = :id")
     suspend fun updateMySelfSentence(sentence: String, id: Int = 0)
