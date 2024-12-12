@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import android.net.Uri
 import androidx.navigation.NavHostController
+import com.example.tokitoki.ui.screen.TokitokiArgs.BIRTHDAY
 import com.example.tokitoki.ui.screen.TokitokiArgs.NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
@@ -39,6 +40,7 @@ private object TokitokiScreens {
 object TokitokiArgs {
     const val URI = "uri"
     const val NAME = "name"
+    const val BIRTHDAY = "birthday"
 }
 
 object TokitokiDestinations {
@@ -48,7 +50,7 @@ object TokitokiDestinations {
     const val AGREEMENT_CONFIRMATION_ROUTE = AGREEMENT_CONFIRMATION_SCREEN
     const val ABOUT_ME_ROUTE = ABOUT_ME_SCREEN
     const val ABOUT_ME_GENDER_ROUTE = ABOUT_ME_GENDER_SCREEN
-    const val ABOUT_ME_BIRTHDAY_ROUTE = ABOUT_ME_BIRTHDAY_SCREEN
+    const val ABOUT_ME_BIRTHDAY_ROUTE = "$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY={$BIRTHDAY}"
     const val ABOUT_ME_NAME_ROUTE = "$ABOUT_ME_NAME_SCREEN?$NAME={$NAME}"
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
     const val ABOUT_ME_TAG_ROUTE = ABOUT_ME_TAG_SCREEN
@@ -79,8 +81,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_GENDER_SCREEN)
     }
 
-    fun navigateToAboutMeBirthday() {
-        navController.navigate(ABOUT_ME_BIRTHDAY_SCREEN)
+    fun navigateToAboutMeBirthday(birthday: String = "") {
+        navController.navigate("$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY=${birthday}")
     }
 
     fun navigateToAboutMeName(name: String = "") {

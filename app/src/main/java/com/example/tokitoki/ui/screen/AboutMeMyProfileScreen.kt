@@ -51,6 +51,7 @@ fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
     onAboutMeProfInputScreen: () -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
+    onAboutMeBirthDayScreen: (String) -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -81,7 +82,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_BIRTHDAY -> {
-
+                            onAboutMeBirthDayScreen(viewModel.uiState.value.myProfileItem.age)
                         }
 
                         AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE -> {

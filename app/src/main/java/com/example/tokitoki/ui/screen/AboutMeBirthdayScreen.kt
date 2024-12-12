@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -36,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
+import com.example.tokitoki.ui.constants.AboutMeNameAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.etc.TkIndicator
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
@@ -48,8 +51,10 @@ import com.example.tokitoki.ui.viewmodel.AboutMeBirthdayViewModel
 
 @Composable
 fun AboutMeBirthdayScreen(
+    birthDay: String = "",
     onAboutMeGenderScreen: () -> Unit = {},
     onAboutMeNameScreen: () -> Unit = {},
+    onPrevScreen: () -> Unit = {},
     viewModel: AboutMeBirthdayViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -61,7 +66,7 @@ fun AboutMeBirthdayScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(birthDay = birthDay)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -85,6 +90,14 @@ fun AboutMeBirthdayScreen(
 
                         AboutMeBirthdayAction.PREVIOUS -> {
                             onAboutMeGenderScreen()
+                        }
+
+                        AboutMeBirthdayAction.EDIT_OK -> {
+                            if (viewModel.checkBirthday()) {
+                                onPrevScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
@@ -133,12 +146,26 @@ fun AboutMeBirthdayContents(
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        TkBottomArrowNavigation(
-            modifier = Modifier.padding(10.dp),
-            action = aboutMeBirthdayAction,
-            previousActionParam = AboutMeBirthdayAction.PREVIOUS,
-            nextActionParam = AboutMeBirthdayAction.NEXT
-        )
+
+        if (uiState.isEditMode) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                text = "修正する",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeBirthdayAction,
+                actionParam = AboutMeBirthdayAction.EDIT_OK
+            )
+        } else {
+            TkBottomArrowNavigation(
+                modifier = Modifier.padding(all = 10.dp),
+                action = aboutMeBirthdayAction,
+                nextActionParam = AboutMeBirthdayAction.NEXT,
+                previousActionParam = AboutMeBirthdayAction.PREVIOUS,
+            )
+        }
     }
 
     if (uiState.showDialog) {
@@ -252,3 +279,12 @@ fun AboutMeBirthdayContentsPreview() {
         AboutMeBirthdayContents()
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun AboutMeBirthdayContentsEditModePreview() {
+    TokitokiTheme {
+        AboutMeBirthdayContents(uiState = AboutMeBirthdayState(isEditMode = true))
+    }
+}
+

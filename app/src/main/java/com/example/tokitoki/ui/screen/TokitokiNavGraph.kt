@@ -78,13 +78,23 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val birthDay = backStackEntry.arguments?.getString(TokitokiArgs.BIRTHDAY) ?: ""
+
             AboutMeBirthdayScreen(
+                birthDay = birthDay,
                 onAboutMeGenderScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
                     navAction.navigateToAboutMeName()
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -181,6 +191,9 @@ fun TokitokiNavGraph(
                 },
                 onAboutMeNameScreen = {
                     navAction.navigateToAboutMeName(it)
+                },
+                onAboutMeBirthDayScreen = {
+                    navAction.navigateToAboutMeBirthday(it)
                 },
                 onIntroduceLikePageScreen = {
 

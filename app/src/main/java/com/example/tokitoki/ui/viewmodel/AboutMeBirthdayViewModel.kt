@@ -29,8 +29,9 @@ class AboutMeBirthdayViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeBirthdayEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init() {
-        _uiState.value = AboutMeBirthdayState()
+    fun init(birthDay: String) {
+        _uiState.value =
+            AboutMeBirthdayState(birthday = birthDay, isEditMode = birthDay.isNotEmpty())
     }
 
     fun onBirthdayChanged(birthday: String) {
