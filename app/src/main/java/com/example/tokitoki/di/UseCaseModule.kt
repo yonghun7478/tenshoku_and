@@ -12,8 +12,8 @@ import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
-import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
+import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCase
@@ -73,8 +73,8 @@ abstract class UseCaseModule {
     @Binds
     @Singleton
     abstract fun bindGetTagByTagIdUseCase(
-        impl: GetTagByTagIdUseCaseImpl
-    ): GetTagByTagIdUseCase
+        impl: GetTagByTagIdWithCategoryIdUseCaseImpl
+    ): GetTagByTagIdWithCategoryIdUseCase
 
     @Binds
     @Singleton

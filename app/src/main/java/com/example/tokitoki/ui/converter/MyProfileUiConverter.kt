@@ -13,9 +13,11 @@ object MyProfileUiConverter {
             mySelfSentence = profile.mySelfSentence,
             myTagItems = tags.map { tag ->
                 MyTagItem(
+                    tagId = tag.id,
+                    categoryId = tag.categoryId,
                     title = tag.title, // 임의의 태그 제목
                     url = tag.url, // 태그 URL 생성
-                    categoryTitle = tag.categoryTitle // 임의의 카테고리 제목
+                    categoryTitle = tag.categoryTitle, // 임의의 카테고리 제목
                 )
             }
         )

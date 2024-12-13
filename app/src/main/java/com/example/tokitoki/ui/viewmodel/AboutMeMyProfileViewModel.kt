@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetTagByTagIdUseCase
+import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
@@ -25,7 +25,7 @@ class AboutMeMyProfileViewModel
 @Inject constructor(
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val getMyTagUseCase: GetMyTagUseCase,
-    private val getTagByTagIdUseCase: GetTagByTagIdUseCase,
+    private val getTagByTagIdWithCategoryIdUseCase: GetTagByTagIdWithCategoryIdUseCase,
     private val calculateAgeUseCase: CalculateAgeUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
@@ -37,10 +37,15 @@ class AboutMeMyProfileViewModel
     suspend fun init() {
         val myProfile = getMyProfileUseCase()
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
-        val myTag = getMyTagUseCase()
-        val tag = getTagByTagIdUseCase(myTag.map { it.tagId })
+        val myTags = getMyTagUseCase()
+        val myTagsMap =
+            myTags.groupBy { it.categoryId }.mapValues { entry -> entry.value.map { it.tagId } }
 
-        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, age, tag)
+        val allTags = myTagsMap.flatMap { (categoryId, tagIds) ->
+            getTagByTagIdWithCategoryIdUseCase(categoryId, tagIds)
+        }
+
+        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, age, allTags)
 
         _uiState.update { currentState ->
             currentState.copy(
