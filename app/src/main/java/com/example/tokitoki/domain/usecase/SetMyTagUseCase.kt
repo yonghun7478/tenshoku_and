@@ -19,7 +19,7 @@ class SetMyTagUseCaseImpl @Inject constructor(
             tags.forEach { repository.addUserTag(it) }
 
             // 2. 저장된 태그 목록 가져오기
-            val savedTags = repository.getUserTags().map { MyTag(tagId = it) }
+            val savedTags = repository.getUserTags()
 
             Result.success(savedTags)
         } catch (e: Exception) {

@@ -7,9 +7,3 @@ data class MyProfileItem(
     val myTagItems: List<MyTagItem> = listOf(),
     val mySelfSentence: String = "",
 )
-
-data class MyTagItem(
-    val title: String = "",
-    val url: String = "",
-    val categoryTitle: String = "",
-)
