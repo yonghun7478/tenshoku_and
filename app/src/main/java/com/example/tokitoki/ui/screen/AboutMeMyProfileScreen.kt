@@ -52,7 +52,7 @@ fun AboutMeMyProfileScreen(
     onAboutMeProfInputScreen: () -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
-    onAboutMeTagScreen: (List<Int>) -> Unit = {},
+    onAboutMeTagScreen: (String) -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -91,7 +91,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {
-                            onAboutMeTagScreen(viewModel.getMyTagIds())
+                            onAboutMeTagScreen(viewModel.getMyTags())
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {

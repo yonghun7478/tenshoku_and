@@ -202,8 +202,8 @@ fun TokitokiNavGraph(
                 onAboutMeBirthDayScreen = {
                     navAction.navigateToAboutMeBirthday(it)
                 },
-                onAboutMeTagScreen = { tagIds ->
-                    navAction.navigateToAboutMeTag(tagIds)
+                onAboutMeTagScreen = {
+                    navAction.navigateToAboutMeTag(it)
                 },
                 onIntroduceLikePageScreen = {
 

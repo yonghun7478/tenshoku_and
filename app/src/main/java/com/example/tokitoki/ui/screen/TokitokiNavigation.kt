@@ -95,9 +95,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_SECOND_SCREEN)
     }
 
-    fun navigateToAboutMeTag(tagIds: List<Int> = listOf()) {
-        val tagIdsString = tagIds.joinToString(",") // "1,2,3"
-        navController.navigate("$ABOUT_ME_TAG_SCREEN?$TAG_IDS=${tagIdsString}")
+    fun navigateToAboutMeTag(args: String = "") {
+        navController.navigate("$ABOUT_ME_TAG_SCREEN?$TAG_IDS=${args}")
     }
 
     fun navigateToAboutMeThird() {

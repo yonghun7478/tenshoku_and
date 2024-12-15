@@ -10,6 +10,7 @@ import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
 import com.example.tokitoki.ui.state.AboutMeMyProfileState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,9 +66,8 @@ class AboutMeMyProfileViewModel
         return myProfile.birthDay
     }
 
-    suspend fun getMyTagIds(): List<Int> {
-        val myTag = getMyTagUseCase()
-        val tagIds = myTag.map { tag -> tag.tagId }
-        return tagIds
+    fun getMyTags(): String {
+        val tagsJson = Gson().toJson(_uiState.value.myProfileItem.myTagItems)
+        return tagsJson
     }
 }
