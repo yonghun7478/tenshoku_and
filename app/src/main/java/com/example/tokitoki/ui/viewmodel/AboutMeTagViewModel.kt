@@ -9,6 +9,7 @@ import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.converter.CategoryUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
+import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.state.AboutMeTagEvent
 import com.example.tokitoki.ui.state.AboutMeTagState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,26 +41,40 @@ class AboutMeTagViewModel
         return isTest
     }
 
-    suspend fun init() {
+    suspend fun init(
+        tagIds: List<MyTagItem> = listOf(),
+    ) {
+        // Step 1: 도메인 데이터를 가져오기
         val domainCategories = getCategoriesUseCase()
         val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
 
-        val tagsByCategory = mutableMapOf<String, List<TagItem>>()
-
-        domainCategories.forEach { category ->
-            val tags = getTagByCategoryIdUseCase(category.id)
+        // Step 2: 기본 tagsByCategory 생성
+        val tagsByCategory = domainCategories.associate { category ->
+            category.title to getTagByCategoryIdUseCase(category.id)
                 .map { TagUiConverter.domainToUi(it) }
-
-            tagsByCategory[category.title] = tags
         }
 
+        // Step 3: tagIds가 비어 있지 않은 경우에만 showBadge 업데이트
+        val finalTagsByCategory = if (tagIds.isNotEmpty()) {
+            tagsByCategory.mapValues { (_, tags) ->
+                tags.map { tag ->
+                    val isFavorite = tagIds.any { it.tagId == tag.id }
+                    tag.copy(showBadge = isFavorite)
+                }
+            }
+        } else {
+            tagsByCategory
+        }
+
+        // Step 4: UI 상태 업데이트
         _uiState.update { currentState ->
             currentState.copy(
                 categoryList = uiCategories,
-                tagsByCategory = tagsByCategory
+                tagsByCategory = finalTagsByCategory
             )
         }
     }
+
 
     fun aboutMeTagAction(action: AboutMeTagAction) {
         viewModelScope.launch {

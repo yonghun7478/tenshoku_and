@@ -65,6 +65,7 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.model.CategoryItem
+import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
@@ -80,7 +81,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeTagScreen(
-    tagIds: List<Int> = listOf(),
+    tagIds: List<MyTagItem> = listOf(),
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
     viewModel: AboutMeTagViewModel = hiltViewModel()
@@ -101,7 +102,7 @@ fun AboutMeTagScreen(
     )
 
     LaunchedEffect(true) {
-        viewModel.init()
+        viewModel.init(tagIds)
 
         viewModel.uiEvent.collect { event ->
             when (event) {

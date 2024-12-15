@@ -12,6 +12,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.tokitoki.ui.model.MyTagItem
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -133,7 +136,11 @@ fun TokitokiNavGraph(
             arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType })
         ) { backStackEntry ->
             val tagIdsString = backStackEntry.arguments?.getString(TokitokiArgs.TAG_IDS) ?: ""
-            val tagIds = tagIdsString.split(",").mapNotNull { it.toIntOrNull() }
+            val tagIds: List<MyTagItem> = if (tagIdsString.isEmpty()) {
+                listOf()
+            } else {
+                Gson().fromJson(tagIdsString, object : TypeToken<List<MyTagItem>>() {}.type)
+            }
 
             AboutMeTagScreen(
                 tagIds = tagIds,
