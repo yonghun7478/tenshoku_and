@@ -149,6 +149,9 @@ fun TokitokiNavGraph(
                 },
                 onAboutMeThirdScreen = {
                     navAction.navigateToAboutMeThird()
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }

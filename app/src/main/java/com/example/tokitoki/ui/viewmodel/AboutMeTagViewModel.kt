@@ -6,7 +6,6 @@ import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeTagAction
-import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.converter.CategoryUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.MyTagItem
@@ -70,7 +69,8 @@ class AboutMeTagViewModel
         _uiState.update { currentState ->
             currentState.copy(
                 categoryList = uiCategories,
-                tagsByCategory = finalTagsByCategory
+                tagsByCategory = finalTagsByCategory,
+                isEditMode = tagIds.isNotEmpty()
             )
         }
     }

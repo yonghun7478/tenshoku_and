@@ -9,6 +9,7 @@ sealed class AboutMeTagAction {
     data object NEXT : AboutMeTagAction()
     data object PREVIOUS : AboutMeTagAction()
     data object DIALOG_OK : AboutMeTagAction()
+    data object EDIT_OK : AboutMeTagAction()
     data class SelectedTab(val index: Int) : AboutMeTagAction()
     data class ITEM_CLICKED(val category:String, val index: Int) : AboutMeTagAction()
 }
