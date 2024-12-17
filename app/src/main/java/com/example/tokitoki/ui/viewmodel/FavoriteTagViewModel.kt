@@ -55,9 +55,9 @@ class FavoriteTagViewModel @Inject constructor(
 
     }
 
-    fun onCategoryTabClicked(categoryId: Int) {
+    fun onCategoryTabClicked(index: Int) {
         viewModelScope.launch {
-            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.CategoryTabClicked(categoryId)))
+            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.CategoryTabClicked(index)))
         }
     }
 
