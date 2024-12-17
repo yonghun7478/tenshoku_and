@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
@@ -23,7 +24,7 @@ import javax.inject.Inject
 class FavoriteTagViewModel @Inject constructor(
     private val getMyTagUseCase: GetMyTagUseCase,
     private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
-    private val getCategoriesUseCase: GetCategoriesUseCase
+    private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoriteTagUiState())

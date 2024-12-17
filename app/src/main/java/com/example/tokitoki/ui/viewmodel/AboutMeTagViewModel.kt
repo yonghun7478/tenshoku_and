@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
@@ -27,8 +28,9 @@ class AboutMeTagViewModel
     private val isTest: Boolean,
     private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val setMyTagUseCase: SetMyTagUseCase
-) : ViewModel() {
+    private val setMyTagUseCase: SetMyTagUseCase,
+    private val clearMyTagUseCase: ClearMyTagUseCase,
+    ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeTagState())
     val uiState: StateFlow<AboutMeTagState> = _uiState.asStateFlow()
@@ -43,6 +45,7 @@ class AboutMeTagViewModel
     suspend fun init(
         tagIds: List<MyTagItem> = listOf(),
     ) {
+        clearMyTagUseCase()
         // Step 1: 도메인 데이터를 가져오기
         val domainCategories = getCategoriesUseCase()
         val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }

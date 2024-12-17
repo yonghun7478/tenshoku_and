@@ -2,6 +2,8 @@ package com.example.tokitoki.di
 
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCaseImpl
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
@@ -129,4 +131,10 @@ abstract class UseCaseModule {
     abstract fun bindSetMySelfSentenceUseCase(
         impl: SetMySelfSentenceUseCaseImpl
     ): SetMySelfSentenceUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindClearMyTagUseCase(
+        impl: ClearMyTagUseCaseImpl
+    ): ClearMyTagUseCase
 }
