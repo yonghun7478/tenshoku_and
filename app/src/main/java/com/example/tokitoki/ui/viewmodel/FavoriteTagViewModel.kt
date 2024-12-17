@@ -6,6 +6,7 @@ import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.ui.constants.FavoriteTagAction
+import com.example.tokitoki.ui.converter.CategoryUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.state.FavoriteTagEvent
@@ -47,7 +48,10 @@ class FavoriteTagViewModel @Inject constructor(
                 filteredTags.map { TagUiConverter.domainToUi(it) }
         }
 
-        _uiState.value = _uiState.value.copy(tagsByCategory = tagsByCategory)
+        _uiState.value = _uiState.value.copy(
+            tagsByCategory = tagsByCategory,
+            categoryList = categories.map { CategoryUiConverter.domainToUi(it) }
+        )
 
     }
 
