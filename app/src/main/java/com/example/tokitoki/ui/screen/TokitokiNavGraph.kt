@@ -218,6 +218,17 @@ fun TokitokiNavGraph(
                 onIntroduceLikePageScreen = {
 
                 },
+                onFavoriteTagScreen = {
+                    navAction.navigateToFavoriteTag()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.FAVORITE_TAG_ROUTE) {
+            FavoriteTagScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
     }

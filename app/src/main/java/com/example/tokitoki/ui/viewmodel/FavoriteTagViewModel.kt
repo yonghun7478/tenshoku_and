@@ -32,27 +32,23 @@ class FavoriteTagViewModel @Inject constructor(
     val uiEvent = _uiEvent.asSharedFlow()
 
     suspend fun loadTagsByCategory() {
-        viewModelScope.launch {
-            try {
-                val categories = getCategoriesUseCase()
-                val myTags = getMyTagUseCase()
-                val tagsByCategory = mutableMapOf<String, List<TagItem>>()
 
-                for (category in categories) {
-                    val categoryTags = getTagByCategoryIdUseCase(category.id)
-                    val filteredTags = categoryTags.filter { tag ->
-                        myTags.any { myTag -> myTag.tagId == tag.id }
-                    }
+        val categories = getCategoriesUseCase()
+        val myTags = getMyTagUseCase()
+        val tagsByCategory = mutableMapOf<String, List<TagItem>>()
 
-                    tagsByCategory[category.title] =
-                        filteredTags.map { TagUiConverter.domainToUi(it) }
-                }
-
-                _uiState.value = _uiState.value.copy(tagsByCategory = tagsByCategory)
-            } catch (e: Exception) {
-                // Handle error here if necessary
+        for (category in categories) {
+            val categoryTags = getTagByCategoryIdUseCase(category.id)
+            val filteredTags = categoryTags.filter { tag ->
+                myTags.any { myTag -> myTag.tagId == tag.id }
             }
+
+            tagsByCategory[category.title] =
+                filteredTags.map { TagUiConverter.domainToUi(it) }
         }
+
+        _uiState.value = _uiState.value.copy(tagsByCategory = tagsByCategory)
+
     }
 
     fun onCategoryTabClicked(categoryId: Int) {

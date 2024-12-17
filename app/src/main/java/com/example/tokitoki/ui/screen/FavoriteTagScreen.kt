@@ -28,6 +28,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -58,7 +59,7 @@ fun FavoriteTagScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState{ uiState.categoryList.size }
+    val pagerState = rememberPagerState { uiState.categoryList.size }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -78,10 +79,11 @@ fun FavoriteTagScreen(
             modifier = Modifier.weight(1f),
             pagerState = pagerState,
             uiState = uiState,
-            onTagPageAction = { tagId ->
-                println("Tag clicked: $tagId")
-            }
         )
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadTagsByCategory()
     }
 }
 
@@ -158,14 +160,14 @@ fun FavoriteTagPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     uiState: FavoriteTagUiState,
-    onTagPageAction: (Int) -> Unit = {}
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = modifier
     ) { page ->
         val currentCategoryTitle: String = uiState.categoryList.getOrNull(page)?.title ?: ""
-        val currentTagList: List<TagItem> = uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
+        val currentTagList: List<TagItem> =
+            uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -180,9 +182,6 @@ fun FavoriteTagPager(
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.Gray)
                         .padding(8.dp)
-                        .clickable {
-                            onTagPageAction(tag.id)
-                        }
                 ) {
                     Text(text = tag.title, color = Color.White)
                 }

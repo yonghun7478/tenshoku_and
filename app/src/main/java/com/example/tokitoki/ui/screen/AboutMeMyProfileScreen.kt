@@ -54,6 +54,7 @@ fun AboutMeMyProfileScreen(
     onAboutMeBirthDayScreen: (String) -> Unit = {},
     onAboutMeTagScreen: (String) -> Unit = {},
     onIntroduceLikePageScreen: () -> Unit = {},
+    onFavoriteTagScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -79,7 +80,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.CHECK_EVERYTHING -> {
-
+                            onFavoriteTagScreen()
                         }
 
                         AboutMeMyProfileAction.FIX_BIRTHDAY -> {
