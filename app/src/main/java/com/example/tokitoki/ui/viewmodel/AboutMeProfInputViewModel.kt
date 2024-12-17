@@ -2,7 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
+import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCase
 import com.example.tokitoki.ui.constants.AboutMeProfInputAction
 import com.example.tokitoki.ui.converter.MySelfSentenceUiConverter
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AboutMeProfInputViewModel
 @Inject constructor(
-    private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
+    private val getAllMySelfSentenceUseCase: GetAllMySelfSentenceUseCase,
     private val setMySelfSentenceUseCase: SetMySelfSentenceUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeProfInputState())
@@ -31,7 +31,7 @@ class AboutMeProfInputViewModel
     val uiEvent = _uiEvent.asSharedFlow()
 
     suspend fun init() {
-        val sentenceList = getMySelfSentenceUseCase().map { MySelfSentenceUiConverter.domainToUi(it) }
+        val sentenceList = getAllMySelfSentenceUseCase().map { MySelfSentenceUiConverter.domainToUi(it) }
 
         _uiState.update {
             it.copy(

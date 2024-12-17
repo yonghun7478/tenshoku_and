@@ -8,6 +8,8 @@ import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
+import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
@@ -52,6 +54,12 @@ abstract class UseCaseModule {
     abstract fun bindGetMyProfileUseCase(
         impl: GetMyProfileUseCaseImpl
     ): GetMyProfileUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetAllMySelfSentenceUseCase(
+        impl: GetAllMySelfSentenceUseCaseImpl
+    ): GetAllMySelfSentenceUseCase
 
     @Binds
     @Singleton

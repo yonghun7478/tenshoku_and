@@ -10,4 +10,7 @@ interface MySelfSentenceDao {
 
     @Query("SELECT COUNT(*) FROM myself_sentence_item")
     suspend fun getRowCount(): Int
+
+    @Query("SELECT * FROM myself_sentence_item WHERE id = :id")
+    suspend fun getSentence(id: Int): MySelfSentenceEntity
 }
