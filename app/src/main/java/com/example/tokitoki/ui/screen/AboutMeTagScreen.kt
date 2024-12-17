@@ -136,7 +136,11 @@ fun AboutMeTagScreen(
                         }
 
                         AboutMeTagAction.EDIT_OK -> {
-                            onPrevScreen()
+                            if (viewModel.checkTags()) {
+                                onPrevScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
