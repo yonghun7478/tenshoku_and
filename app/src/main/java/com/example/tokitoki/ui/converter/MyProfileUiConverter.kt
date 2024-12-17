@@ -6,11 +6,11 @@ import com.example.tokitoki.ui.model.MyProfileItem
 import com.example.tokitoki.ui.model.MyTagItem
 
 object MyProfileUiConverter {
-    fun domainToUi(profile: MyProfile, age: String, tags: List<Tag>): MyProfileItem {
+    fun domainToUi(profile: MyProfile, age: String, tags: List<Tag>, mySelfSentence: String): MyProfileItem {
         return MyProfileItem(
             name = profile.name,
             age = age,
-            mySelfSentence = profile.mySelfSentence,
+            mySelfSentence = mySelfSentence,
             myTagItems = tags.map { tag ->
                 MyTagItem(
                     tagId = tag.id,

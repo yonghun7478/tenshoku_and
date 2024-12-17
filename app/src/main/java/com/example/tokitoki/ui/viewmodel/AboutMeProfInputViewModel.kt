@@ -40,8 +40,8 @@ class AboutMeProfInputViewModel
         }
     }
 
-    suspend fun saveMySelfSentence(sentence: String) {
-        setMySelfSentenceUseCase(sentence)
+    suspend fun saveMySelfSentence(sentenceId: Int) {
+        setMySelfSentenceUseCase(sentenceId)
     }
 
     fun aboutMeProfInputAction(action: AboutMeProfInputAction) {

@@ -9,5 +9,5 @@ data class MyProfileEntity(
     val name: String,
     val birthDay: String,
     val isMale: Boolean,
-    val mySelfSentence: String
+    val mySelfSentenceId: Int
 )

@@ -34,8 +34,8 @@ class MyProfileRepositoryImpl @Inject constructor(
         myProfileDao.updateGender(isMale)
     }
 
-    override suspend fun updateMySelfSentence(sentence: String) {
-        myProfileDao.updateMySelfSentence(sentence)
+    override suspend fun updateMySelfSentence(sentenceId: Int) {
+        myProfileDao.updateMySelfSentence(sentenceId)
     }
 
     override suspend fun deleteUserProfile() {

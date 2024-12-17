@@ -5,5 +5,5 @@ data class MyProfile(
     val name: String = "",
     val birthDay: String = "",
     val isMale: Boolean = false,
-    val mySelfSentence: String = ""
+    val mySelfSentenceId: Int = 0
 )

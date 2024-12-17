@@ -10,7 +10,7 @@ interface MyProfileRepository {
     suspend fun updateUserName(name: String) // 유저 이름 변경
     suspend fun updateUserBirthday(birthDay: String) // 유저 나이 변경
     suspend fun updateGender(isMale: Boolean)
-    suspend fun updateMySelfSentence(sentence: String) // 자기소개 변경
+    suspend fun updateMySelfSentence(sentenceId: Int) // 자기소개 변경
     suspend fun deleteUserProfile() // 유저 프로필 삭제
 
     // User Tags 관련 메서드
