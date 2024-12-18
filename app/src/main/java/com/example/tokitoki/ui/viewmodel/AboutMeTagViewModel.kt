@@ -45,7 +45,6 @@ class AboutMeTagViewModel
     suspend fun init(
         tagIds: List<MyTagItem> = listOf(),
     ) {
-        clearMyTagUseCase()
         // Step 1: 도메인 데이터를 가져오기
         val domainCategories = getCategoriesUseCase()
         val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
@@ -127,6 +126,7 @@ class AboutMeTagViewModel
 
             val domainMyTags = filteredTags.map { TagUiConverter.uiToDomain(it) }
 
+            clearMyTagUseCase()
             val result = setMyTagUseCase(domainMyTags)
 
             if (result.isSuccess) {
