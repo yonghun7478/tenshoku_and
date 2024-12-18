@@ -6,16 +6,18 @@ import com.example.tokitoki.ui.model.MyProfileItem
 import com.example.tokitoki.ui.model.MyTagItem
 
 object MyProfileUiConverter {
-    fun domainToUi(profile: MyProfile, tags: List<Tag>): MyProfileItem {
+    fun domainToUi(profile: MyProfile, age: String, tags: List<Tag>, mySelfSentence: String): MyProfileItem {
         return MyProfileItem(
             name = profile.name,
-            age = profile.age,
-            mySelfSentence = profile.mySelfSentence,
+            age = age,
+            mySelfSentence = mySelfSentence,
             myTagItems = tags.map { tag ->
                 MyTagItem(
+                    tagId = tag.id,
+                    categoryId = tag.categoryId,
                     title = tag.title, // 임의의 태그 제목
                     url = tag.url, // 태그 URL 생성
-                    categoryTitle = tag.categoryTitle // 임의의 카테고리 제목
+                    categoryTitle = tag.categoryTitle, // 임의의 카테고리 제목
                 )
             }
         )

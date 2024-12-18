@@ -65,7 +65,9 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.model.CategoryItem
+import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.model.TagItem
+import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.etc.TkBottomArrowNavigation
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
@@ -80,8 +82,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeTagScreen(
+    tagIds: List<MyTagItem> = listOf(),
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
+    onPrevScreen: () -> Unit = {},
     viewModel: AboutMeTagViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -100,7 +104,7 @@ fun AboutMeTagScreen(
     )
 
     LaunchedEffect(true) {
-        viewModel.init()
+        viewModel.init(tagIds)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -129,6 +133,14 @@ fun AboutMeTagScreen(
 
                         is AboutMeTagAction.ITEM_CLICKED -> {
                             viewModel.updateGridItem(event.action.category, event.action.index)
+                        }
+
+                        AboutMeTagAction.EDIT_OK -> {
+                            if (viewModel.checkTags()) {
+                                onPrevScreen()
+                            } else {
+                                viewModel.updateShowDialogState(true)
+                            }
                         }
                     }
                 }
@@ -184,14 +196,28 @@ fun AboutMeTagContents(
             )
         }
 
-        TkBottomArrowNavigation(
-            modifier = Modifier
-                .padding(10.dp)
-                .align(Alignment.BottomCenter),
-            action = aboutMeTagAction,
-            previousActionParam = AboutMeTagAction.PREVIOUS,
-            nextActionParam = AboutMeTagAction.NEXT
-        )
+        if (uiState.isEditMode) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp)
+                    .align(Alignment.BottomCenter),
+                text = "修正する",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeTagAction,
+                actionParam = AboutMeTagAction.EDIT_OK
+            )
+        } else {
+            TkBottomArrowNavigation(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .align(Alignment.BottomCenter),
+                action = aboutMeTagAction,
+                previousActionParam = AboutMeTagAction.PREVIOUS,
+                nextActionParam = AboutMeTagAction.NEXT
+            )
+        }
 
         if (uiState.showDialog) {
             TkAlertDialog(

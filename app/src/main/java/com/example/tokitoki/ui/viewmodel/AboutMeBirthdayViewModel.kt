@@ -2,8 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
-import com.example.tokitoki.domain.usecase.UpdateAgeUseCase
+import com.example.tokitoki.domain.usecase.UpdateBirthDayUseCase
 import com.example.tokitoki.ui.constants.AboutMeBirthdayAction
 import com.example.tokitoki.ui.state.AboutMeBirthdayEvent
 import com.example.tokitoki.ui.state.AboutMeBirthdayState
@@ -19,8 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AboutMeBirthdayViewModel @Inject constructor(
-    private val updateAgeUseCase: UpdateAgeUseCase,
-    private val calculateAgeUseCase: CalculateAgeUseCase,
+    private val updateBirthDayUseCase: UpdateBirthDayUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeBirthdayState())
@@ -29,8 +27,9 @@ class AboutMeBirthdayViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeBirthdayEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init() {
-        _uiState.value = AboutMeBirthdayState()
+    fun init(birthDay: String) {
+        _uiState.value =
+            AboutMeBirthdayState(birthday = birthDay, isEditMode = birthDay.isNotEmpty())
     }
 
     fun onBirthdayChanged(birthday: String) {
@@ -46,9 +45,7 @@ class AboutMeBirthdayViewModel @Inject constructor(
     fun checkBirthday(): Boolean {
         if (_uiState.value.birthday.length == 8) {
             viewModelScope.launch {
-                val result = calculateAgeUseCase.invoke(_uiState.value.birthday)
-                val myProfile = updateAgeUseCase.invoke(result.getOrNull() ?: "")
-                println("myProfile $myProfile")
+                updateBirthDayUseCase.invoke(_uiState.value.birthday)
             }
             return true
         }

@@ -4,15 +4,15 @@ import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import javax.inject.Inject
 
-interface UpdateAgeUseCase {
-    suspend operator fun invoke(age: String): MyProfile
+interface UpdateBirthDayUseCase {
+    suspend operator fun invoke(birthDay: String): MyProfile
 }
 
-class UpdateAgeUseCaseImpl @Inject constructor(
+class UpdateBirthDayUseCaseImpl @Inject constructor(
     private val myProfileRepository: MyProfileRepository
-) : UpdateAgeUseCase {
-    override suspend operator fun invoke(age: String): MyProfile {
-        myProfileRepository.updateUserAge(age)
+) : UpdateBirthDayUseCase {
+    override suspend operator fun invoke(birthDay: String): MyProfile {
+        myProfileRepository.updateUserBirthday(birthDay)
         return myProfileRepository.getUserProfile() ?: MyProfile()
     }
 }

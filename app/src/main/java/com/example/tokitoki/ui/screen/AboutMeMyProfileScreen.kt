@@ -49,21 +49,24 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 @Composable
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
-    onAboutMeProfInputScreen: () -> Unit = {},
+    onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
-    onIntroduceLikePageScreen: () -> Unit = {},
+    onAboutMeBirthDayScreen: (String) -> Unit = {},
+    onAboutMeTagScreen: (String) -> Unit = {},
+    onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
+    onFavoriteTagScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     AboutMeMyProfileContents(
-        uri = uri,
+        uri = uiState.uri,
         myProfileItem = uiState.myProfileItem,
         aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(uri)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -77,19 +80,19 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.CHECK_EVERYTHING -> {
-
+                            onFavoriteTagScreen()
                         }
 
                         AboutMeMyProfileAction.FIX_BIRTHDAY -> {
-
+                            onAboutMeBirthDayScreen(viewModel.getBirthDay())
                         }
 
                         AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE -> {
-
+                            onAboutMeProfInputScreen(viewModel.getMySelfSentenceId())
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {
-
+                            onAboutMeTagScreen(viewModel.getMyTags())
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {
@@ -97,7 +100,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_PICTURE -> {
-
+                            onAboutMePhotoUploadScreen(uri)
                         }
 
                         AboutMeMyProfileAction.NOTHING -> {
@@ -164,7 +167,7 @@ fun AboutMeMyProfilePicItem(
     val painter = if (thumbnailImageUri.path?.isNotEmpty() == true) {
         rememberAsyncImagePainter(thumbnailImageUri) // 직접 사용
     } else {
-        painterResource(id = R.drawable.no_image_2) // 직접 사용
+        painterResource(id = R.drawable.couple_1) // 직접 사용
     }
     // TODO:後にボタンを追加したい
     // TODO:DBからデータを持ってくる予定
@@ -330,7 +333,7 @@ fun AboutMeMyProfileMyTag(
             )
         }
 
-        for (item in myTagItems) {
+        for (item in myTagItems.take(6)) {
             AboutMeMyProfileMyTagItem(
                 tagTitle = item.title,
                 categoryTitle = item.categoryTitle,

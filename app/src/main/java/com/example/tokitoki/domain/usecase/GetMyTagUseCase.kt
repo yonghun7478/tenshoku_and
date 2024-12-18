@@ -13,6 +13,6 @@ class GetMyTagUseCaseImpl @Inject constructor(
     private val myProfileRepository: MyProfileRepository
 ) : GetMyTagUseCase {
     override suspend operator fun invoke(): List<MyTag> {
-        return myProfileRepository.getUserTagsAsDomain()
+        return myProfileRepository.getUserTags()
     }
 }

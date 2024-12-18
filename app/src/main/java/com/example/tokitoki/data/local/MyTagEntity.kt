@@ -11,5 +11,6 @@ import androidx.room.PrimaryKey
 
 data class MyTagEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val tagId: Int // 태그 ID
+    val tagId: Int, // 태그 ID
+    val categoryId: Int // 카테고리 ID
 )

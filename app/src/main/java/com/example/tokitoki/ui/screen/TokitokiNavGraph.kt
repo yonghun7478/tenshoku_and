@@ -12,6 +12,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.tokitoki.ui.model.MyTagItem
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -78,13 +81,23 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val birthDay = backStackEntry.arguments?.getString(TokitokiArgs.BIRTHDAY) ?: ""
+
             AboutMeBirthdayScreen(
+                birthDay = birthDay,
                 onAboutMeGenderScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeNameScreen = {
                     navAction.navigateToAboutMeName()
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -118,13 +131,27 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_TAG_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_TAG_ROUTE,
+            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType })
+        ) { backStackEntry ->
+            val tagIdsString = backStackEntry.arguments?.getString(TokitokiArgs.TAG_IDS) ?: ""
+            val tagIds: List<MyTagItem> = if (tagIdsString.isEmpty()) {
+                listOf()
+            } else {
+                Gson().fromJson(tagIdsString, object : TypeToken<List<MyTagItem>>() {}.type)
+            }
+
             AboutMeTagScreen(
+                tagIds = tagIds,
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeThirdScreen = {
                     navAction.navigateToAboutMeThird()
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -137,12 +164,33 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_EDIT_MODE) { type = NavType.BoolType },
+            )
+        ) { backStackEntry ->
+            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uri = Uri.parse(Uri.decode(uriString))
+            val isEditMode =
+                backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_EDIT_MODE) ?: false
+
             AboutMePhotoUploadScreen(
+                uriParam = uri,
+                isEditMode = isEditMode,
                 onAboutMeProfInputScreen = {
-                    navAction.navigateToAboutMeProfInput(it)
+                    navAction.navigateToAboutMeProfInput(uri = it)
                 },
                 onAboutMeThirdScreen = {
+                    navController.navigateUp()
+                },
+                onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("isFromEdit", true)
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "uri",
+                        it.toString()
+                    )
                     navController.navigateUp()
                 }
             )
@@ -150,18 +198,27 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_PROF_INPUT_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.SELF_SENTENCE_IDS) { type = NavType.IntType }
+            )
         ) { backStackEntry ->
 
             val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
             val uri = Uri.parse(Uri.decode(uriString))
 
+            val selfSentenceId = backStackEntry.arguments?.getInt(TokitokiArgs.SELF_SENTENCE_IDS)
+
             AboutMeProfInputScreen(
+                selfSentenceId = selfSentenceId ?: -1,
                 onAboutMePhotoUploadScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeMyProfileScreen = {
                     navAction.navigateToAboutMeMyProfile(uri)
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -171,20 +228,48 @@ fun TokitokiNavGraph(
             arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
         ) { backStackEntry ->
 
-            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
-            val uri = Uri.parse(Uri.decode(uriString))
+            val uriStringFromArg = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
+
+            val isFromEditMode: Boolean = navController
+                .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
+
+            val uri = if (isFromEditMode) Uri.parse(
+                Uri.decode(
+                    navController
+                        .currentBackStackEntry?.savedStateHandle?.get("uri") ?: Uri.EMPTY.toString()
+                )
+
+            ) else uriFromArg
 
             AboutMeMyProfileScreen(
                 uri = uri,
                 onAboutMeProfInputScreen = {
-                    navController.navigateUp()
+                    navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                 },
                 onAboutMeNameScreen = {
                     navAction.navigateToAboutMeName(it)
                 },
-                onIntroduceLikePageScreen = {
-
+                onAboutMeBirthDayScreen = {
+                    navAction.navigateToAboutMeBirthday(it)
                 },
+                onAboutMeTagScreen = {
+                    navAction.navigateToAboutMeTag(it)
+                },
+                onAboutMePhotoUploadScreen = {
+                    navAction.navigateToAboutMePhotoUpload(it, true)
+                },
+                onFavoriteTagScreen = {
+                    navAction.navigateToFavoriteTag()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.FAVORITE_TAG_ROUTE) {
+            FavoriteTagScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
     }

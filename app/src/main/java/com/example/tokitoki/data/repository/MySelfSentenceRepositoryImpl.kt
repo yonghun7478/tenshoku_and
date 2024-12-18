@@ -16,4 +16,10 @@ class MySelfSentenceRepositoryImpl @Inject constructor(
             mySelfSentenceDao.getAllSentences().map { MySelfSentenceConverter.entityToDomain(it) }
         }
     }
+
+    override suspend fun getSentence(id: Int): MySelfSentence {
+        return withContext(Dispatchers.IO) {
+            MySelfSentenceConverter.entityToDomain(mySelfSentenceDao.getSentence(id))
+        }
+    }
 }

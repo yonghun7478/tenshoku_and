@@ -24,13 +24,13 @@ class TagRepositoryImpl @Inject constructor(
 
     override suspend fun getTags(categoryId: Int): List<Tag> {
         return withContext(Dispatchers.IO) {
-            tagDao.getTagsWithCategory(categoryId).map { TagConverter.dataToDomain(it) }
+            tagDao.getTagsWithCategoryAndTagId(categoryId).map { TagConverter.dataToDomain(it) }
         }
     }
 
-    override suspend fun getTags(tagIds: List<Int>): List<Tag> {
+    override suspend fun getTags(categoryId: Int, tagIds: List<Int>): List<Tag> {
         return withContext(Dispatchers.IO) {
-            tagDao.getTagsByIds(tagIds).map { TagConverter.dataToDomain(it) }
+            tagDao.getTagsWithCategoryAndTagId(categoryId, tagIds).map { TagConverter.dataToDomain(it) }
         }
     }
 }

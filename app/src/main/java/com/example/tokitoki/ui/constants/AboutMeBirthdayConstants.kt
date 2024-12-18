@@ -9,4 +9,5 @@ sealed class AboutMeBirthdayAction {
     data object NEXT : AboutMeBirthdayAction()
     data object PREVIOUS : AboutMeBirthdayAction()
     data object DIALOG_OK : AboutMeBirthdayAction()
+    data object EDIT_OK : AboutMeBirthdayAction()
 }

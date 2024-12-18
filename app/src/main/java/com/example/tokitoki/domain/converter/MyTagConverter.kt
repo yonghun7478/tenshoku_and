@@ -8,14 +8,16 @@ object MyTagConverter {
     // MyTagEntity -> MyTag
     fun entityToDomain(entity: MyTagEntity): MyTag {
         return MyTag(
-            tagId = entity.tagId
+            tagId = entity.tagId,
+            categoryId = entity.categoryId
         )
     }
 
     // MyTag -> MyTagEntity
     fun domainToEntity(domain: MyTag): MyTagEntity {
         return MyTagEntity(
-            tagId = domain.tagId
+            tagId = domain.tagId,
+            categoryId = domain.categoryId
         )
     }
 }
