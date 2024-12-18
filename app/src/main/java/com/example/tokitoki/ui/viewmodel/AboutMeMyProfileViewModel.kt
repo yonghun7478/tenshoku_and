@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
@@ -29,7 +30,8 @@ class AboutMeMyProfileViewModel
     private val getMyTagUseCase: GetMyTagUseCase,
     private val getTagByTagIdWithCategoryIdUseCase: GetTagByTagIdWithCategoryIdUseCase,
     private val calculateAgeUseCase: CalculateAgeUseCase,
-    private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase
+    private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
@@ -50,7 +52,8 @@ class AboutMeMyProfileViewModel
 
         val mySelfSentence = getMySelfSentenceUseCase(myProfile.mySelfSentenceId)
 
-        val myProfileItem = MyProfileUiConverter.domainToUi(myProfile, age, allTags, mySelfSentence.sentence)
+        val myProfileItem =
+            MyProfileUiConverter.domainToUi(myProfile, age, allTags, mySelfSentence.sentence)
 
         _uiState.update { currentState ->
             currentState.copy(

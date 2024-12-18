@@ -76,7 +76,10 @@ import java.io.File
 
 @Composable
 fun AboutMePhotoUploadScreen(
+    uriParam: Uri = Uri.EMPTY,
+    isEditMode: Boolean = false,
     onAboutMeThirdScreen: () -> Unit = {},
+    onPrevScreen: (Uri) -> Unit = {},
     onAboutMeProfInputScreen: (uri: Uri) -> Unit = {},
     viewModel: AboutMePhotoUploadViewModel = hiltViewModel()
 ) {
@@ -125,11 +128,17 @@ fun AboutMePhotoUploadScreen(
 
     AboutMePhotoUploadContents(
         showBottomDialog = uiState.showBottomDialog,
+        isEditMode = isEditMode,
         aboutMePhotoUploadAction = viewModel::aboutMePhotoUploadAction,
         capturedImageUri = uiState.capturedImageUri
     )
 
     LaunchedEffect(Unit) {
+        viewModel.init(
+            uri = uriParam,
+            isEditMode = isEditMode
+        )
+
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is AboutMePhotoUploadEvent.ACTION -> {
@@ -176,6 +185,10 @@ fun AboutMePhotoUploadScreen(
                             viewModel.updateCapturedImageUri(uri = Uri.EMPTY)
                             viewModel.updateShowBottomDialogState(false)
                         }
+
+                        AboutMePhotoUploadAction.EDIT_OK -> {
+                            onPrevScreen(uiState.capturedImageUri)
+                        }
                     }
                 }
 
@@ -188,6 +201,7 @@ fun AboutMePhotoUploadScreen(
 @Composable
 fun AboutMePhotoUploadContents(
     showBottomDialog: Boolean = false,
+    isEditMode: Boolean = false,
     aboutMePhotoUploadAction: (AboutMePhotoUploadAction) -> Unit = {},
     capturedImageUri: Uri = Uri.EMPTY
 ) {
@@ -218,16 +232,29 @@ fun AboutMePhotoUploadContents(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            TkBtn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 20.dp),
-                text = stringResource(R.string.agreement_confirmation_submit),
-                textColor = LocalColor.current.white,
-                backgroundColor = LocalColor.current.blue,
-                action = aboutMePhotoUploadAction,
-                actionParam = AboutMePhotoUploadAction.SUBMIT
-            )
+            if(isEditMode) {
+                TkBtn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 20.dp),
+                    text = "修正する",
+                    textColor = LocalColor.current.white,
+                    backgroundColor = LocalColor.current.blue,
+                    action = aboutMePhotoUploadAction,
+                    actionParam = AboutMePhotoUploadAction.EDIT_OK
+                )
+            } else {
+                TkBtn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 20.dp),
+                    text = stringResource(R.string.agreement_confirmation_submit),
+                    textColor = LocalColor.current.white,
+                    backgroundColor = LocalColor.current.blue,
+                    action = aboutMePhotoUploadAction,
+                    actionParam = AboutMePhotoUploadAction.SUBMIT
+                )
+            }
         }
 
         TkBottomDialog(

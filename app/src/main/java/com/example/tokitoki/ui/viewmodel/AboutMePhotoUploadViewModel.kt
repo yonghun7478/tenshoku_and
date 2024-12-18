@@ -26,8 +26,13 @@ class AboutMePhotoUploadViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMePhotoUploadEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init() {
-        _uiState.value = AboutMePhotoUploadState()
+    fun init(uri: Uri, isEditMode:Boolean) {
+        _uiState.update {
+            it.copy(
+                capturedImageUri = uri,
+                isEditMode = isEditMode
+            )
+        }
     }
 
     fun aboutMePhotoUploadAction(action: AboutMePhotoUploadAction) {

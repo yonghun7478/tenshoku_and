@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.screen
 import android.net.Uri
 import androidx.navigation.NavHostController
 import com.example.tokitoki.ui.screen.TokitokiArgs.BIRTHDAY
+import com.example.tokitoki.ui.screen.TokitokiArgs.IS_EDIT_MODE
 import com.example.tokitoki.ui.screen.TokitokiArgs.NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.SELF_SENTENCE_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_IDS
@@ -47,6 +48,7 @@ object TokitokiArgs {
     const val BIRTHDAY = "birthday"
     const val TAG_IDS = "tagIds"
     const val SELF_SENTENCE_IDS = "selfSentenceIds"
+    const val IS_EDIT_MODE = "isEditMode"
 }
 
 object TokitokiDestinations {
@@ -61,7 +63,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
     const val ABOUT_ME_TAG_ROUTE = "$ABOUT_ME_TAG_SCREEN?$TAG_IDS={$TAG_IDS}"
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
-    const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = ABOUT_ME_PHOTO_UPLOAD_SCREEN
+    const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = "$ABOUT_ME_PHOTO_UPLOAD_SCREEN?$URI={$URI}&$IS_EDIT_MODE={$IS_EDIT_MODE}"
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}&$SELF_SENTENCE_IDS={$SELF_SENTENCE_IDS}"
     const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}"
     const val FAVORITE_TAG_ROUTE = FAVORITE_TAG_SCREEN
@@ -108,8 +110,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_THIRD_SCREEN)
     }
 
-    fun navigateToAboutMePhotoUpload() {
-        navController.navigate(ABOUT_ME_PHOTO_UPLOAD_SCREEN)
+    fun navigateToAboutMePhotoUpload(uri: Uri = Uri.EMPTY, isEditMode:Boolean = false) {
+        navController.navigate("$ABOUT_ME_PHOTO_UPLOAD_SCREEN?$URI=${Uri.encode(uri.toString())}&$IS_EDIT_MODE=${isEditMode}")
     }
 
     fun navigateToAboutMeProfInput(uri: Uri = Uri.EMPTY, selfSentenceId: Int = -1) {

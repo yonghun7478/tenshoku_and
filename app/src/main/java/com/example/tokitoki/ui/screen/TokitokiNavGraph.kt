@@ -164,12 +164,33 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE) {
+        composable(
+            TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_EDIT_MODE) { type = NavType.BoolType },
+            )
+        ) { backStackEntry ->
+            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uri = Uri.parse(Uri.decode(uriString))
+            val isEditMode =
+                backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_EDIT_MODE) ?: false
+
             AboutMePhotoUploadScreen(
+                uriParam = uri,
+                isEditMode = isEditMode,
                 onAboutMeProfInputScreen = {
                     navAction.navigateToAboutMeProfInput(uri = it)
                 },
                 onAboutMeThirdScreen = {
+                    navController.navigateUp()
+                },
+                onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("isFromEdit", true)
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "uri",
+                        it.toString()
+                    )
                     navController.navigateUp()
                 }
             )
@@ -207,8 +228,19 @@ fun TokitokiNavGraph(
             arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
         ) { backStackEntry ->
 
-            val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
-            val uri = Uri.parse(Uri.decode(uriString))
+            val uriStringFromArg = backStackEntry.arguments?.getString(TokitokiArgs.URI)
+            val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
+
+            val isFromEditMode: Boolean = navController
+                .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
+
+            val uri = if (isFromEditMode) Uri.parse(
+                Uri.decode(
+                    navController
+                        .currentBackStackEntry?.savedStateHandle?.get("uri") ?: Uri.EMPTY.toString()
+                )
+
+            ) else uriFromArg
 
             AboutMeMyProfileScreen(
                 uri = uri,
@@ -224,8 +256,8 @@ fun TokitokiNavGraph(
                 onAboutMeTagScreen = {
                     navAction.navigateToAboutMeTag(it)
                 },
-                onIntroduceLikePageScreen = {
-
+                onAboutMePhotoUploadScreen = {
+                    navAction.navigateToAboutMePhotoUpload(it, true)
                 },
                 onFavoriteTagScreen = {
                     navAction.navigateToFavoriteTag()

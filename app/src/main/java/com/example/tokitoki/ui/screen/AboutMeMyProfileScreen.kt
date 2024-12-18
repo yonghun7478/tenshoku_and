@@ -53,7 +53,7 @@ fun AboutMeMyProfileScreen(
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
     onAboutMeTagScreen: (String) -> Unit = {},
-    onIntroduceLikePageScreen: () -> Unit = {},
+    onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -100,7 +100,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_PICTURE -> {
-
+                            onAboutMePhotoUploadScreen(uri)
                         }
 
                         AboutMeMyProfileAction.NOTHING -> {
