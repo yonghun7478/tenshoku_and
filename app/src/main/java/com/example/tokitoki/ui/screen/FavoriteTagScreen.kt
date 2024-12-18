@@ -78,7 +78,9 @@ fun FavoriteTagScreen(
     val pagerState = rememberPagerState { uiState.categoryList.size }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier
