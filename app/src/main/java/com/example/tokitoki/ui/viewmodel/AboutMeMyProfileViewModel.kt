@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,7 +40,7 @@ class AboutMeMyProfileViewModel
     private val _uiEvent = MutableSharedFlow<AboutMeMyProfileEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun init() {
+    suspend fun init(uri: Uri = Uri.EMPTY) {
         val myProfile = getMyProfileUseCase()
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
         val myTags = getMyTagUseCase()
@@ -58,6 +59,7 @@ class AboutMeMyProfileViewModel
         _uiState.update { currentState ->
             currentState.copy(
                 myProfileItem = myProfileItem,
+                uri = uri
             )
         }
     }

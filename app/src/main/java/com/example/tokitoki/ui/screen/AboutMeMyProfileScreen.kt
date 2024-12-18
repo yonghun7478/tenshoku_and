@@ -60,13 +60,13 @@ fun AboutMeMyProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     AboutMeMyProfileContents(
-        uri = uri,
+        uri = uiState.uri,
         myProfileItem = uiState.myProfileItem,
         aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(uri)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -167,7 +167,7 @@ fun AboutMeMyProfilePicItem(
     val painter = if (thumbnailImageUri.path?.isNotEmpty() == true) {
         rememberAsyncImagePainter(thumbnailImageUri) // 직접 사용
     } else {
-        painterResource(id = R.drawable.no_image_2) // 직접 사용
+        painterResource(id = R.drawable.couple_1) // 직접 사용
     }
     // TODO:後にボタンを追加したい
     // TODO:DBからデータを持ってくる予定
