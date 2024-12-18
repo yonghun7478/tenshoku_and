@@ -167,7 +167,7 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.ABOUT_ME_PHOTO_UPLOAD_ROUTE) {
             AboutMePhotoUploadScreen(
                 onAboutMeProfInputScreen = {
-                    navAction.navigateToAboutMeProfInput(it)
+                    navAction.navigateToAboutMeProfInput(uri = it)
                 },
                 onAboutMeThirdScreen = {
                     navController.navigateUp()
@@ -177,18 +177,27 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_PROF_INPUT_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.SELF_SENTENCE_IDS) { type = NavType.IntType }
+            )
         ) { backStackEntry ->
 
             val uriString = backStackEntry.arguments?.getString(TokitokiArgs.URI)
             val uri = Uri.parse(Uri.decode(uriString))
 
+            val selfSentenceId = backStackEntry.arguments?.getInt(TokitokiArgs.SELF_SENTENCE_IDS)
+
             AboutMeProfInputScreen(
+                selfSentenceId = selfSentenceId ?: -1,
                 onAboutMePhotoUploadScreen = {
                     navController.navigateUp()
                 },
                 onAboutMeMyProfileScreen = {
                     navAction.navigateToAboutMeMyProfile(uri)
+                },
+                onPrevScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -204,7 +213,7 @@ fun TokitokiNavGraph(
             AboutMeMyProfileScreen(
                 uri = uri,
                 onAboutMeProfInputScreen = {
-                    navController.navigateUp()
+                    navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                 },
                 onAboutMeNameScreen = {
                     navAction.navigateToAboutMeName(it)

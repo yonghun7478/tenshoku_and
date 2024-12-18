@@ -10,4 +10,5 @@ sealed class AboutMeProfInputAction {
     data object PREVIOUS : AboutMeProfInputAction()
     data object DIALOG_OK : AboutMeProfInputAction()
     data object SUBMIT : AboutMeProfInputAction()
+    data object EDIT_OK : AboutMeProfInputAction()
 }

@@ -42,8 +42,10 @@ import com.example.tokitoki.ui.viewmodel.AboutMeProfInputViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AboutMeProfInputScreen(
+    selfSentenceId: Int,
     onAboutMePhotoUploadScreen: () -> Unit = {},
     onAboutMeMyProfileScreen: () -> Unit = {},
+    onPrevScreen: () -> Unit = {},
     viewModel: AboutMeProfInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -53,13 +55,20 @@ fun AboutMeProfInputScreen(
     }
 
     AboutMeProfInputContents(
+        isEditMode = uiState.isEditMode,
         pagerState = pagerState,
         itemList = uiState.myselfSentenceList,
         aboutMeProfInputAction = viewModel::aboutMeProfInputAction
     )
 
+    LaunchedEffect(uiState.offset) {
+        if (uiState.offset >= 0) {
+            pagerState.scrollToPage(uiState.offset)
+        }
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.init()
+        viewModel.init(selfSentenceId)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -68,6 +77,11 @@ fun AboutMeProfInputScreen(
                         AboutMeProfInputAction.SUBMIT -> {
                             viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].id)
                             onAboutMeMyProfileScreen()
+                        }
+
+                        AboutMeProfInputAction.EDIT_OK -> {
+                            viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].id)
+                            onPrevScreen()
                         }
 
                         else -> {}
@@ -85,6 +99,7 @@ fun AboutMeProfInputScreen(
 @Composable
 fun AboutMeProfInputContents(
     modifier: Modifier = Modifier,
+    isEditMode: Boolean = false,
     itemList: List<MySelfSentenceItem> = listOf(),
     pagerState: PagerState = rememberPagerState { 1 },
     aboutMeProfInputAction: (AboutMeProfInputAction) -> Unit = {},
@@ -113,16 +128,29 @@ fun AboutMeProfInputContents(
             itemList = itemList
         )
 
-        TkBtn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 20.dp),
-            text = "この自己紹介文で次へ",
-            textColor = LocalColor.current.white,
-            backgroundColor = LocalColor.current.blue,
-            action = aboutMeProfInputAction,
-            actionParam = AboutMeProfInputAction.SUBMIT
-        )
+        if(isEditMode) {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                text = "修正する",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeProfInputAction,
+                actionParam = AboutMeProfInputAction.EDIT_OK
+            )
+        } else {
+            TkBtn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                text = "この自己紹介文で次へ",
+                textColor = LocalColor.current.white,
+                backgroundColor = LocalColor.current.blue,
+                action = aboutMeProfInputAction,
+                actionParam = AboutMeProfInputAction.SUBMIT
+            )
+        }
     }
 }
 

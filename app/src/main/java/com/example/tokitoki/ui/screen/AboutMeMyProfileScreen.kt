@@ -49,7 +49,7 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 @Composable
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
-    onAboutMeProfInputScreen: () -> Unit = {},
+    onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
     onAboutMeTagScreen: (String) -> Unit = {},
@@ -88,7 +88,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_MY_SELF_SENTENCE -> {
-
+                            onAboutMeProfInputScreen(viewModel.getMySelfSentenceId())
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {

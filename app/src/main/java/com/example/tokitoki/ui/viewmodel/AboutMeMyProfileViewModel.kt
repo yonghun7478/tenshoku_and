@@ -70,6 +70,11 @@ class AboutMeMyProfileViewModel
         return myProfile.birthDay
     }
 
+    suspend fun getMySelfSentenceId(): Int {
+        val myProfile = getMyProfileUseCase()
+        return myProfile.mySelfSentenceId
+    }
+
     fun getMyTags(): String {
         val tagsJson = Gson().toJson(_uiState.value.myProfileItem.myTagItems)
         return tagsJson

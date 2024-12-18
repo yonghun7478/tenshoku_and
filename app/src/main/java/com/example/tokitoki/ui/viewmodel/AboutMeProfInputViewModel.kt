@@ -30,12 +30,19 @@ class AboutMeProfInputViewModel
     private val _uiEvent = MutableSharedFlow<AboutMeProfInputEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun init() {
-        val sentenceList = getAllMySelfSentenceUseCase().map { MySelfSentenceUiConverter.domainToUi(it) }
+    suspend fun init(
+        selfSentenceId: Int
+    ) {
+        val sentenceList =
+            getAllMySelfSentenceUseCase().map { MySelfSentenceUiConverter.domainToUi(it) }
+
+        val offset = sentenceList.indexOfFirst { it.id == selfSentenceId }
 
         _uiState.update {
             it.copy(
                 myselfSentenceList = sentenceList,
+                offset = offset,
+                isEditMode = offset != -1
             )
         }
     }
