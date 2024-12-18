@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -28,8 +30,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -207,17 +211,37 @@ fun AboutMeBirthdayInput(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = birthday,
+                selection = TextRange(birthday.length) // 커서를 기본적으로 끝으로 설정
+            )
+        )
+    }
+
+    LaunchedEffect(birthday) {
+        if (birthday != textFieldValue.text) { // 불필요한 업데이트 방지
+            textFieldValue = TextFieldValue(
+                text = birthday,
+                selection = TextRange(birthday.length) // 커서를 끝으로 설정
+            )
+        }
+    }
+
     BasicTextField(
         modifier = modifier
             .focusRequester(focusRequester)
             .testTag(TestTags.ABOUT_ME_BIRTHDAY_TEXT_FIELD),
-        value = birthday,
+        value = textFieldValue,
         singleLine = true,
         onValueChange = { newText ->
-            if (newText.length <= 8)
-                onBirthdayChanged(newText)
+            textFieldValue = newText
 
-            if (newText.length == 8) {
+            if (newText.text.length <= 8)
+                onBirthdayChanged(newText.text)
+
+            if (newText.text.length == 8) {
                 focusManager.clearFocus()
             }
         },
