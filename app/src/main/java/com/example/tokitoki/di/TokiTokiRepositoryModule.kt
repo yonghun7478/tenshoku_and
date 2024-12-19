@@ -1,9 +1,11 @@
 package com.example.tokitoki.di
 
+import com.example.tokitoki.data.repository.AuthRepositoryImpl
 import com.example.tokitoki.data.repository.DbRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
 import com.example.tokitoki.data.repository.TagRepositoryImpl
+import com.example.tokitoki.domain.repository.AuthRepository
 import com.example.tokitoki.domain.repository.DbRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
@@ -13,7 +15,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -41,4 +42,10 @@ abstract class TokiTokiRepositoryModule {
     abstract fun bindDbRepository(
         dbRepositoryImpl: DbRepositoryImpl
     ): DbRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 }
