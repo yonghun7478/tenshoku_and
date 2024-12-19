@@ -6,4 +6,6 @@ import com.example.tokitoki.domain.model.Tokens
 interface AuthRepository {
     suspend fun sendVerificationCode(code: String): Tokens
     suspend fun registerMyProfile(myProfile: MyProfile): MyProfile
+    fun saveTokens(token: String, refreshToken: String)
+    fun getTokens(): Tokens
 }

@@ -10,6 +10,9 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
 
 ) : AuthRepository {
+    private var token: String = ""
+    private var refreshToken: String = ""
+
     override suspend fun sendVerificationCode(code: String): Tokens {
         val res = TokensResponse("dummyToken", "dummyRefreshToken")
         return TokensConverter.fromResponse(res)
@@ -17,5 +20,14 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun registerMyProfile(myProfile: MyProfile): MyProfile {
         return MyProfile(myProfile.id, myProfile.name, myProfile.birthDay, myProfile.isMale, myProfile.mySelfSentenceId)
+    }
+
+    override fun saveTokens(token: String, refreshToken: String) {
+        this.token = token
+        this.refreshToken = refreshToken
+    }
+
+    override fun getTokens(): Tokens {
+        return Tokens(token, refreshToken)
     }
 }

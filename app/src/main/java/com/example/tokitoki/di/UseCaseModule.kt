@@ -18,6 +18,10 @@ import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTokensUseCase
+import com.example.tokitoki.domain.usecase.GetTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
@@ -153,5 +157,17 @@ abstract class UseCaseModule {
     abstract fun bindSendVerificationCodeUseCase(
         impl: SendVerificationCodeUseCaseImpl
     ): SendVerificationCodeUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSaveTokensUseCase(
+        impl: SaveTokensUseCaseImpl
+    ): SaveTokensUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTokensUseCase(
+        impl: GetTokensUseCaseImpl
+    ): GetTokensUseCase
 
 }
