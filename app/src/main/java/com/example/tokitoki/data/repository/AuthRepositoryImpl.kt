@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.data.local.TokenPreferences
 import com.example.tokitoki.data.model.TokensResponse
 import com.example.tokitoki.domain.converter.TokensConverter
 import com.example.tokitoki.domain.model.MyProfile
@@ -8,11 +9,8 @@ import com.example.tokitoki.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-
+    private val tokenPreferences: TokenPreferences
 ) : AuthRepository {
-    private var token: String = ""
-    private var refreshToken: String = ""
-
     override suspend fun sendVerificationCode(code: String): Tokens {
         val res = TokensResponse("dummyToken", "dummyRefreshToken")
         return TokensConverter.fromResponse(res)
@@ -23,11 +21,13 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun saveTokens(token: String, refreshToken: String) {
-        this.token = token
-        this.refreshToken = refreshToken
+        tokenPreferences.saveAccessToken(token)
+        tokenPreferences.saveRefreshToken(refreshToken)
     }
 
     override fun getTokens(): Tokens {
-        return Tokens(token, refreshToken)
+        val accessToken = tokenPreferences.getAccessToken() ?: ""
+        val refreshToken = tokenPreferences.getRefreshToken() ?: ""
+        return Tokens(accessToken, refreshToken)
     }
 }

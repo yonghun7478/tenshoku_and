@@ -12,6 +12,8 @@ import com.example.tokitoki.data.local.TokiTokiLocalDatabase
 import com.example.tokitoki.data.utils.EncryptionHelper
 import com.example.tokitoki.data.local.MyProfileDao
 import com.example.tokitoki.data.local.MyTagDao
+import com.example.tokitoki.data.local.TokenPreferences
+import com.example.tokitoki.data.local.TokenPreferencesImpl
 import com.example.tokitoki.data.utils.DatabaseManager
 import dagger.Module
 import dagger.Provides
@@ -103,5 +105,13 @@ object TokiTokiAppModule {
         @ApplicationContext context: Context
     ): DbVersionPreferences {
         return DbVersionPreferencesImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenPreferences(
+        @ApplicationContext context: Context
+    ): TokenPreferences {
+        return TokenPreferencesImpl(context)
     }
 }
