@@ -36,8 +36,6 @@ import com.example.tokitoki.domain.usecase.UpdateBirthDayUseCase
 import com.example.tokitoki.domain.usecase.UpdateBirthDayUseCaseImpl
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
-import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
-import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCaseImpl
 import dagger.Binds
@@ -91,12 +89,6 @@ abstract class UseCaseModule {
     abstract fun bindGetTagByTagIdUseCase(
         impl: GetTagByTagIdWithCategoryIdUseCaseImpl
     ): GetTagByTagIdWithCategoryIdUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindValidateAuthCodeUseCase(
-        impl: ValidateAuthCodeUseCaseImpl
-    ): ValidateAuthCodeUseCase
 
     @Binds
     @Singleton

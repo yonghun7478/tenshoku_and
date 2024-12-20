@@ -1,3 +1,3 @@
 package com.example.tokitoki.domain.model
 
-data class Tokens(val token: String, val refreshToken: String)
+data class Tokens(val accessToken: String, val refreshToken: String)

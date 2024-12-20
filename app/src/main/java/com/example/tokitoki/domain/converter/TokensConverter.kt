@@ -9,6 +9,6 @@ object TokensConverter {
     }
 
     fun toResponse(tokens: Tokens): TokensResponse {
-        return TokensResponse(tokens.token, tokens.refreshToken)
+        return TokensResponse(tokens.accessToken, tokens.refreshToken)
     }
 }

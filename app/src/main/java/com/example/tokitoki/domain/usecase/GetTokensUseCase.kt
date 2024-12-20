@@ -5,12 +5,12 @@ import com.example.tokitoki.domain.repository.AuthRepository
 import javax.inject.Inject
 
 interface GetTokensUseCase {
-    fun execute(): Tokens
+    suspend operator fun invoke(): Tokens
 }
 
 class GetTokensUseCaseImpl @Inject constructor(private val authRepository: AuthRepository) :
     GetTokensUseCase {
-    override fun execute(): Tokens {
+    override suspend fun invoke(): Tokens {
         return authRepository.getTokens()
     }
 }
