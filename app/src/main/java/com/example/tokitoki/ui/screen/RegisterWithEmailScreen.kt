@@ -73,6 +73,7 @@ fun RegisterWithEmailScreen(
                             val result = viewModel.validateEmail(uiState.email)
 
                             if (result) {
+                                viewModel.saveEmail(uiState.email)
                                 onEmailVerification()
                             } else
                                 viewModel.updateShowDialogState(true)

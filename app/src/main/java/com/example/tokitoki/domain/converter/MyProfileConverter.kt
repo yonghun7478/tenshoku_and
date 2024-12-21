@@ -12,7 +12,8 @@ object MyProfileConverter {
             name = entity.name,
             birthDay = entity.birthDay, // String -> Int 변환, 기본값 0
             isMale = entity.isMale,
-            mySelfSentenceId = entity.mySelfSentenceId
+            mySelfSentenceId = entity.mySelfSentenceId,
+            email = entity.email
         )
     }
 
@@ -23,7 +24,8 @@ object MyProfileConverter {
             name = domain.name,
             birthDay = domain.birthDay, // Int -> String 변환
             isMale = domain.isMale,
-            mySelfSentenceId = domain.mySelfSentenceId
+            mySelfSentenceId = domain.mySelfSentenceId,
+            email = domain.email
         )
     }
 }
