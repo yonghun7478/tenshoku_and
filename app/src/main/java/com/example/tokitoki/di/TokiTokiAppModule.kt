@@ -15,6 +15,7 @@ import com.example.tokitoki.data.local.MyTagDao
 import com.example.tokitoki.data.local.TokenPreferences
 import com.example.tokitoki.data.local.TokenPreferencesImpl
 import com.example.tokitoki.data.utils.DatabaseManager
+import com.example.tokitoki.utils.FileManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -113,5 +114,16 @@ object TokiTokiAppModule {
         @ApplicationContext context: Context
     ): TokenPreferences {
         return TokenPreferencesImpl(context)
+    }
+
+    @Provides
+    fun provideFileManager(
+        @ApplicationContext context: Context
+    ): FileManager {
+        return FileManager(
+            contentResolver = context.contentResolver,
+            cacheDir = context.cacheDir,
+            externalFilesDir = context.getExternalFilesDir(null)
+        )
     }
 }

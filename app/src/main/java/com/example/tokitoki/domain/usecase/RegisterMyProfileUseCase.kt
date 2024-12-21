@@ -6,13 +6,19 @@ import com.example.tokitoki.domain.repository.AuthRepository
 import javax.inject.Inject
 
 interface RegisterMyProfileUseCase {
-    suspend operator fun invoke(myProfile: MyProfile): ResultWrapper<MyProfile>
+    suspend operator fun invoke(
+        myProfile: MyProfile,
+        thumbnailPath: String
+    ): ResultWrapper<MyProfile>
 }
 
 class RegisterMyProfileUseCaseImpl @Inject constructor(
     private val authRepository: AuthRepository
 ) : RegisterMyProfileUseCase {
-    override suspend fun invoke(myProfile: MyProfile): ResultWrapper<MyProfile> {
-        return authRepository.registerMyProfile(myProfile)
+    override suspend fun invoke(
+        myProfile: MyProfile,
+        thumbnailPath: String
+    ): ResultWrapper<MyProfile> {
+        return authRepository.registerMyProfile(myProfile, thumbnailPath)
     }
 }

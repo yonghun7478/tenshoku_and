@@ -77,6 +77,7 @@ fun AboutMeMyProfileScreen(
                 is AboutMeMyProfileEvent.ACTION -> {
                     when (event.action) {
                         AboutMeMyProfileAction.SUBMIT -> {
+                            viewModel.registerMyProfile()
                         }
 
                         AboutMeMyProfileAction.CHECK_EVERYTHING -> {
@@ -154,7 +155,9 @@ fun AboutMeMyProfileContents(
                 aboutMeMyProfileAction = aboutMeMyProfileAction
             )
         }
-        AboutMeMyProfileBottomMenu()
+        AboutMeMyProfileBottomMenu(
+            aboutMeMyProfileAction = aboutMeMyProfileAction
+        )
     }
 }
 
