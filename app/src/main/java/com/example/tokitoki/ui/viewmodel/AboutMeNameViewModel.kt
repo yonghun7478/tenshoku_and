@@ -2,7 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.SetNameUseCase
+import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.ui.constants.AboutMeNameAction
 import com.example.tokitoki.ui.state.AboutMeNameEvent
 import com.example.tokitoki.ui.state.AboutMeNameState
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AboutMeNameViewModel @Inject constructor(
-    private val setNameUseCase: SetNameUseCase
+    private val setMyProfileUseCase: SetMyProfileUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AboutMeNameState())
@@ -41,12 +43,11 @@ class AboutMeNameViewModel @Inject constructor(
         }
     }
 
-    fun checkName(): Boolean {
+    suspend fun checkName(): Boolean {
         if (_uiState.value.name.isNotEmpty()) {
-            viewModelScope.launch {
-                val profile = setNameUseCase(_uiState.value.name)
-                println("profile $profile")
-            }
+            val profile = getMyProfileUseCase()
+            setMyProfileUseCase(profile.copy(name = _uiState.value.name))
+
             return true
         }
 
