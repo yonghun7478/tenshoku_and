@@ -17,8 +17,16 @@ class AuthRepositoryImpl @Inject constructor(
         return ResultWrapper.Success(TokensConverter.fromResponse(res))
     }
 
-    override suspend fun registerMyProfile(myProfile: MyProfile): MyProfile {
-        return MyProfile(myProfile.id, myProfile.name, myProfile.birthDay, myProfile.isMale, myProfile.mySelfSentenceId)
+    override suspend fun registerMyProfile(myProfile: MyProfile): ResultWrapper<MyProfile> {
+        return ResultWrapper.Success(
+            MyProfile(
+                myProfile.id,
+                myProfile.name,
+                myProfile.birthDay,
+                myProfile.isMale,
+                myProfile.mySelfSentenceId
+            )
+        )
     }
 
     override fun saveTokens(token: String, refreshToken: String) {
