@@ -26,8 +26,6 @@ import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
-import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCase
-import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetNameUseCase
@@ -131,12 +129,6 @@ abstract class UseCaseModule {
     abstract fun bindSetMyTagUseCase(
         impl: SetMyTagUseCaseImpl
     ): SetMyTagUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindSetMySelfSentenceUseCase(
-        impl: SetMySelfSentenceUseCaseImpl
-    ): SetMySelfSentenceUseCase
 
     @Binds
     @Singleton
