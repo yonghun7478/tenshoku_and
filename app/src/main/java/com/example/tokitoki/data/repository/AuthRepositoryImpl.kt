@@ -11,7 +11,7 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val tokenPreferences: TokenPreferences
 ) : AuthRepository {
-    override suspend fun sendVerificationCode(code: String): Tokens {
+    override suspend fun sendVerificationCode(email: String, code: String): Tokens {
         val res = TokensResponse("dummyToken", "dummyRefreshToken")
         return TokensConverter.fromResponse(res)
     }

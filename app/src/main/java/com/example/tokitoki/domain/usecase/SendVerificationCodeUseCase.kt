@@ -7,16 +7,16 @@ import java.io.IOException
 import javax.inject.Inject
 
 interface SendVerificationCodeUseCase {
-    suspend operator fun invoke(code: String): DomainResult<Tokens>
+    suspend operator fun invoke(email: String, code: String): DomainResult<Tokens>
 }
 
 class SendVerificationCodeUseCaseImpl @Inject constructor(
     private val authRepository: AuthRepository
 ) : SendVerificationCodeUseCase {
-    override suspend fun invoke(code: String): DomainResult<Tokens> {
+    override suspend fun invoke(email: String, code: String): DomainResult<Tokens> {
         return try {
             // 성공적으로 토큰을 반환하면 Success로 감쌈
-            val tokens = authRepository.sendVerificationCode(code)
+            val tokens = authRepository.sendVerificationCode(email, code)
             DomainResult.Success(tokens)
         } catch (e: IOException) {
             // 네트워크 오류 처리

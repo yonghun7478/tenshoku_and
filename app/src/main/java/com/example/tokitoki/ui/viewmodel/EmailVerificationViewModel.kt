@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.DomainResult
+import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
     private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
-    private val saveTokensUseCase: SaveTokensUseCase
+    private val saveTokensUseCase: SaveTokensUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<EmailVerificationEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -50,7 +52,8 @@ class EmailVerificationViewModel @Inject constructor(
     }
 
     suspend fun processCodeValidation(code: String): Boolean {
-        val result = sendVerificationCodeUseCase(code)
+        val profile = getMyProfileUseCase()
+        val result = sendVerificationCodeUseCase(profile.email, code)
 
         if (result is DomainResult.Success) {
             handleTokens(result.data.accessToken, result.data.refreshToken)
