@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.data.local.TokenPreferences
 import com.example.tokitoki.data.model.TokensResponse
 import com.example.tokitoki.domain.converter.TokensConverter
@@ -11,9 +12,9 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val tokenPreferences: TokenPreferences
 ) : AuthRepository {
-    override suspend fun sendVerificationCode(email: String, code: String): Tokens {
+    override suspend fun sendVerificationCode(email: String, code: String): ResultWrapper<Tokens> {
         val res = TokensResponse("dummyToken", "dummyRefreshToken")
-        return TokensConverter.fromResponse(res)
+        return ResultWrapper.Success(TokensConverter.fromResponse(res))
     }
 
     override suspend fun registerMyProfile(myProfile: MyProfile): MyProfile {

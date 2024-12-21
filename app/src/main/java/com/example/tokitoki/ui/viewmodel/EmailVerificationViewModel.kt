@@ -2,7 +2,6 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.DomainResult
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.common.ResultWrapper
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
@@ -55,7 +55,7 @@ class EmailVerificationViewModel @Inject constructor(
         val profile = getMyProfileUseCase()
         val result = sendVerificationCodeUseCase(profile.email, code)
 
-        if (result is DomainResult.Success) {
+        if (result is ResultWrapper.Success) {
             handleTokens(result.data.accessToken, result.data.refreshToken)
             return true
         }
