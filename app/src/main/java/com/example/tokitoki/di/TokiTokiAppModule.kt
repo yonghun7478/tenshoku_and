@@ -16,6 +16,7 @@ import com.example.tokitoki.data.local.TokenPreferences
 import com.example.tokitoki.data.local.TokenPreferencesImpl
 import com.example.tokitoki.data.utils.DatabaseManager
 import com.example.tokitoki.utils.FileManager
+import com.example.tokitoki.utils.GoogleSignInManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -124,6 +125,15 @@ object TokiTokiAppModule {
             contentResolver = context.contentResolver,
             cacheDir = context.cacheDir,
             externalFilesDir = context.getExternalFilesDir(null)
+        )
+    }
+
+    @Provides
+    fun provideGoogleSignInManager(
+        @ApplicationContext context: Context
+    ): GoogleSignInManager {
+        return GoogleSignInManager(
+            context = context
         )
     }
 }
