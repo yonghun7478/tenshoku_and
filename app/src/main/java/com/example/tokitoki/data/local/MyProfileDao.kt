@@ -16,19 +16,6 @@ interface MyProfileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateProfile(profile: MyProfileEntity)
 
-    // 3. 특정 필드 업데이트 (예: 이름만 변경)
-    @Query("UPDATE my_profile SET name = :name WHERE id = :id")
-    suspend fun updateName(name: String, id: Int = 0)
-
-    @Query("UPDATE my_profile SET birthDay = :birthDay WHERE id = :id")
-    suspend fun updateBirthDay(birthDay: String, id: Int = 0)
-
-    @Query("UPDATE my_profile SET mySelfSentenceId = :sentenceId WHERE id = :id")
-    suspend fun updateMySelfSentence(sentenceId: Int, id: Int = 0)
-
-    @Query("UPDATE my_profile SET isMale = :isMale WHERE id = :id")
-    suspend fun updateGender(isMale: Boolean, id: Int = 0)
-
     // 4. 프로필 삭제 (초기화)
     @Query("DELETE FROM my_profile WHERE id = :id")
     suspend fun deleteProfile(id: Int = 0)

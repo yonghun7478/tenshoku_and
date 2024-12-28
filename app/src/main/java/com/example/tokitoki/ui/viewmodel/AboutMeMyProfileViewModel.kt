@@ -1,18 +1,20 @@
 package com.example.tokitoki.ui.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
+import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
 import com.example.tokitoki.ui.state.AboutMeMyProfileState
+import com.example.tokitoki.utils.FileManager
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,7 +34,8 @@ class AboutMeMyProfileViewModel
     private val getTagByTagIdWithCategoryIdUseCase: GetTagByTagIdWithCategoryIdUseCase,
     private val calculateAgeUseCase: CalculateAgeUseCase,
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
-    private val savedStateHandle: SavedStateHandle
+    private val registerMyProfileUseCase: RegisterMyProfileUseCase,
+    private val fileManager: FileManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
@@ -84,4 +87,14 @@ class AboutMeMyProfileViewModel
         val tagsJson = Gson().toJson(_uiState.value.myProfileItem.myTagItems)
         return tagsJson
     }
+
+    suspend fun registerMyProfile(): Boolean {
+        val thumbnailPath = fileManager.saveUriToInternalCache(uiState.value.uri) ?: ""
+        val myProfile = getMyProfileUseCase()
+
+        val result = registerMyProfileUseCase(myProfile, thumbnailPath)
+
+        return result is ResultWrapper.Success
+    }
+
 }

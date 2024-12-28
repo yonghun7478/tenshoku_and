@@ -2,6 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
 import com.example.tokitoki.ui.constants.RegisterWithEmailAction
 import com.example.tokitoki.ui.state.RegisterWithEmailEvent
@@ -18,7 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterWithEmailViewModel @Inject constructor(
-    private val validateEmailFormatUseCase: ValidateEmailFormatUseCase
+    private val validateEmailFormatUseCase: ValidateEmailFormatUseCase,
+    private val setMyProfileUseCase: SetMyProfileUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase,
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<RegisterWithEmailEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -50,5 +54,10 @@ class RegisterWithEmailViewModel @Inject constructor(
 
     suspend fun validateEmail(email: String): Boolean {
         return validateEmailFormatUseCase.invoke(email)
+    }
+
+    suspend fun saveEmail(email: String) {
+        val profile = getMyProfileUseCase()
+        setMyProfileUseCase(profile.copy(email = email))
     }
 }

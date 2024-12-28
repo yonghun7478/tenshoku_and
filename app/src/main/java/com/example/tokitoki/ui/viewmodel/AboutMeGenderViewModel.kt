@@ -43,12 +43,9 @@ class AboutMeGenderViewModel @Inject constructor(
         }
     }
 
-    fun checkGender(): Boolean {
+    suspend fun checkGender(): Boolean {
         if (_uiState.value.selectedGender != Gender.NONE) {
-            viewModelScope.launch {
-                val myProfile = setMyProfileUseCase(MyProfile(isMale = _uiState.value.selectedGender == Gender.MALE))
-                println("myProfile $myProfile")
-            }
+            setMyProfileUseCase(MyProfile(isMale = _uiState.value.selectedGender == Gender.MALE))
             return true
         }
         return false

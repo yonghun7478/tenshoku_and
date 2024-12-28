@@ -2,11 +2,12 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
+import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
-import com.example.tokitoki.ui.state.RegisterWithEmailState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,10 +17,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.common.ResultWrapper
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-    private val validateAuthCodeUseCase: ValidateAuthCodeUseCase,
+    private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
+    private val saveTokensUseCase: SaveTokensUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<EmailVerificationEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -43,13 +47,24 @@ class EmailVerificationViewModel @Inject constructor(
         }
     }
 
-    suspend fun validateCode(code: String): Boolean {
-        return validateAuthCodeUseCase.invoke(code)
+    private suspend fun handleTokens(accessToken: String, refreshToken: String) {
+        saveTokensUseCase(accessToken, refreshToken)
+    }
+
+    suspend fun processCodeValidation(code: String): Boolean {
+        val profile = getMyProfileUseCase()
+        val result = sendVerificationCodeUseCase(profile.email, code)
+
+        if (result is ResultWrapper.Success) {
+            handleTokens(result.data.accessToken, result.data.refreshToken)
+            return true
+        }
+        return false
     }
 
     fun updateShowDialogState(showDialog: Boolean) {
         _uiState.update {
-            if(showDialog)
+            if (showDialog)
                 it.copy(showDialog = true)
             else
                 it.copy(showDialog = false, code = "")

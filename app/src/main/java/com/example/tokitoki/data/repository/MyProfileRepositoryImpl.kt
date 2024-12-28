@@ -22,22 +22,6 @@ class MyProfileRepositoryImpl @Inject constructor(
         myProfileDao.insertOrUpdateProfile(MyProfileConverter.domainToEntity(profile))
     }
 
-    override suspend fun updateUserName(name: String) {
-        myProfileDao.updateName(name)
-    }
-
-    override suspend fun updateUserBirthday(birthDay: String) {
-        myProfileDao.updateBirthDay(birthDay)
-    }
-
-    override suspend fun updateGender(isMale: Boolean) {
-        myProfileDao.updateGender(isMale)
-    }
-
-    override suspend fun updateMySelfSentence(sentenceId: Int) {
-        myProfileDao.updateMySelfSentence(sentenceId)
-    }
-
     override suspend fun deleteUserProfile() {
         myProfileDao.deleteProfile()
     }

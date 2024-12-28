@@ -18,20 +18,20 @@ import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTokensUseCase
+import com.example.tokitoki.domain.usecase.GetTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
+import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
+import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
-import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCase
-import com.example.tokitoki.domain.usecase.SetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCaseImpl
-import com.example.tokitoki.domain.usecase.SetNameUseCase
-import com.example.tokitoki.domain.usecase.SetNameUseCaseImpl
-import com.example.tokitoki.domain.usecase.UpdateBirthDayUseCase
-import com.example.tokitoki.domain.usecase.UpdateBirthDayUseCaseImpl
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
-import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCase
-import com.example.tokitoki.domain.usecase.ValidateAuthCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCaseImpl
 import dagger.Binds
@@ -88,12 +88,6 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindValidateAuthCodeUseCase(
-        impl: ValidateAuthCodeUseCaseImpl
-    ): ValidateAuthCodeUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindValidateEmailFormatUseCase(
         impl: ValidateEmailFormatUseCaseImpl
     ): ValidateEmailFormatUseCase
@@ -118,31 +112,38 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindUpdateAgeUseCase(
-        impl: UpdateBirthDayUseCaseImpl
-    ): UpdateBirthDayUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindSetNameUseCase(
-        impl: SetNameUseCaseImpl
-    ): SetNameUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindSetMyTagUseCase(
         impl: SetMyTagUseCaseImpl
     ): SetMyTagUseCase
 
     @Binds
     @Singleton
-    abstract fun bindSetMySelfSentenceUseCase(
-        impl: SetMySelfSentenceUseCaseImpl
-    ): SetMySelfSentenceUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindClearMyTagUseCase(
         impl: ClearMyTagUseCaseImpl
     ): ClearMyTagUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSendVerificationCodeUseCase(
+        impl: SendVerificationCodeUseCaseImpl
+    ): SendVerificationCodeUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSaveTokensUseCase(
+        impl: SaveTokensUseCaseImpl
+    ): SaveTokensUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTokensUseCase(
+        impl: GetTokensUseCaseImpl
+    ): GetTokensUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindRegisterMyProfileUseCase(
+        impl: RegisterMyProfileUseCaseImpl
+    ): RegisterMyProfileUseCase
+
 }

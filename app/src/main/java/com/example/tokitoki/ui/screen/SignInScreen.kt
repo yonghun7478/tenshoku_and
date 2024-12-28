@@ -59,7 +59,11 @@ fun SignInScreen(
                 is SignInEvent.ACTION -> {
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
-                            onRegisterWithEmail()
+                            if(viewModel.checkToken()) {
+
+                            } else {
+                                onRegisterWithEmail()
+                            }
                         }
 
                         else -> {}
