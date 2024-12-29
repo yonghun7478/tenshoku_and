@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.screen
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +46,8 @@ fun SignInScreen(
     onRegisterWithEmail: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
+    val activityContext = LocalContext.current as Activity
+
     SignInContent(
         signInAction = {
             viewModel.signInAction(it)
@@ -64,6 +68,10 @@ fun SignInScreen(
                             } else {
                                 onRegisterWithEmail()
                             }
+                        }
+
+                        SignInAction.LoginWithGoogle -> {
+                            viewModel.signInGoogle(activityContext)
                         }
 
                         else -> {}
