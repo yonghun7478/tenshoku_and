@@ -24,6 +24,8 @@ import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.SendGoogleTokenUseCase
+import com.example.tokitoki.domain.usecase.SendGoogleTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
 import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
@@ -146,4 +148,8 @@ abstract class UseCaseModule {
         impl: RegisterMyProfileUseCaseImpl
     ): RegisterMyProfileUseCase
 
+    @Binds
+    abstract fun bindSendGoogleTokenUseCase(
+        useCaseImpl: SendGoogleTokenUseCaseImpl
+    ): SendGoogleTokenUseCase
 }
