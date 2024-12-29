@@ -33,7 +33,7 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    suspend fun signInGoogle(activityContext: Context) {
+    suspend fun signInGoogle(activityContext: Context): Boolean {
         val requestLoginResult = googleSignInManager.requestLogin(activityContext)
 
         if (requestLoginResult is ResultWrapper.Success) {
@@ -48,10 +48,11 @@ class SignInViewModel @Inject constructor(
                     refreshToken = response.data.refreshToken
                 )
 
+                return true
             }
-        } else {
-
         }
+
+        return false
     }
 
     suspend fun checkToken(): Boolean {

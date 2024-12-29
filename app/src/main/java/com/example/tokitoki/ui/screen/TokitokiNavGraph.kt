@@ -37,6 +37,9 @@ fun TokitokiNavGraph(
             SignInScreen(
                 onRegisterWithEmail = {
                     navAction.navigateToRegisterWithEmail()
+                },
+                onAgreementConfirmation = {
+                    navAction.navigateToAboutMe()
                 }
             )
         }

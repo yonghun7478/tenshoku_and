@@ -18,12 +18,6 @@ class GoogleSignInManager @Inject constructor(
     val context: Context
 ) {
     suspend fun requestLogin(activityContext: Context): ResultWrapper<Credential> {
-//        return ResultWrapper.Success(
-//            Credential(
-//                id = "12345",
-//                token = "12345"
-//            )
-//        )
         val signInWithGoogleOption: GetSignInWithGoogleOption =
             GetSignInWithGoogleOption.Builder("945331839593-qlm9du6m229fpi11pk1ootiroaephd1b.apps.googleusercontent.com")
                 .setNonce("nonce")

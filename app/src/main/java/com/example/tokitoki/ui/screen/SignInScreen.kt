@@ -44,6 +44,7 @@ import com.example.tokitoki.ui.viewmodel.SignInViewModel
 @Composable
 fun SignInScreen(
     onRegisterWithEmail: () -> Unit = {},
+    onAgreementConfirmation:  () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val activityContext = LocalContext.current as Activity
@@ -64,14 +65,15 @@ fun SignInScreen(
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
                             if(viewModel.checkToken()) {
-
                             } else {
                                 onRegisterWithEmail()
                             }
                         }
 
                         SignInAction.LoginWithGoogle -> {
-                            viewModel.signInGoogle(activityContext)
+                            if(viewModel.signInGoogle(activityContext)) {
+                                onAgreementConfirmation()
+                            }
                         }
 
                         else -> {}
