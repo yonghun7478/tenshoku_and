@@ -18,64 +18,64 @@ class GoogleSignInManager @Inject constructor(
     val context: Context
 ) {
     suspend fun requestLogin(activityContext: Context): ResultWrapper<Credential> {
-        return ResultWrapper.Success(
-            Credential(
-                id = "12345",
-                token = "12345"
-            )
-        )
-//        val signInWithGoogleOption: GetSignInWithGoogleOption =
-//            GetSignInWithGoogleOption.Builder("945331839593-qlm9du6m229fpi11pk1ootiroaephd1b.apps.googleusercontent.com")
-//                .setNonce("nonce")
-//                .build()
-//
-//        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-//            .addCredentialOption(signInWithGoogleOption)
-//            .build()
-//
-//        val credentialManager = CredentialManager.create(context)
-//
-//        try {
-//            val result = credentialManager.getCredential(
-//                request = request,
-//                context = activityContext,
+//        return ResultWrapper.Success(
+//            Credential(
+//                id = "12345",
+//                token = "12345"
 //            )
-//
-//            val credential = result.credential
-//
-//            when (credential) {
-//                is CustomCredential -> {
-//                    if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-//                        try {
-//                            // Use googleIdTokenCredential and extract id to validate and
-//                            // authenticate on your server.
-//                            val googleIdTokenCredential = GoogleIdTokenCredential
-//                                .createFrom(credential.data)
-//
-//                            return ResultWrapper.Success(
-//                                Credential(
-//                                    id = googleIdTokenCredential.id,
-//                                    token = googleIdTokenCredential.idToken,
-//                                    type = CredentialType.GOOGLE_ID_TOKEN
-//                                )
-//                            )
-//
-//                        } catch (e: GoogleIdTokenParsingException) {
-//                            Log.e("TAG", "Received an invalid google id token response", e)
-//                            return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = e.message ?: ""))
-//                        }
-//                    }
-//                }
-//
-//                else -> {
-//                    // Catch any unrecognized credential type her.
-//                    Log.e("TAG", "Unexpected type of credential")
-//                }
-//            }
-//        } catch (e: GetCredentialException) {
-//            return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = e.message?:""))
-//        }
-//
-//        return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = "message"))
+//        )
+        val signInWithGoogleOption: GetSignInWithGoogleOption =
+            GetSignInWithGoogleOption.Builder("945331839593-qlm9du6m229fpi11pk1ootiroaephd1b.apps.googleusercontent.com")
+                .setNonce("nonce")
+                .build()
+
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .build()
+
+        val credentialManager = CredentialManager.create(context)
+
+        try {
+            val result = credentialManager.getCredential(
+                request = request,
+                context = activityContext,
+            )
+
+            val credential = result.credential
+
+            when (credential) {
+                is CustomCredential -> {
+                    if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                        try {
+                            // Use googleIdTokenCredential and extract id to validate and
+                            // authenticate on your server.
+                            val googleIdTokenCredential = GoogleIdTokenCredential
+                                .createFrom(credential.data)
+
+                            return ResultWrapper.Success(
+                                Credential(
+                                    id = googleIdTokenCredential.id,
+                                    token = googleIdTokenCredential.idToken,
+                                    type = CredentialType.GOOGLE_ID_TOKEN
+                                )
+                            )
+
+                        } catch (e: GoogleIdTokenParsingException) {
+                            Log.e("TAG", "Received an invalid google id token response", e)
+                            return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = e.message ?: ""))
+                        }
+                    }
+                }
+
+                else -> {
+                    // Catch any unrecognized credential type her.
+                    Log.e("TAG", "Unexpected type of credential")
+                }
+            }
+        } catch (e: GetCredentialException) {
+            return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = e.message?:""))
+        }
+
+        return ResultWrapper.Error(errorType = ResultWrapper.ErrorType.ExceptionError(message = "message"))
     }
 }
