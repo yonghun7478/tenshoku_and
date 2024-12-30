@@ -12,7 +12,7 @@ interface AuthRepository {
         thumbnailPath: String
     ): ResultWrapper<MyProfile>
 
-    suspend fun sendGoogleToken(id: String, idToken: String): ResultWrapper<VerifyGoogleToken>
+    suspend fun verifyGoogleToken(id: String, idToken: String): ResultWrapper<VerifyGoogleToken>
 
     fun saveTokens(token: String, refreshToken: String)
     fun getTokens(): Tokens

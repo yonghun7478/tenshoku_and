@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetTokensUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
-import com.example.tokitoki.domain.usecase.SendGoogleTokenUseCase
+import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCase
 import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.constants.SignInAction
 import com.example.tokitoki.utils.GoogleSignInManager
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val getTokensUseCase: GetTokensUseCase,
     private val googleSignInManager: GoogleSignInManager,
-    private val sendGoogleTokenUseCase: SendGoogleTokenUseCase,
+    private val verifyGoogleTokenUseCase: VerifyGoogleTokenUseCase,
     private val saveTokenUseCase: SaveTokensUseCase
 
 ) : ViewModel() {
@@ -37,7 +37,7 @@ class SignInViewModel @Inject constructor(
         val requestLoginResult = googleSignInManager.requestLogin(activityContext)
 
         if (requestLoginResult is ResultWrapper.Success) {
-            val response = sendGoogleTokenUseCase(
+            val response = verifyGoogleTokenUseCase(
                 id = requestLoginResult.data.id,
                 idToken = requestLoginResult.data.token ?: ""
             )

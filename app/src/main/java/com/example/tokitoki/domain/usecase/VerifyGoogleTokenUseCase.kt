@@ -5,14 +5,14 @@ import com.example.tokitoki.domain.model.VerifyGoogleToken
 import com.example.tokitoki.domain.repository.AuthRepository
 import javax.inject.Inject
 
-interface SendGoogleTokenUseCase {
+interface VerifyGoogleTokenUseCase {
     suspend operator fun invoke(id: String, idToken: String): ResultWrapper<VerifyGoogleToken>
 }
 
-class SendGoogleTokenUseCaseImpl @Inject constructor(
+class VerifyGoogleTokenUseCaseImpl @Inject constructor(
     private val authRepository: AuthRepository
-) : SendGoogleTokenUseCase {
+) : VerifyGoogleTokenUseCase {
     override suspend operator fun invoke(id: String, idToken: String): ResultWrapper<VerifyGoogleToken> {
-        return authRepository.sendGoogleToken(id, idToken)
+        return authRepository.verifyGoogleToken(id, idToken)
     }
 }

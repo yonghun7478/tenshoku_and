@@ -34,7 +34,7 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun sendGoogleToken(
+    override suspend fun verifyGoogleToken(
         id: String,
         idToken: String
     ): ResultWrapper<VerifyGoogleToken> {
