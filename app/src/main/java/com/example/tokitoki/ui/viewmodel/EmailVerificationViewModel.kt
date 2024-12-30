@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
-import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
+import com.example.tokitoki.domain.usecase.VerifyEmailUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
@@ -21,7 +21,7 @@ import com.example.tokitoki.common.ResultWrapper
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-    private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
+    private val verifyEmailUseCase: VerifyEmailUseCase,
     private val saveTokensUseCase: SaveTokensUseCase,
     private val getMyProfileUseCase: GetMyProfileUseCase
 ) : ViewModel() {
@@ -53,7 +53,7 @@ class EmailVerificationViewModel @Inject constructor(
 
     suspend fun processCodeValidation(code: String): Boolean {
         val profile = getMyProfileUseCase()
-        val result = sendVerificationCodeUseCase(profile.email, code)
+        val result = verifyEmailUseCase(profile.email, code)
 
         if (result is ResultWrapper.Success) {
             handleTokens(result.data.accessToken, result.data.refreshToken)
