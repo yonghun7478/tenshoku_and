@@ -275,5 +275,9 @@ fun TokitokiNavGraph(
                 }
             )
         }
+
+        composable(TokitokiDestinations.MAIN_ROUTE) {
+            MainScreen()
+        }
     }
 }
