@@ -51,9 +51,6 @@ class EmailVerificationViewModel @Inject constructor(
     }
 
     suspend fun processCodeValidation(code: String): VerificationType {
-        if(code.length != 6)
-            return VerificationType.Error
-
         val profile = getMyProfileUseCase()
         val result = verifyEmailUseCase(profile.email, code)
 
@@ -62,10 +59,10 @@ class EmailVerificationViewModel @Inject constructor(
             val isRegistered = checkEmailRegisteredUseCase(profile.email)
 
             if (isRegistered is ResultWrapper.Success) {
-                if (isRegistered.data.isRegistered) {
-                    _uiEvent.emit(EmailVerificationEvent.ACTION(EmailVerificationAction.GO_TO_MAIN))
+                return if (isRegistered.data.isRegistered) {
+                    VerificationType.GotoMainScreen
                 } else {
-                    _uiEvent.emit(EmailVerificationEvent.ACTION(EmailVerificationAction.GO_TO_ABOUT_ME))
+                    VerificationType.GotoAboutMeScreen
                 }
             }
         }

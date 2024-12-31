@@ -54,6 +54,9 @@ fun TokitokiNavGraph(
             EmailVerificationScreen(
                 onAgreementConfirmationScreen = {
                     navAction.navigateToAgreementConfirmation()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }

@@ -50,6 +50,7 @@ import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
 @Composable
 fun EmailVerificationScreen(
     onAgreementConfirmationScreen: () -> Unit = {},
+    onMainScreen: () -> Unit = {},
     viewModel: EmailVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -87,13 +88,10 @@ fun EmailVerificationScreen(
                                     onAgreementConfirmationScreen()
                                 }
                                 VerificationType.GotoMainScreen -> {
-
+                                    onMainScreen()
                                 }
                             }
                         }
-
-                        EmailVerificationAction.GO_TO_ABOUT_ME -> TODO()
-                        EmailVerificationAction.GO_TO_MAIN -> TODO()
                     }
                 }
             }
