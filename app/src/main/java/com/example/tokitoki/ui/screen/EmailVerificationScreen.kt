@@ -42,6 +42,7 @@ import com.example.tokitoki.ui.screen.components.dialog.TkAlertDialog
 import com.example.tokitoki.ui.screen.components.icons.TkRoundedIcon
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
+import com.example.tokitoki.ui.state.VerificationType
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.EmailVerificationViewModel
@@ -78,12 +79,21 @@ fun EmailVerificationScreen(
                         EmailVerificationAction.SUBMIT -> {
                             val result = viewModel.processCodeValidation(uiState.code)
 
-                            if (result)
-                                onAgreementConfirmationScreen()
-                            else {
-                                viewModel.updateShowDialogState(true)
+                            when(result) {
+                                VerificationType.Error -> {
+                                    viewModel.updateShowDialogState(true)
+                                }
+                                VerificationType.GotoAboutMeScreen -> {
+                                    onAgreementConfirmationScreen()
+                                }
+                                VerificationType.GotoMainScreen -> {
+
+                                }
                             }
                         }
+
+                        EmailVerificationAction.GO_TO_ABOUT_ME -> TODO()
+                        EmailVerificationAction.GO_TO_MAIN -> TODO()
                     }
                 }
             }

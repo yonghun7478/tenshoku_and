@@ -75,7 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
         return if (email.contains("true"))
             ResultWrapper.Success(
                 CheckEmailRegistered(
-                    isRestered = CheckEmailRegisteredResponse(
+                    isRegistered = CheckEmailRegisteredResponse(
                         isRestered = true
                     ).isRestered
                 )
@@ -83,7 +83,7 @@ class AuthRepositoryImpl @Inject constructor(
         else
             ResultWrapper.Success(
                 CheckEmailRegistered(
-                    isRestered = CheckEmailRegisteredResponse(
+                    isRegistered = CheckEmailRegisteredResponse(
                         isRestered = false
                     ).isRestered
                 )

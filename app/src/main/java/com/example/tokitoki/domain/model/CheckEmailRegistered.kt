@@ -1,3 +1,3 @@
 package com.example.tokitoki.domain.model
 
-data class CheckEmailRegistered(val isRestered: Boolean)
+data class CheckEmailRegistered(val isRegistered: Boolean)
