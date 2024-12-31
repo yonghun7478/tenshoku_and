@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetTokensUseCase
-import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
 import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCase
 import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.constants.SignInAction
@@ -21,8 +21,7 @@ class SignInViewModel @Inject constructor(
     private val getTokensUseCase: GetTokensUseCase,
     private val googleSignInManager: GoogleSignInManager,
     private val verifyGoogleTokenUseCase: VerifyGoogleTokenUseCase,
-    private val saveTokenUseCase: SaveTokensUseCase
-
+    private val saveRegistrationTokenUseCase: SaveRegistrationTokenUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<SignInEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -42,12 +41,8 @@ class SignInViewModel @Inject constructor(
                 idToken = requestLoginResult.data.token ?: ""
             )
 
-            if(response is ResultWrapper.Success) {
-                saveTokenUseCase(
-                    token = response.data.accessToken,
-                    refreshToken = response.data.refreshToken
-                )
-
+            if (response is ResultWrapper.Success) {
+                saveRegistrationTokenUseCase(response.data.registrationToken)
                 return true
             }
         }

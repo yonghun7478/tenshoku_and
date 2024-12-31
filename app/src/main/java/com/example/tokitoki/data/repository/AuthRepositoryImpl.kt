@@ -40,18 +40,12 @@ class AuthRepositoryImpl @Inject constructor(
     ): ResultWrapper<VerifyGoogleToken> {
 
         val result = VerifyGoogleTokenResponse(
-            id = "12345",
-            idToken = "asdf",
-            accessToken = "asdf",
-            refreshToken = "asdf"
+            registrationToken = "1234"
         )
 
         return ResultWrapper.Success(
             VerifyGoogleToken(
-                id = result.id,
-                idToken = result.idToken,
-                accessToken = result.accessToken,
-                refreshToken = result.refreshToken
+                registrationToken = result.registrationToken
             )
         )
     }
