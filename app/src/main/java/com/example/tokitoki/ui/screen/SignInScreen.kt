@@ -39,12 +39,14 @@ import com.example.tokitoki.ui.constants.SignInConstants
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.buttons.TkOutlineBtn
+import com.example.tokitoki.ui.state.VerificationType
 import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
     onRegisterWithEmail: () -> Unit = {},
     onAgreementConfirmation:  () -> Unit = {},
+    onMainScreen: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val activityContext = LocalContext.current as Activity
@@ -71,8 +73,14 @@ fun SignInScreen(
                         }
 
                         SignInAction.LoginWithGoogle -> {
-                            if(viewModel.signInGoogle(activityContext)) {
-                                onAgreementConfirmation()
+                            when(viewModel.signInGoogle(activityContext)) {
+                                VerificationType.Error -> {}
+                                VerificationType.GotoAboutMeScreen -> {
+                                    onAgreementConfirmation()
+                                }
+                                VerificationType.GotoMainScreen -> {
+                                    onMainScreen()
+                                }
                             }
                         }
 

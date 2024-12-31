@@ -40,6 +40,9 @@ fun TokitokiNavGraph(
                 },
                 onAgreementConfirmation = {
                     navAction.navigateToAboutMe()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }
