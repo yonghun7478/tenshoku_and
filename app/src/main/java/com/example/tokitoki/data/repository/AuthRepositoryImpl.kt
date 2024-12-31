@@ -4,7 +4,6 @@ import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.data.local.TokenPreferences
 import com.example.tokitoki.data.model.VerifyEmailResponse
 import com.example.tokitoki.data.model.VerifyGoogleTokenResponse
-import com.example.tokitoki.domain.converter.VerifyEmailConverter
 import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.model.Tokens
 import com.example.tokitoki.domain.model.VerifyEmail
@@ -16,8 +15,8 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenPreferences: TokenPreferences
 ) : AuthRepository {
     override suspend fun verifyEmail(email: String, code: String): ResultWrapper<VerifyEmail> {
-        val res = VerifyEmailResponse("dummyToken", "dummyRefreshToken")
-        return ResultWrapper.Success(VerifyEmailConverter.fromResponse(res))
+        val res = VerifyEmailResponse("dummyToken")
+        return ResultWrapper.Success(VerifyEmail(res.registrationToken))
     }
 
     override suspend fun registerMyProfile(
@@ -66,5 +65,13 @@ class AuthRepositoryImpl @Inject constructor(
         val accessToken = tokenPreferences.getAccessToken() ?: ""
         val refreshToken = tokenPreferences.getRefreshToken() ?: ""
         return Tokens(accessToken, refreshToken)
+    }
+
+    override fun saveRegistrationToken(registrationToken: String) {
+        tokenPreferences.saveRegistrationToken(registrationToken)
+    }
+
+    override fun getRegistrationToken(): String {
+        return tokenPreferences.getRegistrationToken()
     }
 }

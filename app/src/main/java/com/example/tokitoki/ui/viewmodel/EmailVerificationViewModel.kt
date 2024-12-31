@@ -3,7 +3,6 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
-import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.VerifyEmailUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.state.EmailVerificationEvent
@@ -18,12 +17,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
     private val verifyEmailUseCase: VerifyEmailUseCase,
-    private val saveTokensUseCase: SaveTokensUseCase,
-    private val getMyProfileUseCase: GetMyProfileUseCase
+    private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val saveRegistrationTokenUseCase: SaveRegistrationTokenUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<EmailVerificationEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -47,8 +47,8 @@ class EmailVerificationViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleTokens(accessToken: String, refreshToken: String) {
-        saveTokensUseCase(accessToken, refreshToken)
+    private suspend fun handleTokens(registrationToken: String) {
+        saveRegistrationTokenUseCase(registrationToken)
     }
 
     suspend fun processCodeValidation(code: String): Boolean {
@@ -56,7 +56,7 @@ class EmailVerificationViewModel @Inject constructor(
         val result = verifyEmailUseCase(profile.email, code)
 
         if (result is ResultWrapper.Success) {
-            handleTokens(result.data.accessToken, result.data.refreshToken)
+            handleTokens(result.data.registrationToken)
             return true
         }
         return false

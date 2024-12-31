@@ -14,6 +14,8 @@ import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
@@ -22,6 +24,8 @@ import com.example.tokitoki.domain.usecase.GetTokensUseCase
 import com.example.tokitoki.domain.usecase.GetTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCase
@@ -152,4 +156,15 @@ abstract class UseCaseModule {
     abstract fun bindSendGoogleTokenUseCase(
         useCaseImpl: VerifyGoogleTokenUseCaseImpl
     ): VerifyGoogleTokenUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSaveRegistrationTokenUseCase(
+        impl: SaveRegistrationTokenUseCaseImpl
+    ): SaveRegistrationTokenUseCase
+
+    @Binds
+    abstract fun bindGetRegistrationTokenUseCase(
+        useCaseImpl: GetRegistrationTokenUseCaseImpl
+    ): GetRegistrationTokenUseCase
 }
