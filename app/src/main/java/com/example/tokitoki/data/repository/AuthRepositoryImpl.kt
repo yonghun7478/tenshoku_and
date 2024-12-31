@@ -2,8 +2,10 @@ package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.data.local.TokenPreferences
+import com.example.tokitoki.data.model.CheckEmailRegisteredResponse
 import com.example.tokitoki.data.model.VerifyEmailResponse
 import com.example.tokitoki.data.model.VerifyGoogleTokenResponse
+import com.example.tokitoki.domain.model.CheckEmailRegistered
 import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.model.Tokens
 import com.example.tokitoki.domain.model.VerifyEmail
@@ -67,5 +69,24 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun getRegistrationToken(): String {
         return tokenPreferences.getRegistrationToken()
+    }
+
+    override suspend fun checkEmailRegistered(email: String): ResultWrapper<CheckEmailRegistered> {
+        return if (email.contains("true"))
+            ResultWrapper.Success(
+                CheckEmailRegistered(
+                    isRestered = CheckEmailRegisteredResponse(
+                        isRestered = true
+                    ).isRestered
+                )
+            )
+        else
+            ResultWrapper.Success(
+                CheckEmailRegistered(
+                    isRestered = CheckEmailRegisteredResponse(
+                        isRestered = false
+                    ).isRestered
+                )
+            )
     }
 }

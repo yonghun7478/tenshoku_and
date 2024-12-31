@@ -2,6 +2,8 @@ package com.example.tokitoki.di
 
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCaseImpl
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
@@ -167,4 +169,9 @@ abstract class UseCaseModule {
     abstract fun bindGetRegistrationTokenUseCase(
         useCaseImpl: GetRegistrationTokenUseCaseImpl
     ): GetRegistrationTokenUseCase
+
+    @Binds
+    abstract fun bindCheckEmailRegisteredUseCase(
+        useCaseImpl: CheckEmailRegisteredUseCaseImpl
+    ): CheckEmailRegisteredUseCase
 }
