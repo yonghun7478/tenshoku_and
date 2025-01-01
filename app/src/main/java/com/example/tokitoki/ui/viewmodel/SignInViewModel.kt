@@ -7,6 +7,7 @@ import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.GetTokensUseCase
 import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCase
 import com.example.tokitoki.ui.state.SignInEvent
 import com.example.tokitoki.ui.constants.SignInAction
@@ -24,7 +25,8 @@ class SignInViewModel @Inject constructor(
     private val googleSignInManager: GoogleSignInManager,
     private val verifyGoogleTokenUseCase: VerifyGoogleTokenUseCase,
     private val saveRegistrationTokenUseCase: SaveRegistrationTokenUseCase,
-    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase
+    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
+    private val saveTokensUseCase: SaveTokensUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<SignInEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -48,8 +50,12 @@ class SignInViewModel @Inject constructor(
                 saveRegistrationTokenUseCase(response.data.registrationToken)
                 val isRegistered = checkEmailRegisteredUseCase(requestLoginResult.data.id)
 
-                if(isRegistered is ResultWrapper.Success) {
+                if (isRegistered is ResultWrapper.Success) {
                     return if (isRegistered.data.isRegistered) {
+                        saveTokensUseCase(
+                            isRegistered.data.accessToken,
+                            isRegistered.data.refreshToken
+                        )
                         VerificationType.GotoMainScreen
                     } else {
                         VerificationType.GotoAboutMeScreen

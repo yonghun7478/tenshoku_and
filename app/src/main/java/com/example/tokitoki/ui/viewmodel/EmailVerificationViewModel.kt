@@ -19,6 +19,7 @@ import javax.inject.Inject
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.ui.state.VerificationType
 
 @HiltViewModel
@@ -26,7 +27,8 @@ class EmailVerificationViewModel @Inject constructor(
     private val verifyEmailUseCase: VerifyEmailUseCase,
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val saveRegistrationTokenUseCase: SaveRegistrationTokenUseCase,
-    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase
+    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
+    private val saveTokensUseCase: SaveTokensUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<EmailVerificationEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -60,6 +62,7 @@ class EmailVerificationViewModel @Inject constructor(
 
             if (isRegistered is ResultWrapper.Success) {
                 return if (isRegistered.data.isRegistered) {
+                    saveTokensUseCase(isRegistered.data.accessToken, isRegistered.data.refreshToken)
                     VerificationType.GotoMainScreen
                 } else {
                     VerificationType.GotoAboutMeScreen
