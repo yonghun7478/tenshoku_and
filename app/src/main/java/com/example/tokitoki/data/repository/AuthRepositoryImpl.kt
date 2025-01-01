@@ -72,21 +72,27 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkEmailRegistered(email: String): ResultWrapper<CheckEmailRegistered> {
-        return if (email.contains("true"))
-            ResultWrapper.Success(
-                CheckEmailRegistered(
-                    isRegistered = CheckEmailRegisteredResponse(
-                        isRestered = true
-                    ).isRestered
-                )
+
+        val rowResponse = if (email.contains("true")) {
+            CheckEmailRegisteredResponse(
+                isRegistered = true,
+                accessToken = "asdfasdf",
+                refreshToken = "asdfadf"
             )
-        else
-            ResultWrapper.Success(
-                CheckEmailRegistered(
-                    isRegistered = CheckEmailRegisteredResponse(
-                        isRestered = false
-                    ).isRestered
-                )
+        } else {
+            CheckEmailRegisteredResponse(
+                isRegistered = false,
+                accessToken = "",
+                refreshToken = ""
             )
+        }
+
+        return ResultWrapper.Success(
+            CheckEmailRegistered(
+                rowResponse.isRegistered,
+                rowResponse.accessToken,
+                rowResponse.refreshToken
+            )
+        )
     }
 }
