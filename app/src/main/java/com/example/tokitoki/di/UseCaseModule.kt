@@ -2,6 +2,8 @@ package com.example.tokitoki.di
 
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCaseImpl
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
@@ -14,6 +16,8 @@ import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
@@ -22,10 +26,14 @@ import com.example.tokitoki.domain.usecase.GetTokensUseCase
 import com.example.tokitoki.domain.usecase.GetTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCaseImpl
-import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
-import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCaseImpl
+import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCase
+import com.example.tokitoki.domain.usecase.VerifyGoogleTokenUseCaseImpl
+import com.example.tokitoki.domain.usecase.VerifyEmailUseCase
+import com.example.tokitoki.domain.usecase.VerifyEmailUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
@@ -124,9 +132,9 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindSendVerificationCodeUseCase(
-        impl: SendVerificationCodeUseCaseImpl
-    ): SendVerificationCodeUseCase
+    abstract fun bindVerifyEmailUseCase(
+        impl: VerifyEmailUseCaseImpl
+    ): VerifyEmailUseCase
 
     @Binds
     @Singleton
@@ -146,4 +154,24 @@ abstract class UseCaseModule {
         impl: RegisterMyProfileUseCaseImpl
     ): RegisterMyProfileUseCase
 
+    @Binds
+    abstract fun bindSendGoogleTokenUseCase(
+        useCaseImpl: VerifyGoogleTokenUseCaseImpl
+    ): VerifyGoogleTokenUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSaveRegistrationTokenUseCase(
+        impl: SaveRegistrationTokenUseCaseImpl
+    ): SaveRegistrationTokenUseCase
+
+    @Binds
+    abstract fun bindGetRegistrationTokenUseCase(
+        useCaseImpl: GetRegistrationTokenUseCaseImpl
+    ): GetRegistrationTokenUseCase
+
+    @Binds
+    abstract fun bindCheckEmailRegisteredUseCase(
+        useCaseImpl: CheckEmailRegisteredUseCaseImpl
+    ): CheckEmailRegisteredUseCase
 }

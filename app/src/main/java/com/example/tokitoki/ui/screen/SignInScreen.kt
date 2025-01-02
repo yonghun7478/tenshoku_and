@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.screen
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,13 +39,18 @@ import com.example.tokitoki.ui.constants.SignInConstants
 import com.example.tokitoki.ui.constants.TestTags
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
 import com.example.tokitoki.ui.screen.components.buttons.TkOutlineBtn
+import com.example.tokitoki.ui.state.VerificationType
 import com.example.tokitoki.ui.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
     onRegisterWithEmail: () -> Unit = {},
+    onAgreementConfirmation:  () -> Unit = {},
+    onMainScreen: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
+    val activityContext = LocalContext.current as Activity
+
     SignInContent(
         signInAction = {
             viewModel.signInAction(it)
@@ -60,9 +67,25 @@ fun SignInScreen(
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
                             if(viewModel.checkToken()) {
-
+                                onMainScreen()
                             } else {
                                 onRegisterWithEmail()
+                            }
+                        }
+
+                        SignInAction.LoginWithGoogle -> {
+                            if(viewModel.checkToken()) {
+                                onMainScreen()
+                            } else {
+                                when(viewModel.signInGoogle(activityContext)) {
+                                    VerificationType.Error -> {}
+                                    VerificationType.GotoAboutMeScreen -> {
+                                        onAgreementConfirmation()
+                                    }
+                                    VerificationType.GotoMainScreen -> {
+                                        onMainScreen()
+                                    }
+                                }
                             }
                         }
 

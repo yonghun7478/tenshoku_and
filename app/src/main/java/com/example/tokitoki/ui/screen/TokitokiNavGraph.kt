@@ -37,6 +37,12 @@ fun TokitokiNavGraph(
             SignInScreen(
                 onRegisterWithEmail = {
                     navAction.navigateToRegisterWithEmail()
+                },
+                onAgreementConfirmation = {
+                    navAction.navigateToAboutMe()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }
@@ -51,6 +57,9 @@ fun TokitokiNavGraph(
             EmailVerificationScreen(
                 onAgreementConfirmationScreen = {
                     navAction.navigateToAgreementConfirmation()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }
@@ -261,6 +270,9 @@ fun TokitokiNavGraph(
                 },
                 onFavoriteTagScreen = {
                     navAction.navigateToFavoriteTag()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }
@@ -271,6 +283,10 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 }
             )
+        }
+
+        composable(TokitokiDestinations.MAIN_ROUTE) {
+            MainScreen()
         }
     }
 }

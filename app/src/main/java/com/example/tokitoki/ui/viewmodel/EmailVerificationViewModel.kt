@@ -3,8 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
-import com.example.tokitoki.domain.usecase.SaveTokensUseCase
-import com.example.tokitoki.domain.usecase.SendVerificationCodeUseCase
+import com.example.tokitoki.domain.usecase.VerifyEmailUseCase
 import com.example.tokitoki.ui.constants.EmailVerificationAction
 import com.example.tokitoki.ui.state.EmailVerificationEvent
 import com.example.tokitoki.ui.state.EmailVerificationState
@@ -18,12 +17,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
+import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.ui.state.VerificationType
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-    private val sendVerificationCodeUseCase: SendVerificationCodeUseCase,
-    private val saveTokensUseCase: SaveTokensUseCase,
-    private val getMyProfileUseCase: GetMyProfileUseCase
+    private val verifyEmailUseCase: VerifyEmailUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val saveRegistrationTokenUseCase: SaveRegistrationTokenUseCase,
+    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
+    private val saveTokensUseCase: SaveTokensUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<EmailVerificationEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -47,19 +52,25 @@ class EmailVerificationViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleTokens(accessToken: String, refreshToken: String) {
-        saveTokensUseCase(accessToken, refreshToken)
-    }
-
-    suspend fun processCodeValidation(code: String): Boolean {
+    suspend fun processCodeValidation(code: String): VerificationType {
         val profile = getMyProfileUseCase()
-        val result = sendVerificationCodeUseCase(profile.email, code)
+        val result = verifyEmailUseCase(profile.email, code)
 
         if (result is ResultWrapper.Success) {
-            handleTokens(result.data.accessToken, result.data.refreshToken)
-            return true
+            saveRegistrationTokenUseCase(result.data.registrationToken)
+            val isRegistered = checkEmailRegisteredUseCase(profile.email)
+
+            if (isRegistered is ResultWrapper.Success) {
+                return if (isRegistered.data.isRegistered) {
+                    saveTokensUseCase(isRegistered.data.accessToken, isRegistered.data.refreshToken)
+                    VerificationType.GotoMainScreen
+                } else {
+                    VerificationType.GotoAboutMeScreen
+                }
+            }
         }
-        return false
+
+        return VerificationType.Error
     }
 
     fun updateShowDialogState(showDialog: Boolean) {

@@ -1,23 +1,23 @@
 package com.example.tokitoki.domain.usecase
 
-import com.example.tokitoki.domain.model.Tokens
+import com.example.tokitoki.domain.model.VerifyEmail
 import com.example.tokitoki.domain.repository.AuthRepository
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 import com.example.tokitoki.common.ResultWrapper
 
-interface SendVerificationCodeUseCase {
-    suspend operator fun invoke(email: String, code: String): ResultWrapper<Tokens>
+interface VerifyEmailUseCase {
+    suspend operator fun invoke(email: String, code: String): ResultWrapper<VerifyEmail>
 }
 
-class SendVerificationCodeUseCaseImpl @Inject constructor(
+class VerifyEmailUseCaseImpl @Inject constructor(
     private val authRepository: AuthRepository
-) : SendVerificationCodeUseCase {
-    override suspend fun invoke(email: String, code: String): ResultWrapper<Tokens> {
+) : VerifyEmailUseCase {
+    override suspend fun invoke(email: String, code: String): ResultWrapper<VerifyEmail> {
         return try {
             // 성공적으로 토큰을 반환하면 Success로 감쌈
-            val result = authRepository.sendVerificationCode(email, code)
+            val result = authRepository.verifyEmail(email, code)
             return result
         } catch (e: IOException) {
             // 네트워크 오류 처리
