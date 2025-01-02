@@ -54,6 +54,7 @@ fun AboutMeMyProfileScreen(
     onAboutMeBirthDayScreen: (String) -> Unit = {},
     onAboutMeTagScreen: (String) -> Unit = {},
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
+    onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -77,7 +78,11 @@ fun AboutMeMyProfileScreen(
                 is AboutMeMyProfileEvent.ACTION -> {
                     when (event.action) {
                         AboutMeMyProfileAction.SUBMIT -> {
-                            viewModel.registerMyProfile()
+                            val result = viewModel.registerMyProfile()
+
+                            if (result) {
+                                onMainScreen()
+                            }
                         }
 
                         AboutMeMyProfileAction.CHECK_EVERYTHING -> {

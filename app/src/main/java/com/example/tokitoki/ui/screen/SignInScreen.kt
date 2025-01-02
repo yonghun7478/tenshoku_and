@@ -67,19 +67,24 @@ fun SignInScreen(
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
                             if(viewModel.checkToken()) {
+                                onMainScreen()
                             } else {
                                 onRegisterWithEmail()
                             }
                         }
 
                         SignInAction.LoginWithGoogle -> {
-                            when(viewModel.signInGoogle(activityContext)) {
-                                VerificationType.Error -> {}
-                                VerificationType.GotoAboutMeScreen -> {
-                                    onAgreementConfirmation()
-                                }
-                                VerificationType.GotoMainScreen -> {
-                                    onMainScreen()
+                            if(viewModel.checkToken()) {
+                                onMainScreen()
+                            } else {
+                                when(viewModel.signInGoogle(activityContext)) {
+                                    VerificationType.Error -> {}
+                                    VerificationType.GotoAboutMeScreen -> {
+                                        onAgreementConfirmation()
+                                    }
+                                    VerificationType.GotoMainScreen -> {
+                                        onMainScreen()
+                                    }
                                 }
                             }
                         }

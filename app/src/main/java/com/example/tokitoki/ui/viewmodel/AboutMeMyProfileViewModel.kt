@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
+import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
@@ -36,6 +38,8 @@ class AboutMeMyProfileViewModel
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
     private val registerMyProfileUseCase: RegisterMyProfileUseCase,
     private val fileManager: FileManager,
+    private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
+    private val saveTokensUseCase: SaveTokensUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
@@ -89,10 +93,19 @@ class AboutMeMyProfileViewModel
     }
 
     suspend fun registerMyProfile(): Boolean {
-        val thumbnailPath = fileManager.saveUriToInternalCache(uiState.value.uri) ?: ""
+        val thumbnailPath = fileManager.saveUriToInternalCache(uiState.value.uri).orEmpty()
         val myProfile = getMyProfileUseCase()
-
         val result = registerMyProfileUseCase(myProfile, thumbnailPath)
+
+        if (result is ResultWrapper.Success) {
+//            (checkEmailRegisteredUseCase(myProfile.email) as ResultWrapper.Success).let { res ->
+//                saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
+//            }
+
+            (checkEmailRegisteredUseCase("true@asdf.com") as ResultWrapper.Success).let { res ->
+                saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
+            }
+        }
 
         return result is ResultWrapper.Success
     }

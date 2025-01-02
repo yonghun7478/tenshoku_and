@@ -188,38 +188,40 @@ fun AboutMeProfInputMySelf(
             state = pagerState
         ) { page ->
 
-            val curItem = itemList[page]
+            val curItem = itemList.getOrNull(page)
 
-            ElevatedCard(
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 3.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = LocalColor.current.white,
-                ),
-                modifier = modifier
-                    .fillMaxSize()
-            ) {
-                Column(
+            if(curItem != null) {
+                ElevatedCard(
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 3.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = LocalColor.current.white,
+                    ),
                     modifier = modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
                 ) {
-                    Text(
-                        text = curItem.type,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(color = Color(curItem.typeColor.toLong(radix = 16)))
-                            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
-                        textAlign = TextAlign.Center,
-                        color = LocalColor.current.white
-                    )
+                    Column(
+                        modifier = modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = curItem.type,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(color = Color(curItem.typeColor.toLong(radix = 16)))
+                                .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
+                            textAlign = TextAlign.Center,
+                            color = LocalColor.current.white
+                        )
 
-                    Text(
-                        text = curItem.sentence,
-                        modifier = Modifier
-                            .padding(16.dp),
-                    )
+                        Text(
+                            text = curItem.sentence,
+                            modifier = Modifier
+                                .padding(16.dp),
+                        )
+                    }
                 }
             }
         }

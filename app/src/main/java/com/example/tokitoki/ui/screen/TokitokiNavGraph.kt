@@ -270,6 +270,9 @@ fun TokitokiNavGraph(
                 },
                 onFavoriteTagScreen = {
                     navAction.navigateToFavoriteTag()
+                },
+                onMainScreen = {
+                    navAction.navigateToMain()
                 }
             )
         }
