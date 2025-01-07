@@ -89,7 +89,7 @@ fun MainContents(
         ) {
             when (uiState.selectedBottomItem) {
                 MainBottomItem.HOME -> {
-                    MainHomeContents()
+                    MainHomeScreen()
                 }
 
                 MainBottomItem.LIKE -> {
@@ -176,11 +176,6 @@ fun CustomBottomNavigationItem(
             color = if (isSelected) Color.Black else Color.Gray
         )
     }
-}
-
-@Composable
-fun MainHomeContents() {
-    Text("MainHomeContents")
 }
 
 @Composable
