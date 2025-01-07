@@ -1,5 +1,8 @@
 package com.example.tokitoki.ui.state
 
-enum class MainBottomItem {
-    HOME, LIKE, MESSAGE, MY_PAGE
+enum class MainBottomItem(val label: String) {
+    HOME("ホーム"),        // Home
+    LIKE("いいね"),       // Like
+    MESSAGE("メッセージ"), // Message
+    MY_PAGE("マイページ")  // My Page
 }
