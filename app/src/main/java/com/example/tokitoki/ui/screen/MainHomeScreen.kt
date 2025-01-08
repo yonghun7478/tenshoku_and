@@ -1,21 +1,22 @@
 package com.example.tokitoki.ui.screen
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,19 +37,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
 import com.example.tokitoki.ui.state.MainHomeTab
 import com.example.tokitoki.ui.state.MainHomeUiEvent
 import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 
@@ -96,10 +97,6 @@ fun MainHomeContents(
                         onClick = { onEvent(MainHomeUiEvent.TabSelected(tab)) }
                     )
                 }
-            }
-
-            if(uiState.selectedTab == MainHomeTab.SEARCH) {
-
             }
         }
 
@@ -187,139 +184,110 @@ fun MainHomeSearchContents(
     uiState: MainHomeSearchUiState,
     onEvent: (MainHomeSearchUiEvent) -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
-        when (uiState.state) {
-            MainHomeSearchState.LOADING -> {
-                ShimmerGridPlaceholder()
-            }
-
-            MainHomeSearchState.INITIALIZED -> {
-                UserGrid(
-                    users = listOf(), // Replace with actual user data
-                    onUserSelected = { index ->
-                        onEvent(MainHomeSearchUiEvent.UserSelected(index))
-                    }
-                )
-            }
-
-            else -> {}
-        }
-    }
-}
-
-@Composable
-fun SortMenu(
-    modifier: Modifier,
-    currentOrder: OrderType,
-    onOrderSelected: (OrderType) -> Unit
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    val iconRes = when (currentOrder) {
-        OrderType.LOGIN -> Icons.Default.AccountBox
-        OrderType.REGISTRATION -> Icons.Default.DateRange
-    }
-
-    IconButton(
-        modifier = modifier,
-        onClick = { showDialog = true }
-    ) {
-        Icon(iconRes, contentDescription = "Sort")
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("정렬 선택") },
-            text = {
-                Column {
-                    TextButton(onClick = {
-                        onOrderSelected(OrderType.LOGIN)
-                        showDialog = false
-                    }) {
-                        Text("로그인순")
-                    }
-                    TextButton(onClick = {
-                        onOrderSelected(OrderType.REGISTRATION)
-                        showDialog = false
-                    }) {
-                        Text("등록순")
-                    }
-                }
-            },
-            confirmButton = {}
+        SortMenu(
+            modifier = Modifier.fillMaxWidth(),
+            currentOrder = uiState.orderType,
+            onOrderSelected = { onEvent(MainHomeSearchUiEvent.OrderSelected(it)) }
         )
     }
 }
 
 @Composable
-fun UserGrid(
-    users: List<UserProfile>,
-    onUserSelected: (Int) -> Unit
+fun SortMenu(
+    modifier: Modifier = Modifier,
+    currentOrder: OrderType = OrderType.LOGIN,
+    onOrderSelected: (OrderType) -> Unit = {}
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        itemsIndexed(users) { index, user ->
-            UserProfileItem(user = user, onClick = { onUserSelected(index) })
-        }
-    }
-}
+    var selectedOrder by remember { mutableStateOf(currentOrder) }
 
-@Composable
-fun UserProfileItem(
-    user: UserProfile,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray)
-            .clickable { onClick() }
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    val indicatorOffset = remember { Animatable(if (selectedOrder == OrderType.LOGIN) 0f else 51f) }
+
+    LaunchedEffect(selectedOrder) {
+        indicatorOffset.animateTo(
+            targetValue = if (selectedOrder == OrderType.LOGIN) 0f else 51f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
+    }
+
+    Box(
+        modifier = modifier
     ) {
         Box(
             modifier = Modifier
-                .size(100.dp)
-                .background(Color.Gray, shape = CircleShape),
-            contentAlignment = Alignment.Center
+                .height(40.dp)
+                .width(100.dp)
+                .align(Alignment.Center)
+                .background(
+                    color = Color(0xFFD3D3D3),
+                    shape = RoundedCornerShape(50.dp)
+                )
+                .border(1.dp, Color.Gray, RoundedCornerShape(50.dp))
         ) {
-            Text("IMG")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Age: ${user.age}", fontSize = 14.sp)
-    }
-}
-
-@Composable
-fun ShimmerGridPlaceholder() {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(10) {
+            // 애니메이션으로 이동하는 원
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(150.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray.copy(alpha = 0.3f))
+                    .fillMaxHeight()
+                    .width(50.dp)
+                    .offset(x = indicatorOffset.value.dp)  // 애니메이션으로 위치 이동
+                    .background(
+                        color = Color.White,
+                        shape = CircleShape
+                    )
             )
+
+            // 아이콘 Row
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            selectedOrder = OrderType.LOGIN
+                            onOrderSelected(OrderType.LOGIN)
+                        },
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Account"
+                )
+                Icon(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            selectedOrder = OrderType.REGISTRATION
+                            onOrderSelected(OrderType.REGISTRATION)
+                        },
+                    imageVector = Icons.Default.AccountBox,
+                    contentDescription = "Date"
+                )
+            }
         }
     }
 }
 
-// Placeholder data class
-data class UserProfile(
-    val age: Int
-)
+@Preview
+@Composable
+fun SortMenuPreview() {
+    TokitokiTheme {
+        SortMenu(modifier = Modifier.fillMaxWidth(), currentOrder = OrderType.LOGIN) {
+
+        }
+    }
+}
 
 @Composable
 fun MainHomePickupScreen() {
