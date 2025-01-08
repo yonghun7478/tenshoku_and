@@ -3,10 +3,12 @@ package com.example.tokitoki.ui.screen
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,18 +40,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
 import com.example.tokitoki.ui.state.MainHomeTab
 import com.example.tokitoki.ui.state.MainHomeUiEvent
 import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
+import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 
@@ -80,22 +87,47 @@ fun MainHomeContents(
     onEvent: (MainHomeUiEvent) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFFFFFF))
-                .padding(8.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                MainHomeTab.entries.forEach { tab ->
-                    MainHomeTabItem(
-                        tab = tab,
-                        isSelected = uiState.selectedTab == tab,
-                        onClick = { onEvent(MainHomeUiEvent.TabSelected(tab)) }
-                    )
+                Image(
+                    modifier = Modifier
+                        .offset(x = 10.dp)
+                        .height(30.dp)
+                        .then(DrawableSemantics.withDrawableId(resId = R.drawable.pink_heart_logo)),
+                    painter = painterResource(id = R.drawable.pink_heart_logo),
+                    contentDescription = "TopLogoImage",
+                )
+
+                Text(
+                    text = stringResource(id = R.string.logo_name),
+                    color = LocalColor.current.grayColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(Color(0xFFFFFFFF))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    MainHomeTab.entries.forEach { tab ->
+                        MainHomeTabItem(
+                            tab = tab,
+                            isSelected = uiState.selectedTab == tab,
+                            onClick = { onEvent(MainHomeUiEvent.TabSelected(tab)) }
+                        )
+                    }
                 }
             }
         }
@@ -297,4 +329,14 @@ fun MainHomePickupScreen() {
 @Composable
 fun MainHomeMyTagScreen() {
     Text("MYTAG")
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeContentsPreview() {
+    TokitokiTheme {
+        MainHomeContents(uiState = MainHomeUiState()) {
+
+        }
+    }
 }
