@@ -93,15 +93,15 @@ fun MainContents(
                 }
 
                 MainBottomItem.LIKE -> {
-                    MainLikeContents()
+                    Text("LIKE")
                 }
 
                 MainBottomItem.MESSAGE -> {
-                    MainMessageContents()
+                    Text("MESSAGE")
                 }
 
                 MainBottomItem.MY_PAGE -> {
-                    MypageContents()
+                    Text("MYPAGE")
                 }
             }
         }
@@ -176,19 +176,4 @@ fun CustomBottomNavigationItem(
             color = if (isSelected) Color.Black else Color.Gray
         )
     }
-}
-
-@Composable
-fun MainLikeContents() {
-    Text("MainLikeContents")
-}
-
-@Composable
-fun MainMessageContents() {
-    Text("MainMessageContents")
-}
-
-@Composable
-fun MypageContents() {
-    Text("MypageContents")
 }
