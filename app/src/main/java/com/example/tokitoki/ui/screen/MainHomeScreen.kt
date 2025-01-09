@@ -32,12 +32,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,10 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -266,7 +266,7 @@ fun MainHomeSearchContents(
 
 @Composable
 fun MainHomeSearchGrid(
-    lazyGridState:LazyGridState
+    lazyGridState: LazyGridState
 ) {
     // LazyVerticalGrid
     LazyVerticalGrid(
@@ -275,18 +275,39 @@ fun MainHomeSearchGrid(
         modifier = Modifier.fillMaxSize()
     ) {
         items(50) { index ->
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .aspectRatio(1f)
-                    .background(Color.LightGray)
-            ) {
-                Text(
-                    text = "Item $index",
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+            MainHomeSearchGridItem(index)
         }
+    }
+}
+
+@Composable
+fun MainHomeSearchGridItem(index: Int) {
+    Column(
+        modifier = Modifier
+            .aspectRatio(0.7f),
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(10.dp)
+        ) {
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.Crop,
+                painter = painterResource(id = R.drawable.profile_sample),
+                contentDescription = "",
+            )
+        }
+
+        Text(
+            text = "Item $index",
+            modifier = Modifier
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp
+        )
     }
 }
 
