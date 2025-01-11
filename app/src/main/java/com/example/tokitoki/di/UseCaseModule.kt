@@ -24,6 +24,9 @@ import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTokensUseCase
 import com.example.tokitoki.domain.usecase.GetTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUsersUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
@@ -174,4 +177,14 @@ abstract class UseCaseModule {
     abstract fun bindCheckEmailRegisteredUseCase(
         useCaseImpl: CheckEmailRegisteredUseCaseImpl
     ): CheckEmailRegisteredUseCase
+
+    @Binds
+    abstract fun bindGetUsersByLoginUseCase(
+        useCaseImpl: GetUsersByLoginUseCaseImpl
+    ): GetUsersUseCase
+
+    @Binds
+    abstract fun bindGetUsersBySignupUseCase(
+        useCaseImpl: GetUsersBySignupUseCaseImpl
+    ): GetUsersUseCase
 }
