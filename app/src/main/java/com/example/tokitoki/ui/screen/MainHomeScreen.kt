@@ -211,6 +211,13 @@ fun MainHomeSearchScreen(
                 is MainHomeSearchUiEvent.OrderSelected -> {
 
                 }
+
+                is MainHomeSearchUiEvent.Error -> {
+
+                }
+                MainHomeSearchUiEvent.LoadMore -> {
+
+                }
             }
         }
     }
