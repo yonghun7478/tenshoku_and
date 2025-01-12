@@ -274,7 +274,7 @@ fun MainHomeSearchContents(
     Box(modifier = Modifier.fillMaxSize()) {
         // 데이터 표시 그리드
         MainHomeSearchGrid(
-            users = uiState.users,
+            users = if(uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
             lazyGridState = lazyGridState,
             onUserSelected = { index ->
                 onEvent(MainHomeSearchUiEvent.UserSelected(index))

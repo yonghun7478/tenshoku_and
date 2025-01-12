@@ -35,7 +35,8 @@ class MainHomeSearchViewModel @Inject constructor(
     val uiEvent: SharedFlow<MainHomeSearchUiEvent> = _uiEvent.asSharedFlow()
 
     // 커서 상태
-    private var currentCursor: String? = null
+    private var loginCursor: String? = null
+    private var registCursor: String? = null
 
     // 유저 데이터 로드
     fun fetchUsers(limit: Int = 20) {
@@ -49,22 +50,41 @@ class MainHomeSearchViewModel @Inject constructor(
 
             // 유스케이스 선택 및 호출
             val result = when (orderType) {
-                OrderType.LOGIN -> getUsersByLoginUseCase.execute(currentCursor, limit)
-                OrderType.REGISTRATION -> getUsersBySignupUseCase.execute(currentCursor, limit)
+                OrderType.LOGIN -> getUsersByLoginUseCase.execute(loginCursor, limit)
+                OrderType.REGISTRATION -> getUsersBySignupUseCase.execute(registCursor, limit)
             }
 
             // 결과 처리
             when (result) {
                 is ResultWrapper.Success -> {
-                    val updatedUsers = _uiState.value.users + result.data.users.map { user ->
-                        UserUiMapper.domainToUi(user)
+
+                    if (orderType == OrderType.LOGIN) {
+                        val updatedUsers =
+                            _uiState.value.usersOrderByLogin + result.data.users.map { user ->
+                                UserUiMapper.domainToUi(user)
+                            }
+
+                        loginCursor = result.data.nextCursor
+
+                        _uiState.value = _uiState.value.copy(
+                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.NOTHING else MainHomeSearchState.INITIALIZED,
+                            usersOrderByLogin = updatedUsers,
+                            isLastPage = result.data.isLastPage
+                        )
+                    } else {
+                        val updatedUsers =
+                            _uiState.value.usersOrderByRegist + result.data.users.map { user ->
+                                UserUiMapper.domainToUi(user)
+                            }
+
+                        registCursor = result.data.nextCursor
+
+                        _uiState.value = _uiState.value.copy(
+                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.NOTHING else MainHomeSearchState.INITIALIZED,
+                            usersOrderByRegist = updatedUsers,
+                            isLastPage = result.data.isLastPage
+                        )
                     }
-                    currentCursor = result.data.nextCursor // 커서 업데이트
-                    _uiState.value = _uiState.value.copy(
-                        state = if (updatedUsers.isEmpty()) MainHomeSearchState.NOTHING else MainHomeSearchState.INITIALIZED,
-                        users = updatedUsers,
-                        isLastPage = result.data.isLastPage
-                    )
                 }
 
                 is ResultWrapper.Error -> {
@@ -105,11 +125,9 @@ class MainHomeSearchViewModel @Inject constructor(
 
     // 상태 초기화
     fun resetState(orderType: OrderType) {
-        currentCursor = null
         _uiState.value = _uiState.value.copy(
             orderType = orderType,
             state = MainHomeSearchState.NOTHING,
-            users = emptyList(),
             isLastPage = false
         )
     }
