@@ -39,6 +39,8 @@ class MainHomeSearchViewModel @Inject constructor(
 
     // 유저 데이터 로드
     fun fetchUsers(limit: Int = 20) {
+        if (_uiState.value.state == MainHomeSearchState.LOADING || _uiState.value.isLastPage) return
+
         val orderType = _uiState.value.orderType
 
         viewModelScope.launch {
@@ -90,7 +92,9 @@ class MainHomeSearchViewModel @Inject constructor(
             }
 
             is MainHomeSearchUiEvent.LoadMore -> {
-                if (!_uiState.value.isLastPage) fetchUsers(limit = 20)
+                viewModelScope.launch {
+                    _uiEvent.emit(event)
+                }
             }
 
             is MainHomeSearchUiEvent.Error -> {

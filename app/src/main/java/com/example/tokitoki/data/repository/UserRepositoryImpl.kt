@@ -9,154 +9,36 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
-    override suspend fun getUsers(cursor: String?, limit: Int, orderBy: String): ResultWrapper<UserList> {
+    override suspend fun getUsers(
+        cursor: String?,
+        limit: Int,
+        orderBy: String
+    ): ResultWrapper<UserList> {
         return try {
-            val users =  if(orderBy == "lastLoginAt") {
-                listOf(
+            val users = if (orderBy == "lastLoginAt") {
+                (1..30).map { id ->
                     UserEntity(
-                        id = "1",
+                        id = id.toString(),
                         thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "2",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "3",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "4",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "5",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "6",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "7",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "8",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "9",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "10",
-                        thumbnailUrl = "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                )
+                        age = (18..60).random(),
+                        createdAt = (1609459200..1672531199).random()
+                            .toLong(), // 2021-01-01 to 2022-12-31 Unix timestamp range
+                        lastLoginAt = (1672531200..1704067199).random()
+                            .toLong() // 2023-01-01 to 2023-12-31 Unix timestamp range
+                    )
+                }
             } else {
-                listOf(
+                (1..30).map { id ->
                     UserEntity(
-                        id = "1",
+                        id = id.toString(),
                         thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "2",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "3",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "4",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "5",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "6",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "7",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "8",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "9",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                    UserEntity(
-                        id = "10",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg",
-                        age = 22,
-                        createdAt = 1234,
-                        lastLoginAt = 1234
-                    ),
-                )
+                        age = (18..60).random(),
+                        createdAt = (1609459200..1672531199).random()
+                            .toLong(), // 2021-01-01 to 2022-12-31 Unix timestamp range
+                        lastLoginAt = (1672531200..1704067199).random()
+                            .toLong() // 2023-01-01 to 2023-12-31 Unix timestamp range
+                    )
+                }
             }
 
             val nextCursor = "id"
@@ -170,7 +52,11 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
+            ResultWrapper.Error(
+                ResultWrapper.ErrorType.ExceptionError(
+                    e.message ?: "Unknown error"
+                )
+            )
         }
     }
 }

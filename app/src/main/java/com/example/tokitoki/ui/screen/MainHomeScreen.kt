@@ -60,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.model.UserUiModel
+import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
 import com.example.tokitoki.ui.state.MainHomeTab
@@ -210,8 +211,7 @@ fun MainHomeSearchScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is MainHomeSearchUiEvent.UserSelected -> {
-                    // Navigate to User Detail (Placeholder)
-                    // TODO: Implement navigation logic here
+                    println("userSelected ${event.index}")
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {
@@ -223,7 +223,7 @@ fun MainHomeSearchScreen(
 
                 }
                 MainHomeSearchUiEvent.LoadMore -> {
-
+                    viewModel.fetchUsers()
                 }
             }
         }
@@ -251,6 +251,23 @@ fun MainHomeSearchContents(
                 isSortMenuVisible =
                     currentOffset < previousScrollOffset || lazyGridState.firstVisibleItemIndex == 0
                 previousScrollOffset = currentOffset
+            }
+    }
+
+    // 무한 스크롤 트리거
+    LaunchedEffect(lazyGridState) {
+        snapshotFlow { lazyGridState.layoutInfo }
+            .collect { layoutInfo ->
+                val totalItemCount = layoutInfo.totalItemsCount
+                val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+
+                if (lastVisibleItemIndex != null && totalItemCount > 0 &&
+                    lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
+                    uiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
+                    !uiState.isLastPage // 마지막 페이지가 아닐 때
+                ) {
+                    onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
+                }
             }
     }
 
