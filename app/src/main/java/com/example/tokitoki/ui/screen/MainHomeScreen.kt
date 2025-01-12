@@ -215,7 +215,8 @@ fun MainHomeSearchScreen(
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {
-
+                    viewModel.resetState(orderType = event.orderType)
+                    viewModel.fetchUsers()
                 }
 
                 is MainHomeSearchUiEvent.Error -> {
@@ -331,7 +332,7 @@ fun MainHomeSearchGridItem(
         }
 
         Text(
-            text = "${user.age}",
+            text = "${user.age}歳",
             modifier = Modifier
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,

@@ -64,6 +64,7 @@ class MainHomeSearchViewModel @Inject constructor(
                         isLastPage = result.data.isLastPage
                     )
                 }
+
                 is ResultWrapper.Error -> {
                     // 에러 처리
                     _uiState.value = _uiState.value.copy(state = MainHomeSearchState.NOTHING)
@@ -77,14 +78,17 @@ class MainHomeSearchViewModel @Inject constructor(
     fun onEvent(event: MainHomeSearchUiEvent) {
         when (event) {
             is MainHomeSearchUiEvent.OrderSelected -> {
-                _uiState.value = _uiState.value.copy(orderType = event.orderType)
-                resetState()
+                viewModelScope.launch {
+                    _uiEvent.emit(event)
+                }
             }
+
             is MainHomeSearchUiEvent.UserSelected -> {
                 viewModelScope.launch {
                     _uiEvent.emit(event)
                 }
             }
+
             is MainHomeSearchUiEvent.LoadMore -> {
                 if (!_uiState.value.isLastPage) fetchUsers(limit = 20)
             }
@@ -96,9 +100,10 @@ class MainHomeSearchViewModel @Inject constructor(
     }
 
     // 상태 초기화
-    private fun resetState() {
+    fun resetState(orderType: OrderType) {
         currentCursor = null
         _uiState.value = _uiState.value.copy(
+            orderType = orderType,
             state = MainHomeSearchState.NOTHING,
             users = emptyList(),
             isLastPage = false
