@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +42,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -57,7 +57,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.model.UserUiModel
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
 import com.example.tokitoki.ui.state.MainHomeTab
@@ -200,6 +202,10 @@ fun MainHomeSearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchUsers()
+    }
+
     LaunchedEffect(viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -236,7 +242,6 @@ fun MainHomeSearchContents(
     val lazyGridState = rememberLazyGridState()
     var isSortMenuVisible by remember { mutableStateOf(true) }
     var previousScrollOffset by remember { mutableStateOf(0) }
-    val coroutineScope = rememberCoroutineScope()
 
     // 스크롤 상태 감지
     LaunchedEffect(lazyGridState) {
@@ -249,8 +254,13 @@ fun MainHomeSearchContents(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // 데이터 표시 그리드
         MainHomeSearchGrid(
-            lazyGridState = lazyGridState
+            users = uiState.users,
+            lazyGridState = lazyGridState,
+            onUserSelected = { index ->
+                onEvent(MainHomeSearchUiEvent.UserSelected(index))
+            }
         )
 
         // SortMenu - 스크롤 상태에 따라 표시/숨김
@@ -265,7 +275,11 @@ fun MainHomeSearchContents(
             SortMenu(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                currentOrder = uiState.orderType,
+                onOrderSelected = { orderType ->
+                    onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
+                }
             )
         }
     }
@@ -273,25 +287,33 @@ fun MainHomeSearchContents(
 
 @Composable
 fun MainHomeSearchGrid(
-    lazyGridState: LazyGridState
+    users: List<UserUiModel>,
+    lazyGridState: LazyGridState,
+    onUserSelected: (Int) -> Unit
 ) {
-    // LazyVerticalGrid
     LazyVerticalGrid(
         state = lazyGridState,
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(50) { index ->
-            MainHomeSearchGridItem(index)
+        itemsIndexed(users) { index, user ->
+            MainHomeSearchGridItem(
+                user = user,
+                onClick = { onUserSelected(index) }
+            )
         }
     }
 }
 
 @Composable
-fun MainHomeSearchGridItem(index: Int) {
+fun MainHomeSearchGridItem(
+    user: UserUiModel,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
-            .aspectRatio(0.7f),
+            .aspectRatio(0.7f)
+            .clickable { onClick() },
     ) {
         Column(
             modifier = Modifier
@@ -303,13 +325,13 @@ fun MainHomeSearchGridItem(index: Int) {
                     .fillMaxSize()
                     .clip(RoundedCornerShape(20.dp)),
                 contentScale = ContentScale.Crop,
-                painter = painterResource(id = R.drawable.profile_sample),
+                painter = rememberAsyncImagePainter(user.thumbnailUrl),
                 contentDescription = "",
             )
         }
 
         Text(
-            text = "Item $index",
+            text = "${user.age}",
             modifier = Modifier
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
