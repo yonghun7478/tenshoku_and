@@ -34,8 +34,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -222,8 +224,13 @@ fun MainHomeSearchScreen(
                 is MainHomeSearchUiEvent.Error -> {
 
                 }
+
                 MainHomeSearchUiEvent.LoadMore -> {
                     viewModel.fetchUsers()
+                }
+
+                MainHomeSearchUiEvent.OnRefreshing -> {
+                    viewModel.onPullToRefreshTrigger()
                 }
             }
         }
@@ -235,6 +242,7 @@ fun MainHomeSearchScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeSearchContents(
     uiState: MainHomeSearchUiState,
@@ -271,34 +279,40 @@ fun MainHomeSearchContents(
             }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // 데이터 표시 그리드
-        MainHomeSearchGrid(
-            users = if(uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
-            lazyGridState = lazyGridState,
-            onUserSelected = { index ->
-                onEvent(MainHomeSearchUiEvent.UserSelected(index))
-            }
-        )
-
-        // SortMenu - 스크롤 상태에 따라 표시/숨김
-        AnimatedVisibility(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
-            visible = isSortMenuVisible,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            SortMenu(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                currentOrder = uiState.orderType,
-                onOrderSelected = { orderType ->
-                    onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
+    PullToRefreshBox(
+        modifier = Modifier.fillMaxSize(),
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { onEvent(MainHomeSearchUiEvent.OnRefreshing) }
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 데이터 표시 그리드
+            MainHomeSearchGrid(
+                users = if (uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
+                lazyGridState = lazyGridState,
+                onUserSelected = { index ->
+                    onEvent(MainHomeSearchUiEvent.UserSelected(index))
                 }
             )
+
+            // SortMenu - 스크롤 상태에 따라 표시/숨김
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 20.dp),
+                visible = isSortMenuVisible,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                SortMenu(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    currentOrder = uiState.orderType,
+                    onOrderSelected = { orderType ->
+                        onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
+                    }
+                )
+            }
         }
     }
 }
