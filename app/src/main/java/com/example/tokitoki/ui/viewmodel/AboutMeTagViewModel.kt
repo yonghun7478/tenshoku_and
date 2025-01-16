@@ -130,7 +130,6 @@ class AboutMeTagViewModel
             val result = setMyTagUseCase(domainMyTags)
 
             if (result.isSuccess) {
-                println("result $result")
                 return true
             } else {
                 return false

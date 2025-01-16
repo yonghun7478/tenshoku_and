@@ -280,6 +280,7 @@ fun MainHomeSearchContents(
 
                 if (lastVisibleItemIndex != null && totalItemCount > 0 &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
+                    uiState.state != MainHomeSearchState.NOTHING &&
                     uiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
                     !uiState.isLastPage // 마지막 페이지가 아닐 때
                 ) {
@@ -339,8 +340,6 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-
-        println("CYHH ${uiState.state}")
         if (uiState.state == MainHomeSearchState.LOADING) {
             items(10) {
                 ShimmerGridItem()
