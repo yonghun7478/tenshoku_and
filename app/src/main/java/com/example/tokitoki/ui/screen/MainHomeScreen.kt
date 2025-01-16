@@ -2,8 +2,14 @@ package com.example.tokitoki.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -15,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +56,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -287,6 +296,7 @@ fun MainHomeSearchContents(
         Box(modifier = Modifier.fillMaxSize()) {
             // 데이터 표시 그리드
             MainHomeSearchGrid(
+                uiState = uiState,
                 users = if (uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
                 lazyGridState = lazyGridState,
                 onUserSelected = { index ->
@@ -319,6 +329,7 @@ fun MainHomeSearchContents(
 
 @Composable
 fun MainHomeSearchGrid(
+    uiState: MainHomeSearchUiState,
     users: List<UserUiModel>,
     lazyGridState: LazyGridState,
     onUserSelected: (Int) -> Unit
@@ -328,11 +339,21 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        itemsIndexed(users) { index, user ->
-            MainHomeSearchGridItem(
-                user = user,
-                onClick = { onUserSelected(index) }
-            )
+
+        println("CYHH ${uiState.state}")
+        if (uiState.state == MainHomeSearchState.LOADING) {
+            items(10) {
+                ShimmerGridItem()
+            }
+        } else if (uiState.state == MainHomeSearchState.COMPLETED) {
+            itemsIndexed(users) { index, user ->
+                MainHomeSearchGridItem(
+                    user = user,
+                    onClick = { onUserSelected(index) }
+                )
+            }
+        } else {
+
         }
     }
 }
@@ -368,6 +389,54 @@ fun MainHomeSearchGridItem(
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
             fontSize = 18.sp
+        )
+    }
+}
+
+@Composable
+fun ShimmerAnimation(modifier: Modifier = Modifier): Modifier {
+    val infiniteTransition = rememberInfiniteTransition()
+    val translateAnim = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+    val brush = Brush.linearGradient(
+        colors = listOf(
+            Color.LightGray.copy(alpha = 0.6f),
+            Color.Gray.copy(alpha = 0.2f),
+            Color.LightGray.copy(alpha = 0.6f)
+        ),
+        start = Offset(translateAnim.value, translateAnim.value),
+        end = Offset(translateAnim.value + 200f, translateAnim.value + 200f)
+    )
+
+    return modifier.background(brush)
+}
+
+@Composable
+fun ShimmerGridItem() {
+    Column(
+        modifier = Modifier
+            .aspectRatio(0.7f)
+            .padding(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize()
+                .clip(RoundedCornerShape(20.dp))
+                .then(ShimmerAnimation())
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(18.dp)
+                .then(ShimmerAnimation())
         )
     }
 }

@@ -18,6 +18,7 @@ enum class OrderType {
 
 enum class MainHomeSearchState {
     NOTHING,
+    ERROR,
     LOADING,
     COMPLETED,
 }

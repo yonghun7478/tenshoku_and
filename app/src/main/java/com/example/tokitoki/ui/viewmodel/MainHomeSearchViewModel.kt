@@ -53,7 +53,7 @@ class MainHomeSearchViewModel @Inject constructor(
             )
         }
 
-        delay(1500)
+        delay(2000)
 
         // 유스케이스 선택 및 호출
         val result = when (orderType) {
@@ -64,7 +64,6 @@ class MainHomeSearchViewModel @Inject constructor(
         // 결과 처리
         when (result) {
             is ResultWrapper.Success -> {
-
                 if (orderType == OrderType.LOGIN) {
                     val updatedUsers =
                         _uiState.value.usersOrderByLogin + result.data.users.map { user ->
@@ -75,7 +74,7 @@ class MainHomeSearchViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.NOTHING else MainHomeSearchState.COMPLETED,
+                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
                             usersOrderByLogin = updatedUsers,
                             isLastPage = result.data.isLastPage
                         )
@@ -90,7 +89,7 @@ class MainHomeSearchViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.NOTHING else MainHomeSearchState.COMPLETED,
+                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
                             usersOrderByRegist = updatedUsers,
                             isLastPage = result.data.isLastPage
                         )
@@ -102,7 +101,7 @@ class MainHomeSearchViewModel @Inject constructor(
                 // 에러 처리
                 _uiState.update {
                     it.copy(
-                        state = MainHomeSearchState.NOTHING
+                        state = MainHomeSearchState.ERROR
                     )
                 }
                 _uiEvent.emit(MainHomeSearchUiEvent.Error(result.errorType))
@@ -123,7 +122,7 @@ class MainHomeSearchViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 orderType = orderType,
-                state = MainHomeSearchState.NOTHING,
+                state = MainHomeSearchState.ERROR,
                 isLastPage = false
             )
         }
