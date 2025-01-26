@@ -6,6 +6,8 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
@@ -16,6 +18,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +32,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -47,8 +51,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,17 +62,21 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
@@ -83,6 +93,11 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
+import kotlinx.coroutines.delay
+import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 @Composable
 fun MainHomeScreen(
@@ -524,8 +539,149 @@ fun SortMenu(
 
 @Composable
 fun MainHomePickupScreen() {
-    Text("PICKUP")
+    DraggableCardStack()
 }
+
+@Composable
+fun DraggableCardStack() {
+
+    val screenWidth = 1080f
+    val screenHeight = 1920f
+    val threshold = screenWidth / 4
+
+    // 카드 상태 리스트
+    val cardStates = remember {
+        mutableStateListOf(
+            CardState(Color.Blue),
+            CardState(Color.Green),
+            CardState(Color.Red),
+            CardState(Color.Black)
+        )
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        // 카드 리스트를 역순으로 그리기
+        cardStates.reversed().forEachIndexed { index, cardState ->
+            val isFrontCard = index == cardStates.lastIndex // 최상단 카드 판별
+
+            DraggableCard(
+                cardState = cardState,
+                isFrontCard = isFrontCard,
+                screenWidth = screenWidth,
+                screenHeight = screenHeight,
+                threshold = threshold,
+                onRemove = { cardStates.remove(cardState) } // 카드 제거 콜백
+            )
+        }
+    }
+}
+
+@Composable
+fun DraggableCard(
+    cardState: CardState,
+    isFrontCard: Boolean,
+    screenWidth: Float,
+    screenHeight: Float,
+    threshold: Float,
+    onRemove: () -> Unit
+) {
+    val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
+    val animatedRotation by animateFloatAsState(targetValue = cardState.rotation.value, label = "RotationAnimation")
+
+    // 회전 각도에 따른 덮어씌우는 색상 계산
+    val overlayColor = calculateBackgroundColor(animatedRotation)
+
+    // 카드 제거 애니메이션 처리
+    LaunchedEffect(cardState.isOut.value) {
+        if (cardState.isOut.value) {
+            delay(300) // 애니메이션 완료 대기
+            onRemove()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .offset {
+                IntOffset(animatedOffset.x.roundToInt(), animatedOffset.y.roundToInt())
+            }
+            .size(300.dp)
+            .rotate(animatedRotation)
+            .zIndex(if (isFrontCard) 1f else 0f) // 최상단 카드 우선순위 설정
+            .pointerInput(isFrontCard) { // pointerInput을 Modifier 체인에 연결
+                if (isFrontCard) {
+                    detectDragGestures(
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            cardState.offset.value = cardState.offset.value + dragAmount
+                            cardState.rotation.value = calculateRotation(cardState.offset.value.x)
+                        },
+                        onDragEnd = {
+                            if (cardState.offset.value.x.absoluteValue < threshold) {
+                                // 원래 위치로 복귀
+                                cardState.offset.value = Offset.Zero
+                                cardState.rotation.value = 0f
+                            } else {
+                                // 카드 제거 설정
+                                val directionX = if (cardState.offset.value.x > 0) 1 else -1
+                                cardState.offset.value = Offset(
+                                    x = screenWidth * directionX,
+                                    y = screenHeight / 2 * -1
+                                )
+                                cardState.isOut.value = true
+                            }
+                        }
+                    )
+                }
+            }
+    ) {
+        // 안쪽 Box: 카드의 기본 색상
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(cardState.color)
+        )
+
+        // 바깥쪽 Box: 회전 각도에 따라 덮어씌우는 색상
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+        )
+
+    }
+}
+
+// 회전 각도 기반 덮어씌우는 색상 계산
+fun calculateBackgroundColor(rotation: Float): Color {
+    val maxRotation = 30f
+    val normalizedRotation = (rotation / maxRotation).coerceIn(-1f, 1f)
+
+    return when {
+        normalizedRotation > 0 -> Color.Red.copy(alpha = normalizedRotation) // 시계방향 -> 빨간색
+        normalizedRotation < 0 -> Color.Blue.copy(alpha = -normalizedRotation) // 반시계방향 -> 파란색
+        else -> Color.Transparent // 중립
+    }
+}
+
+// 회전 각도 계산
+fun calculateRotation(offsetX: Float, maxRotation: Float = 30f): Float {
+    val screenWidth = 1080f
+    val halfWidth = screenWidth / 2
+    val normalizedOffset = offsetX / halfWidth
+    return (maxRotation * normalizedOffset).coerceIn(-maxRotation, maxRotation)
+}
+
+// 카드 상태 데이터 클래스
+data class CardState(
+    val color: Color,
+    val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
+    val rotation: MutableState<Float> = mutableStateOf(0f),
+    val isOut: MutableState<Boolean> = mutableStateOf(false)
+)
+
 
 @Composable
 fun MainHomeMyTagScreen() {
