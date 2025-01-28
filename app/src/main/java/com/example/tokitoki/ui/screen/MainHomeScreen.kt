@@ -562,7 +562,7 @@ fun MainHomePickupScreen() {
                 .fillMaxSize()
                 .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
             cardStates = cardStates,
-            onCardRemoved = { removedCard ->
+            onCardRemoved = { removedCard, isRightDrag ->
                 cardStates.remove(removedCard)
             }
         )
@@ -607,7 +607,7 @@ fun DraggableCardStack(
     cardStates: List<CardState>,
     cardWidth: Dp = 300.dp,
     cardHeight: Dp = 400.dp,
-    onCardRemoved: (CardState) -> Unit,
+    onCardRemoved: (CardState, Boolean) -> Unit,
     cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
 ) {
     Box(
@@ -622,7 +622,7 @@ fun DraggableCardStack(
                 isFrontCard = isFrontCard,
                 cardWidth = cardWidth,
                 cardHeight = cardHeight,
-                onRemove = { onCardRemoved(cardState) },
+                onRemove = { onCardRemoved(cardState, it) },
                 content = { cardContent(cardState) }
             )
         }
@@ -635,7 +635,7 @@ fun DraggableCard(
     isFrontCard: Boolean,
     cardWidth: Dp,
     cardHeight: Dp,
-    onRemove: () -> Unit,
+    onRemove: (Boolean) -> Unit,
     content: @Composable () -> Unit
 ) {
     val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
@@ -662,7 +662,7 @@ fun DraggableCard(
     LaunchedEffect(cardState.isOut.value) {
         if (cardState.isOut.value) {
             delay(300) // 애니메이션 완료 대기
-            onRemove()
+            onRemove(isRightDrag)
         }
     }
 
