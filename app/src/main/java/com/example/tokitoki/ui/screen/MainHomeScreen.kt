@@ -45,6 +45,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -550,16 +551,59 @@ fun MainHomePickupScreen() {
         )
     }
 
-    DraggableCardStack(
-        cardStates = cardStates,
-        onCardRemoved = { removedCard ->
-            cardStates.remove(removedCard)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // 카드 스택
+        DraggableCardStack(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
+            cardStates = cardStates,
+            onCardRemoved = { removedCard ->
+                cardStates.remove(removedCard)
+            }
+        )
+
+        // 좋아요 / 싫어요 버튼
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter) // 화면 하단 중앙에 배치
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = {
+                    if (cardStates.isNotEmpty()) {
+                        val cardState = cardStates[0]
+                        cardState.isOut.value = true
+                        cardState.offset.value = Offset(-2000f, 0f) // 좌측 화면 밖으로 이동
+                    }
+                }
+            ) {
+                Text("싫어요")
+            }
+
+            Button(
+                onClick = {
+                    if (cardStates.isNotEmpty()) {
+                        val cardState = cardStates[0]
+                        cardState.isOut.value = true
+                        cardState.offset.value = Offset(2000f, 0f) // 우측 화면 밖으로 이동
+                    }
+                }
+            ) {
+                Text("좋아요")
+            }
         }
-    )
+    }
 }
 
 @Composable
 fun DraggableCardStack(
+    modifier: Modifier = Modifier, // Modifier 추가
     cardStates: List<CardState>,
     cardWidth: Dp = 300.dp,
     cardHeight: Dp = 400.dp,
@@ -567,7 +611,7 @@ fun DraggableCardStack(
     cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         cardStates.reversed().forEachIndexed { index, cardState ->
@@ -657,15 +701,15 @@ fun DraggableCard(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+            // 카드 콘텐츠
+            content()
+
             // 배경 오버레이
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(calculateBackgroundColor(animatedRotation))
             )
-
-            // 카드 콘텐츠
-            content()
 
             // 좌측 하단 동그라미와 아이콘
             Box(
