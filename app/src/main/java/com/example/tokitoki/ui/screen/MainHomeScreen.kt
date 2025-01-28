@@ -44,6 +44,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -591,8 +592,19 @@ fun DraggableCard(
     val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
     val animatedRotation by animateFloatAsState(targetValue = cardState.rotation.value, label = "RotationAnimation")
 
-    // 회전 각도에 따른 덮어씌우는 색상 계산
-    val overlayColor = calculateBackgroundColor(animatedRotation)
+    // 현재 드래그 방향 판별 (우측/좌측)
+    val isRightDrag = animatedRotation > 15f
+    val isLeftDrag = animatedRotation < -15f
+
+    // 좌측 동그라미 색상
+    val leftCircleBorderColor = if (isLeftDrag) Color.Black else Color.Transparent
+    val leftCircleFillColor = if (isLeftDrag) Color.White else Color.Transparent
+    val leftIconFillColor = if (isLeftDrag) Color.Blue else Color.White
+
+    // 우측 동그라미 색상
+    val rightCircleBorderColor = if (isRightDrag) Color.Black else Color.Transparent
+    val rightCircleFillColor = if (isRightDrag) Color.White else Color.Transparent
+    val rightIconFillColor = if (isRightDrag) Color.Red else Color.White
 
     // 카드 제거 애니메이션 처리
     LaunchedEffect(cardState.isOut.value) {
@@ -648,11 +660,48 @@ fun DraggableCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(overlayColor)
+                .background(calculateBackgroundColor(animatedRotation))
         )
 
+        // 좌측 하단 동그라미와 아이콘
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .size(50.dp)
+                .background(leftCircleFillColor, shape = CircleShape)
+                .border(2.dp, leftCircleBorderColor, shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ThumbUp,
+                contentDescription = "Left Touch Icon",
+                tint = leftIconFillColor,
+                modifier = Modifier.fillMaxSize(0.5f)
+                    .rotate(180f)
+            )
+        }
+
+        // 우측 하단 동그라미와 아이콘
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .size(50.dp)
+                .background(rightCircleFillColor, shape = CircleShape)
+                .border(2.dp, rightCircleBorderColor, shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ThumbUp,
+                contentDescription = "Right Touch Icon",
+                tint = rightIconFillColor,
+                modifier = Modifier.fillMaxSize(0.5f)
+            )
+        }
     }
 }
+
 
 // 회전 각도 기반 덮어씌우는 색상 계산
 fun calculateBackgroundColor(rotation: Float): Color {
