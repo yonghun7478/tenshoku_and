@@ -563,7 +563,6 @@ fun DraggableCardStack(
     cardStates: List<CardState>,
     cardWidth: Dp = 300.dp,
     cardHeight: Dp = 400.dp,
-    threshold: Float = 300f,
     onCardRemoved: (CardState) -> Unit,
     cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
 ) {
@@ -579,7 +578,6 @@ fun DraggableCardStack(
                 isFrontCard = isFrontCard,
                 cardWidth = cardWidth,
                 cardHeight = cardHeight,
-                threshold = threshold,
                 onRemove = { onCardRemoved(cardState) },
                 content = { cardContent(cardState) }
             )
@@ -593,12 +591,14 @@ fun DraggableCard(
     isFrontCard: Boolean,
     cardWidth: Dp,
     cardHeight: Dp,
-    threshold: Float,
     onRemove: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
     val animatedRotation by animateFloatAsState(targetValue = cardState.rotation.value, label = "RotationAnimation")
+
+    // 회전 임계값
+    val removalAngle = 15f
 
     // 현재 드래그 방향 판별
     val isRightDrag = animatedRotation > 15f
@@ -637,17 +637,17 @@ fun DraggableCard(
                             cardState.rotation.value = calculateRotation(cardState.offset.value.x)
                         },
                         onDragEnd = {
-                            if (cardState.offset.value.x.absoluteValue < threshold) {
-                                // 원래 위치로 복귀
-                                cardState.offset.value = Offset.Zero
-                                cardState.rotation.value = 0f
-                            } else {
+                            if (animatedRotation.absoluteValue > removalAngle) {
                                 // 카드 제거 설정
                                 cardState.isOut.value = true
                                 cardState.offset.value = Offset(
-                                    x = if (cardState.offset.value.x > 0) 2000f else -2000f,
+                                    x = if (animatedRotation > 0) 2000f else -2000f,
                                     y = 0f
                                 )
+                            } else {
+                                // 원래 위치로 복귀
+                                cardState.offset.value = Offset.Zero
+                                cardState.rotation.value = 0f
                             }
                         }
                     )
@@ -657,15 +657,15 @@ fun DraggableCard(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // 카드 콘텐츠
-            content()
-
             // 배경 오버레이
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(calculateBackgroundColor(animatedRotation))
             )
+
+            // 카드 콘텐츠
+            content()
 
             // 좌측 하단 동그라미와 아이콘
             Box(
@@ -741,6 +741,7 @@ data class CardState(
     val rotation: MutableState<Float> = mutableStateOf(0f),
     val isOut: MutableState<Boolean> = mutableStateOf(false)
 )
+
 
 @Composable
 fun MainHomeMyTagScreen() {
