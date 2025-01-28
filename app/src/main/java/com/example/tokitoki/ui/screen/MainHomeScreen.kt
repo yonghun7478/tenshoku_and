@@ -74,6 +74,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -540,41 +541,47 @@ fun SortMenu(
 
 @Composable
 fun MainHomePickupScreen() {
-    DraggableCardStack()
-}
-
-@Composable
-fun DraggableCardStack() {
-
-    val screenWidth = 1080f
-    val screenHeight = 1920f
-    val threshold = screenWidth / 4
-
-    // 카드 상태 리스트
     val cardStates = remember {
         mutableStateListOf(
-            CardState(Color.Blue),
-            CardState(Color.Green),
-            CardState(Color.Red),
-            CardState(Color.Black)
+            CardState(Color.Cyan),
+            CardState(Color.Magenta),
+            CardState(Color.Yellow),
+            CardState(Color.Gray)
         )
     }
 
+    DraggableCardStack(
+        cardStates = cardStates,
+        onCardRemoved = { removedCard ->
+            cardStates.remove(removedCard)
+        }
+    )
+}
+
+@Composable
+fun DraggableCardStack(
+    cardStates: List<CardState>,
+    cardWidth: Dp = 300.dp,
+    cardHeight: Dp = 400.dp,
+    threshold: Float = 300f,
+    onCardRemoved: (CardState) -> Unit,
+    cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // 카드 리스트를 역순으로 그리기
         cardStates.reversed().forEachIndexed { index, cardState ->
-            val isFrontCard = index == cardStates.lastIndex // 최상단 카드 판별
+            val isFrontCard = index == cardStates.lastIndex
 
             DraggableCard(
                 cardState = cardState,
                 isFrontCard = isFrontCard,
-                screenWidth = screenWidth,
-                screenHeight = screenHeight,
+                cardWidth = cardWidth,
+                cardHeight = cardHeight,
                 threshold = threshold,
-                onRemove = { cardStates.remove(cardState) } // 카드 제거 콜백
+                onRemove = { onCardRemoved(cardState) },
+                content = { cardContent(cardState) }
             )
         }
     }
@@ -584,15 +591,16 @@ fun DraggableCardStack() {
 fun DraggableCard(
     cardState: CardState,
     isFrontCard: Boolean,
-    screenWidth: Float,
-    screenHeight: Float,
+    cardWidth: Dp,
+    cardHeight: Dp,
     threshold: Float,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
     val animatedRotation by animateFloatAsState(targetValue = cardState.rotation.value, label = "RotationAnimation")
 
-    // 현재 드래그 방향 판별 (우측/좌측)
+    // 현재 드래그 방향 판별
     val isRightDrag = animatedRotation > 15f
     val isLeftDrag = animatedRotation < -15f
 
@@ -616,18 +624,16 @@ fun DraggableCard(
 
     Box(
         modifier = Modifier
-            .offset {
-                IntOffset(animatedOffset.x.roundToInt(), animatedOffset.y.roundToInt())
-            }
-            .size(300.dp)
+            .offset { IntOffset(animatedOffset.x.roundToInt(), animatedOffset.y.roundToInt()) }
+            .size(cardWidth, cardHeight)
             .rotate(animatedRotation)
-            .zIndex(if (isFrontCard) 1f else 0f) // 최상단 카드 우선순위 설정
-            .pointerInput(isFrontCard) { // pointerInput을 Modifier 체인에 연결
+            .zIndex(if (isFrontCard) 1f else 0f)
+            .pointerInput(isFrontCard) {
                 if (isFrontCard) {
                     detectDragGestures(
                         onDrag = { change, dragAmount ->
                             change.consume()
-                            cardState.offset.value = cardState.offset.value + dragAmount
+                            cardState.offset.value += dragAmount
                             cardState.rotation.value = calculateRotation(cardState.offset.value.x)
                         },
                         onDragEnd = {
@@ -637,77 +643,82 @@ fun DraggableCard(
                                 cardState.rotation.value = 0f
                             } else {
                                 // 카드 제거 설정
-                                val directionX = if (cardState.offset.value.x > 0) 1 else -1
-                                cardState.offset.value = Offset(
-                                    x = screenWidth * directionX,
-                                    y = screenHeight / 2 * -1
-                                )
                                 cardState.isOut.value = true
+                                cardState.offset.value = Offset(
+                                    x = if (cardState.offset.value.x > 0) 2000f else -2000f,
+                                    y = 0f
+                                )
                             }
                         }
                     )
                 }
             }
     ) {
-        // 안쪽 Box: 카드의 기본 색상
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(cardState.color)
-        )
-
-        // 바깥쪽 Box: 회전 각도에 따라 덮어씌우는 색상
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(calculateBackgroundColor(animatedRotation))
-        )
-
-        // 좌측 하단 동그라미와 아이콘
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .size(50.dp)
-                .background(leftCircleFillColor, shape = CircleShape)
-                .border(2.dp, leftCircleBorderColor, shape = CircleShape),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxSize()
         ) {
-            Icon(
-                imageVector = Icons.Default.ThumbUp,
-                contentDescription = "Left Touch Icon",
-                tint = leftIconFillColor,
-                modifier = Modifier.fillMaxSize(0.5f)
-                    .rotate(180f)
-            )
-        }
+            // 카드 콘텐츠
+            content()
 
-        // 우측 하단 동그라미와 아이콘
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .size(50.dp)
-                .background(rightCircleFillColor, shape = CircleShape)
-                .border(2.dp, rightCircleBorderColor, shape = CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.ThumbUp,
-                contentDescription = "Right Touch Icon",
-                tint = rightIconFillColor,
-                modifier = Modifier.fillMaxSize(0.5f)
+            // 배경 오버레이
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(calculateBackgroundColor(animatedRotation))
             )
+
+            // 좌측 하단 동그라미와 아이콘
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .size(50.dp)
+                    .background(leftCircleFillColor, shape = CircleShape)
+                    .border(2.dp, leftCircleBorderColor, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = "Left Touch Icon",
+                    tint = leftIconFillColor,
+                    modifier = Modifier.fillMaxSize(0.5f).rotate(180f)
+                )
+            }
+
+            // 우측 하단 동그라미와 아이콘
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .size(50.dp)
+                    .background(rightCircleFillColor, shape = CircleShape)
+                    .border(2.dp, rightCircleBorderColor, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = "Right Touch Icon",
+                    tint = rightIconFillColor,
+                    modifier = Modifier.fillMaxSize(0.5f)
+                )
+            }
         }
     }
 }
 
+@Composable
+fun DefaultCardContent(cardState: CardState) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(cardState.color)
+    )
+}
 
 // 회전 각도 기반 덮어씌우는 색상 계산
 fun calculateBackgroundColor(rotation: Float): Color {
     val maxRotation = 30f
     val normalizedRotation = (rotation / maxRotation).coerceIn(-1f, 1f)
-
     return when {
         normalizedRotation > 0 -> Color.Red.copy(alpha = normalizedRotation) // 시계방향 -> 빨간색
         normalizedRotation < 0 -> Color.Blue.copy(alpha = -normalizedRotation) // 반시계방향 -> 파란색
@@ -730,7 +741,6 @@ data class CardState(
     val rotation: MutableState<Float> = mutableStateOf(0f),
     val isOut: MutableState<Boolean> = mutableStateOf(false)
 )
-
 
 @Composable
 fun MainHomeMyTagScreen() {
