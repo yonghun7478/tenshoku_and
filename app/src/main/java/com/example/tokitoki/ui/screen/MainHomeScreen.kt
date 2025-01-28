@@ -717,7 +717,7 @@ fun DefaultCardContent(cardState: CardState) {
 
 // 회전 각도 기반 덮어씌우는 색상 계산
 fun calculateBackgroundColor(rotation: Float): Color {
-    val maxRotation = 30f
+    val maxRotation = 15f
     val normalizedRotation = (rotation / maxRotation).coerceIn(-1f, 1f)
     return when {
         normalizedRotation > 0 -> Color.Red.copy(alpha = normalizedRotation) // 시계방향 -> 빨간색
