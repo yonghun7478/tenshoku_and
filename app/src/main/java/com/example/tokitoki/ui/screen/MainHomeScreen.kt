@@ -562,7 +562,7 @@ fun MainHomePickupScreen() {
                 .fillMaxSize()
                 .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
             cardStates = cardStates,
-            onCardRemoved = { removedCard, isRightDrag ->
+            onCardRemoved = { removedCard ->
                 cardStates.remove(removedCard)
             }
         )
@@ -607,7 +607,7 @@ fun DraggableCardStack(
     cardStates: List<CardState>,
     cardWidth: Dp = 300.dp,
     cardHeight: Dp = 400.dp,
-    onCardRemoved: (CardState, Boolean) -> Unit,
+    onCardRemoved: (CardState) -> Unit,
     cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
 ) {
     Box(
@@ -622,7 +622,7 @@ fun DraggableCardStack(
                 isFrontCard = isFrontCard,
                 cardWidth = cardWidth,
                 cardHeight = cardHeight,
-                onRemove = { onCardRemoved(cardState, it) },
+                onRemove = { onCardRemoved(cardState) },
                 content = { cardContent(cardState) }
             )
         }
@@ -635,7 +635,7 @@ fun DraggableCard(
     isFrontCard: Boolean,
     cardWidth: Dp,
     cardHeight: Dp,
-    onRemove: (Boolean) -> Unit,
+    onRemove: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
@@ -662,9 +662,24 @@ fun DraggableCard(
     LaunchedEffect(cardState.isOut.value) {
         if (cardState.isOut.value) {
             delay(300) // 애니메이션 완료 대기
-            onRemove(isRightDrag)
+            onRemove()
         }
     }
+
+    LaunchedEffect(cardState.autoRemoveDirection.value) {
+        if (cardState.autoRemoveDirection.value != AutoRemoveDirection.NONE) {
+            cardState.isOut.value = true
+            cardState.offset.value = Offset(
+                x = when (cardState.autoRemoveDirection.value) {
+                    AutoRemoveDirection.RIGHT -> 2000f
+                    AutoRemoveDirection.LEFT -> -2000f
+                    else -> 0f
+                },
+                y = 0f
+            )
+        }
+    }
+
 
     Box(
         modifier = Modifier
@@ -783,9 +798,13 @@ data class CardState(
     val color: Color,
     val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
     val rotation: MutableState<Float> = mutableStateOf(0f),
-    val isOut: MutableState<Boolean> = mutableStateOf(false)
+    val isOut: MutableState<Boolean> = mutableStateOf(false),
+    val autoRemoveDirection: MutableState<AutoRemoveDirection> = mutableStateOf(AutoRemoveDirection.NONE) // 자동 제거 방향 추가
 )
 
+enum class AutoRemoveDirection {
+    LEFT, RIGHT, NONE
+}
 
 @Composable
 fun MainHomeMyTagScreen() {
