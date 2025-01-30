@@ -94,6 +94,7 @@ import com.example.tokitoki.ui.state.OrderType
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
+import com.example.tokitoki.ui.viewmodel.MainHomePickupViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 import kotlinx.coroutines.delay
@@ -541,15 +542,10 @@ fun SortMenu(
 }
 
 @Composable
-fun MainHomePickupScreen() {
-    val cardStates = remember {
-        mutableStateListOf(
-            CardState(Color.Cyan),
-            CardState(Color.Magenta),
-            CardState(Color.Yellow),
-            CardState(Color.Gray)
-        )
-    }
+fun MainHomePickupScreen(
+    viewModel: MainHomePickupViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -561,9 +557,9 @@ fun MainHomePickupScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
-            cardStates = cardStates,
+            cardStates = uiState.cardStates,
             onCardRemoved = { removedCard ->
-                cardStates.remove(removedCard)
+                viewModel.removeCard(removedCard)
             }
         )
 
@@ -575,25 +571,13 @@ fun MainHomePickupScreen() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = {
-                    if (cardStates.isNotEmpty()) {
-                        val cardState = cardStates[0]
-                        cardState.isOut.value = true
-                        cardState.offset.value = Offset(-2000f, 0f) // 좌측 화면 밖으로 이동
-                    }
-                }
+                onClick = { viewModel.triggerAutoRemove(AutoRemoveDirection.LEFT) }
             ) {
                 Text("싫어요")
             }
 
             Button(
-                onClick = {
-                    if (cardStates.isNotEmpty()) {
-                        val cardState = cardStates[0]
-                        cardState.isOut.value = true
-                        cardState.offset.value = Offset(2000f, 0f) // 우측 화면 밖으로 이동
-                    }
-                }
+                onClick = { viewModel.triggerAutoRemove(AutoRemoveDirection.RIGHT) }
             ) {
                 Text("좋아요")
             }
@@ -677,6 +661,8 @@ fun DraggableCard(
                 },
                 y = 0f
             )
+            delay(300) // 애니메이션 완료 대기
+            onRemove()
         }
     }
 
