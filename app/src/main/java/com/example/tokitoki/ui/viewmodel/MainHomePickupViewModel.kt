@@ -1,9 +1,10 @@
 package com.example.tokitoki.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.example.tokitoki.ui.screen.AutoRemoveDirection
+import com.example.tokitoki.ui.screen.CardDirection
 import com.example.tokitoki.ui.screen.CardState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +36,7 @@ class MainHomePickupViewModel @Inject constructor() : ViewModel() {
 
     // 카드 제거 처리
     fun removeCard(cardState: CardState) {
-        println("CYHH $cardState")
+        Log.d("CYHH", "cardState: $cardState")
         _uiState.update { currentState ->
             currentState.copy(cardStates = currentState.cardStates.toMutableList().apply {
                 remove(cardState)
@@ -44,11 +45,11 @@ class MainHomePickupViewModel @Inject constructor() : ViewModel() {
     }
 
     // 자동 제거 트리거 (좋아요 / 싫어요 버튼 클릭 시)
-    fun triggerAutoRemove(direction: AutoRemoveDirection) {
+    fun triggerAutoRemove(direction: CardDirection) {
         _uiState.update { currentState ->
             // 리스트가 비어있지 않다면 첫 번째 카드의 autoRemoveDirection 업데이트
             if (currentState.cardStates.isNotEmpty()) {
-                currentState.cardStates.first().autoRemoveDirection.value = direction
+                currentState.cardStates.first().cardDirection.value = direction
             }
             currentState
         }

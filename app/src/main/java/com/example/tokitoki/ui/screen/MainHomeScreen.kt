@@ -56,7 +56,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -98,9 +97,7 @@ import com.example.tokitoki.ui.viewmodel.MainHomePickupViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 import kotlinx.coroutines.delay
-import kotlin.math.abs
 import kotlin.math.absoluteValue
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Composable
@@ -571,13 +568,13 @@ fun MainHomePickupScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { viewModel.triggerAutoRemove(AutoRemoveDirection.LEFT) }
+                onClick = { viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT) }
             ) {
                 Text("싫어요")
             }
 
             Button(
-                onClick = { viewModel.triggerAutoRemove(AutoRemoveDirection.RIGHT) }
+                onClick = { viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT) }
             ) {
                 Text("좋아요")
             }
@@ -622,8 +619,14 @@ fun DraggableCard(
     onRemove: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val animatedOffset by animateOffsetAsState(targetValue = cardState.offset.value, label = "OffsetAnimation")
-    val animatedRotation by animateFloatAsState(targetValue = cardState.rotation.value, label = "RotationAnimation")
+    val animatedOffset by animateOffsetAsState(
+        targetValue = cardState.offset.value,
+        label = "OffsetAnimation"
+    )
+    val animatedRotation by animateFloatAsState(
+        targetValue = cardState.rotation.value,
+        label = "RotationAnimation"
+    )
 
     // 회전 임계값
     val removalAngle = 15f
@@ -650,13 +653,13 @@ fun DraggableCard(
         }
     }
 
-    LaunchedEffect(cardState.autoRemoveDirection.value) {
-        if (cardState.autoRemoveDirection.value != AutoRemoveDirection.NONE) {
+    LaunchedEffect(cardState.cardDirection.value) {
+        if (cardState.cardDirection.value == CardDirection.AUTO_RIGHT || cardState.cardDirection.value == CardDirection.AUTO_LEFT) {
             cardState.isOut.value = true
             cardState.offset.value = Offset(
-                x = when (cardState.autoRemoveDirection.value) {
-                    AutoRemoveDirection.RIGHT -> 2000f
-                    AutoRemoveDirection.LEFT -> -2000f
+                x = when (cardState.cardDirection.value) {
+                    CardDirection.AUTO_RIGHT -> 2000f
+                    CardDirection.AUTO_LEFT -> -2000f
                     else -> 0f
                 },
                 y = 0f
@@ -689,6 +692,8 @@ fun DraggableCard(
                                     x = if (animatedRotation > 0) 2000f else -2000f,
                                     y = 0f
                                 )
+                                cardState.cardDirection.value =
+                                    if (animatedRotation > 0) CardDirection.RIGHT else CardDirection.LEFT
                             } else {
                                 // 원래 위치로 복귀
                                 cardState.offset.value = Offset.Zero
@@ -726,7 +731,9 @@ fun DraggableCard(
                     imageVector = Icons.Default.ThumbUp,
                     contentDescription = "Left Touch Icon",
                     tint = leftIconFillColor,
-                    modifier = Modifier.fillMaxSize(0.5f).rotate(180f)
+                    modifier = Modifier
+                        .fillMaxSize(0.5f)
+                        .rotate(180f)
                 )
             }
 
@@ -785,11 +792,11 @@ data class CardState(
     val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
     val rotation: MutableState<Float> = mutableStateOf(0f),
     val isOut: MutableState<Boolean> = mutableStateOf(false),
-    val autoRemoveDirection: MutableState<AutoRemoveDirection> = mutableStateOf(AutoRemoveDirection.NONE) // 자동 제거 방향 추가
+    val cardDirection: MutableState<CardDirection> = mutableStateOf(CardDirection.NONE) // 자동 제거 방향 추가
 )
 
-enum class AutoRemoveDirection {
-    LEFT, RIGHT, NONE
+enum class CardDirection {
+    AUTO_LEFT, AUTO_RIGHT, NONE, LEFT, RIGHT
 }
 
 @Composable
