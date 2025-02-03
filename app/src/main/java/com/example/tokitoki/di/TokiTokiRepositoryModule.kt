@@ -4,12 +4,14 @@ import com.example.tokitoki.data.repository.AuthRepositoryImpl
 import com.example.tokitoki.data.repository.DbRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
+import com.example.tokitoki.data.repository.PickupUserRepositoryImpl
 import com.example.tokitoki.data.repository.TagRepositoryImpl
 import com.example.tokitoki.data.repository.UserRepositoryImpl
 import com.example.tokitoki.domain.repository.AuthRepository
 import com.example.tokitoki.domain.repository.DbRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
+import com.example.tokitoki.domain.repository.PickupUserRepository
 import com.example.tokitoki.domain.repository.TagRepository
 import com.example.tokitoki.domain.repository.UserRepository
 import dagger.Binds
@@ -56,4 +58,10 @@ abstract class TokiTokiRepositoryModule {
     abstract fun bindUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPickupUserRepository(
+        pickupRepositoryImpl: PickupUserRepositoryImpl
+    ): PickupUserRepository
 }
