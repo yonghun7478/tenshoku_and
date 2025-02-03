@@ -8,6 +8,7 @@ import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
 import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
 import com.example.tokitoki.ui.converter.PickupUserMapper
 import com.example.tokitoki.ui.screen.CardDirection
+import com.example.tokitoki.ui.state.PickupUserState
 import com.example.tokitoki.ui.state.PickupUserUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,11 @@ class PickupUserViewModel @Inject constructor(
     }
 
     fun loadPickupUsers() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                state = PickupUserState.LOADING
+            )
+
             when (val result = fetchPickupUsersUseCase()) {
                 is ResultWrapper.Success -> {
                     _uiState.value = _uiState.value.copy(users = result.data.map { PickupUserMapper.toPresentation(it) })
@@ -41,6 +46,9 @@ class PickupUserViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(errorMessage = "Failed to load users")
                 }
             }
+            _uiState.value = _uiState.value.copy(
+                state = PickupUserState.LOADING
+            )
         }
     }
 
