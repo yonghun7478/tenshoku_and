@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -639,12 +640,15 @@ fun DraggableCard(
 ) {
     val animatedOffset by animateOffsetAsState(
         targetValue = cardState.offset.value,
+        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), // 1초 동안 애니메이션
         label = "OffsetAnimation"
     )
+
     val animatedRotation by animateFloatAsState(
         targetValue = cardState.rotation.value,
         label = "RotationAnimation"
     )
+
 
     // 회전 임계값
     val removalAngle = 15f
@@ -680,7 +684,7 @@ fun DraggableCard(
                     CardDirection.AUTO_LEFT -> -2000f
                     else -> 0f
                 },
-                y = 0f
+                y = -2000f
             )
             delay(300) // 애니메이션 완료 대기
             onRemove()
@@ -708,7 +712,7 @@ fun DraggableCard(
                                 cardState.isOut.value = true
                                 cardState.offset.value = Offset(
                                     x = if (animatedRotation > 0) 2000f else -2000f,
-                                    y = 0f
+                                    y = -2000f
                                 )
                                 cardState.cardDirection.value =
                                     if (animatedRotation > 0) CardDirection.RIGHT else CardDirection.LEFT
@@ -782,8 +786,7 @@ fun DefaultCardContent(item: PickupUserItem) {
         painter = rememberAsyncImagePainter(item.thumbnail),
         contentDescription = "Loaded Image",
         modifier = Modifier
-            .width(200.dp)
-            .height(200.dp),
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
 }
@@ -791,7 +794,7 @@ fun DefaultCardContent(item: PickupUserItem) {
 // 회전 각도 기반 덮어씌우는 색상 계산
 fun calculateBackgroundColor(rotation: Float): Color {
     val maxRotation = 15f
-    val normalizedRotation = (rotation / maxRotation).coerceIn(-1f, 1f)
+    val normalizedRotation = (rotation / maxRotation).coerceIn(-0.5f, 0.5f)
     return when {
         normalizedRotation > 0 -> Color.Red.copy(alpha = normalizedRotation) // 시계방향 -> 빨간색
         normalizedRotation < 0 -> Color.Blue.copy(alpha = -normalizedRotation) // 반시계방향 -> 파란색
