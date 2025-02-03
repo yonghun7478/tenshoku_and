@@ -10,8 +10,12 @@ import javax.inject.Inject
 class PickupUserRepositoryImpl @Inject constructor() : PickupUserRepository {
     override suspend fun fetchPickupUsers(): ResultWrapper<List<PickupUser>> {
         val mockData = listOf(
-            PickupUserResponse("1", "https://example.com/image1.jpg", 25),
-            PickupUserResponse("2", "https://example.com/image2.jpg", 30)
+            PickupUserResponse("1", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 25),
+            PickupUserResponse("2", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 30),
+            PickupUserResponse("3", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 30),
+            PickupUserResponse("4", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 30),
+            PickupUserResponse("5", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 30),
+            PickupUserResponse("6", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg", 30),
         ).map { PickupUserConverter.fromResponse(it) }
         return ResultWrapper.Success(mockData)
     }

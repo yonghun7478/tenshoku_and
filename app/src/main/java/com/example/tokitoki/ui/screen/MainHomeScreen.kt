@@ -82,6 +82,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.model.PickupUserItem
 import com.example.tokitoki.ui.model.UserUiModel
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
@@ -96,6 +97,7 @@ import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.MainHomePickupViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
+import com.example.tokitoki.ui.viewmodel.PickupUserViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -540,7 +542,7 @@ fun SortMenu(
 
 @Composable
 fun MainHomePickupScreen(
-    viewModel: MainHomePickupViewModel = hiltViewModel()
+    viewModel: PickupUserViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -554,10 +556,22 @@ fun MainHomePickupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
-            cardStates = uiState.cardStates,
+            cardStates = uiState.users,
             onCardRemoved = { removedCard ->
-                viewModel.removeCard(removedCard)
-            }
+                when (removedCard.cardDirection.value) {
+                    CardDirection.AUTO_LEFT, CardDirection.LEFT -> {
+                        viewModel.dislikePickupUser()
+                    }
+
+                    CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> {
+                        viewModel.likePickupUser()
+                    }
+
+                    CardDirection.NONE -> {
+
+                    }
+                }
+            },
         )
 
         // 좋아요 / 싫어요 버튼
@@ -568,13 +582,17 @@ fun MainHomePickupScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT) }
+                onClick = {
+                    viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
+                }
             ) {
                 Text("싫어요")
             }
 
             Button(
-                onClick = { viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT) }
+                onClick = {
+                    viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
+                }
             ) {
                 Text("좋아요")
             }
@@ -585,11 +603,11 @@ fun MainHomePickupScreen(
 @Composable
 fun DraggableCardStack(
     modifier: Modifier = Modifier, // Modifier 추가
-    cardStates: List<CardState>,
+    cardStates: List<PickupUserItem>,
     cardWidth: Dp = 300.dp,
     cardHeight: Dp = 400.dp,
-    onCardRemoved: (CardState) -> Unit,
-    cardContent: @Composable (CardState) -> Unit = { DefaultCardContent(it) }
+    onCardRemoved: (PickupUserItem) -> Unit,
+    cardContent: @Composable (PickupUserItem) -> Unit = { DefaultCardContent(it) }
 ) {
     Box(
         modifier = modifier,
@@ -612,7 +630,7 @@ fun DraggableCardStack(
 
 @Composable
 fun DraggableCard(
-    cardState: CardState,
+    cardState: PickupUserItem,
     isFrontCard: Boolean,
     cardWidth: Dp,
     cardHeight: Dp,
@@ -759,11 +777,14 @@ fun DraggableCard(
 }
 
 @Composable
-fun DefaultCardContent(cardState: CardState) {
-    Box(
+fun DefaultCardContent(item: PickupUserItem) {
+    Image(
+        painter = rememberAsyncImagePainter(item.thumbnail),
+        contentDescription = "Loaded Image",
         modifier = Modifier
-            .fillMaxSize()
-            .background(cardState.color)
+            .width(200.dp)
+            .height(200.dp),
+        contentScale = ContentScale.Crop
     )
 }
 
