@@ -15,6 +15,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +25,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -44,12 +46,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -72,6 +81,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -92,6 +102,8 @@ import com.example.tokitoki.ui.state.MainHomeTab
 import com.example.tokitoki.ui.state.MainHomeUiEvent
 import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.state.PickupUserState
+import com.example.tokitoki.ui.state.PickupUserUiState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
@@ -547,57 +559,104 @@ fun MainHomePickupScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Box(
+    if (uiState.state == PickupUserState.COMPLETE) {
+        MainHomePickupContents(
+            uiState = uiState,
+            onLike = { viewModel.likePickupUser() },
+            onDislike = { viewModel.dislikePickupUser() },
+            onRefresh = { viewModel.loadPickupUsers() },
+            triggerRemove = { viewModel.triggerAutoRemove(it) }
+        )
+    }
+}
+
+@Composable
+fun MainHomePickupContents(
+    uiState: PickupUserUiState,
+    onLike: () -> Unit,
+    onDislike: () -> Unit,
+    onRefresh: () -> Unit,
+    triggerRemove: (CardDirection) -> Unit,
+) {
+    Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 카드 스택
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            fontSize = 20.sp,
+            text = "気に入る相手に\nいいねしよう！",
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            lineHeight = 35.sp
+        )
+
         DraggableCardStack(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 80.dp), // 버튼 영역을 고려하여 패딩 추가
+                .weight(1f)
+                .aspectRatio(0.7f)
+                .fillMaxWidth(),
             cardStates = uiState.users,
             onCardRemoved = { removedCard ->
                 when (removedCard.cardDirection.value) {
-                    CardDirection.AUTO_LEFT, CardDirection.LEFT -> {
-                        viewModel.dislikePickupUser()
-                    }
-
-                    CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> {
-                        viewModel.likePickupUser()
-                    }
-
-                    CardDirection.NONE -> {
-
-                    }
+                    CardDirection.AUTO_LEFT, CardDirection.LEFT -> onDislike()
+                    CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> onLike()
+                    CardDirection.NONE -> {}
                 }
-            },
+            }
         )
 
-        // 좋아요 / 싫어요 버튼
-        Row(
+        Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter) // 화면 하단 중앙에 배치
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = {
-                    viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("싫어요")
-            }
+                OutlinedButton(
+                    onClick = { triggerRemove(CardDirection.AUTO_LEFT) },
+                    modifier = Modifier.height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color.Blue),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "いまいち", tint = Color.Blue)
+                    Text("いまいち")
+                }
 
-            Button(
-                onClick = {
-                    viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
+                OutlinedButton(
+                    onClick = { onRefresh() },
+                    modifier = Modifier.height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color.Black),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = "再ロード", tint = Color.Black)
+                    Text("再ロード")
                 }
-            ) {
-                Text("좋아요")
+
+                OutlinedButton(
+                    onClick = { triggerRemove(CardDirection.AUTO_RIGHT) },
+                    modifier = Modifier.height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color.Red),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+                ) {
+                    Icon(Icons.Default.Favorite, contentDescription = "いいね", tint = Color.Red)
+                    Text("いいね")
+                }
             }
         }
+
     }
 }
 
@@ -605,8 +664,6 @@ fun MainHomePickupScreen(
 fun DraggableCardStack(
     modifier: Modifier = Modifier, // Modifier 추가
     cardStates: List<PickupUserItem>,
-    cardWidth: Dp = 300.dp,
-    cardHeight: Dp = 400.dp,
     onCardRemoved: (PickupUserItem) -> Unit,
     cardContent: @Composable (PickupUserItem) -> Unit = { DefaultCardContent(it) }
 ) {
@@ -620,8 +677,6 @@ fun DraggableCardStack(
             DraggableCard(
                 cardState = cardState,
                 isFrontCard = isFrontCard,
-                cardWidth = cardWidth,
-                cardHeight = cardHeight,
                 onRemove = { onCardRemoved(cardState) },
                 content = { cardContent(cardState) }
             )
@@ -633,8 +688,6 @@ fun DraggableCardStack(
 fun DraggableCard(
     cardState: PickupUserItem,
     isFrontCard: Boolean,
-    cardWidth: Dp,
-    cardHeight: Dp,
     onRemove: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -695,7 +748,7 @@ fun DraggableCard(
     Box(
         modifier = Modifier
             .offset { IntOffset(animatedOffset.x.roundToInt(), animatedOffset.y.roundToInt()) }
-            .size(cardWidth, cardHeight)
+            .fillMaxSize()
             .rotate(animatedRotation)
             .zIndex(if (isFrontCard) 1f else 0f)
             .pointerInput(isFrontCard) {
@@ -727,7 +780,9 @@ fun DraggableCard(
             }
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp)),
         ) {
             // 카드 콘텐츠
             content()
@@ -782,13 +837,36 @@ fun DraggableCard(
 
 @Composable
 fun DefaultCardContent(item: PickupUserItem) {
-    Image(
-        painter = rememberAsyncImagePainter(item.thumbnail),
-        contentDescription = "Loaded Image",
+    Box(
         modifier = Modifier
-            .fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
+            .fillMaxSize()
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(item.thumbnail),
+            contentDescription = "Loaded Image",
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .align(Alignment.BottomCenter),
+        ) {
+            Text(
+                modifier = Modifier
+                    .height(35.dp)
+                    .width(70.dp),
+                text = "${item.age}歳",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
 
 // 회전 각도 기반 덮어씌우는 색상 계산

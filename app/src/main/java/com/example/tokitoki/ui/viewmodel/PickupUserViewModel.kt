@@ -47,7 +47,7 @@ class PickupUserViewModel @Inject constructor(
                 }
             }
             _uiState.value = _uiState.value.copy(
-                state = PickupUserState.LOADING
+                state = PickupUserState.COMPLETE
             )
         }
     }
