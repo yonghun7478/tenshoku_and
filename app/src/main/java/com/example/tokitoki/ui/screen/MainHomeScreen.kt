@@ -583,7 +583,8 @@ fun MainHomePickupContents(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -597,21 +598,34 @@ fun MainHomePickupContents(
             lineHeight = 35.sp
         )
 
-        DraggableCardStack(
-            modifier = Modifier
-                .weight(1f)
-                .aspectRatio(0.7f)
-                .fillMaxWidth(),
-            cardStates = uiState.users,
-            onCardRemoved = { removedCard ->
-                when (removedCard.cardDirection.value) {
-                    CardDirection.AUTO_LEFT, CardDirection.LEFT -> onDislike()
-                    CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> onLike()
-                    CardDirection.NONE -> {}
+        if(uiState.users.isNotEmpty()) {
+            DraggableCardStack(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(0.7f)
+                    .fillMaxWidth(),
+                cardStates = uiState.users,
+                onCardRemoved = { removedCard ->
+                    when (removedCard.cardDirection.value) {
+                        CardDirection.AUTO_LEFT, CardDirection.LEFT -> onDislike()
+                        CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> onLike()
+                        CardDirection.NONE -> {}
+                    }
                 }
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "残されたカードはございません。\n 再ロードをおねがいいたします！",
+                    textAlign = TextAlign.Center
+                )
             }
-        )
-
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
