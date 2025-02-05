@@ -729,7 +729,6 @@ fun DraggableCard(
 
     LaunchedEffect(cardState.cardDirection.value) {
         if (cardState.cardDirection.value == CardDirection.AUTO_RIGHT || cardState.cardDirection.value == CardDirection.AUTO_LEFT) {
-            cardState.isOut.value = true
             cardState.offset.value = Offset(
                 x = when (cardState.cardDirection.value) {
                     CardDirection.AUTO_RIGHT -> 2000f
