@@ -51,13 +51,10 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -68,6 +65,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -81,11 +79,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,7 +103,6 @@ import com.example.tokitoki.ui.state.PickupUserUiState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
-import com.example.tokitoki.ui.viewmodel.MainHomePickupViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 import com.example.tokitoki.ui.viewmodel.PickupUserViewModel
@@ -249,7 +244,7 @@ fun MainHomeSearchScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUsers()
+        viewModel.fetchUsers(showLoading = true)
     }
 
     LaunchedEffect(viewModel.uiEvent) {
@@ -260,8 +255,7 @@ fun MainHomeSearchScreen(
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {
-                    viewModel.resetState(orderType = event.orderType)
-                    viewModel.fetchUsers()
+
                 }
 
                 is MainHomeSearchUiEvent.Error -> {
@@ -273,6 +267,7 @@ fun MainHomeSearchScreen(
                 }
 
                 MainHomeSearchUiEvent.OnRefreshing -> {
+                    viewModel.resetState()
                     viewModel.onPullToRefreshTrigger()
                 }
             }
@@ -305,18 +300,21 @@ fun MainHomeSearchContents(
             }
     }
 
+    val rememberedUiState by rememberUpdatedState(uiState)
+
     // 무한 스크롤 트리거
     LaunchedEffect(lazyGridState) {
         snapshotFlow { lazyGridState.layoutInfo }
             .collect { layoutInfo ->
+
                 val totalItemCount = layoutInfo.totalItemsCount
                 val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
 
                 if (lastVisibleItemIndex != null && totalItemCount > 0 &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
-                    uiState.state != MainHomeSearchState.NOTHING &&
-                    uiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
-                    !uiState.isLastPage // 마지막 페이지가 아닐 때
+                    rememberedUiState.state != MainHomeSearchState.NOTHING &&
+                    rememberedUiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
+                    !rememberedUiState.isLastPage // 마지막 페이지가 아닐 때
                 ) {
                     onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
                 }
@@ -332,7 +330,7 @@ fun MainHomeSearchContents(
             // 데이터 표시 그리드
             MainHomeSearchGrid(
                 uiState = uiState,
-                users = if (uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
+                users = uiState.users,
                 lazyGridState = lazyGridState,
                 onUserSelected = { index ->
                     onEvent(MainHomeSearchUiEvent.UserSelected(index))
@@ -348,15 +346,15 @@ fun MainHomeSearchContents(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                SortMenu(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    currentOrder = uiState.orderType,
-                    onOrderSelected = { orderType ->
-                        onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
-                    }
-                )
+//                SortMenu(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    currentOrder = uiState.orderType,
+//                    onOrderSelected = { orderType ->
+//                        onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
+//                    }
+//                )
             }
         }
     }

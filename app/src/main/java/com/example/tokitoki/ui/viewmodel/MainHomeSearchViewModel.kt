@@ -37,63 +37,42 @@ class MainHomeSearchViewModel @Inject constructor(
     val uiEvent: SharedFlow<MainHomeSearchUiEvent> = _uiEvent.asSharedFlow()
 
     // 커서 상태
-    private var loginCursor: String? = null
-    private var registCursor: String? = null
+    private var cursor: String? = null
 
     // 유저 데이터 로드
-    suspend fun fetchUsers(limit: Int = 20) {
+    suspend fun fetchUsers(limit: Int = 20, showLoading: Boolean = false) {
         if (_uiState.value.state == MainHomeSearchState.LOADING || _uiState.value.isLastPage) return
 
-        val orderType = _uiState.value.orderType
-
         // 로딩 상태 업데이트
-        _uiState.update {
-            it.copy(
-                state = MainHomeSearchState.LOADING
-            )
+        if (showLoading) {
+            _uiState.update {
+                it.copy(
+                    state = MainHomeSearchState.LOADING
+                )
+            }
         }
 
         delay(2000)
 
         // 유스케이스 선택 및 호출
-        val result = when (orderType) {
-            OrderType.LOGIN -> getUsersByLoginUseCase.execute(loginCursor, limit)
-            OrderType.REGISTRATION -> getUsersBySignupUseCase.execute(registCursor, limit)
-        }
+        val result = getUsersByLoginUseCase.execute(cursor, limit)
 
         // 결과 처리
         when (result) {
             is ResultWrapper.Success -> {
-                if (orderType == OrderType.LOGIN) {
-                    val updatedUsers =
-                        _uiState.value.usersOrderByLogin + result.data.users.map { user ->
-                            UserUiMapper.domainToUi(user)
-                        }
-
-                    loginCursor = result.data.nextCursor
-
-                    _uiState.update {
-                        it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
-                            usersOrderByLogin = updatedUsers,
-                            isLastPage = result.data.isLastPage
-                        )
+                val updatedUsers =
+                    _uiState.value.users + result.data.users.map { user ->
+                        UserUiMapper.domainToUi(user)
                     }
-                } else {
-                    val updatedUsers =
-                        _uiState.value.usersOrderByRegist + result.data.users.map { user ->
-                            UserUiMapper.domainToUi(user)
-                        }
 
-                    registCursor = result.data.nextCursor
+                cursor = result.data.nextCursor
 
-                    _uiState.update {
-                        it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
-                            usersOrderByRegist = updatedUsers,
-                            isLastPage = result.data.isLastPage
-                        )
-                    }
+                _uiState.update {
+                    it.copy(
+                        state = MainHomeSearchState.COMPLETED,
+                        users = updatedUsers,
+                        isLastPage = result.data.isLastPage
+                    )
                 }
             }
 
@@ -118,14 +97,8 @@ class MainHomeSearchViewModel @Inject constructor(
     }
 
     // 상태 초기화
-    fun resetState(orderType: OrderType) {
-        _uiState.update {
-            it.copy(
-                orderType = orderType,
-                state = MainHomeSearchState.ERROR,
-                isLastPage = false
-            )
-        }
+    fun resetState() {
+        _uiState.value = MainHomeSearchUiState()
     }
 
     suspend fun onPullToRefreshTrigger() {
@@ -135,7 +108,7 @@ class MainHomeSearchViewModel @Inject constructor(
             )
         }
 
-        fetchUsers()
+        fetchUsers(showLoading = true)
 
         _uiState.update {
             it.copy(
