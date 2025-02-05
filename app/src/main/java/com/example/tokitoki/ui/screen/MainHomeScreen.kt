@@ -244,7 +244,8 @@ fun MainHomeSearchScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUsers(showLoading = true)
+        if (uiState.state == MainHomeSearchState.NOTHING)
+            viewModel.fetchUsers(showLoading = true)
     }
 
     LaunchedEffect(viewModel.uiEvent) {
@@ -596,7 +597,7 @@ fun MainHomePickupContents(
             lineHeight = 35.sp
         )
 
-        if(uiState.users.isNotEmpty()) {
+        if (uiState.users.isNotEmpty()) {
             DraggableCardStack(
                 modifier = Modifier
                     .weight(1f)
