@@ -143,6 +143,10 @@ fun MainHomeContents(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .zIndex(2f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
@@ -198,7 +202,6 @@ fun MainHomeContents(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             when (uiState.selectedTab) {
                 MainHomeTab.SEARCH -> MainHomeSearchScreen()
@@ -586,7 +589,7 @@ fun MainHomePickupContents(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 10.dp),
+                .padding(vertical = 10.dp),
             fontSize = 20.sp,
             text = "気に入る相手に\nいいねしよう！",
             fontWeight = FontWeight.Bold,
@@ -609,54 +612,50 @@ fun MainHomePickupContents(
             }
         )
 
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(Color.White)
+                .padding(vertical = 20.dp)
+                .zIndex(2f),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            OutlinedButton(
+                onClick = { triggerRemove(CardDirection.AUTO_LEFT) },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Blue),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
             ) {
-                OutlinedButton(
-                    onClick = { triggerRemove(CardDirection.AUTO_LEFT) },
-                    modifier = Modifier.height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color.Blue),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                ) {
-                    Icon(Icons.Default.Close, contentDescription = "いまいち", tint = Color.Blue)
-                    Text("いまいち")
-                }
+                Icon(Icons.Default.Close, contentDescription = "いまいち", tint = Color.Blue)
+                Text("いまいち")
+            }
 
-                OutlinedButton(
-                    onClick = { onRefresh() },
-                    modifier = Modifier.height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color.Black),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                ) {
-                    Icon(Icons.Default.Refresh, contentDescription = "再ロード", tint = Color.Black)
-                    Text("再ロード")
-                }
+            OutlinedButton(
+                onClick = { onRefresh() },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = "再ロード", tint = Color.Black)
+                Text("再ロード")
+            }
 
-                OutlinedButton(
-                    onClick = { triggerRemove(CardDirection.AUTO_RIGHT) },
-                    modifier = Modifier.height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color.Red),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                ) {
-                    Icon(Icons.Default.Favorite, contentDescription = "いいね", tint = Color.Red)
-                    Text("いいね")
-                }
+            OutlinedButton(
+                onClick = { triggerRemove(CardDirection.AUTO_RIGHT) },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Red),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Icon(Icons.Default.Favorite, contentDescription = "いいね", tint = Color.Red)
+                Text("いいね")
             }
         }
-
     }
 }
 
