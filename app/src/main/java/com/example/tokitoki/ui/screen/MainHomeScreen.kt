@@ -94,6 +94,7 @@ import com.example.tokitoki.ui.model.UserUiModel
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
+import com.example.tokitoki.ui.state.MainHomeSearchUiStateData
 import com.example.tokitoki.ui.state.MainHomeTab
 import com.example.tokitoki.ui.state.MainHomeUiEvent
 import com.example.tokitoki.ui.state.MainHomeUiState
@@ -243,8 +244,11 @@ fun MainHomeSearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val currentData =
+        if (uiState.orderType == OrderType.LOGIN) uiState.dataByLogin else uiState.dataByRegister
+
     LaunchedEffect(Unit) {
-        if (uiState.dataByLogin.state == MainHomeSearchState.NOTHING)
+        if (currentData.state == MainHomeSearchState.NOTHING)
             viewModel.fetchUsers(showLoading = true)
     }
 
@@ -276,7 +280,7 @@ fun MainHomeSearchScreen(
     }
 
     MainHomeSearchContents(
-        uiState = uiState,
+        data = currentData,
         onEvent = { viewModel.onEvent(it) }
     )
 }
@@ -284,7 +288,7 @@ fun MainHomeSearchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeSearchContents(
-    uiState: MainHomeSearchUiState,
+    data: MainHomeSearchUiStateData,
     onEvent: (MainHomeSearchUiEvent) -> Unit
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -301,7 +305,7 @@ fun MainHomeSearchContents(
             }
     }
 
-    val rememberedUiState by rememberUpdatedState(uiState)
+    val rememberedUiStateData by rememberUpdatedState(data)
 
     // 무한 스크롤 트리거
     LaunchedEffect(lazyGridState) {
@@ -313,9 +317,9 @@ fun MainHomeSearchContents(
 
                 if (lastVisibleItemIndex != null && totalItemCount > 0 &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
-                    rememberedUiState.dataByLogin.state != MainHomeSearchState.NOTHING &&
-                    rememberedUiState.dataByLogin.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
-                    !rememberedUiState.dataByLogin.isLastPage // 마지막 페이지가 아닐 때
+                    rememberedUiStateData.state != MainHomeSearchState.NOTHING &&
+                    rememberedUiStateData.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
+                    !rememberedUiStateData.isLastPage // 마지막 페이지가 아닐 때
                 ) {
                     onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
                 }
@@ -324,14 +328,14 @@ fun MainHomeSearchContents(
 
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
-        isRefreshing = uiState.dataByLogin.isRefreshing,
+        isRefreshing = data.isRefreshing,
         onRefresh = { onEvent(MainHomeSearchUiEvent.OnRefreshing) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // 데이터 표시 그리드
             MainHomeSearchGrid(
-                uiState = uiState,
-                users = uiState.dataByLogin.users,
+                data = data,
+                users = data.users,
                 lazyGridState = lazyGridState,
                 onUserSelected = { index ->
                     onEvent(MainHomeSearchUiEvent.UserSelected(index))
@@ -363,7 +367,7 @@ fun MainHomeSearchContents(
 
 @Composable
 fun MainHomeSearchGrid(
-    uiState: MainHomeSearchUiState,
+    data: MainHomeSearchUiStateData,
     users: List<UserUiModel>,
     lazyGridState: LazyGridState,
     onUserSelected: (Int) -> Unit
@@ -373,11 +377,11 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        if (uiState.dataByLogin.state == MainHomeSearchState.LOADING) {
+        if (data.state == MainHomeSearchState.LOADING) {
             items(10) {
                 ShimmerGridItem()
             }
-        } else if (uiState.dataByLogin.state == MainHomeSearchState.COMPLETED) {
+        } else if (data.state == MainHomeSearchState.COMPLETED) {
             itemsIndexed(users) { index, user ->
                 MainHomeSearchGridItem(
                     user = user,
