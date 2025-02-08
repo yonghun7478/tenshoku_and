@@ -244,7 +244,7 @@ fun MainHomeSearchScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        if (uiState.state == MainHomeSearchState.NOTHING)
+        if (uiState.dataByLogin.state == MainHomeSearchState.NOTHING)
             viewModel.fetchUsers(showLoading = true)
     }
 
@@ -313,9 +313,9 @@ fun MainHomeSearchContents(
 
                 if (lastVisibleItemIndex != null && totalItemCount > 0 &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
-                    rememberedUiState.state != MainHomeSearchState.NOTHING &&
-                    rememberedUiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
-                    !rememberedUiState.isLastPage // 마지막 페이지가 아닐 때
+                    rememberedUiState.dataByLogin.state != MainHomeSearchState.NOTHING &&
+                    rememberedUiState.dataByLogin.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
+                    !rememberedUiState.dataByLogin.isLastPage // 마지막 페이지가 아닐 때
                 ) {
                     onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
                 }
@@ -324,14 +324,14 @@ fun MainHomeSearchContents(
 
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
-        isRefreshing = uiState.isRefreshing,
+        isRefreshing = uiState.dataByLogin.isRefreshing,
         onRefresh = { onEvent(MainHomeSearchUiEvent.OnRefreshing) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // 데이터 표시 그리드
             MainHomeSearchGrid(
                 uiState = uiState,
-                users = uiState.users,
+                users = uiState.dataByLogin.users,
                 lazyGridState = lazyGridState,
                 onUserSelected = { index ->
                     onEvent(MainHomeSearchUiEvent.UserSelected(index))
@@ -373,11 +373,11 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        if (uiState.state == MainHomeSearchState.LOADING) {
+        if (uiState.dataByLogin.state == MainHomeSearchState.LOADING) {
             items(10) {
                 ShimmerGridItem()
             }
-        } else if (uiState.state == MainHomeSearchState.COMPLETED) {
+        } else if (uiState.dataByLogin.state == MainHomeSearchState.COMPLETED) {
             itemsIndexed(users) { index, user ->
                 MainHomeSearchGridItem(
                     user = user,

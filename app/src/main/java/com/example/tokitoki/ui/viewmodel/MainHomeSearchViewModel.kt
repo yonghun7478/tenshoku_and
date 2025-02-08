@@ -9,7 +9,6 @@ import com.example.tokitoki.ui.converter.UserUiMapper
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
-import com.example.tokitoki.ui.state.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,13 +40,15 @@ class MainHomeSearchViewModel @Inject constructor(
 
     // 유저 데이터 로드
     suspend fun fetchUsers(limit: Int = 20, showLoading: Boolean = false) {
-        if (_uiState.value.state == MainHomeSearchState.LOADING || _uiState.value.isLastPage) return
+        if (_uiState.value.dataByLogin.state == MainHomeSearchState.LOADING || _uiState.value.dataByLogin.isLastPage) return
 
         // 로딩 상태 업데이트
         if (showLoading) {
             _uiState.update {
                 it.copy(
-                    state = MainHomeSearchState.LOADING
+                    dataByLogin = it.dataByLogin.copy(
+                        state = MainHomeSearchState.LOADING
+                    ),
                 )
             }
         }
@@ -61,7 +62,7 @@ class MainHomeSearchViewModel @Inject constructor(
         when (result) {
             is ResultWrapper.Success -> {
                 val updatedUsers =
-                    _uiState.value.users + result.data.users.map { user ->
+                    _uiState.value.dataByLogin.users + result.data.users.map { user ->
                         UserUiMapper.domainToUi(user)
                     }
 
@@ -69,9 +70,11 @@ class MainHomeSearchViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        state = MainHomeSearchState.COMPLETED,
-                        users = updatedUsers,
-                        isLastPage = result.data.isLastPage
+                        dataByLogin = it.dataByLogin.copy(
+                            state = MainHomeSearchState.COMPLETED,
+                            users = updatedUsers,
+                            isLastPage = result.data.isLastPage
+                        ),
                     )
                 }
             }
@@ -80,7 +83,9 @@ class MainHomeSearchViewModel @Inject constructor(
                 // 에러 처리
                 _uiState.update {
                     it.copy(
-                        state = MainHomeSearchState.ERROR
+                        dataByLogin = it.dataByLogin.copy(
+                            state = MainHomeSearchState.ERROR
+                        ),
                     )
                 }
                 _uiEvent.emit(MainHomeSearchUiEvent.Error(result.errorType))
@@ -104,7 +109,9 @@ class MainHomeSearchViewModel @Inject constructor(
     suspend fun onPullToRefreshTrigger() {
         _uiState.update {
             it.copy(
-                isRefreshing = true
+                dataByLogin = it.dataByLogin.copy(
+                    isRefreshing = true
+                ),
             )
         }
 
@@ -112,7 +119,9 @@ class MainHomeSearchViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(
-                isRefreshing = false
+                dataByLogin = it.dataByLogin.copy(
+                    isRefreshing = false
+                ),
             )
         }
     }
