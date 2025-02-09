@@ -260,7 +260,14 @@ fun MainHomeSearchScreen(
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {
+                    viewModel.changeOrderType(event.orderType)
+                    val state =
+                        if (event.orderType == OrderType.LOGIN) uiState.dataByLogin.state else uiState.dataByRegister.state
 
+                    if (state == MainHomeSearchState.NOTHING)
+                        viewModel.fetchUsers(showLoading = true)
+                    else
+                        viewModel.fetchUsers()
                 }
 
                 is MainHomeSearchUiEvent.Error -> {
@@ -280,6 +287,7 @@ fun MainHomeSearchScreen(
     }
 
     MainHomeSearchContents(
+        orderType = uiState.orderType,
         data = currentData,
         onEvent = { viewModel.onEvent(it) }
     )
@@ -288,6 +296,7 @@ fun MainHomeSearchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeSearchContents(
+    orderType: OrderType,
     data: MainHomeSearchUiStateData,
     onEvent: (MainHomeSearchUiEvent) -> Unit
 ) {
@@ -351,15 +360,15 @@ fun MainHomeSearchContents(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-//                SortMenu(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp),
-//                    currentOrder = uiState.orderType,
-//                    onOrderSelected = { orderType ->
-//                        onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
-//                    }
-//                )
+                SortMenu(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    currentOrder = orderType,
+                    onOrderSelected = { orderType ->
+                        onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
+                    }
+                )
             }
         }
     }

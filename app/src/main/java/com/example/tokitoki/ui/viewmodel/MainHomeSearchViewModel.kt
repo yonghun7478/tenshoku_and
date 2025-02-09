@@ -61,7 +61,8 @@ class MainHomeSearchViewModel @Inject constructor(
             val currentData = it.currentData() // 최신 값 반영
             when (result) {
                 is ResultWrapper.Success -> {
-                    val updatedUsers = currentData.users + result.data.users.map(UserUiMapper::domainToUi)
+                    val updatedUsers =
+                        currentData.users + result.data.users.map(UserUiMapper::domainToUi)
 
                     it.updateData(
                         currentData.copy(
@@ -72,6 +73,7 @@ class MainHomeSearchViewModel @Inject constructor(
                         )
                     )
                 }
+
                 is ResultWrapper.Error -> {
                     it.updateData(currentData.copy(state = MainHomeSearchState.ERROR))
                 }
@@ -91,6 +93,14 @@ class MainHomeSearchViewModel @Inject constructor(
     fun resetState() {
         _uiState.update {
             it.updateData(newData = MainHomeSearchUiStateData())
+        }
+    }
+
+    fun changeOrderType(curOrderType: OrderType) {
+        _uiState.update {
+            it.copy(
+                orderType = curOrderType
+            )
         }
     }
 
