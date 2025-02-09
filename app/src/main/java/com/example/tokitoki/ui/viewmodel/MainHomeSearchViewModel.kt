@@ -9,6 +9,10 @@ import com.example.tokitoki.ui.converter.UserUiMapper
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
+import com.example.tokitoki.ui.state.MainHomeSearchUiStateData
+import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.state.currentData
+import com.example.tokitoki.ui.state.updateData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,64 +39,46 @@ class MainHomeSearchViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<MainHomeSearchUiEvent>()
     val uiEvent: SharedFlow<MainHomeSearchUiEvent> = _uiEvent.asSharedFlow()
 
-    // 커서 상태
-    private var cursor: String? = null
-
     // 유저 데이터 로드
     suspend fun fetchUsers(limit: Int = 20, showLoading: Boolean = false) {
-        if (_uiState.value.dataByLogin.state == MainHomeSearchState.LOADING || _uiState.value.dataByLogin.isLastPage) return
+        _uiState.update {
+            val currentData = it.currentData()
+            if (currentData.state == MainHomeSearchState.LOADING || currentData.isLastPage) return
 
-        // 로딩 상태 업데이트
-        if (showLoading) {
-            _uiState.update {
-                it.copy(
-                    dataByLogin = it.dataByLogin.copy(
-                        state = MainHomeSearchState.LOADING
-                    ),
-                )
-            }
+            if (showLoading) {
+                it.updateData(currentData.copy(state = MainHomeSearchState.LOADING))
+            } else it
         }
 
         delay(2000)
 
-        // 유스케이스 선택 및 호출
-        val result = getUsersByLoginUseCase.execute(cursor, limit)
+        val result = if (_uiState.value.orderType == OrderType.LOGIN)
+            getUsersByLoginUseCase.execute(_uiState.value.currentData().cursor, limit)
+        else
+            getUsersBySignupUseCase.execute(_uiState.value.currentData().cursor, limit)
 
-        // 결과 처리
-        when (result) {
-            is ResultWrapper.Success -> {
-                val updatedUsers =
-                    _uiState.value.dataByLogin.users + result.data.users.map { user ->
-                        UserUiMapper.domainToUi(user)
-                    }
+        _uiState.update {
+            val currentData = it.currentData() // 최신 값 반영
+            when (result) {
+                is ResultWrapper.Success -> {
+                    val updatedUsers = currentData.users + result.data.users.map(UserUiMapper::domainToUi)
 
-                cursor = result.data.nextCursor
-
-                _uiState.update {
-                    it.copy(
-                        dataByLogin = it.dataByLogin.copy(
+                    it.updateData(
+                        currentData.copy(
                             state = MainHomeSearchState.COMPLETED,
                             users = updatedUsers,
-                            isLastPage = result.data.isLastPage
-                        ),
+                            isLastPage = result.data.isLastPage,
+                            cursor = result.data.nextCursor
+                        )
                     )
                 }
-            }
-
-            is ResultWrapper.Error -> {
-                // 에러 처리
-                _uiState.update {
-                    it.copy(
-                        dataByLogin = it.dataByLogin.copy(
-                            state = MainHomeSearchState.ERROR
-                        ),
-                    )
+                is ResultWrapper.Error -> {
+                    it.updateData(currentData.copy(state = MainHomeSearchState.ERROR))
                 }
-                _uiEvent.emit(MainHomeSearchUiEvent.Error(result.errorType))
             }
         }
-
     }
+
 
     // UI 이벤트 처리
     fun onEvent(event: MainHomeSearchUiEvent) {
@@ -103,26 +89,16 @@ class MainHomeSearchViewModel @Inject constructor(
 
     // 상태 초기화
     fun resetState() {
-        _uiState.value = MainHomeSearchUiState()
+        _uiState.update {
+            it.updateData(newData = MainHomeSearchUiStateData())
+        }
     }
 
     suspend fun onPullToRefreshTrigger() {
-        _uiState.update {
-            it.copy(
-                dataByLogin = it.dataByLogin.copy(
-                    isRefreshing = true
-                ),
-            )
-        }
+        _uiState.update { it.updateData(it.currentData().copy(isRefreshing = true)) }
 
         fetchUsers(showLoading = true)
 
-        _uiState.update {
-            it.copy(
-                dataByLogin = it.dataByLogin.copy(
-                    isRefreshing = false
-                ),
-            )
-        }
+        _uiState.update { it.updateData(it.currentData().copy(isRefreshing = false)) }
     }
 }

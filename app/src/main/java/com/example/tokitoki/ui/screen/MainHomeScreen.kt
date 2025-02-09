@@ -101,6 +101,7 @@ import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.state.OrderType
 import com.example.tokitoki.ui.state.PickupUserState
 import com.example.tokitoki.ui.state.PickupUserUiState
+import com.example.tokitoki.ui.state.currentData
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
@@ -244,8 +245,7 @@ fun MainHomeSearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val currentData =
-        if (uiState.orderType == OrderType.LOGIN) uiState.dataByLogin else uiState.dataByRegister
+    val currentData = uiState.currentData()
 
     LaunchedEffect(Unit) {
         if (currentData.state == MainHomeSearchState.NOTHING)
