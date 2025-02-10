@@ -3,23 +3,29 @@ package com.example.tokitoki.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -29,6 +35,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -39,50 +46,71 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.model.PickupUserItem
 import com.example.tokitoki.ui.model.UserUiModel
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
+import com.example.tokitoki.ui.state.MainHomeSearchUiStateData
 import com.example.tokitoki.ui.state.MainHomeTab
 import com.example.tokitoki.ui.state.MainHomeUiEvent
 import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.state.PickupUserState
+import com.example.tokitoki.ui.state.PickupUserUiState
+import com.example.tokitoki.ui.state.currentData
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
+import com.example.tokitoki.ui.viewmodel.PickupUserViewModel
+import kotlinx.coroutines.delay
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 @Composable
 fun MainHomeScreen(
@@ -112,6 +140,10 @@ fun MainHomeContents(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .zIndex(2f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
@@ -167,7 +199,6 @@ fun MainHomeContents(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             when (uiState.selectedTab) {
                 MainHomeTab.SEARCH -> MainHomeSearchScreen()
@@ -214,8 +245,11 @@ fun MainHomeSearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val currentData = uiState.currentData()
+
     LaunchedEffect(Unit) {
-        viewModel.fetchUsers()
+        if (currentData.state == MainHomeSearchState.NOTHING)
+            viewModel.fetchUsers(showLoading = true)
     }
 
     LaunchedEffect(viewModel.uiEvent) {
@@ -226,8 +260,12 @@ fun MainHomeSearchScreen(
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {
-                    viewModel.resetState(orderType = event.orderType)
-                    viewModel.fetchUsers()
+                    viewModel.changeOrderType(event.orderType)
+                    val state =
+                        if (event.orderType == OrderType.LOGIN) uiState.dataByLogin.state else uiState.dataByRegister.state
+
+                    if (state == MainHomeSearchState.NOTHING)
+                        viewModel.fetchUsers(showLoading = true)
                 }
 
                 is MainHomeSearchUiEvent.Error -> {
@@ -239,6 +277,7 @@ fun MainHomeSearchScreen(
                 }
 
                 MainHomeSearchUiEvent.OnRefreshing -> {
+                    viewModel.resetState()
                     viewModel.onPullToRefreshTrigger()
                 }
             }
@@ -246,7 +285,8 @@ fun MainHomeSearchScreen(
     }
 
     MainHomeSearchContents(
-        uiState = uiState,
+        orderType = uiState.orderType,
+        data = currentData,
         onEvent = { viewModel.onEvent(it) }
     )
 }
@@ -254,36 +294,45 @@ fun MainHomeSearchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeSearchContents(
-    uiState: MainHomeSearchUiState,
+    orderType: OrderType,
+    data: MainHomeSearchUiStateData,
     onEvent: (MainHomeSearchUiEvent) -> Unit
 ) {
-    val lazyGridState = rememberLazyGridState()
+    val lazyGridStateByLogin = rememberLazyGridState()
+    val lazyGridStateByRegist = rememberLazyGridState()
+
+    val curLazyGridState = if(orderType == OrderType.LOGIN) lazyGridStateByLogin else lazyGridStateByRegist
+
     var isSortMenuVisible by remember { mutableStateOf(true) }
     var previousScrollOffset by remember { mutableStateOf(0) }
 
     // 스크롤 상태 감지
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.firstVisibleItemScrollOffset }
+    LaunchedEffect(curLazyGridState) {
+        snapshotFlow { curLazyGridState.firstVisibleItemScrollOffset }
             .collect { currentOffset ->
                 isSortMenuVisible =
-                    currentOffset < previousScrollOffset || lazyGridState.firstVisibleItemIndex == 0
+                    currentOffset < previousScrollOffset || curLazyGridState.firstVisibleItemIndex == 0
                 previousScrollOffset = currentOffset
             }
     }
 
-    // 무한 스크롤 트리거
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.layoutInfo }
+    val rememberedUiStateData by rememberUpdatedState(data)
+
+    // 🔥 무한 스크롤 트리거 - 중복 호출 방지 로직 추가
+    LaunchedEffect(curLazyGridState) {
+        snapshotFlow { curLazyGridState.layoutInfo }
             .collect { layoutInfo ->
                 val totalItemCount = layoutInfo.totalItemsCount
                 val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
 
-                if (lastVisibleItemIndex != null && totalItemCount > 0 &&
+                // ✅ 데이터가 증가했을 때만 LoadMore 실행
+                if (lastVisibleItemIndex != null &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
-                    uiState.state != MainHomeSearchState.NOTHING &&
-                    uiState.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
-                    !uiState.isLastPage // 마지막 페이지가 아닐 때
+                    rememberedUiStateData.state != MainHomeSearchState.NOTHING &&
+                    rememberedUiStateData.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
+                    !rememberedUiStateData.isLastPage // 마지막 페이지가 아닐 때
                 ) {
+                    println("CYHH snapshotFlow: Loading more items...")
                     onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
                 }
             }
@@ -291,15 +340,15 @@ fun MainHomeSearchContents(
 
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
-        isRefreshing = uiState.isRefreshing,
+        isRefreshing = data.isRefreshing,
         onRefresh = { onEvent(MainHomeSearchUiEvent.OnRefreshing) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // 데이터 표시 그리드
             MainHomeSearchGrid(
-                uiState = uiState,
-                users = if (uiState.orderType == OrderType.LOGIN) uiState.usersOrderByLogin else uiState.usersOrderByRegist,
-                lazyGridState = lazyGridState,
+                data = data,
+                users = data.users,
+                lazyGridState = curLazyGridState,
                 onUserSelected = { index ->
                     onEvent(MainHomeSearchUiEvent.UserSelected(index))
                 }
@@ -318,7 +367,7 @@ fun MainHomeSearchContents(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    currentOrder = uiState.orderType,
+                    currentOrder = orderType,
                     onOrderSelected = { orderType ->
                         onEvent(MainHomeSearchUiEvent.OrderSelected(orderType))
                     }
@@ -330,7 +379,7 @@ fun MainHomeSearchContents(
 
 @Composable
 fun MainHomeSearchGrid(
-    uiState: MainHomeSearchUiState,
+    data: MainHomeSearchUiStateData,
     users: List<UserUiModel>,
     lazyGridState: LazyGridState,
     onUserSelected: (Int) -> Unit
@@ -340,11 +389,11 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        if (uiState.state == MainHomeSearchState.LOADING) {
+        if (data.showShimmerEffect) {
             items(10) {
                 ShimmerGridItem()
             }
-        } else if (uiState.state == MainHomeSearchState.COMPLETED) {
+        } else if (data.state == MainHomeSearchState.LOADING || data.state == MainHomeSearchState.COMPLETED) {
             itemsIndexed(users) { index, user ->
                 MainHomeSearchGridItem(
                     user = user,
@@ -523,8 +572,360 @@ fun SortMenu(
 }
 
 @Composable
-fun MainHomePickupScreen() {
-    Text("PICKUP")
+fun MainHomePickupScreen(
+    viewModel: PickupUserViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.state == PickupUserState.COMPLETE) {
+        MainHomePickupContents(
+            uiState = uiState,
+            onLike = { viewModel.likePickupUser() },
+            onDislike = { viewModel.dislikePickupUser() },
+            onRefresh = { viewModel.loadPickupUsers() },
+            triggerRemove = { viewModel.triggerAutoRemove(it) }
+        )
+    }
+}
+
+@Composable
+fun MainHomePickupContents(
+    uiState: PickupUserUiState,
+    onLike: () -> Unit,
+    onDislike: () -> Unit,
+    onRefresh: () -> Unit,
+    triggerRemove: (CardDirection) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            fontSize = 20.sp,
+            text = "気に入る相手に\nいいねしよう！",
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            lineHeight = 35.sp
+        )
+
+        if (uiState.users.isNotEmpty()) {
+            DraggableCardStack(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(0.7f)
+                    .fillMaxWidth(),
+                cardStates = uiState.users,
+                onCardRemoved = { removedCard ->
+                    when (removedCard.cardDirection.value) {
+                        CardDirection.AUTO_LEFT, CardDirection.LEFT -> onDislike()
+                        CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> onLike()
+                        CardDirection.NONE -> {}
+                    }
+                }
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "残されたカードはございません。\n 再ロードをおねがいいたします！",
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(vertical = 20.dp)
+                .zIndex(2f),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            OutlinedButton(
+                onClick = { triggerRemove(CardDirection.AUTO_LEFT) },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Blue),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "いまいち", tint = Color.Blue)
+                Text("いまいち")
+            }
+
+            OutlinedButton(
+                onClick = { onRefresh() },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = "再ロード", tint = Color.Black)
+                Text("再ロード")
+            }
+
+            OutlinedButton(
+                onClick = { triggerRemove(CardDirection.AUTO_RIGHT) },
+                modifier = Modifier.height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.Red),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Icon(Icons.Default.Favorite, contentDescription = "いいね", tint = Color.Red)
+                Text("いいね")
+            }
+        }
+    }
+}
+
+@Composable
+fun DraggableCardStack(
+    modifier: Modifier = Modifier, // Modifier 추가
+    cardStates: List<PickupUserItem>,
+    onCardRemoved: (PickupUserItem) -> Unit,
+    cardContent: @Composable (PickupUserItem) -> Unit = { DefaultCardContent(it) }
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        cardStates.reversed().forEachIndexed { index, cardState ->
+            val isFrontCard = index == cardStates.lastIndex
+
+            DraggableCard(
+                cardState = cardState,
+                isFrontCard = isFrontCard,
+                onRemove = { onCardRemoved(cardState) },
+                content = { cardContent(cardState) }
+            )
+        }
+    }
+}
+
+@Composable
+fun DraggableCard(
+    cardState: PickupUserItem,
+    isFrontCard: Boolean,
+    onRemove: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val animatedOffset by animateOffsetAsState(
+        targetValue = cardState.offset.value,
+        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), // 1초 동안 애니메이션
+        label = "OffsetAnimation"
+    )
+
+    val animatedRotation by animateFloatAsState(
+        targetValue = cardState.rotation.value,
+        label = "RotationAnimation"
+    )
+
+
+    // 회전 임계값
+    val removalAngle = 15f
+
+    // 현재 드래그 방향 판별
+    val isRightDrag = animatedRotation > 15f
+    val isLeftDrag = animatedRotation < -15f
+
+    // 좌측 동그라미 색상
+    val leftCircleBorderColor = if (isLeftDrag) Color.Black else Color.Transparent
+    val leftCircleFillColor = if (isLeftDrag) Color.White else Color.Transparent
+    val leftIconFillColor = if (isLeftDrag) Color.Blue else Color.White
+
+    // 우측 동그라미 색상
+    val rightCircleBorderColor = if (isRightDrag) Color.Black else Color.Transparent
+    val rightCircleFillColor = if (isRightDrag) Color.White else Color.Transparent
+    val rightIconFillColor = if (isRightDrag) Color.Red else Color.White
+
+    // 카드 제거 애니메이션 처리
+    LaunchedEffect(cardState.isOut.value) {
+        if (cardState.isOut.value) {
+            delay(300) // 애니메이션 완료 대기
+            onRemove()
+        }
+    }
+
+    LaunchedEffect(cardState.cardDirection.value) {
+        if (cardState.cardDirection.value == CardDirection.AUTO_RIGHT || cardState.cardDirection.value == CardDirection.AUTO_LEFT) {
+            cardState.offset.value = Offset(
+                x = when (cardState.cardDirection.value) {
+                    CardDirection.AUTO_RIGHT -> 2000f
+                    CardDirection.AUTO_LEFT -> -2000f
+                    else -> 0f
+                },
+                y = -2000f
+            )
+            delay(300) // 애니메이션 완료 대기
+            onRemove()
+        }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .offset { IntOffset(animatedOffset.x.roundToInt(), animatedOffset.y.roundToInt()) }
+            .fillMaxSize()
+            .rotate(animatedRotation)
+            .zIndex(if (isFrontCard) 1f else 0f)
+            .pointerInput(isFrontCard) {
+                if (isFrontCard) {
+                    detectDragGestures(
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            cardState.offset.value += dragAmount
+                            cardState.rotation.value = calculateRotation(cardState.offset.value.x)
+                        },
+                        onDragEnd = {
+                            if (animatedRotation.absoluteValue > removalAngle) {
+                                // 카드 제거 설정
+                                cardState.isOut.value = true
+                                cardState.offset.value = Offset(
+                                    x = if (animatedRotation > 0) 2000f else -2000f,
+                                    y = -2000f
+                                )
+                                cardState.cardDirection.value =
+                                    if (animatedRotation > 0) CardDirection.RIGHT else CardDirection.LEFT
+                            } else {
+                                // 원래 위치로 복귀
+                                cardState.offset.value = Offset.Zero
+                                cardState.rotation.value = 0f
+                            }
+                        }
+                    )
+                }
+            }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp)),
+        ) {
+            // 카드 콘텐츠
+            content()
+
+            // 배경 오버레이
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(calculateBackgroundColor(animatedRotation))
+            )
+
+            // 좌측 하단 동그라미와 아이콘
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .size(50.dp)
+                    .background(leftCircleFillColor, shape = CircleShape)
+                    .border(2.dp, leftCircleBorderColor, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = "Left Touch Icon",
+                    tint = leftIconFillColor,
+                    modifier = Modifier
+                        .fillMaxSize(0.5f)
+                        .rotate(180f)
+                )
+            }
+
+            // 우측 하단 동그라미와 아이콘
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .size(50.dp)
+                    .background(rightCircleFillColor, shape = CircleShape)
+                    .border(2.dp, rightCircleBorderColor, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = "Right Touch Icon",
+                    tint = rightIconFillColor,
+                    modifier = Modifier.fillMaxSize(0.5f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DefaultCardContent(item: PickupUserItem) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(item.thumbnail),
+            contentDescription = "Loaded Image",
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .align(Alignment.BottomCenter),
+        ) {
+            Text(
+                modifier = Modifier
+                    .height(35.dp)
+                    .width(70.dp),
+                text = "${item.age}歳",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+// 회전 각도 기반 덮어씌우는 색상 계산
+fun calculateBackgroundColor(rotation: Float): Color {
+    val maxRotation = 15f
+    val normalizedRotation = (rotation / maxRotation).coerceIn(-0.5f, 0.5f)
+    return when {
+        normalizedRotation > 0 -> Color.Red.copy(alpha = normalizedRotation) // 시계방향 -> 빨간색
+        normalizedRotation < 0 -> Color.Blue.copy(alpha = -normalizedRotation) // 반시계방향 -> 파란색
+        else -> Color.Transparent // 중립
+    }
+}
+
+// 회전 각도 계산
+fun calculateRotation(offsetX: Float, maxRotation: Float = 30f): Float {
+    val screenWidth = 1080f
+    val halfWidth = screenWidth / 2
+    val normalizedOffset = offsetX / halfWidth
+    return (maxRotation * normalizedOffset).coerceIn(-maxRotation, maxRotation)
+}
+
+// 카드 상태 데이터 클래스
+data class CardState(
+    val color: Color,
+    val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
+    val rotation: MutableState<Float> = mutableStateOf(0f),
+    val isOut: MutableState<Boolean> = mutableStateOf(false),
+    val cardDirection: MutableState<CardDirection> = mutableStateOf(CardDirection.NONE) // 자동 제거 방향 추가
+)
+
+enum class CardDirection {
+    AUTO_LEFT, AUTO_RIGHT, NONE, LEFT, RIGHT
 }
 
 @Composable

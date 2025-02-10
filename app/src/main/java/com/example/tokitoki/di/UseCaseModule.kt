@@ -6,6 +6,10 @@ import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
+import com.example.tokitoki.domain.usecase.DislikePickupUserUseCaseImpl
+import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
+import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
@@ -28,6 +32,8 @@ import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCase
 import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCase
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCaseImpl
+import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
+import com.example.tokitoki.domain.usecase.LikePickupUserUseCaseImpl
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
@@ -188,4 +194,19 @@ abstract class UseCaseModule {
     abstract fun bindGetUsersBySignupUseCase(
         useCaseImpl: GetUsersBySignupUseCaseImpl
     ): GetUsersBySignupUseCase
+
+    @Binds
+    abstract fun bindFetchPickupUsersUseCase(
+        useCaseImpl: FetchPickupUsersUseCaseImpl
+    ): FetchPickupUsersUseCase
+
+    @Binds
+    abstract fun bindLikePickupUserUseCase(
+        useCaseImpl: LikePickupUserUseCaseImpl
+    ): LikePickupUserUseCase
+
+    @Binds
+    abstract fun bindDislikePickupUserUseCase(
+        useCaseImpl: DislikePickupUserUseCaseImpl
+    ): DislikePickupUserUseCase
 }

@@ -9,7 +9,10 @@ import com.example.tokitoki.ui.converter.UserUiMapper
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
+import com.example.tokitoki.ui.state.MainHomeSearchUiStateData
 import com.example.tokitoki.ui.state.OrderType
+import com.example.tokitoki.ui.state.currentData
+import com.example.tokitoki.ui.state.updateData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,79 +39,51 @@ class MainHomeSearchViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<MainHomeSearchUiEvent>()
     val uiEvent: SharedFlow<MainHomeSearchUiEvent> = _uiEvent.asSharedFlow()
 
-    // 커서 상태
-    private var loginCursor: String? = null
-    private var registCursor: String? = null
-
     // 유저 데이터 로드
-    suspend fun fetchUsers(limit: Int = 20) {
-        if (_uiState.value.state == MainHomeSearchState.LOADING || _uiState.value.isLastPage) return
-
-        val orderType = _uiState.value.orderType
-
-        // 로딩 상태 업데이트
+    suspend fun fetchUsers(limit: Int = 20, showLoading: Boolean = false) {
         _uiState.update {
-            it.copy(
-                state = MainHomeSearchState.LOADING
+            val currentData = it.currentData()
+            if (currentData.state == MainHomeSearchState.LOADING || currentData.isLastPage) return
+            it.updateData(
+                currentData.copy(
+                    showShimmerEffect = showLoading,
+                    state = MainHomeSearchState.LOADING
+                )
             )
         }
 
         delay(2000)
 
-        // 유스케이스 선택 및 호출
-        val result = when (orderType) {
-            OrderType.LOGIN -> getUsersByLoginUseCase.execute(loginCursor, limit)
-            OrderType.REGISTRATION -> getUsersBySignupUseCase.execute(registCursor, limit)
-        }
+        val result = if (_uiState.value.orderType == OrderType.LOGIN)
+            getUsersByLoginUseCase.execute(_uiState.value.currentData().cursor, limit)
+        else
+            getUsersBySignupUseCase.execute(_uiState.value.currentData().cursor, limit)
 
-        // 결과 처리
-        when (result) {
-            is ResultWrapper.Success -> {
-                if (orderType == OrderType.LOGIN) {
+        _uiState.update {
+            val currentData = it.currentData() // 최신 값 반영
+            when (result) {
+                is ResultWrapper.Success -> {
                     val updatedUsers =
-                        _uiState.value.usersOrderByLogin + result.data.users.map { user ->
-                            UserUiMapper.domainToUi(user)
-                        }
+                        currentData.users + result.data.users.map(UserUiMapper::domainToUi)
 
-                    loginCursor = result.data.nextCursor
-
-                    _uiState.update {
-                        it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
-                            usersOrderByLogin = updatedUsers,
-                            isLastPage = result.data.isLastPage
+                    it.updateData(
+                        currentData.copy(
+                            state = MainHomeSearchState.COMPLETED,
+                            showShimmerEffect = false,
+                            users = updatedUsers,
+                            isLastPage = result.data.isLastPage,
+                            cursor = result.data.nextCursor
                         )
-                    }
-                } else {
-                    val updatedUsers =
-                        _uiState.value.usersOrderByRegist + result.data.users.map { user ->
-                            UserUiMapper.domainToUi(user)
-                        }
-
-                    registCursor = result.data.nextCursor
-
-                    _uiState.update {
-                        it.copy(
-                            state = if (updatedUsers.isEmpty()) MainHomeSearchState.ERROR else MainHomeSearchState.COMPLETED,
-                            usersOrderByRegist = updatedUsers,
-                            isLastPage = result.data.isLastPage
-                        )
-                    }
-                }
-            }
-
-            is ResultWrapper.Error -> {
-                // 에러 처리
-                _uiState.update {
-                    it.copy(
-                        state = MainHomeSearchState.ERROR
                     )
                 }
-                _uiEvent.emit(MainHomeSearchUiEvent.Error(result.errorType))
+
+                is ResultWrapper.Error -> {
+                    it.updateData(currentData.copy(state = MainHomeSearchState.ERROR))
+                }
             }
         }
-
     }
+
 
     // UI 이벤트 처리
     fun onEvent(event: MainHomeSearchUiEvent) {
@@ -118,29 +93,25 @@ class MainHomeSearchViewModel @Inject constructor(
     }
 
     // 상태 초기화
-    fun resetState(orderType: OrderType) {
+    fun resetState() {
+        _uiState.update {
+            it.updateData(newData = MainHomeSearchUiStateData())
+        }
+    }
+
+    fun changeOrderType(curOrderType: OrderType) {
         _uiState.update {
             it.copy(
-                orderType = orderType,
-                state = MainHomeSearchState.ERROR,
-                isLastPage = false
+                orderType = curOrderType
             )
         }
     }
 
     suspend fun onPullToRefreshTrigger() {
-        _uiState.update {
-            it.copy(
-                isRefreshing = true
-            )
-        }
+        _uiState.update { it.updateData(it.currentData().copy(isRefreshing = true)) }
 
-        fetchUsers()
+        fetchUsers(showLoading = true)
 
-        _uiState.update {
-            it.copy(
-                isRefreshing = false
-            )
-        }
+        _uiState.update { it.updateData(it.currentData().copy(isRefreshing = false)) }
     }
 }
