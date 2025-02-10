@@ -44,10 +44,12 @@ class MainHomeSearchViewModel @Inject constructor(
         _uiState.update {
             val currentData = it.currentData()
             if (currentData.state == MainHomeSearchState.LOADING || currentData.isLastPage) return
-
-            if (showLoading) {
-                it.updateData(currentData.copy(state = MainHomeSearchState.LOADING))
-            } else it
+            it.updateData(
+                currentData.copy(
+                    showShimmerEffect = showLoading,
+                    state = MainHomeSearchState.LOADING
+                )
+            )
         }
 
         delay(2000)
@@ -67,6 +69,7 @@ class MainHomeSearchViewModel @Inject constructor(
                     it.updateData(
                         currentData.copy(
                             state = MainHomeSearchState.COMPLETED,
+                            showShimmerEffect = false,
                             users = updatedUsers,
                             isLastPage = result.data.isLastPage,
                             cursor = result.data.nextCursor

@@ -266,8 +266,6 @@ fun MainHomeSearchScreen(
 
                     if (state == MainHomeSearchState.NOTHING)
                         viewModel.fetchUsers(showLoading = true)
-                    else
-                        viewModel.fetchUsers()
                 }
 
                 is MainHomeSearchUiEvent.Error -> {
@@ -397,11 +395,11 @@ fun MainHomeSearchGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        if (data.state == MainHomeSearchState.LOADING) {
+        if (data.showShimmerEffect) {
             items(10) {
                 ShimmerGridItem()
             }
-        } else if (data.state == MainHomeSearchState.COMPLETED) {
+        } else if (data.state == MainHomeSearchState.LOADING || data.state == MainHomeSearchState.COMPLETED) {
             itemsIndexed(users) { index, user ->
                 MainHomeSearchGridItem(
                     user = user,

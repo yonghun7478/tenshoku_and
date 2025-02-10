@@ -10,6 +10,7 @@ data class MainHomeSearchUiState(
 
 data class MainHomeSearchUiStateData(
     val state: MainHomeSearchState = MainHomeSearchState.NOTHING,
+    val showShimmerEffect: Boolean = false,
     val users: List<UserUiModel> = emptyList(), // 유저 리스트
     val isLastPage: Boolean = false, // 마지막 페이지 여부
     val isRefreshing: Boolean = false,
