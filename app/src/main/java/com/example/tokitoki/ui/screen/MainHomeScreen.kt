@@ -298,25 +298,20 @@ fun MainHomeSearchContents(
     data: MainHomeSearchUiStateData,
     onEvent: (MainHomeSearchUiEvent) -> Unit
 ) {
-    val lazyGridState = rememberLazyGridState()
+    val lazyGridStateByLogin = rememberLazyGridState()
+    val lazyGridStateByRegist = rememberLazyGridState()
+
+    val curLazyGridState = if(orderType == OrderType.LOGIN) lazyGridStateByLogin else lazyGridStateByRegist
+
     var isSortMenuVisible by remember { mutableStateOf(true) }
     var previousScrollOffset by remember { mutableStateOf(0) }
 
-    // 🔹 이전 totalItemCount를 저장하여 중복 호출 방지
-    var lastFetchedItemCount by remember { mutableStateOf(0) }
-
-    LaunchedEffect(data) {
-        if (data.users.isEmpty()) {
-            lastFetchedItemCount = 0
-        }
-    }
-
     // 스크롤 상태 감지
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.firstVisibleItemScrollOffset }
+    LaunchedEffect(curLazyGridState) {
+        snapshotFlow { curLazyGridState.firstVisibleItemScrollOffset }
             .collect { currentOffset ->
                 isSortMenuVisible =
-                    currentOffset < previousScrollOffset || lazyGridState.firstVisibleItemIndex == 0
+                    currentOffset < previousScrollOffset || curLazyGridState.firstVisibleItemIndex == 0
                 previousScrollOffset = currentOffset
             }
     }
@@ -324,20 +319,19 @@ fun MainHomeSearchContents(
     val rememberedUiStateData by rememberUpdatedState(data)
 
     // 🔥 무한 스크롤 트리거 - 중복 호출 방지 로직 추가
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.layoutInfo }
+    LaunchedEffect(curLazyGridState) {
+        snapshotFlow { curLazyGridState.layoutInfo }
             .collect { layoutInfo ->
                 val totalItemCount = layoutInfo.totalItemsCount
                 val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
 
                 // ✅ 데이터가 증가했을 때만 LoadMore 실행
-                if (lastVisibleItemIndex != null && totalItemCount > lastFetchedItemCount &&
+                if (lastVisibleItemIndex != null &&
                     lastVisibleItemIndex >= totalItemCount - 5 && // 마지막에서 5번째
                     rememberedUiStateData.state != MainHomeSearchState.NOTHING &&
                     rememberedUiStateData.state != MainHomeSearchState.LOADING && // 로딩 중이 아니며
                     !rememberedUiStateData.isLastPage // 마지막 페이지가 아닐 때
                 ) {
-                    lastFetchedItemCount = totalItemCount // ✅ 새로운 데이터 반영 후 업데이트
                     println("CYHH snapshotFlow: Loading more items...")
                     onEvent(MainHomeSearchUiEvent.LoadMore) // 추가 데이터 요청
                 }
@@ -354,7 +348,7 @@ fun MainHomeSearchContents(
             MainHomeSearchGrid(
                 data = data,
                 users = data.users,
-                lazyGridState = lazyGridState,
+                lazyGridState = curLazyGridState,
                 onUserSelected = { index ->
                     onEvent(MainHomeSearchUiEvent.UserSelected(index))
                 }
