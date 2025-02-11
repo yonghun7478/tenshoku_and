@@ -57,6 +57,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,9 +89,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.model.PickupUserItem
 import com.example.tokitoki.ui.model.UserUiModel
+import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiState
@@ -105,6 +108,7 @@ import com.example.tokitoki.ui.state.currentData
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.util.DrawableSemantics
+import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 import com.example.tokitoki.ui.viewmodel.PickupUserViewModel
@@ -929,8 +933,153 @@ enum class CardDirection {
 }
 
 @Composable
-fun MainHomeMyTagScreen() {
-    Text("MYTAG")
+fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.initialize()
+    }
+
+    MainHomeMyTagContents(
+        uiState = uiState,
+        onSearchTextChanged = viewModel::onSearchTextChanged
+    )
+}
+
+@Composable
+fun MainHomeMyTagContents(
+    uiState: MainHomeMyTagUiState,
+    onSearchTextChanged: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        SearchBar(onSearchTextChanged)
+        Spacer(modifier = Modifier.height(16.dp))
+        SectionTitle("오늘의 태그 & 트렌딩 태그")
+        TrendingTags(uiState.trendingTags)
+        Spacer(modifier = Modifier.height(16.dp))
+        SectionTitle("내가 선택한 태그")
+        SelectedTags(uiState.selectedTags)
+        Spacer(modifier = Modifier.height(16.dp))
+        SectionTitle("새로운 태그 추천")
+        RecommendedTags(uiState.recommendedTags)
+    }
+}
+
+@Composable
+fun SearchBar(onTextChanged: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+
+    TextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onTextChanged(it)
+        },
+        placeholder = { Text("태그 검색...") },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = "검색 아이콘",
+                tint = Color.Black
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray.copy(alpha = 0.3f))
+            .padding(horizontal = 8.dp)
+    )
+}
+
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+}
+
+@Composable
+fun TagItem(tag: String, imageUrl: String) {
+    Box(
+        modifier = Modifier
+            .size(80.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        Image(
+            painter = rememberImagePainter(data = imageUrl),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+        )
+        Text(
+            text = tag,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@Composable
+fun TrendingTags(tags: List<Pair<String, String>>) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        tags.forEach { (tag, image) ->
+            TagItem(tag, image)
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+fun SelectedTags(tags: List<Pair<String, String>>) {
+    Column {
+        tags.chunked(2).forEach { rowTags ->
+            Row {
+                rowTags.forEach { (tag, image) ->
+                    TagItem(tag, image)
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RecommendedTags(tags: List<Pair<String, String>>) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        tags.forEach { (tag, image) ->
+            TagItem(tag, image)
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewMainHomeMyTagContents() {
+    MainHomeMyTagContents(
+        uiState = MainHomeMyTagUiState(
+            trendingTags = listOf("운동" to "https://via.placeholder.com/150", "독서" to "https://via.placeholder.com/150"),
+            selectedTags = listOf("게임" to "https://via.placeholder.com/150", "요리" to "https://via.placeholder.com/150"),
+            recommendedTags = listOf("음악" to "https://via.placeholder.com/150", "여행" to "https://via.placeholder.com/150")
+        ),
+        onSearchTextChanged = {}
+    )
 }
 
 @Preview(showBackground = true)
@@ -938,7 +1087,6 @@ fun MainHomeMyTagScreen() {
 fun MainHomeContentsPreview() {
     TokitokiTheme {
         MainHomeContents(uiState = MainHomeUiState()) {
-
         }
     }
 }
