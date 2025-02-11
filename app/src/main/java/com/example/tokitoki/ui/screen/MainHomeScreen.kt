@@ -58,6 +58,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,6 +81,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -305,7 +307,8 @@ fun MainHomeSearchContents(
     val lazyGridStateByLogin = rememberLazyGridState()
     val lazyGridStateByRegist = rememberLazyGridState()
 
-    val curLazyGridState = if(orderType == OrderType.LOGIN) lazyGridStateByLogin else lazyGridStateByRegist
+    val curLazyGridState =
+        if (orderType == OrderType.LOGIN) lazyGridStateByLogin else lazyGridStateByRegist
 
     var isSortMenuVisible by remember { mutableStateOf(true) }
     var previousScrollOffset by remember { mutableStateOf(0) }
@@ -974,26 +977,56 @@ fun MainHomeMyTagContents(
 fun SearchBar(onTextChanged: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
 
-    TextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onTextChanged(it)
-        },
-        placeholder = { Text("태그 검색...") },
-        trailingIcon = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "검색 아이콘",
-                tint = Color.Black
-            )
-        },
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray.copy(alpha = 0.3f))
-            .padding(horizontal = 8.dp)
-    )
+            .border(
+                width = 3.dp,
+                color = LocalColor.current.lightGray,
+                shape = RoundedCornerShape(10.dp)
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .size(30.dp),
+            painter = painterResource(id = R.drawable.ic_search),
+            tint = LocalColor.current.lightGray,
+            contentDescription = ""
+        )
+
+        TextField(
+            value = text,
+            onValueChange = { newText ->
+                text = newText
+                onTextChanged(newText)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White)
+                .padding(all = 0.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedContainerColor = Color.White,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = TextStyle(fontSize = 16.sp),
+            placeholder = {
+                Text(
+                    text = "興味があるマイタグを検索",
+                    fontSize = 16.sp,
+                    color = LocalColor.current.lightGray
+                )
+            }
+        )
+    }
+
+
 }
 
 @Composable
@@ -1072,21 +1105,32 @@ fun RecommendedTags(tags: List<Pair<String, String>>) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainHomeMyTagContents() {
-    MainHomeMyTagContents(
-        uiState = MainHomeMyTagUiState(
-            trendingTags = listOf("운동" to "https://via.placeholder.com/150", "독서" to "https://via.placeholder.com/150"),
-            selectedTags = listOf("게임" to "https://via.placeholder.com/150", "요리" to "https://via.placeholder.com/150"),
-            recommendedTags = listOf("음악" to "https://via.placeholder.com/150", "여행" to "https://via.placeholder.com/150")
-        ),
-        onSearchTextChanged = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainHomeContentsPreview() {
     TokitokiTheme {
-        MainHomeContents(uiState = MainHomeUiState()) {
-        }
+        MainHomeMyTagContents(
+            uiState = MainHomeMyTagUiState(
+                trendingTags = listOf(
+                    "운동" to "https://via.placeholder.com/150",
+                    "독서" to "https://via.placeholder.com/150"
+                ),
+                selectedTags = listOf(
+                    "게임" to "https://via.placeholder.com/150",
+                    "요리" to "https://via.placeholder.com/150"
+                ),
+                recommendedTags = listOf(
+                    "음악" to "https://via.placeholder.com/150",
+                    "여행" to "https://via.placeholder.com/150"
+                )
+            ),
+            onSearchTextChanged = {}
+        )
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun MainHomeContentsPreview() {
+//    TokitokiTheme {
+//        MainHomeContents(uiState = MainHomeUiState()) {
+//        }
+//    }
+//}
