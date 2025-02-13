@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateOffsetAsState
@@ -15,6 +16,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -52,6 +55,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -954,79 +959,93 @@ fun MainHomeMyTagContents(
     uiState: MainHomeMyTagUiState,
     onSearchTextChanged: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        SearchBar(onSearchTextChanged)
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("오늘의 태그 & 트렌딩 태그")
-        TrendingTags(uiState.trendingTags)
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("내가 선택한 태그")
-        SelectedTags(uiState.selectedTags)
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("새로운 태그 추천")
-        RecommendedTags(uiState.recommendedTags)
+    // ✅ SearchBar와 나머지 UI를 감싸는 Box
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding()
+        ) {
+            Spacer(modifier = Modifier.height(100.dp)) // 검색바 높이만큼 간격 추가
+            SectionTitle("오늘의 태그 & 트렌딩 태그")
+            TrendingTags(uiState.trendingTags)
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionTitle("내가 선택한 태그")
+            SelectedTags(uiState.selectedTags)
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionTitle("새로운 태그 추천")
+            RecommendedTags(uiState.recommendedTags)
+        }
+
+        // ✅ 상단에 고정된 SearchBar
+        SearchBar(
+            onTextChanged = onSearchTextChanged,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(10.dp)
+        )
     }
 }
 
 @Composable
-fun SearchBar(onTextChanged: (String) -> Unit) {
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    onTextChanged: (String) -> Unit
+) {
+    var showDropdown by remember { mutableStateOf(true) }
+    val dropdownHeight by animateDpAsState(
+        targetValue = if (showDropdown) 200.dp else 0.dp, // 열릴 때 200dp, 닫힐 때 0dp
+        animationSpec = tween(durationMillis = 300)
+    )
     var text by remember { mutableStateOf("") }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 3.dp,
-                color = LocalColor.current.lightGray,
-                shape = RoundedCornerShape(10.dp)
-            ),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxSize()
     ) {
-        Icon(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .size(30.dp),
-            painter = painterResource(id = R.drawable.ic_search),
-            tint = LocalColor.current.lightGray,
-            contentDescription = ""
-        )
-
-        TextField(
-            value = text,
-            onValueChange = { newText ->
-                text = newText
-                onTextChanged(newText)
-            },
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White)
-                .padding(all = 0.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = Color.White,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            textStyle = TextStyle(fontSize = 16.sp),
-            placeholder = {
-                Text(
-                    text = "興味があるマイタグを検索",
-                    fontSize = 16.sp,
-                    color = LocalColor.current.lightGray
+                .border(
+                    width = 3.dp,
+                    color = LocalColor.current.lightGray,
+                    shape = RoundedCornerShape(10.dp)
                 )
-            }
-        )
+                .padding(5.dp)
+                .clickable {
+                    showDropdown = !showDropdown
+                }
+                .zIndex(1f)
+            ,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .size(30.dp),
+                painter = painterResource(id = R.drawable.ic_search),
+                tint = LocalColor.current.lightGray,
+                contentDescription = ""
+            )
+
+            Text(
+                text = "興味があるマイタグを検索",
+                fontSize = 16.sp,
+                color = LocalColor.current.lightGray
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dropdownHeight)
+                .background(color = Color(0xFFEEEEEE))
+                .zIndex(2f),
+        ) {
+
+        }
     }
-
-
 }
 
 @Composable
