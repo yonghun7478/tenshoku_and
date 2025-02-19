@@ -663,3 +663,246 @@ fun MyTagScreen_SuggestedTags(
         }
     }
 }
+
+@Preview(showBackground = true, name = "Normal Search Bar Preview")
+@Composable
+fun MyTagScreen_NormalSearchBarPreview() {
+    TokitokiTheme { // Theme 적용
+        MyTagScreen_NormalSearchBar(
+            selectedTags = listOf(
+                TagItemUiState("태그1", "image1", 10),
+                TagItemUiState("태그2", "image2", 20),
+                TagItemUiState("태그3", "image3", 30)
+            ),
+            onSearchBarClicked = {},
+            onTagRemoved = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Normal Search Bar Empty Preview")
+@Composable
+fun MyTagScreen_NormalSearchBarEmptyPreview() {
+    TokitokiTheme { // Theme 적용
+        MyTagScreen_NormalSearchBar(
+            selectedTags = listOf(), // 빈 리스트
+            onSearchBarClicked = {},
+            onTagRemoved = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Expanded Search Bar Preview")
+@Composable
+fun MyTagScreen_ExpandedSearchBarPreview() {
+    TokitokiTheme { // Theme 적용
+        MyTagScreen_ExpandedSearchBar(
+            searchQuery = "",
+            onSearchQueryChanged = {},
+            focusRequester = FocusRequester()
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Expanded Search Bar with text Preview")
+@Composable
+fun MyTagScreen_ExpandedSearchBarTextPreview() {
+    TokitokiTheme { // Theme 적용
+        MyTagScreen_ExpandedSearchBar(
+            searchQuery = "검색어 입력됨",
+            onSearchQueryChanged = {},
+            focusRequester = FocusRequester()
+        )
+    }
+}
+
+
+@Preview(showBackground = true, name = "SearchBar Expanded Preview")
+@Composable
+fun MyTagScreen_SearchBarExpandedPreview() {
+    TokitokiTheme {
+        MyTagScreen_SearchBar(
+            selectedTags = listOf(
+                TagItemUiState("태그1", "image1", 1),
+                TagItemUiState("태그2", "image2", 2)
+            ),
+            isExpanded = true,
+            searchQuery = "",
+            onSearchQueryChanged = {},
+            onTagRemoved = {},
+            onSearchBarClicked = {},
+            onSearchPerformed = {},
+            onBackButtonClicked = {},
+            focusRequester = FocusRequester()
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "SearchBar Normal Preview")
+@Composable
+fun MyTagScreen_SearchBarNormalPreview() {
+    TokitokiTheme {
+        MyTagScreen_SearchBar(
+            selectedTags = listOf(
+                TagItemUiState("태그1", "image1", 1),
+                TagItemUiState("태그2", "image2", 2)
+            ),
+            isExpanded = false,
+            searchQuery = "",
+            onSearchQueryChanged = {},
+            onTagRemoved = {},
+            onSearchBarClicked = {},
+            onSearchPerformed = {},
+            onBackButtonClicked = {},
+            focusRequester = FocusRequester()
+        )
+    }
+}
+
+
+
+@Preview(showBackground = true, name = "Selected Tags Row Preview")
+@Composable
+fun MyTagScreen_SelectedTagsRowPreview() {
+    TokitokiTheme{
+        MyTagScreen_SelectedTagsRow(
+            selectedTags = listOf(
+                TagItemUiState("태그1", "image1", 10),
+                TagItemUiState("태그2", "image2", 20),
+                TagItemUiState("태그3", "image3", 30),
+                TagItemUiState("태그4", "image4", 40),
+                TagItemUiState("태그5", "image5", 50)
+            ),
+            onTagRemoved = {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true, name = "Expanded Search Content Preview")
+@Composable
+fun MyTagScreen_ExpandedSearchContentPreview() {
+    TokitokiTheme {
+        MyTagScreen_ExpandedSearchContent(
+            searchQuery = "",
+            recentSearches =  listOf(
+                TagItemUiState("최근검색1", "recent1", 1),
+                TagItemUiState("최근검색2", "recent2", 2)
+            ),
+            trendingTags =  listOf(
+                TagItemUiState("트렌딩 태그1", "image1", 50),
+                TagItemUiState("트렌딩 태그2", "image2", 120),
+                TagItemUiState("트렌딩 태그3", "image3", 80)
+            ),
+            searchResults =  listOf(
+                TagItemUiState("검색결과1", "search_result_image1", 10),
+                TagItemUiState("검색결과2", "search_result_image2", 20)
+            ),
+            selectedTags =  listOf(
+                TagItemUiState("선택된태그1", "selected_image1", 100),
+                TagItemUiState("선택된태그2", "selected_image2", 200)
+            ),
+            onTagSelected = {},
+            onTagRemoved = {},
+            isVisible = true
+        )
+    }
+}
+@Preview(showBackground = true, name = "Expanded Search Content SearchQuery Preview")
+@Composable
+fun MyTagScreen_ExpandedSearchContentSearchQueryPreview() {
+    TokitokiTheme {
+        MyTagScreen_ExpandedSearchContent(
+            searchQuery = "검색어있음",
+            recentSearches =  listOf(
+                TagItemUiState("최근검색1", "recent1", 1),
+                TagItemUiState("최근검색2", "recent2", 2)
+            ),
+            trendingTags =  listOf(
+                TagItemUiState("트렌딩 태그1", "image1", 50),
+                TagItemUiState("트렌딩 태그2", "image2", 120),
+                TagItemUiState("트렌딩 태그3", "image3", 80)
+            ),
+            searchResults =  listOf(
+                TagItemUiState("검색결과1", "search_result_image1", 10),
+                TagItemUiState("검색결과2", "search_result_image2", 20)
+            ),
+            selectedTags =  listOf(
+                TagItemUiState("선택된태그1", "selected_image1", 100),
+                TagItemUiState("선택된태그2", "selected_image2", 200)
+            ),
+            onTagSelected = {},
+            onTagRemoved = {},
+            isVisible = true
+        )
+    }
+}
+@Preview(showBackground = true, name = "Tag Section Preview")
+@Composable
+fun MyTagScreen_TagSectionPreview() {
+    TokitokiTheme{
+        MyTagScreen_TagSection(
+            title = "섹션 제목",
+            tags = listOf(
+                TagItemUiState("태그1", "image1", 10),
+                TagItemUiState("태그2", "image2", 20),
+                TagItemUiState("태그3", "image3", 30)
+            ),
+            onTagClick = {},
+            isRemovable = false
+        )
+    }
+}
+@Preview(showBackground = true, name = "Tag Section Preview Removable")
+@Composable
+fun MyTagScreen_TagSectionPreviewRemovable() {
+    TokitokiTheme{
+        MyTagScreen_TagSection(
+            title = "섹션 제목",
+            tags = listOf(
+                TagItemUiState("태그1", "image1", 10),
+                TagItemUiState("태그2", "image2", 20),
+                TagItemUiState("태그3", "image3", 30)
+            ),
+            onTagClick = {},
+            isRemovable = true
+        )
+    }
+}
+@Preview(showBackground = true, name = "Trending Tag Section Preview")
+@Composable
+fun MyTagScreen_TrendingTagSectionPreview() {
+    TokitokiTheme{
+        MyTagScreen_TrendingTagSection(
+            title = "급상승 태그",
+            trendingTags = listOf(
+                TagItemUiState("트렌딩 태그1", "image1", 50),
+                TagItemUiState("트렌딩 태그2", "image2", 120),
+                TagItemUiState("트렌딩 태그3", "image3", 80)
+            ),
+            onTagClick = {}
+        )
+    }
+}
+@Preview(showBackground = true, name = "Tag Chip Preview")
+@Composable
+fun MyTagScreen_TagChipPreview() {
+    TokitokiTheme{
+        MyTagScreen_TagChip(
+            tag = TagItemUiState("태그", "image1", 10),
+            onTagClick = {},
+            isRemovable = true
+        )
+    }
+}
+@Preview(showBackground = true, name = "Tag Chip Preview2")
+@Composable
+fun MyTagScreen_TagChipPreview2() {
+    TokitokiTheme{
+        MyTagScreen_TagChip(
+            tag = TagItemUiState("태그", "image1", 10),
+            onTagClick = {},
+            isRemovable = false
+        )
+    }
+}
