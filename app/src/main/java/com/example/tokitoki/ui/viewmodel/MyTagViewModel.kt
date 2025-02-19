@@ -11,47 +11,83 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class MyTagViewModel @Inject constructor(
-): ViewModel() {
+    // private val getTrendingTagsUseCase: GetTrendingTagsUseCase, // UseCase는 주석처리.
+    // private val searchTagsUseCase: SearchTagsUseCase // UseCase 주석처리
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MyTagUiState())
     val uiState: StateFlow<MyTagUiState> = _uiState.asStateFlow()
 
     init {
-        loadTags() // 초기 데이터 로드
+        loadTags()
+        loadRecentSearches() // 추가
     }
 
     fun onTagSearchQueryChanged(query: String) {
         _uiState.update {
             it.copy(searchQuery = query)
         }
+        searchTags(query) // 검색 기능 추가
     }
-    fun onTagSelected(tag: String) {
-        if(!_uiState.value.selectedTags.contains(tag)){
+
+    // 태그 선택
+    fun onTagSelected(tag: TagItemUiState) {
+        if (!_uiState.value.selectedTags.contains(tag)) {
             _uiState.update {
                 it.copy(selectedTags = it.selectedTags + tag)
             }
         }
     }
 
-    fun onTagRemoved(tag: String) {
+    // 태그 제거
+    fun onTagRemoved(tag: TagItemUiState) {
         _uiState.update {
             it.copy(selectedTags = it.selectedTags - tag)
         }
     }
 
-    fun onSearchPerformed() {
-        //검색로직 임시 생략
+    // 검색 기능 (임시 - 테스트 데이터 사용)
+    fun searchTags(query: String) {
+        viewModelScope.launch {
+            // UseCase 사용 (주석 처리)
+            // val results = searchTagsUseCase(query)
+
+            // 테스트 데이터 (실제로는 API나 DB에서 검색)
+            val results = if (query.isNotBlank()) {
+                listOf(
+                    TagItemUiState("검색결과1_$query", "search_result_image1", 10),
+                    TagItemUiState("검색결과2_$query", "search_result_image2", 20)
+                )
+            } else {
+                listOf() // 빈 검색어면 빈 결과
+            }
+            _uiState.update {
+                it.copy(searchResults = results)
+            }
+        }
     }
 
-    // 태그 로드 함수 (테스트 데이터 사용)
-    fun loadTags() {
-        viewModelScope.launch { // 코루틴 사용
-            // UseCase 호출 (주석 처리)
-            // val trendingTags = getTrendingTagsUseCase()
+    //최근 검색어 임시 추가
+    fun loadRecentSearches() {
+        viewModelScope.launch {
+            val recentSearches = listOf(
+                TagItemUiState("최근검색1", "recent1", 1),
+                TagItemUiState("최근검색2", "recent2", 2)
+            )
+            _uiState.update{
+                it.copy(recentSearches = recentSearches)
+            }
+        }
+    }
+    fun onSearchPerformed() {
+        // 검색 로직 (여기서는 간단하게 searchQuery를 사용)
+        // searchTags(_uiState.value.searchQuery) //이미 다른곳에서 함
+    }
 
-            // 테스트 데이터 생성
+    // 태그 로드 (테스트 데이터 사용, 이전과 동일)
+    fun loadTags() {
+        viewModelScope.launch {
             val todayTag = TagItemUiState("오늘의 태그", "today_image", 100)
             val trendingTags = listOf(
                 TagItemUiState("트렌딩 태그1", "image1", 50),

@@ -64,7 +64,7 @@ import com.example.tokitoki.ui.state.TagItemUiState
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.MyTagViewModel
 
-// 최상위 Composable (Scaffold 사용)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
@@ -78,15 +78,15 @@ fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
             item {
                 // 상단 태그 검색 바
                 MyTagScreen_SearchBar(
-                    selectedTags = uiState.selectedTags,
+                    selectedTags = uiState.selectedTags, // 변경
                     isExpanded = isExpanded,
-                    searchQuery = uiState.searchQuery, // ViewModel의 StateFlow에서 가져옴
+                    searchQuery = uiState.searchQuery,
                     onSearchQueryChanged = { query -> viewModel.onTagSearchQueryChanged(query) },
-                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) },
+                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) }, // 변경
                     onSearchBarClicked = { isExpanded = true },
                     onSearchPerformed = {
                         viewModel.onSearchPerformed()
-                        isExpanded = false // 검색 후 확장 상태 false
+                        isExpanded = false
                     },
                     onBackButtonClicked = { isExpanded = false },
                     focusRequester = FocusRequester()
@@ -101,8 +101,8 @@ fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
                     trendingTags = uiState.trendingTags,
                     searchResults = uiState.searchResults,
                     selectedTags = uiState.selectedTags,
-                    onTagSelected = { tag -> viewModel.onTagSelected(tag) },
-                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) },
+                    onTagSelected = { tag -> viewModel.onTagSelected(tag) }, // 변경
+                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) }, // 변경
                     isVisible = isExpanded
                 )
                 Divider()
@@ -110,7 +110,7 @@ fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
 
             item {
                 // 오늘의 태그 & 트렌딩 태그
-                MyTagScreen_TodayAndTrendingTags(uiState.todayTags, uiState.trendingTags)
+                MyTagScreen_TodayAndTrendingTags(listOf(uiState.todayTags) + uiState.trendingTags) // 여기서 합침
                 Divider()
             }
             item {
@@ -140,9 +140,9 @@ fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
 // 검색 바 (일반 상태)
 @Composable
 fun MyTagScreen_NormalSearchBar(
-    selectedTags: List<String>,
+    selectedTags: List<TagItemUiState>, // 변경
     onSearchBarClicked: () -> Unit,
-    onTagRemoved: (String) -> Unit,
+    onTagRemoved: (TagItemUiState) -> Unit, // 변경
     modifier: Modifier = Modifier, // 추가: 외부에서 Modifier를 받을 수 있도록
 ) {
     Row(
@@ -167,7 +167,7 @@ fun MyTagScreen_NormalSearchBar(
                 color = Color.Gray
             )
         } else {
-            MyTagScreen_SelectedTagsRow(
+            MyTagScreen_SelectedTagsRow( // 변경
                 selectedTags = selectedTags,
                 onTagRemoved = onTagRemoved
             )
@@ -223,11 +223,11 @@ fun MyTagScreen_ExpandedSearchBar(
 // 상단 검색 바 (확장/축소 애니메이션 포함)
 @Composable
 fun MyTagScreen_SearchBar(
-    selectedTags: List<String>,
+    selectedTags: List<TagItemUiState>, // 변경
     isExpanded: Boolean, // 확장 상태 변수
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    onTagRemoved: (String) -> Unit,
+    onTagRemoved: (TagItemUiState) -> Unit, //변경
     onSearchBarClicked: () -> Unit, // 검색 바 클릭 이벤트 핸들러
     onSearchPerformed: () -> Unit, // 검색 버튼 클릭 이벤트 핸들러
     onBackButtonClicked: () -> Unit,
@@ -275,8 +275,8 @@ fun MyTagScreen_SearchBar(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MyTagScreen_SelectedTagsRow(
-    selectedTags: List<String>,
-    onTagRemoved: (String) -> Unit,
+    selectedTags: List<TagItemUiState>, // 변경
+    onTagRemoved: (TagItemUiState) -> Unit, // 변경
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -284,26 +284,25 @@ fun MyTagScreen_SelectedTagsRow(
 
         ) {
         selectedTags.forEach { tag ->
-            MyTagScreen_TagChip(
+            MyTagScreen_TagChip( // 변경
                 tag = tag,
-                onTagRemoved = onTagRemoved,
+                onTagClick = { onTagRemoved(tag) }, //변경
                 isRemovable = true
             )
         }
     }
 }
 
-
 // 확장된 검색 바의 내용 (최근 검색, 급상승 태그, 검색 결과)
 @Composable
 fun MyTagScreen_ExpandedSearchContent(
     searchQuery: String,
-    recentSearches: List<String>,
+    recentSearches: List<TagItemUiState>,
     trendingTags: List<TagItemUiState>,
-    searchResults: List<String>,
-    selectedTags: List<String>,
-    onTagSelected: (String) -> Unit,
-    onTagRemoved: (String) -> Unit,
+    searchResults: List<TagItemUiState>,
+    selectedTags: List<TagItemUiState>,
+    onTagSelected: (TagItemUiState) -> Unit,
+    onTagRemoved: (TagItemUiState) -> Unit,
     isVisible: Boolean
 ) {
     AnimatedVisibility(isVisible) {
@@ -316,30 +315,30 @@ fun MyTagScreen_ExpandedSearchContent(
             MyTagScreen_TagSection(
                 title = "선택된 태그",
                 tags = selectedTags,
-                onTagClick = onTagRemoved, // 이미 선택된 태그는 제거
+                onTagClick = onTagRemoved,
                 isRemovable = true
             )
 
-            // 최근 검색 태그
+            // 검색 결과
             MyTagScreen_TagSection(
-                title = "최근 검색 태그",
-                tags = recentSearches,
+                title = "검색 결과",
+                tags = searchResults,
                 onTagClick = onTagSelected
             )
 
             if (searchQuery.isBlank()) {
+                // 최근 검색 태그
+                MyTagScreen_TagSection(
+                    title = "최근 검색 태그",
+                    tags = recentSearches,
+                    onTagClick = onTagSelected
+                )
+
                 // 급상승 태그
                 MyTagScreen_TrendingTagSection(
                     title = "급상승 태그",
                     trendingTags = trendingTags,
                     onTagClick = onTagSelected
-                )
-            } else {
-                // 검색 결과
-                MyTagScreen_TagSection(
-                    title = "검색 결과",
-                    tags = searchResults,
-                    onTagClick = onTagSelected // 검색 결과 태그 클릭 시 추가
                 )
             }
         }
@@ -347,12 +346,13 @@ fun MyTagScreen_ExpandedSearchContent(
 }
 
 // 태그 섹션 (제목 + 칩 목록)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MyTagScreen_TagSection(
     title: String,
-    tags: List<String>,
-    onTagClick: (String) -> Unit,
-    isRemovable: Boolean = false // 삭제 가능한 칩인지 여부
+    tags: List<TagItemUiState>, // List<String> -> List<TagItemUiState>
+    onTagClick: (TagItemUiState) -> Unit, // (String) -> Unit 에서 변경
+    isRemovable: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -372,7 +372,23 @@ fun MyTagScreen_TagSection(
                 color = Color.Gray
             )
         } else {
-            MyTagScreen_ChipRow(tags = tags, onTagClick = onTagClick, isRemovable = isRemovable)
+            // MyTagScreen_ChipRow(tags = tags, onTagClick = onTagClick, isRemovable = isRemovable)
+            // 여기
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                maxItemsInEachRow = 3
+            ) {
+                tags.forEach { tag ->
+                    MyTagScreen_TagChip( // 변경
+                        tag = tag,
+                        onTagClick = {
+                            onTagClick(tag) // 클릭 시 전체 객체 전달
+
+                        },
+                        isRemovable = isRemovable
+                    )
+                }
+            }
         }
     }
 }
@@ -382,7 +398,7 @@ fun MyTagScreen_TagSection(
 fun MyTagScreen_TrendingTagSection( //이름 변경
     title: String,
     trendingTags: List<TagItemUiState>, // List<String> -> List<TagItemUiState>
-    onTagClick: (String) -> Unit,
+    onTagClick: (TagItemUiState) -> Unit, // 변경된 부분
     isRemovable: Boolean = false // 삭제 가능한 칩인지 여부
 ) {
     Column(
@@ -406,39 +422,18 @@ fun MyTagScreen_TrendingTagSection( //이름 변경
             //MyTagScreen_ChipRow(tags = trendingTags, onTagClick = onTagClick, isRemovable = isRemovable)
             //칩을 TagCard 형태로 변경
             trendingTags.forEach { tag ->
-                MyTagScreen_TagCard(tag = tag)
+                MyTagScreen_TagCard(tag = tag, onClick = { onTagClick(tag) }) //여기
 
             }
         }
     }
 }
 
-// 칩(Chip) 형태의 태그 (클릭 가능)
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun MyTagScreen_ChipRow(
-    tags: List<String>,
-    onTagClick: (String) -> Unit,
-    isRemovable: Boolean = false // 삭제 가능한 칩인지 (X 표시 여부)
-) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        maxItemsInEachRow = 3
-    ) {
-        tags.forEach { tag ->
-            MyTagScreen_TagChip(
-                tag = tag,
-                onTagRemoved = { onTagClick(tag) }, // onTagClick 재사용
-                isRemovable = isRemovable
-            )
-        }
-    }
-}
 
 @Composable
 fun MyTagScreen_TagChip(
-    tag: String,
-    onTagRemoved: (String) -> Unit,
+    tag: TagItemUiState, // String -> TagItemUiState
+    onTagClick: () -> Unit, // 변경
     isRemovable: Boolean = false
 ) {
     Surface(
@@ -448,10 +443,12 @@ fun MyTagScreen_TagChip(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = 4.dp)
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .clickable(onClick = onTagClick) //여기
         ) {
             Text(
-                text = tag,
+                text = tag.name, // tag -> tag.name
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White,
                 modifier = Modifier.padding(
@@ -466,9 +463,7 @@ fun MyTagScreen_TagChip(
                     modifier = Modifier
                         .size(20.dp)
                         .clip(CircleShape)
-                        .clickable {
-                            onTagRemoved(tag)
-                        },
+                        .clickable(onClick = onTagClick), // 여기
                     contentAlignment = Alignment.Center // X 아이콘을 중앙에 배치
                 ) {
                     Text(
@@ -487,12 +482,13 @@ fun MyTagScreen_TagChip(
 // 오늘의 태그 & 트렌딩 태그 (Carousel)
 @Composable
 fun MyTagScreen_TodayAndTrendingTags(
-    todayTag: TagItemUiState,
-    trendingTags: List<TagItemUiState>
+    tags: List<TagItemUiState> // 단일 리스트로 변경
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
         Text(
             text = "오늘의 태그 & 트렌딩 태그",
             style = MaterialTheme.typography.titleMedium,
@@ -501,8 +497,7 @@ fun MyTagScreen_TodayAndTrendingTags(
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyTagScreen_TagCarousel(
-            todayTag = todayTag,
-            trendingTags = trendingTags
+            tags = tags // 단일 리스트 전달
         )
     }
 }
@@ -510,19 +505,14 @@ fun MyTagScreen_TodayAndTrendingTags(
 // Carousel 구현 (LazyRow 사용)
 @Composable
 fun MyTagScreen_TagCarousel(
-    todayTag: TagItemUiState,
-    trendingTags: List<TagItemUiState>
+    tags: List<TagItemUiState> // 단일 리스트로 받음
 ) {
-    val items = listOf(todayTag) + trendingTags
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
-        items(items) { tag ->
-            MyTagScreen_TagCard(
-                tag = tag
-            )
+        items(tags) { tag ->
+            MyTagScreen_TagCard(tag = tag)
         }
     }
 }
@@ -530,7 +520,8 @@ fun MyTagScreen_TagCarousel(
 // 태그 카드 (섬네일, 태그 이름, 사용자 수)
 @Composable
 fun MyTagScreen_TagCard(
-    tag: TagItemUiState
+    tag: TagItemUiState,
+    onClick: () -> Unit = {} // 기본값 추가
 ) {
     Surface(
         shape = RoundedCornerShape(8.dp),
@@ -538,6 +529,7 @@ fun MyTagScreen_TagCard(
         modifier = Modifier
             .width(150.dp) // 너비 고정
             .height(100.dp) // 높이 고정
+            .clickable(onClick = onClick) //클릭 리스너
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
             // 이미지
@@ -669,165 +661,5 @@ fun MyTagScreen_SuggestedTags(
                 MyTagScreen_TagCard(tag)
             }
         }
-    }
-}
-
-// Preview
-
-@Preview(showBackground = true, name = "Normal Search Bar Preview")
-@Composable
-fun MyTagScreen_NormalSearchBarPreview() {
-    MyTagScreen_NormalSearchBar(
-        selectedTags = listOf("태그1", "태그2", "태그3"),
-        onSearchBarClicked = {},
-        onTagRemoved = {}
-    )
-}
-
-
-@Preview(showBackground = true, name = "Expanded Search Bar Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchBarPreview() {
-    MyTagScreen_ExpandedSearchBar(
-        searchQuery = "",
-        onSearchQueryChanged = {},
-        focusRequester = FocusRequester()
-    )
-}
-
-@Preview(showBackground = true, name = "Selected Tags Row Preview")
-@Composable
-fun MyTagScreen_SelectedTagsRowPreview() {
-    MyTagScreen_SelectedTagsRow(
-        selectedTags = listOf("태그1", "태그2", "태그3", "태그4", "태그5"),
-        onTagRemoved = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Expanded Search Content Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchContentPreview() {
-    MyTagScreen_ExpandedSearchContent(
-        searchQuery = "검색어",
-        recentSearches = listOf("최근검색1", "최근검색2"),
-        trendingTags = listOf(
-            TagItemUiState("트렌딩 태그1", "image1", 50),
-            TagItemUiState("트렌딩 태그2", "image2", 120),
-            TagItemUiState("트렌딩 태그3", "image3", 80)
-        ),//여기
-        searchResults = listOf("검색결과1", "검색결과2"),
-        selectedTags = listOf("선택된태그1", "선택된태그2"),
-        onTagSelected = {},
-        onTagRemoved = {},
-        isVisible = true
-    )
-}
-
-@Preview(showBackground = true, name = "Tag Section Preview")
-@Composable
-fun MyTagScreen_TagSectionPreview() {
-    MyTagScreen_TagSection(
-        title = "섹션 제목",
-        tags = listOf("태그1", "태그2", "태그3"),
-        onTagClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Trending Tag Section Preview")
-@Composable
-fun MyTagScreen_TrendingTagSectionPreview() {
-    MyTagScreen_TrendingTagSection(
-        title = "급상승 태그",
-        trendingTags = listOf(
-            TagItemUiState("트렌딩 태그1", "image1", 50),
-            TagItemUiState("트렌딩 태그2", "image2", 120),
-            TagItemUiState("트렌딩 태그3", "image3", 80)
-        ),
-        onTagClick = {}
-    )
-}
-
-
-@Preview(showBackground = true, name = "Tag Chip Preview")
-@Composable
-fun MyTagScreen_TagChipPreview() {
-    MyTagScreen_TagChip(
-        tag = "태그",
-        onTagRemoved = {},
-        isRemovable = true
-    )
-}
-
-@Preview(showBackground = true, name = "Carousel Preview")
-@Composable
-fun MyTagScreen_TodayAndTrendingTagsPreview() {
-    MyTagScreen_TodayAndTrendingTags(
-        todayTag = TagItemUiState("오늘의 태그", "", 100),
-        trendingTags = listOf(
-            TagItemUiState("트렌딩 태그1", "image1", 50),
-            TagItemUiState("트렌딩 태그2", "image2", 120),
-            TagItemUiState("트렌딩 태그3", "image3", 80)
-        )
-    )
-}
-
-@Preview(showBackground = true, name = "Tag Card Preview")
-@Composable
-fun MyTagScreen_TagCardPreview() {
-    MyTagScreen_TagCard(
-        tag = TagItemUiState("태그 이름", "image_url", 123)
-    )
-}
-
-@Preview(showBackground = true, name = "My Selected Tags Preview")
-@Composable
-fun MyTagScreen_MySelectedTagsPreview() {
-    MyTagScreen_MySelectedTags(
-        myTags = listOf(
-            TagItemUiState("선택한 태그1", "", 30),
-            TagItemUiState("선택한 태그2", "", 45),
-            TagItemUiState("선택한 태그3", "", 60),
-            TagItemUiState("선택한 태그4", "", 22)
-        )
-    )
-}
-
-@Preview(showBackground = true, name = "Promotion Banner Preview")
-@Composable
-fun MyTagScreen_PromotionBannerPreview() {
-    MyTagScreen_PromotionBanner(
-        imageUrl = "https://via.placeholder.com/350x150",
-        onClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Suggested Tags Preview")
-@Composable
-fun MyTagScreen_SuggestedTagsPreview() {
-    MyTagScreen_SuggestedTags(
-        suggestedTags = listOf(
-            TagItemUiState("추천 태그1", "image1", 15),
-            TagItemUiState("추천 태그2", "image2", 33)
-        )
-    )
-}
-
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "MyTagScreen Dark Mode"
-)
-@Composable
-fun MyTagScreenPreviewDarkMode() {
-    TokitokiTheme { // 머티리얼 테마 적용
-        MyTagScreen(MyTagViewModel())
-    }
-}
-
-@Preview(showBackground = true, name = "MyTagScreen Light Mode")
-@Composable
-fun MyTagScreenPreviewLightMode() {
-    TokitokiTheme { // 머티리얼 테마 적용
-        MyTagScreen(MyTagViewModel())
     }
 }
