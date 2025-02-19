@@ -320,14 +320,14 @@ fun MyTagScreen_ExpandedSearchContent(
                 isRemovable = true
             )
 
-            if (searchQuery.isBlank()) {
-                // 최근 검색 태그
-                MyTagScreen_TagSection(
-                    title = "최근 검색 태그",
-                    tags = recentSearches,
-                    onTagClick = onTagSelected
-                )
+            // 최근 검색 태그
+            MyTagScreen_TagSection(
+                title = "최근 검색 태그",
+                tags = recentSearches,
+                onTagClick = onTagSelected
+            )
 
+            if (searchQuery.isBlank()) {
                 // 급상승 태그
                 MyTagScreen_TrendingTagSection(
                     title = "급상승 태그",
