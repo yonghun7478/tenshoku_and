@@ -75,6 +75,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
 
     // BackHandler 추가: 물리적 뒤로 가기 버튼 처리
     BackHandler(enabled = isExpanded) {
+        viewModel.restoreSelectedTags()
         viewModel.clearSearchQuery()
         isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
     }
@@ -99,6 +100,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                         MainHomeMyTagScreen_NormalSearchBar(
                             selectedTags = uiState.selectedTags,
                             onSearchBarClicked = {
+                                viewModel.saveSelectedTags()
                                 viewModel.clearSearchQuery()
                                 isExpanded = true
                             },
@@ -154,6 +156,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                             isExpanded = false
                         },
                         onBackButtonClicked = {
+                            viewModel.restoreSelectedTags()
                             viewModel.clearSearchQuery()
                             isExpanded = false
                         } // 추가

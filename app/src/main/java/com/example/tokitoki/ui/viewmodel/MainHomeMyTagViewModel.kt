@@ -19,6 +19,8 @@ class MainHomeMyTagViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainHomeMyTagUiState())
     val uiState: StateFlow<MainHomeMyTagUiState> = _uiState.asStateFlow()
+    private var _tempSelectedTags: List<MainHomeTagItemUiState> = listOf() // 임시 저장 변수
+
 
     init {
         loadTags()
@@ -36,6 +38,18 @@ class MainHomeMyTagViewModel @Inject constructor(
     fun clearSearchQuery() {
         _uiState.update {
             it.copy(searchQuery = "") // searchQuery를 빈 문자열로 설정
+        }
+    }
+
+    // 확장 모드 진입 시 현재 선택된 태그를 임시 저장
+    fun saveSelectedTags() {
+        _tempSelectedTags = _uiState.value.selectedTags
+    }
+
+    // 돌아가기 시 임시 저장된 태그로 복원
+    fun restoreSelectedTags() {
+        _uiState.update {
+            it.copy(selectedTags = _tempSelectedTags)
         }
     }
 
