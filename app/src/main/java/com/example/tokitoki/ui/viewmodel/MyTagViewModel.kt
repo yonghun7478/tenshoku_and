@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class MyTagViewModel @Inject constructor(
     // private val getTrendingTagsUseCase: GetTrendingTagsUseCase, // UseCase는 주석처리.
@@ -29,6 +30,13 @@ class MyTagViewModel @Inject constructor(
             it.copy(searchQuery = query)
         }
         searchTags(query) // 검색 기능 추가
+    }
+
+    // 검색어 초기화 함수
+    fun clearSearchQuery() {
+        _uiState.update {
+            it.copy(searchQuery = "") // searchQuery를 빈 문자열로 설정
+        }
     }
 
     // 태그 선택
@@ -75,11 +83,12 @@ class MyTagViewModel @Inject constructor(
                 TagItemUiState("최근검색1", "recent1", 1),
                 TagItemUiState("최근검색2", "recent2", 2)
             )
-            _uiState.update{
+            _uiState.update {
                 it.copy(recentSearches = recentSearches)
             }
         }
     }
+
     fun onSearchPerformed() {
         // 검색 로직 (여기서는 간단하게 searchQuery를 사용)
         // searchTags(_uiState.value.searchQuery) //이미 다른곳에서 함

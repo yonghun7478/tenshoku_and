@@ -1,8 +1,12 @@
 package com.example.tokitoki.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +16,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -69,69 +74,106 @@ import com.example.tokitoki.ui.viewmodel.MyTagViewModel
 fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     var isExpanded by remember { mutableStateOf(false) } // 검색창 확장 상태
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
+
+    // BackHandler 추가: 물리적 뒤로 가기 버튼 처리
+    BackHandler(enabled = isExpanded) {
+        viewModel.clearSearchQuery()
+        isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
+    }
 
     Scaffold(
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier.fillMaxSize()) { // Box 추가: 전체를 감싸는 역할
 
-            item {
-                // 상단 태그 검색 바
-                MyTagScreen_SearchBar(
-                    selectedTags = uiState.selectedTags, // 변경
-                    isExpanded = isExpanded,
-                    searchQuery = uiState.searchQuery,
-                    onSearchQueryChanged = { query -> viewModel.onTagSearchQueryChanged(query) },
-                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) }, // 변경
-                    onSearchBarClicked = { isExpanded = true },
-                    onSearchPerformed = {
-                        viewModel.onSearchPerformed()
-                        isExpanded = false
-                    },
-                    onBackButtonClicked = { isExpanded = false },
-                    focusRequester = FocusRequester()
-                )
-                Divider()
-            }
-            item {
-                // 검색바 확장되었을 때의 UI
-                MyTagScreen_ExpandedSearchContent(
-                    searchQuery = uiState.searchQuery,
-                    recentSearches = uiState.recentSearches,
-                    trendingTags = uiState.trendingTags,
-                    searchResults = uiState.searchResults,
-                    selectedTags = uiState.selectedTags,
-                    onTagSelected = { tag -> viewModel.onTagSelected(tag) }, // 변경
-                    onTagRemoved = { tag -> viewModel.onTagRemoved(tag) }, // 변경
-                    isVisible = isExpanded
-                )
-                Divider()
-            }
+            // 원래의 컨텐츠 (LazyColumn)
+            AnimatedVisibility(
+                visible = !isExpanded, // isExpanded가 false일 때만 보임
+                enter = fadeIn(),
+                exit = fadeOut()
+            )
+            {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                ) {
+                    item {
+                        // 상단 태그 검색 바 (isExpanded == false 일때만)
+                        MyTagScreen_NormalSearchBar(
+                            selectedTags = uiState.selectedTags,
+                            onSearchBarClicked = {
+                                viewModel.clearSearchQuery()
+                                isExpanded = true
+                            },
+                        )
+                        Divider()
+                    }
 
-            item {
-                // 오늘의 태그 & 트렌딩 태그
-                MyTagScreen_TodayAndTrendingTags(listOf(uiState.todayTags) + uiState.trendingTags) // 여기서 합침
-                Divider()
-            }
-            item {
-                // 내가 선택한 태그
-                MyTagScreen_MySelectedTags(uiState.myTags)
-                Divider()
-            }
+                    item {
+                        // 오늘의 태그 & 트렌딩 태그
+                        MyTagScreen_TodayAndTrendingTags(listOf(uiState.todayTags) + uiState.trendingTags)
+                        Divider()
+                    }
+                    item {
+                        // 내가 선택한 태그
+                        MyTagScreen_MySelectedTags(uiState.myTags)
+                        Divider()
+                    }
 
-            item {
-                // 프로모션 배너 (임시)
-                MyTagScreen_PromotionBanner(
-                    imageUrl = "https://via.placeholder.com/350x150", // 임시 이미지
-                    onClick = { /* TODO: Handle banner click */ }
-                )
-                Divider()
-            }
-            item {
-                // 새로운 태그 추천
-                MyTagScreen_SuggestedTags(uiState.suggestedTags)
+                    item {
+                        // 프로모션 배너 (임시)
+                        MyTagScreen_PromotionBanner(
+                            imageUrl = "https://via.placeholder.com/350x150", // 임시 이미지
+                            onClick = { /* TODO: Handle banner click */ }
+                        )
+                        Divider()
+                    }
+                    item {
+                        // 새로운 태그 추천
+                        MyTagScreen_SuggestedTags(uiState.suggestedTags)
+                    }
+                }
             }
 
+            // 확장된 검색 바 화면 (전체 화면, isExpanded == true 일때만)
+            AnimatedVisibility(
+                visible = isExpanded, // isExpanded가 true일 때만 보임
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                ) { // 배경색 추가
 
+                    MyTagScreen_ExpandedSearchBar(
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChanged = { query -> viewModel.onTagSearchQueryChanged(query) },
+                        focusRequester = focusRequester,
+                        onSearchPerformed = {  // 추가
+                            viewModel.onSearchPerformed()
+                            viewModel.clearSearchQuery()
+                            isExpanded = false
+                        },
+                        onBackButtonClicked = {
+                            viewModel.clearSearchQuery()
+                            isExpanded = false
+                        } // 추가
+                    )
+
+                    MyTagScreen_ExpandedSearchContent(
+                        searchQuery = uiState.searchQuery,
+                        recentSearches = uiState.recentSearches,
+                        trendingTags = uiState.trendingTags,
+                        searchResults = uiState.searchResults,
+                        selectedTags = uiState.selectedTags,
+                        onTagSelected = { tag -> viewModel.onTagSelected(tag) },
+                        onTagRemoved = { tag -> viewModel.onTagRemoved(tag) },
+                        isVisible = true // AnimatedVisibility 안에 있으므로 항상 true
+                    )
+                }
+            }
         }
     }
 }
@@ -165,7 +207,8 @@ fun MyTagScreen_NormalSearchBar(
                 color = Color.Gray
             )
         } else {
-            MyTagScreen_SelectedTagsRow( // 변경
+            MyTagScreen_SelectedTagsRow(
+                // 변경
                 selectedTags = selectedTags,
             )
         }
@@ -173,99 +216,68 @@ fun MyTagScreen_NormalSearchBar(
 }
 
 // 검색 바 (확장 상태)
+// 검색 바 (확장 상태)
 @Composable
 fun MyTagScreen_ExpandedSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     focusRequester: FocusRequester,
-    modifier: Modifier = Modifier, // 추가: 외부에서 Modifier를 받을 수 있도록
+    onSearchPerformed: () -> Unit, // 추가
+    onBackButtonClicked: () -> Unit, // 추가
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    )
-    {
-        Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-        Spacer(modifier = Modifier.width(8.dp))
-        BasicTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChanged,
-            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-            cursorBrush = SolidColor(Color.Black),
-            singleLine = true,
+    Column(modifier = modifier) { // Column 추가
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester), // focusRequester 적용
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier.fillMaxWidth() // 너비를 최대로 설정
-                ) {
-                    if (searchQuery.isEmpty()) {
-                        Text(
-                            text = "興味があるマイタグを検索", // 플레이스홀더
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
-                        )
-                    }
-                    innerTextField() // 입력 필드
-                }
-            }
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         )
-    }
-}
-
-// 상단 검색 바 (확장/축소 애니메이션 포함)
-@Composable
-fun MyTagScreen_SearchBar(
-    selectedTags: List<TagItemUiState>, // 변경
-    isExpanded: Boolean, // 확장 상태 변수
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    onTagRemoved: (TagItemUiState) -> Unit, //변경
-    onSearchBarClicked: () -> Unit, // 검색 바 클릭 이벤트 핸들러
-    onSearchPerformed: () -> Unit, // 검색 버튼 클릭 이벤트 핸들러
-    onBackButtonClicked: () -> Unit,
-    focusRequester: FocusRequester,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize() // 애니메이션 효과 적용
-    ) {
-        if (isExpanded) {
-            MyTagScreen_ExpandedSearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChanged = onSearchQueryChanged,
-                focusRequester = focusRequester,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(
+        {
+            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+            Spacer(modifier = Modifier.width(8.dp))
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChanged,
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                cursorBrush = SolidColor(Color.Black),
+                singleLine = true,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(onClick = onSearchPerformed) {
-                    Text("검색")
+                    .weight(1f) // 남은 공간 모두 차지
+                    .focusRequester(focusRequester),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = "興味があるマイタグを検索",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
+                        innerTextField()
+                    }
                 }
-                Button(onClick = onBackButtonClicked) {
-                    Text("돌아가기")
-                }
-            }
-
-        } else {
-            MyTagScreen_NormalSearchBar(
-                selectedTags = selectedTags,
-                onSearchBarClicked = onSearchBarClicked,
-                modifier = Modifier.fillMaxWidth()
             )
+        }
+        Row( // 버튼들을 위한 Row
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.End // 오른쪽 정렬
+        ) {
+            Button(onClick = onSearchPerformed) {
+                Text("검색")
+            }
+            Spacer(modifier = Modifier.width(8.dp)) // 버튼 사이 간격
+            Button(onClick = onBackButtonClicked) {
+                Text("돌아가기")
+            }
         }
     }
 }
-
 
 // 선택된 태그들을 보여주는 가로 스크롤 리스트
 @OptIn(ExperimentalLayoutApi::class)
@@ -281,7 +293,6 @@ fun MyTagScreen_SelectedTagsRow(
         selectedTags.forEach { tag ->
             MyTagScreen_TagChip( // 변경
                 tag = tag,
-                onTagClick = { }, //변경
                 isRemovable = false
             )
         }
@@ -390,8 +401,8 @@ fun MyTagScreen_TagSection(
 
 @Composable
 fun MyTagScreen_TagChip(
-    tag: TagItemUiState, // String -> TagItemUiState
-    onTagClick: () -> Unit, // 변경
+    tag: TagItemUiState,
+    onTagClick: (() -> Unit)? = null, // Optional<() -> Unit>으로 변경,  null 허용, 기본값 null
     isRemovable: Boolean = false
 ) {
     Surface(
@@ -403,10 +414,10 @@ fun MyTagScreen_TagChip(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(end = 4.dp)
-                .clickable(onClick = onTagClick) //여기
+                .then(if (onTagClick != null) Modifier.clickable(onClick = onTagClick) else Modifier) // 조건부 clickable
         ) {
             Text(
-                text = tag.name, // tag -> tag.name
+                text = tag.name,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White,
                 modifier = Modifier.padding(
@@ -421,8 +432,8 @@ fun MyTagScreen_TagChip(
                     modifier = Modifier
                         .size(20.dp)
                         .clip(CircleShape)
-                        .clickable(onClick = onTagClick), // 여기
-                    contentAlignment = Alignment.Center // X 아이콘을 중앙에 배치
+                        .then(if (onTagClick != null) Modifier.clickable(onClick = onTagClick) else Modifier), // 조건부 clickable
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "X",
@@ -432,7 +443,6 @@ fun MyTagScreen_TagChip(
                     )
                 }
             }
-
         }
     }
 }
@@ -619,231 +629,5 @@ fun MyTagScreen_SuggestedTags(
                 MyTagScreen_TagCard(tag)
             }
         }
-    }
-}
-
-@Preview(showBackground = true, name = "Normal Search Bar Preview")
-@Composable
-fun MyTagScreen_NormalSearchBarPreview() {
-    TokitokiTheme { // Theme 적용
-        MyTagScreen_NormalSearchBar(
-            selectedTags = listOf(
-                TagItemUiState("태그1", "image1", 10),
-                TagItemUiState("태그2", "image2", 20),
-                TagItemUiState("태그3", "image3", 30)
-            ),
-            onSearchBarClicked = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Normal Search Bar Empty Preview")
-@Composable
-fun MyTagScreen_NormalSearchBarEmptyPreview() {
-    TokitokiTheme { // Theme 적용
-        MyTagScreen_NormalSearchBar(
-            selectedTags = listOf(), // 빈 리스트
-            onSearchBarClicked = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Expanded Search Bar Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchBarPreview() {
-    TokitokiTheme { // Theme 적용
-        MyTagScreen_ExpandedSearchBar(
-            searchQuery = "",
-            onSearchQueryChanged = {},
-            focusRequester = FocusRequester()
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Expanded Search Bar with text Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchBarTextPreview() {
-    TokitokiTheme { // Theme 적용
-        MyTagScreen_ExpandedSearchBar(
-            searchQuery = "검색어 입력됨",
-            onSearchQueryChanged = {},
-            focusRequester = FocusRequester()
-        )
-    }
-}
-
-
-@Preview(showBackground = true, name = "SearchBar Expanded Preview")
-@Composable
-fun MyTagScreen_SearchBarExpandedPreview() {
-    TokitokiTheme {
-        MyTagScreen_SearchBar(
-            selectedTags = listOf(
-                TagItemUiState("태그1", "image1", 1),
-                TagItemUiState("태그2", "image2", 2)
-            ),
-            isExpanded = true,
-            searchQuery = "",
-            onSearchQueryChanged = {},
-            onTagRemoved = {},
-            onSearchBarClicked = {},
-            onSearchPerformed = {},
-            onBackButtonClicked = {},
-            focusRequester = FocusRequester()
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "SearchBar Normal Preview")
-@Composable
-fun MyTagScreen_SearchBarNormalPreview() {
-    TokitokiTheme {
-        MyTagScreen_SearchBar(
-            selectedTags = listOf(
-                TagItemUiState("태그1", "image1", 1),
-                TagItemUiState("태그2", "image2", 2)
-            ),
-            isExpanded = false,
-            searchQuery = "",
-            onSearchQueryChanged = {},
-            onTagRemoved = {},
-            onSearchBarClicked = {},
-            onSearchPerformed = {},
-            onBackButtonClicked = {},
-            focusRequester = FocusRequester()
-        )
-    }
-}
-
-
-
-@Preview(showBackground = true, name = "Selected Tags Row Preview")
-@Composable
-fun MyTagScreen_SelectedTagsRowPreview() {
-    TokitokiTheme{
-        MyTagScreen_SelectedTagsRow(
-            selectedTags = listOf(
-                TagItemUiState("태그1", "image1", 10),
-                TagItemUiState("태그2", "image2", 20),
-                TagItemUiState("태그3", "image3", 30),
-                TagItemUiState("태그4", "image4", 40),
-                TagItemUiState("태그5", "image5", 50)
-            ),
-        )
-    }
-}
-
-
-@Preview(showBackground = true, name = "Expanded Search Content Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchContentPreview() {
-    TokitokiTheme {
-        MyTagScreen_ExpandedSearchContent(
-            searchQuery = "",
-            recentSearches =  listOf(
-                TagItemUiState("최근검색1", "recent1", 1),
-                TagItemUiState("최근검색2", "recent2", 2)
-            ),
-            trendingTags =  listOf(
-                TagItemUiState("트렌딩 태그1", "image1", 50),
-                TagItemUiState("트렌딩 태그2", "image2", 120),
-                TagItemUiState("트렌딩 태그3", "image3", 80)
-            ),
-            searchResults =  listOf(
-                TagItemUiState("검색결과1", "search_result_image1", 10),
-                TagItemUiState("검색결과2", "search_result_image2", 20)
-            ),
-            selectedTags =  listOf(
-                TagItemUiState("선택된태그1", "selected_image1", 100),
-                TagItemUiState("선택된태그2", "selected_image2", 200)
-            ),
-            onTagSelected = {},
-            onTagRemoved = {},
-            isVisible = true
-        )
-    }
-}
-@Preview(showBackground = true, name = "Expanded Search Content SearchQuery Preview")
-@Composable
-fun MyTagScreen_ExpandedSearchContentSearchQueryPreview() {
-    TokitokiTheme {
-        MyTagScreen_ExpandedSearchContent(
-            searchQuery = "검색어있음",
-            recentSearches =  listOf(
-                TagItemUiState("최근검색1", "recent1", 1),
-                TagItemUiState("최근검색2", "recent2", 2)
-            ),
-            trendingTags =  listOf(
-                TagItemUiState("트렌딩 태그1", "image1", 50),
-                TagItemUiState("트렌딩 태그2", "image2", 120),
-                TagItemUiState("트렌딩 태그3", "image3", 80)
-            ),
-            searchResults =  listOf(
-                TagItemUiState("검색결과1", "search_result_image1", 10),
-                TagItemUiState("검색결과2", "search_result_image2", 20)
-            ),
-            selectedTags =  listOf(
-                TagItemUiState("선택된태그1", "selected_image1", 100),
-                TagItemUiState("선택된태그2", "selected_image2", 200)
-            ),
-            onTagSelected = {},
-            onTagRemoved = {},
-            isVisible = true
-        )
-    }
-}
-@Preview(showBackground = true, name = "Tag Section Preview")
-@Composable
-fun MyTagScreen_TagSectionPreview() {
-    TokitokiTheme{
-        MyTagScreen_TagSection(
-            title = "섹션 제목",
-            tags = listOf(
-                TagItemUiState("태그1", "image1", 10),
-                TagItemUiState("태그2", "image2", 20),
-                TagItemUiState("태그3", "image3", 30)
-            ),
-            onTagClick = {},
-            isRemovable = false
-        )
-    }
-}
-@Preview(showBackground = true, name = "Tag Section Preview Removable")
-@Composable
-fun MyTagScreen_TagSectionPreviewRemovable() {
-    TokitokiTheme{
-        MyTagScreen_TagSection(
-            title = "섹션 제목",
-            tags = listOf(
-                TagItemUiState("태그1", "image1", 10),
-                TagItemUiState("태그2", "image2", 20),
-                TagItemUiState("태그3", "image3", 30)
-            ),
-            onTagClick = {},
-            isRemovable = true
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Tag Chip Preview")
-@Composable
-fun MyTagScreen_TagChipPreview() {
-    TokitokiTheme{
-        MyTagScreen_TagChip(
-            tag = TagItemUiState("태그", "image1", 10),
-            onTagClick = {},
-            isRemovable = true
-        )
-    }
-}
-@Preview(showBackground = true, name = "Tag Chip Preview2")
-@Composable
-fun MyTagScreen_TagChipPreview2() {
-    TokitokiTheme{
-        MyTagScreen_TagChip(
-            tag = TagItemUiState("태그", "image1", 10),
-            onTagClick = {},
-            isRemovable = false
-        )
     }
 }
