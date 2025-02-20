@@ -1,40 +1,47 @@
 package com.example.tokitoki.ui.screen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,431 +53,578 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
 import com.example.tokitoki.R
-import com.example.tokitoki.ui.state.MainHomeMyTagUiState
-import com.example.tokitoki.ui.theme.LocalColor
-import com.example.tokitoki.ui.theme.TokitokiTheme
+import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
+    var isExpanded by remember { mutableStateOf(false) } // 검색창 확장 상태
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
 
-    LaunchedEffect(Unit) {
-        viewModel.initialize()
+    // BackHandler 추가: 물리적 뒤로 가기 버튼 처리
+    BackHandler(enabled = isExpanded) {
+        viewModel.clearSearchQuery()
+        isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
     }
 
-    MainHomeMyTagContents(
-        uiState = uiState,
-        onSearchTextChanged = viewModel::onSearchTextChanged
-    )
-}
+    Scaffold(
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) { // Box 추가: 전체를 감싸는 역할
 
-@Composable
-fun MainHomeMyTagContents(
-    uiState: MainHomeMyTagUiState,
-    onSearchTextChanged: (String) -> Unit
-) {
-    // ✅ SearchBar와 나머지 UI를 감싸는 Box
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding()
-        ) {
-            Spacer(modifier = Modifier.height(100.dp)) // 검색바 높이만큼 간격 추가
-            SectionTitle("오늘의 태그 & 트렌딩 태그")
-            TrendingTags(uiState.trendingTags)
-            Spacer(modifier = Modifier.height(16.dp))
-            SectionTitle("내가 선택한 태그")
-            SelectedTags(uiState.selectedTags)
-            Spacer(modifier = Modifier.height(16.dp))
-            SectionTitle("새로운 태그 추천")
-            RecommendedTags(uiState.recommendedTags)
-        }
+            // 원래의 컨텐츠 (LazyColumn)
+            AnimatedVisibility(
+                visible = !isExpanded, // isExpanded가 false일 때만 보임
+                enter = fadeIn(),
+                exit = fadeOut()
+            )
+            {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                ) {
+                    item {
+                        // 상단 태그 검색 바 (isExpanded == false 일때만)
+                        MainHomeMyTagScreen_NormalSearchBar(
+                            selectedTags = uiState.selectedTags,
+                            onSearchBarClicked = {
+                                viewModel.clearSearchQuery()
+                                isExpanded = true
+                            },
+                        )
+                        Divider()
+                    }
 
-        // ✅ 상단에 고정된 SearchBar
-        TopSearchBar()
-    }
-}
+                    item {
+                        // 오늘의 태그 & 트렌딩 태그
+                        MainHomeMyTagScreen_TodayAndTrendingTags(listOf(uiState.todayTags) + uiState.trendingTags)
+                        Divider()
+                    }
+                    item {
+                        // 내가 선택한 태그
+                        MainHomeMyTagScreen_MySelectedTags(uiState.myTags)
+                        Divider()
+                    }
 
-/**
- * 최상위 TopSearchBar 컴포저블.
- * - Normal 모드와 Expanded 모드를 상태값(isExpanded)을 통해 전환함.
- * - 추후 ViewModel과 연결하여 상태 관리를 할 수 있도록 구성함.
- */
-@Composable
-fun TopSearchBar() {
-    // 모드 전환 상태 (Normal / Expanded)
-    var isExpanded by remember { mutableStateOf(false) }
-    // Normal 모드에서 표시할 '선택한 취미' 리스트 (확정된 선택값)
-    var confirmedSelectedHobbies by remember { mutableStateOf(listOf<String>()) }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        if (isExpanded) {
-            TopSearchBarExpanded(
-                initialSelectedHobbies = confirmedSelectedHobbies,
-                onSearchConfirmed = { newSelectedHobbies ->
-                    confirmedSelectedHobbies = newSelectedHobbies
-                    isExpanded = false
-                },
-                onCancel = {
-                    isExpanded = false
+                    item {
+                        // 프로모션 배너 (임시)
+                        MainHomeMyTagScreen_PromotionBanner(
+                            imageUrl = "https://via.placeholder.com/350x150", // 임시 이미지
+                            onClick = { /* TODO: Handle banner click */ }
+                        )
+                        Divider()
+                    }
+                    item {
+                        // 새로운 태그 추천
+                        MainHomeMyTagScreen_SuggestedTags(uiState.suggestedTags)
+                    }
                 }
+            }
+
+            // 확장된 검색 바 화면 (전체 화면, isExpanded == true 일때만)
+            AnimatedVisibility(
+                visible = isExpanded, // isExpanded가 true일 때만 보임
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                ) { // 배경색 추가
+
+                    MainHomeMyTagScreen_ExpandedSearchBar(
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChanged = { query -> viewModel.onTagSearchQueryChanged(query) },
+                        focusRequester = focusRequester,
+                        onSearchPerformed = {  // 추가
+                            viewModel.onSearchPerformed()
+                            viewModel.clearSearchQuery()
+                            isExpanded = false
+                        },
+                        onBackButtonClicked = {
+                            viewModel.clearSearchQuery()
+                            isExpanded = false
+                        } // 추가
+                    )
+
+                    MainHomeMyTagScreen_ExpandedSearchContent(
+                        searchQuery = uiState.searchQuery,
+                        recentSearches = uiState.recentSearches,
+                        trendingTags = uiState.trendingTags,
+                        searchResults = uiState.searchResults,
+                        selectedTags = uiState.selectedTags,
+                        onTagSelected = { tag -> viewModel.onTagSelected(tag) },
+                        onTagRemoved = { tag -> viewModel.onTagRemoved(tag) },
+                        isVisible = true // AnimatedVisibility 안에 있으므로 항상 true
+                    )
+                }
+            }
+        }
+    }
+}
+
+// 검색 바 (일반 상태)
+@Composable
+fun MainHomeMyTagScreen_NormalSearchBar(
+    selectedTags: List<MainHomeTagItemUiState>, // 변경
+    onSearchBarClicked: () -> Unit,
+    modifier: Modifier = Modifier, // 추가: 외부에서 Modifier를 받을 수 있도록
+) {
+    Row(
+        modifier = modifier // 외부에서 Modifier 적용
+            .fillMaxWidth()
+            .height(56.dp)
+            .clickable { onSearchBarClicked() }
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = "Search Icon",
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+
+        if (selectedTags.isEmpty()) {
+            Text(
+                text = "興味があるマイタグを検索",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
             )
         } else {
-            TopSearchBarNormal(
-                selectedHobbies = confirmedSelectedHobbies,
-                onClick = { isExpanded = true }
+            MainHomeMyTagScreen_SelectedTagsRow(
+                // 변경
+                selectedTags = selectedTags,
             )
         }
     }
 }
 
-/**
- * Normal 모드의 TopSearchBar.
- */
+// 검색 바 (확장 상태)
+// 검색 바 (확장 상태)
 @Composable
-fun TopSearchBarNormal(
-    selectedHobbies: List<String>,
-    onClick: () -> Unit
+fun MainHomeMyTagScreen_ExpandedSearchBar(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    focusRequester: FocusRequester,
+    onSearchPerformed: () -> Unit, // 추가
+    onBackButtonClicked: () -> Unit, // 추가
+    modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
+    Column(modifier = modifier) { // Column 추가
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon",
-                tint = Color.Black
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = formatSelectedHobbies(selectedHobbies),
-                style = TextStyle(fontSize = 16.sp, color = Color.Black)
-            )
-        }
-    }
-}
-
-/**
- * 선택한 취미 리스트 포맷팅 함수.
- */
-private fun formatSelectedHobbies(selectedHobbies: List<String>): String {
-    if (selectedHobbies.isEmpty()) return "興味があるマイタグを検索"
-    val maxCount = 3
-    return if (selectedHobbies.size > maxCount) {
-        selectedHobbies.take(maxCount).joinToString(", ") + ", +${selectedHobbies.size - maxCount}"
-    } else {
-        selectedHobbies.joinToString(", ")
-    }
-}
-
-/**
- * Expanded 모드의 TopSearchBar.
- */
-@Composable
-fun TopSearchBarExpanded(
-    initialSelectedHobbies: List<String>,
-    onSearchConfirmed: (List<String>) -> Unit,
-    onCancel: () -> Unit
-) {
-    var inputText by remember { mutableStateOf("") }
-    // 여기서는 리스트의 참조가 변경되어야 하므로 immutable List로 관리함.
-    var localSelectedHobbies by remember { mutableStateOf(initialSelectedHobbies) }
-
-    // 더미 데이터 (실제 데이터는 ViewModel에서 제공)
-    val recentSearchedHobbies = listOf("농구", "독서", "요리")
-    val trendingHobbies = listOf("캠핑", "사진", "댄스")
-    val allHobbies = listOf("test", "독서", "요리", "캠핑", "사진", "댄스", "수영", "등산", "게임")
-    val searchResults = if (inputText.isBlank()) emptyList() else {
-        allHobbies.filter { it.contains(inputText, ignoreCase = true) }
-    }
-
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-    BackHandler {
-        onCancel()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .animateContentSize()
-            .padding(16.dp)
-    ) {
-        // 상단 영역: 검색 입력바
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon",
-                tint = Color.Black
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            TextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                placeholder = { Text("검색어를 입력하세요", style = TextStyle(fontSize = 16.sp, color = Color.LightGray)) },
-                singleLine = true,
-                keyboardActions = KeyboardActions(
-                    onSearch = { onSearchConfirmed(localSelectedHobbies) }
-                )
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 중단 영역: 스크롤 가능한 내용 영역
-        Column(
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // "선택한 취미" 섹션: 클릭 시 토글 방식으로 추가/제거
-            TopSearchBarSection(
-                title = "선택한 취미",
-                items = localSelectedHobbies,
-                onItemClick = { item ->
-                    localSelectedHobbies = if (localSelectedHobbies.contains(item)) {
-                        // 제거: 새로운 리스트 생성
-                        localSelectedHobbies - item
-                    } else {
-                        // 추가: 새로운 리스트 생성
-                        localSelectedHobbies + item
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        )
+        {
+            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+            Spacer(modifier = Modifier.width(8.dp))
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChanged,
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                cursorBrush = SolidColor(Color.Black),
+                singleLine = true,
+                modifier = Modifier
+                    .weight(1f) // 남은 공간 모두 차지
+                    .focusRequester(focusRequester),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = "興味があるマイタグを検索",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
+                        innerTextField()
                     }
                 }
             )
-
-            if (inputText.isBlank()) {
-                TopSearchBarSection(
-                    title = "최근 검색한 취미",
-                    items = recentSearchedHobbies,
-                    onItemClick = { item ->
-                        if (!localSelectedHobbies.contains(item)) {
-                            localSelectedHobbies = localSelectedHobbies + item
-                        }
-                    }
-                )
-                TopSearchBarSection(
-                    title = "급상승 취미",
-                    items = trendingHobbies,
-                    onItemClick = { item ->
-                        if (!localSelectedHobbies.contains(item)) {
-                            localSelectedHobbies = localSelectedHobbies + item
-                        }
-                    }
-                )
-            } else {
-                TopSearchBarSection(
-                    title = "검색 결과",
-                    items = searchResults,
-                    onItemClick = { item ->
-                        if (!localSelectedHobbies.contains(item)) {
-                            localSelectedHobbies = localSelectedHobbies + item
-                        }
-                    }
-                )
-            }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 하단 영역: 검색 버튼과 돌아가기 버튼
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Row( // 버튼들을 위한 Row
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.End // 오른쪽 정렬
         ) {
-            Button(onClick = {
-                onSearchConfirmed(localSelectedHobbies)
-            }) {
-                Text("검색", style = TextStyle(fontSize = 16.sp, color = Color.White))
+            Button(onClick = onSearchPerformed) {
+                Text("검색")
             }
-            Button(onClick = {
-                onCancel()
-            }) {
-                Text("돌아가기", style = TextStyle(fontSize = 16.sp, color = Color.White))
+            Spacer(modifier = Modifier.width(8.dp)) // 버튼 사이 간격
+            Button(onClick = onBackButtonClicked) {
+                Text("돌아가기")
             }
         }
     }
 }
 
-/**
- * TopSearchBar의 섹션 UI 컴포저블.
- */
+// 선택된 태그들을 보여주는 가로 스크롤 리스트
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TopSearchBarSection(
-    title: String,
-    items: List<String>,
-    onItemClick: (String) -> Unit
+fun MainHomeMyTagScreen_SelectedTagsRow(
+    selectedTags: List<MainHomeTagItemUiState>, // 변경
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+
+        ) {
+        selectedTags.forEach { tag ->
+            MainHomeMyTagScreen_TagChip( // 변경
+                tag = tag,
+                isRemovable = false
+            )
+        }
+    }
+}
+
+// 확장된 검색 바의 내용 (최근 검색, 급상승 태그, 검색 결과)
+@Composable
+fun MainHomeMyTagScreen_ExpandedSearchContent(
+    searchQuery: String,
+    recentSearches: List<MainHomeTagItemUiState>,
+    trendingTags: List<MainHomeTagItemUiState>,
+    searchResults: List<MainHomeTagItemUiState>,
+    selectedTags: List<MainHomeTagItemUiState>,
+    onTagSelected: (MainHomeTagItemUiState) -> Unit,
+    onTagRemoved: (MainHomeTagItemUiState) -> Unit,
+    isVisible: Boolean
+) {
+    AnimatedVisibility(isVisible) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            // 선택된 태그
+            MainHomeMyTagScreen_TagSection(
+                title = "선택된 태그",
+                tags = selectedTags,
+                onTagClick = onTagRemoved,
+                isRemovable = true
+            )
+
+            // 검색 결과
+            MainHomeMyTagScreen_TagSection(
+                title = "검색 결과",
+                tags = searchResults,
+                onTagClick = onTagSelected
+            )
+
+            if (searchQuery.isBlank()) {
+                // 최근 검색 태그
+                MainHomeMyTagScreen_TagSection(
+                    title = "최근 검색 태그",
+                    tags = recentSearches,
+                    onTagClick = onTagSelected
+                )
+
+                // 최근 검색 태그
+                MainHomeMyTagScreen_TagSection(
+                    title = "급상승 태그",
+                    tags = trendingTags,
+                    onTagClick = onTagSelected
+                )
+            }
+        }
+    }
+}
+
+// 태그 섹션 (제목 + 칩 목록)
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun MainHomeMyTagScreen_TagSection(
+    title: String,
+    tags: List<MainHomeTagItemUiState>, // List<String> -> List<TagItemUiState>
+    onTagClick: (MainHomeTagItemUiState) -> Unit, // (String) -> Unit 에서 변경
+    isRemovable: Boolean = false
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
         Text(
             text = title,
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        if (items.isEmpty()) {
-            Text(text = "없음", style = TextStyle(fontSize = 14.sp, color = Color.Gray))
+        Spacer(modifier = Modifier.height(8.dp))
+        if (tags.isEmpty()) {
+            Text(
+                text = "없음",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
         } else {
-            FlowRow {
-                items.forEach { item ->
-                    TopSearchBarChip(text = item, onClick = { onItemClick(item) })
+            // MainHomeMyTagScreen_ChipRow(tags = tags, onTagClick = onTagClick, isRemovable = isRemovable)
+            // 여기
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                maxItemsInEachRow = 3
+            ) {
+                tags.forEach { tag ->
+                    MainHomeMyTagScreen_TagChip( // 변경
+                        tag = tag,
+                        onTagClick = {
+                            onTagClick(tag) // 클릭 시 전체 객체 전달
+
+                        },
+                        isRemovable = isRemovable
+                    )
                 }
             }
         }
     }
 }
 
-/**
- * TopSearchBar에서 개별 취미를 chip 형태로 표현하는 컴포저블.
- */
 @Composable
-fun TopSearchBarChip(
-    text: String,
-    onClick: () -> Unit
+fun MainHomeMyTagScreen_TagChip(
+    tag: MainHomeTagItemUiState,
+    onTagClick: (() -> Unit)? = null, // Optional<() -> Unit>으로 변경,  null 허용, 기본값 null
+    isRemovable: Boolean = false
 ) {
     Surface(
-        modifier = Modifier.clickable { onClick() },
-        shape = MaterialTheme.shapes.small,
-        color = Color(0xFF6200EE).copy(alpha = 0.2f)
+        modifier = Modifier.padding(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = if (isRemovable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .then(if (onTagClick != null) Modifier.clickable(onClick = onTagClick) else Modifier) // 조건부 clickable
+        ) {
+            Text(
+                text = tag.name,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = if (isRemovable) 0.dp else 8.dp,
+                    top = 4.dp,
+                    bottom = 4.dp
+                )
+            )
+            if (isRemovable) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .then(if (onTagClick != null) Modifier.clickable(onClick = onTagClick) else Modifier), // 조건부 clickable
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "X",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+// 오늘의 태그 & 트렌딩 태그 (Carousel)
+@Composable
+fun MainHomeMyTagScreen_TodayAndTrendingTags(
+    tags: List<MainHomeTagItemUiState> // 단일 리스트로 변경
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = TextStyle(fontSize = 14.sp, color = Color.Black)
+            text = "오늘의 태그 & 트렌딩 태그",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MainHomeMyTagScreen_TagCarousel(
+            tags = tags // 단일 리스트 전달
         )
     }
 }
 
+// Carousel 구현 (LazyRow 사용)
 @Composable
-fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Black,
-        modifier = Modifier.padding(vertical = 8.dp)
+fun MainHomeMyTagScreen_TagCarousel(
+    tags: List<MainHomeTagItemUiState> // 단일 리스트로 받음
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(tags) { tag ->
+            MainHomeMyTagScreen_TagCard(tag = tag)
+        }
+    }
+}
+
+// 태그 카드 (섬네일, 태그 이름, 사용자 수)
+@Composable
+fun MainHomeMyTagScreen_TagCard(
+    tag: MainHomeTagItemUiState,
+    onClick: () -> Unit = {} // 기본값 추가
+) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant, // 배경색
+        modifier = Modifier
+            .width(150.dp) // 너비 고정
+            .height(100.dp) // 높이 고정
+            .clickable(onClick = onClick) //클릭 리스너
+    ) {
+        Row(modifier = Modifier.padding(8.dp)) {
+            // 이미지
+            Image(
+                painter = painterResource(R.drawable.couple_3), // 임시 이미지
+                contentDescription = "Tag Image",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(4.dp)), // 둥근 모서리
+                contentScale = ContentScale.Crop // 이미지를 꽉 채우도록
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 텍스트 (태그 이름, 사용자 수)
+            Column {
+                Text(
+                    text = tag.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                Text(
+                    text = "${tag.userCount} 명",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
+
+}
+
+// 내가 선택한 태그
+@Composable
+fun MainHomeMyTagScreen_MySelectedTags(
+    MainHomeMyTags: List<MainHomeTagItemUiState>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "내가 선택한 태그",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "더보기",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        if (MainHomeMyTags.isEmpty()) {
+            Text(
+                text = "프로필에서 태그를 선택해주세요.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        } else {
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(3), // 3행 그리드
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.heightIn(max = 250.dp)
+            ) {
+                items(MainHomeMyTags) { tag ->
+                    MainHomeMyTagScreen_TagCard(tag = tag)
+                }
+            }
+        }
+
+    }
+}
+
+// 프로모션 배너
+@Composable
+fun MainHomeMyTagScreen_PromotionBanner(
+    imageUrl: String,
+    onClick: () -> Unit
+) {
+    Image(
+        painter = painterResource(id = R.drawable.couple_3), // 임시 이미지
+        contentDescription = "Promotion Banner",
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        contentScale = ContentScale.Crop
     )
 }
 
+// 새로운 태그 추천
 @Composable
-fun TagItem(tag: String, imageUrl: String) {
-    Box(
+fun MainHomeMyTagScreen_SuggestedTags(
+    suggestedTags: List<MainHomeTagItemUiState>
+) {
+    Column(
         modifier = Modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
-        Image(
-            painter = rememberImagePainter(data = imageUrl),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-        )
         Text(
-            text = tag,
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Center)
+            text = "새로운 태그 추천",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
         )
-    }
-}
-
-@Composable
-fun TrendingTags(tags: List<Pair<String, String>>) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        tags.forEach { (tag, image) ->
-            TagItem(tag, image)
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-    }
-}
-
-@Composable
-fun SelectedTags(tags: List<Pair<String, String>>) {
-    Column {
-        tags.chunked(2).forEach { rowTags ->
-            Row {
-                rowTags.forEach { (tag, image) ->
-                    TagItem(tag, image)
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+        Spacer(modifier = Modifier.height(8.dp))
+        LazyHorizontalGrid(
+            rows = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .heightIn(max = 200.dp) // 최대 높이 제한
+        ) {
+            items(suggestedTags) { tag ->
+                MainHomeMyTagScreen_TagCard(tag)
             }
         }
     }
 }
-
-@Composable
-fun RecommendedTags(tags: List<Pair<String, String>>) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        tags.forEach { (tag, image) ->
-            TagItem(tag, image)
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainHomeMyTagContents() {
-    TokitokiTheme {
-        MainHomeMyTagContents(
-            uiState = MainHomeMyTagUiState(
-                trendingTags = listOf(
-                    "운동" to "https://via.placeholder.com/150",
-                    "독서" to "https://via.placeholder.com/150"
-                ),
-                selectedTags = listOf(
-                    "게임" to "https://via.placeholder.com/150",
-                    "요리" to "https://via.placeholder.com/150"
-                ),
-                recommendedTags = listOf(
-                    "음악" to "https://via.placeholder.com/150",
-                    "여행" to "https://via.placeholder.com/150"
-                )
-            ),
-            onSearchTextChanged = {}
-        )
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun MainHomeContentsPreview() {
-//    TokitokiTheme {
-//        MainHomeContents(uiState = MainHomeUiState()) {
-//        }
-//    }
-//}

@@ -214,7 +214,7 @@ fun MainHomeContents(
             when (uiState.selectedTab) {
                 MainHomeTab.SEARCH -> MainHomeSearchScreen()
                 MainHomeTab.PICKUP -> MainHomePickupScreen()
-                MainHomeTab.MY_TAG -> MyTagScreen()
+                MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
             }
         }
     }
