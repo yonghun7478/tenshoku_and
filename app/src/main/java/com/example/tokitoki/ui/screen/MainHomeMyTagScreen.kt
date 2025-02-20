@@ -35,7 +35,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -58,15 +57,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
+import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
@@ -80,8 +80,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
         isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
     }
 
-    Scaffold(
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) { // Box 추가: 전체를 감싸는 역할
 
             // 원래의 컨텐츠 (LazyColumn)
@@ -533,7 +532,7 @@ fun MainHomeMyTagScreen_TagCard(
 // 내가 선택한 태그
 @Composable
 fun MainHomeMyTagScreen_MySelectedTags(
-    MainHomeMyTags: List<MainHomeTagItemUiState>
+    myTags: List<MainHomeTagItemUiState>
 ) {
     Column(
         modifier = Modifier
@@ -560,7 +559,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        if (MainHomeMyTags.isEmpty()) {
+        if (myTags.isEmpty()) {
             Text(
                 text = "프로필에서 태그를 선택해주세요.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -575,7 +574,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.heightIn(max = 250.dp)
             ) {
-                items(MainHomeMyTags) { tag ->
+                items(myTags) { tag ->
                     MainHomeMyTagScreen_TagCard(tag = tag)
                 }
             }
@@ -629,5 +628,246 @@ fun MainHomeMyTagScreen_SuggestedTags(
                 MainHomeMyTagScreen_TagCard(tag)
             }
         }
+    }
+}
+
+// 1. MainHomeMyTagScreen_NormalSearchBar Preview
+@Preview(showBackground = true, name = "Normal Search Bar (Empty)")
+@Composable
+fun MainHomeMyTagScreen_NormalSearchBarEmptyPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_NormalSearchBar(
+            selectedTags = listOf(), // 빈 리스트
+            onSearchBarClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Normal Search Bar (With Tags)")
+@Composable
+fun MainHomeMyTagScreen_NormalSearchBarWithTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_NormalSearchBar(
+            selectedTags = listOf(
+                MainHomeTagItemUiState("태그1", "image1", 10),
+                MainHomeTagItemUiState("태그2", "image2", 25)
+            ),
+            onSearchBarClicked = {}
+        )
+    }
+}
+
+// 2. MainHomeMyTagScreen_ExpandedSearchBar Preview
+@Preview(showBackground = true, name = "Expanded Search Bar (Empty)")
+@Composable
+fun MainHomeMyTagScreen_ExpandedSearchBarEmptyPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_ExpandedSearchBar(
+            searchQuery = "", // 빈 검색어
+            onSearchQueryChanged = {},
+            focusRequester = FocusRequester(),
+            onSearchPerformed = {},
+            onBackButtonClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Expanded Search Bar (With Text)")
+@Composable
+fun MainHomeMyTagScreen_ExpandedSearchBarWithTextPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_ExpandedSearchBar(
+            searchQuery = "검색 중...", // 검색어 입력
+            onSearchQueryChanged = {},
+            focusRequester = FocusRequester(),
+            onSearchPerformed = {},
+            onBackButtonClicked = {}
+        )
+    }
+}
+
+// 4. MainHomeMyTagScreen_SelectedTagsRow Preview
+@Preview(showBackground = true, name = "Selected Tags Row")
+@Composable
+fun MainHomeMyTagScreen_SelectedTagsRowPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SelectedTagsRow(
+            selectedTags = listOf(
+                MainHomeTagItemUiState("태그1", "image1", 10),
+                MainHomeTagItemUiState("태그2", "image2", 25),
+                MainHomeTagItemUiState("태그3", "image3", 5)
+            ),
+        )
+    }
+}
+
+// 5. MainHomeMyTagScreen_ExpandedSearchContent Preview:  검색어 없는 경우 (최근, 급상승) + 있는 경우.
+@Preview(showBackground = true, name = "Expanded Search Content Preview")
+@Composable
+fun MainHomeMyTagScreen_ExpandedSearchContentPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_ExpandedSearchContent(
+            searchQuery = "", // 빈 검색어
+            recentSearches = listOf(
+                MainHomeTagItemUiState("최근검색1", "recent1", 1),
+                MainHomeTagItemUiState("최근검색2", "recent2", 2)
+            ),
+            trendingTags = listOf(
+                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
+                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
+                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+            ),
+            searchResults = listOf(
+                MainHomeTagItemUiState("검색결과1", "search_result_image1", 10),
+                MainHomeTagItemUiState("검색결과2", "search_result_image2", 20)
+            ),
+            selectedTags = listOf(
+                MainHomeTagItemUiState("선택된태그1", "selected_image1", 100),
+                MainHomeTagItemUiState("선택된태그2", "selected_image2", 200)
+            ),
+            onTagSelected = {},
+            onTagRemoved = {},
+            isVisible = true
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Expanded Search Content with Query")
+@Composable
+fun MainHomeMyTagScreen_ExpandedSearchContentSearchQueryPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_ExpandedSearchContent(
+            searchQuery = "검색어있음", // 검색어 있음
+            recentSearches = listOf(
+                MainHomeTagItemUiState("최근검색1", "recent1", 1),
+                MainHomeTagItemUiState("최근검색2", "recent2", 2)
+            ),
+            trendingTags = listOf(
+                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
+                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
+                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+            ),
+            searchResults = listOf(
+                MainHomeTagItemUiState("검색결과1", "search_result_image1", 10),
+                MainHomeTagItemUiState("검색결과2", "search_result_image2", 20)
+            ),
+            selectedTags = listOf(
+                MainHomeTagItemUiState("선택된태그1", "selected_image1", 100),
+                MainHomeTagItemUiState("선택된태그2", "selected_image2", 200)
+            ),
+            onTagSelected = {},
+            onTagRemoved = {},
+            isVisible = true
+        )
+    }
+}
+
+// 6. MainHomeMyTagScreen_TagSection:  isRemovable = false 만. (true는 Chip에서 확인)
+@Preview(showBackground = true, name = "Tag Section Preview")
+@Composable
+fun MainHomeMyTagScreen_TagSectionPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TagSection(
+            title = "섹션 제목",
+            tags = listOf(
+                MainHomeTagItemUiState("태그1", "image1", 10),
+                MainHomeTagItemUiState("태그2", "image2", 20),
+                MainHomeTagItemUiState("태그3", "image3", 30)
+            ),
+            onTagClick = {},
+            isRemovable = false
+        )
+    }
+}
+
+// 8. MainHomeMyTagScreen_TagChip: isRemovable = true, false  2가지
+@Preview(showBackground = true, name = "Tag Chip Removable")
+@Composable
+fun MainHomeMyTagScreen_TagChipRemovablePreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TagChip(
+            tag = MainHomeTagItemUiState("태그", "image1", 10),
+            onTagClick = {},
+            isRemovable = true
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Tag Chip Not Removable")
+@Composable
+fun MainHomeMyTagScreen_TagChipNotRemovablePreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TagChip(
+            tag = MainHomeTagItemUiState("태그", "image1", 10),
+            onTagClick = {},
+            isRemovable = false
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Carousel Preview")
+@Composable
+fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TodayAndTrendingTags(
+            // 더 이상 todayTag, trendingTags를 분리하지 않음.
+            tags = listOf(
+                MainHomeTagItemUiState("오늘의 태그", "", 100),
+                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
+                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
+                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+            )
+
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Tag Card Preview")
+@Composable
+fun MainHomeMyTagScreen_TagCardPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TagCard(
+            tag = MainHomeTagItemUiState("태그 이름", "image_url", 123),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "My Selected Tags Preview")
+@Composable
+fun MainHomeMyTagScreen_MySelectedTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_MySelectedTags(
+            myTags = listOf(
+                MainHomeTagItemUiState("선택한 태그1", "", 30),
+                MainHomeTagItemUiState("선택한 태그2", "", 45),
+                MainHomeTagItemUiState("선택한 태그3", "", 60),
+                MainHomeTagItemUiState("선택한 태그4", "", 22)
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Promotion Banner Preview")
+@Composable
+fun MainHomeMyTagScreen_PromotionBannerPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_PromotionBanner(
+            imageUrl = "https://via.placeholder.com/350x150",
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Suggested Tags Preview")
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SuggestedTags(
+            suggestedTags = listOf(
+                MainHomeTagItemUiState("추천 태그1", "image1", 15),
+                MainHomeTagItemUiState("추천 태그2", "image2", 33)
+            )
+        )
     }
 }
