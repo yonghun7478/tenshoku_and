@@ -1,6 +1,5 @@
 package com.example.tokitoki.ui.screen
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -142,7 +141,6 @@ fun MyTagScreen(viewModel: MyTagViewModel = hiltViewModel()) {
 fun MyTagScreen_NormalSearchBar(
     selectedTags: List<TagItemUiState>, // 변경
     onSearchBarClicked: () -> Unit,
-    onTagRemoved: (TagItemUiState) -> Unit, // 변경
     modifier: Modifier = Modifier, // 추가: 외부에서 Modifier를 받을 수 있도록
 ) {
     Row(
@@ -169,7 +167,6 @@ fun MyTagScreen_NormalSearchBar(
         } else {
             MyTagScreen_SelectedTagsRow( // 변경
                 selectedTags = selectedTags,
-                onTagRemoved = onTagRemoved
             )
         }
     }
@@ -263,7 +260,6 @@ fun MyTagScreen_SearchBar(
             MyTagScreen_NormalSearchBar(
                 selectedTags = selectedTags,
                 onSearchBarClicked = onSearchBarClicked,
-                onTagRemoved = onTagRemoved,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -276,7 +272,6 @@ fun MyTagScreen_SearchBar(
 @Composable
 fun MyTagScreen_SelectedTagsRow(
     selectedTags: List<TagItemUiState>, // 변경
-    onTagRemoved: (TagItemUiState) -> Unit, // 변경
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -286,8 +281,8 @@ fun MyTagScreen_SelectedTagsRow(
         selectedTags.forEach { tag ->
             MyTagScreen_TagChip( // 변경
                 tag = tag,
-                onTagClick = { onTagRemoved(tag) }, //변경
-                isRemovable = true
+                onTagClick = { }, //변경
+                isRemovable = false
             )
         }
     }
@@ -334,10 +329,10 @@ fun MyTagScreen_ExpandedSearchContent(
                     onTagClick = onTagSelected
                 )
 
-                // 급상승 태그
-                MyTagScreen_TrendingTagSection(
+                // 최근 검색 태그
+                MyTagScreen_TagSection(
                     title = "급상승 태그",
-                    trendingTags = trendingTags,
+                    tags = trendingTags,
                     onTagClick = onTagSelected
                 )
             }
@@ -392,43 +387,6 @@ fun MyTagScreen_TagSection(
         }
     }
 }
-
-// 태그 섹션 (제목 + 칩 목록)
-@Composable
-fun MyTagScreen_TrendingTagSection( //이름 변경
-    title: String,
-    trendingTags: List<TagItemUiState>, // List<String> -> List<TagItemUiState>
-    onTagClick: (TagItemUiState) -> Unit, // 변경된 부분
-    isRemovable: Boolean = false // 삭제 가능한 칩인지 여부
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        if (trendingTags.isEmpty()) {
-            Text(
-                text = "없음",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-        } else {
-            //MyTagScreen_ChipRow(tags = trendingTags, onTagClick = onTagClick, isRemovable = isRemovable)
-            //칩을 TagCard 형태로 변경
-            trendingTags.forEach { tag ->
-                MyTagScreen_TagCard(tag = tag, onClick = { onTagClick(tag) }) //여기
-
-            }
-        }
-    }
-}
-
 
 @Composable
 fun MyTagScreen_TagChip(
@@ -675,7 +633,6 @@ fun MyTagScreen_NormalSearchBarPreview() {
                 TagItemUiState("태그3", "image3", 30)
             ),
             onSearchBarClicked = {},
-            onTagRemoved = {}
         )
     }
 }
@@ -687,7 +644,6 @@ fun MyTagScreen_NormalSearchBarEmptyPreview() {
         MyTagScreen_NormalSearchBar(
             selectedTags = listOf(), // 빈 리스트
             onSearchBarClicked = {},
-            onTagRemoved = {}
         )
     }
 }
@@ -773,7 +729,6 @@ fun MyTagScreen_SelectedTagsRowPreview() {
                 TagItemUiState("태그4", "image4", 40),
                 TagItemUiState("태그5", "image5", 50)
             ),
-            onTagRemoved = {}
         )
     }
 }
@@ -869,21 +824,7 @@ fun MyTagScreen_TagSectionPreviewRemovable() {
         )
     }
 }
-@Preview(showBackground = true, name = "Trending Tag Section Preview")
-@Composable
-fun MyTagScreen_TrendingTagSectionPreview() {
-    TokitokiTheme{
-        MyTagScreen_TrendingTagSection(
-            title = "급상승 태그",
-            trendingTags = listOf(
-                TagItemUiState("트렌딩 태그1", "image1", 50),
-                TagItemUiState("트렌딩 태그2", "image2", 120),
-                TagItemUiState("트렌딩 태그3", "image3", 80)
-            ),
-            onTagClick = {}
-        )
-    }
-}
+
 @Preview(showBackground = true, name = "Tag Chip Preview")
 @Composable
 fun MyTagScreen_TagChipPreview() {
