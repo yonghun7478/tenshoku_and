@@ -1,5 +1,7 @@
 package com.example.tokitoki.ui.state
 
+import com.example.tokitoki.domain.model.MainHomeTag
+
 // UiState
 data class MainHomeMyTagUiState(
     val selectedTags: List<MainHomeTagItemUiState> = listOf(), // 변경
@@ -16,4 +18,12 @@ data class MainHomeTagItemUiState( //임시
     val name: String,
     val imageUrl: String,
     val userCount: Int
-)
+) {
+    fun toDomain(): MainHomeTag {
+        return MainHomeTag(
+            name = this.name,
+            imageUrl = this.imageUrl,
+            userCount = this.userCount
+        )
+    }
+}

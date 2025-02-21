@@ -2,6 +2,19 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.model.MainHomeTag
+import com.example.tokitoki.domain.usecase.AddRecentSearchUseCase
+import com.example.tokitoki.domain.usecase.AddSelectedTagUseCase
+import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCase
+import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
+import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCase
+import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCase
+import com.example.tokitoki.domain.usecase.GetTodayTagUseCase
+import com.example.tokitoki.domain.usecase.GetTrendingTagsUseCase
+import com.example.tokitoki.domain.usecase.RemoveSelectedTagUseCase
+import com.example.tokitoki.domain.usecase.RestoreTempSelectedTagsUseCase
+import com.example.tokitoki.domain.usecase.SaveTempSelectedTagsUseCase
+import com.example.tokitoki.domain.usecase.SearchTagsUseCase
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,132 +27,157 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainHomeMyTagViewModel @Inject constructor(
-    // private val getTrendingTagsUseCase: GetTrendingTagsUseCase, // UseCase는 주석처리.
-    // private val searchTagsUseCase: SearchTagsUseCase // UseCase 주석처리
+    private val getTodayTagUseCase: GetTodayTagUseCase,
+    private val getTrendingTagsUseCase: GetTrendingTagsUseCase,
+    private val getMyTagsUseCase: GetMyMainHomeTagsUseCase,
+    private val getSuggestedTagsUseCase: GetSuggestedTagsUseCase,
+    private val searchTagsUseCase: SearchTagsUseCase,
+    private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
+    private val addSelectedTagUseCase: AddSelectedTagUseCase,
+    private val removeSelectedTagUseCase: RemoveSelectedTagUseCase,
+    private val saveTempSelectedTagsUseCase: SaveTempSelectedTagsUseCase,
+    private val restoreTempSelectedTagsUseCase: RestoreTempSelectedTagsUseCase,
+//    private val addRecentSearchUseCase: AddRecentSearchUseCase, // 추가
+//    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase // 추가
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(MainHomeMyTagUiState())
     val uiState: StateFlow<MainHomeMyTagUiState> = _uiState.asStateFlow()
-    private var _tempSelectedTags: List<MainHomeTagItemUiState> = listOf() // 임시 저장 변수
-
 
     init {
         loadTags()
-        loadRecentSearches() // 추가
+        loadRecentSearches()
     }
 
     fun onTagSearchQueryChanged(query: String) {
         _uiState.update {
             it.copy(searchQuery = query)
         }
-        searchTags(query) // 검색 기능 추가
+        searchTags(query)
     }
 
     // 검색어 초기화 함수
     fun clearSearchQuery() {
         _uiState.update {
-            it.copy(searchQuery = "") // searchQuery를 빈 문자열로 설정
+            it.copy(searchQuery = "")
         }
     }
 
     // 확장 모드 진입 시 현재 선택된 태그를 임시 저장
     fun saveSelectedTags() {
-        _tempSelectedTags = _uiState.value.selectedTags
+        viewModelScope.launch {
+            saveTempSelectedTagsUseCase(_uiState.value.selectedTags.map { it.toDomain() })
+        }
     }
 
     // 돌아가기 시 임시 저장된 태그로 복원
     fun restoreSelectedTags() {
-        _uiState.update {
-            it.copy(selectedTags = _tempSelectedTags)
+        viewModelScope.launch {
+            val result = restoreTempSelectedTagsUseCase()
+            if (result.isSuccess) {
+                _uiState.update {
+                    it.copy(selectedTags = result.getOrThrow().map { tag -> tag.toPresentation() })
+                }
+            } else {
+                // 에러 처리
+            }
         }
     }
 
     // 태그 선택
     fun onTagSelected(tag: MainHomeTagItemUiState) {
-        if (!_uiState.value.selectedTags.contains(tag)) {
-            _uiState.update {
-                it.copy(selectedTags = it.selectedTags + tag)
+        viewModelScope.launch {
+            val tagItem = tag.toDomain()
+            val result = addSelectedTagUseCase(tagItem)
+            if(result.isSuccess){
+                if (!_uiState.value.selectedTags.contains(tag)) {
+                    _uiState.update {
+                        it.copy(selectedTags = it.selectedTags + tag)
+                    }
+                }
             }
+
         }
+
     }
 
     // 태그 제거
     fun onTagRemoved(tag: MainHomeTagItemUiState) {
-        _uiState.update {
-            it.copy(selectedTags = it.selectedTags - tag)
+        viewModelScope.launch {
+            val tagItem = tag.toDomain()
+            val result = removeSelectedTagUseCase(tagItem)
+            if(result.isSuccess){
+                _uiState.update {
+                    it.copy(selectedTags = it.selectedTags - tag)
+                }
+            }
         }
     }
 
-    // 검색 기능 (임시 - 테스트 데이터 사용)
+    //검색 usecase
     fun searchTags(query: String) {
         viewModelScope.launch {
-            // UseCase 사용 (주석 처리)
-            // val results = searchTagsUseCase(query)
-
-            // 테스트 데이터 (실제로는 API나 DB에서 검색)
-            val results = if (query.isNotBlank()) {
-                listOf(
-                    MainHomeTagItemUiState("검색결과1_$query", "search_result_image1", 10),
-                    MainHomeTagItemUiState("검색결과2_$query", "search_result_image2", 20)
-                )
+            val result = searchTagsUseCase(query)
+            if (result.isSuccess) {
+                _uiState.update {
+                    it.copy(searchResults = result.getOrThrow().map { tag -> tag.toPresentation() })
+                }
             } else {
-                listOf() // 빈 검색어면 빈 결과
-            }
-            _uiState.update {
-                it.copy(searchResults = results)
+                // 에러 처리
             }
         }
     }
 
-    //최근 검색어 임시 추가
     fun loadRecentSearches() {
         viewModelScope.launch {
-            val recentSearches = listOf(
-                MainHomeTagItemUiState("최근검색1", "recent1", 1),
-                MainHomeTagItemUiState("최근검색2", "recent2", 2)
-            )
-            _uiState.update {
-                it.copy(recentSearches = recentSearches)
+            val result = getRecentSearchesUseCase()
+            if (result.isSuccess) {
+                _uiState.update {
+                    it.copy(recentSearches = result.getOrThrow().map { tag -> tag.toPresentation()})
+                }
+            } else {
+                // 에러 처리
             }
         }
     }
 
+
+    //검색 usecase
+    //최근 검색 usecase
     fun onSearchPerformed() {
-        // 검색 로직 (여기서는 간단하게 searchQuery를 사용)
-        // searchTags(_uiState.value.searchQuery) //이미 다른곳에서 함
+        // 검색 버튼 눌렀을 때 추가 작업 (예: 최근 검색어 추가)
+//        viewModelScope.launch {
+//            val currentQuery = _uiState.value.searchQuery
+//            if (currentQuery.isNotBlank()) {
+//                val result = addRecentSearchUseCase(MainHomeTag(currentQuery, "", 0)) // 최근 검색어 객체 생성, MainHomeTag 타입으로
+//                if (result.isSuccess.not()) {
+//                    // 에러 처리 (최근 검색어 추가 실패)
+//                }
+//            }
+//        }
     }
 
-    // 태그 로드 (테스트 데이터 사용, 이전과 동일)
     fun loadTags() {
         viewModelScope.launch {
-            val todayTag = MainHomeTagItemUiState("오늘의 태그", "today_image", 100)
-            val trendingTags = listOf(
-                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
-                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
-                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
-            )
-            val myTags = listOf(
-                MainHomeTagItemUiState("선택한 태그1", "my_image1", 30),
-                MainHomeTagItemUiState("선택한 태그2", "my_image2", 45),
-            )
-            val suggestedTags = listOf(
-                MainHomeTagItemUiState("추천 태그1", "suggested_image1", 15),
-                MainHomeTagItemUiState("추천 태그2", "suggested_image2", 33),
-                MainHomeTagItemUiState("추천 태그3", "suggested_image3", 77),
-                MainHomeTagItemUiState("추천 태그4", "suggested_image3", 77),
-                MainHomeTagItemUiState("추천 태그5", "suggested_image3", 77),
-                MainHomeTagItemUiState("추천 태그6", "suggested_image3", 77),
-                MainHomeTagItemUiState("추천 태그7", "suggested_image3", 77),
-                MainHomeTagItemUiState("추천 태그8", "suggested_image3", 77),
-            )
+            val todayTagResult = getTodayTagUseCase()
+            val trendingTagsResult = getTrendingTagsUseCase()
+            val myTagsResult = getMyTagsUseCase()
+            val suggestedTagsResult = getSuggestedTagsUseCase()
 
-            // UI 상태 업데이트
-            _uiState.update {
-                it.copy(
-                    todayTags = todayTag,
-                    trendingTags = trendingTags,
-                    myTags = myTags,
-                    suggestedTags = suggestedTags
-                )
+            if (todayTagResult.isSuccess && trendingTagsResult.isSuccess &&
+                myTagsResult.isSuccess && suggestedTagsResult.isSuccess
+            ) {
+                _uiState.update {
+                    it.copy(
+                        todayTags = todayTagResult.getOrThrow().toPresentation(),
+                        trendingTags = trendingTagsResult.getOrThrow().map { it -> it.toPresentation() },
+                        myTags = myTagsResult.getOrThrow().map { it -> it.toPresentation() },
+                        suggestedTags = suggestedTagsResult.getOrThrow().map { it-> it.toPresentation() }
+                    )
+                }
+            } else {
+                // 에러 처리 (하나라도 실패하면)
+                // 예: todayTagResult.exceptionOrNull() 등을 사용하여 에러 원인 확인
             }
         }
     }
