@@ -9,7 +9,7 @@ interface MainHomeTagRepository {
     suspend fun getSuggestedTags(): Result<List<MainHomeTag>>
     suspend fun searchTags(query: String): Result<List<MainHomeTag>>
     suspend fun getRecentSearches(): Result<List<MainHomeTag>>
-    suspend fun addRecentSearch(tag: MainHomeTag) : Result<Unit>
+    suspend fun addRecentSearch(tags: List<MainHomeTag>) : Result<Unit>
     suspend fun deleteRecentSearch(tag: MainHomeTag): Result<Unit>
     suspend fun addSelectedTag(tag: MainHomeTag): Result<Unit>
     suspend fun removeSelectedTag(tag: MainHomeTag): Result<Unit>

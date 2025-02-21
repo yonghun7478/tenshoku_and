@@ -41,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,6 +79,13 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
         viewModel.restoreSelectedTags()
         viewModel.clearSearchQuery()
         isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
+    }
+
+    // LaunchedEffect 추가: isExpanded가 true로 바뀔 때마다 loadRecentSearches 호출
+    LaunchedEffect(isExpanded) {
+        if (isExpanded) {
+            viewModel.loadRecentSearches()
+        }
     }
 
     Scaffold { innerPadding ->

@@ -28,13 +28,10 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
         MainHomeTagData("추천 태그6", "suggested_image3", 77),
         MainHomeTagData("추천 태그7", "suggested_image3", 77),
         MainHomeTagData("추천 태그8", "suggested_image3", 77),
-    ).map {it.toDomain()}
+    ).map { it.toDomain() }
 
 
-    private  val recentSearches = listOf(
-        MainHomeTagData("최근검색1", "recent1", 1),
-        MainHomeTagData("최근검색2", "recent2", 2)
-    ).map{it.toDomain()}
+    private var recentSearches: List<MainHomeTagData> = listOf()
 
     private var selectedTags: MutableList<MainHomeTag> = mutableListOf()
     private var tempSelectedTags: List<MainHomeTag> = listOf()
@@ -73,11 +70,16 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
 
     override suspend fun getRecentSearches(): Result<List<MainHomeTag>> {
         delay(200)
-        return  Result.success(recentSearches.toList())
+        return Result.success(recentSearches.map { it.toDomain() })
     }
 
-    override suspend fun addRecentSearch(tag: MainHomeTag): Result<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun addRecentSearch(tags: List<MainHomeTag>): Result<Unit> {
+        delay(100)
+        recentSearches = (tags.map { it.toData() } + recentSearches) // 리스트 + 리스트
+            .distinctBy { it.name }
+            .take(5)
+            .toMutableList()
+        return Result.success(Unit)
     }
 
     override suspend fun deleteRecentSearch(tag: MainHomeTag): Result<Unit> {

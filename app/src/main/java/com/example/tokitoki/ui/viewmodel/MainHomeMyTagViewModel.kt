@@ -37,7 +37,7 @@ class MainHomeMyTagViewModel @Inject constructor(
     private val removeSelectedTagUseCase: RemoveSelectedTagUseCase,
     private val saveTempSelectedTagsUseCase: SaveTempSelectedTagsUseCase,
     private val restoreTempSelectedTagsUseCase: RestoreTempSelectedTagsUseCase,
-//    private val addRecentSearchUseCase: AddRecentSearchUseCase, // 추가
+    private val addRecentSearchUseCase: AddRecentSearchUseCase, // 추가
 //    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase // 추가
 ) : ViewModel() {
 
@@ -145,16 +145,15 @@ class MainHomeMyTagViewModel @Inject constructor(
     //검색 usecase
     //최근 검색 usecase
     fun onSearchPerformed() {
-        // 검색 버튼 눌렀을 때 추가 작업 (예: 최근 검색어 추가)
-//        viewModelScope.launch {
-//            val currentQuery = _uiState.value.searchQuery
-//            if (currentQuery.isNotBlank()) {
-//                val result = addRecentSearchUseCase(MainHomeTag(currentQuery, "", 0)) // 최근 검색어 객체 생성, MainHomeTag 타입으로
-//                if (result.isSuccess.not()) {
-//                    // 에러 처리 (최근 검색어 추가 실패)
-//                }
-//            }
-//        }
+        viewModelScope.launch {
+            val currentSelectedTags = _uiState.value.selectedTags.map { it.toDomain() } // List<MainHomeTagItemUiState> -> List<MainHomeTag>
+            if (currentSelectedTags.isNotEmpty()) {
+                val result = addRecentSearchUseCase(currentSelectedTags) // List<MainHomeTag> 전달
+                if (result.isSuccess.not()) {
+                    // 에러 처리
+                }
+            }
+        }
     }
 
     fun loadTags() {

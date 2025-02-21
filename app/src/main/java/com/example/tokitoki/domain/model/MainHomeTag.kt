@@ -1,5 +1,6 @@
 package com.example.tokitoki.domain.model
 
+import com.example.tokitoki.data.model.MainHomeTagData
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 
 data class MainHomeTag(
@@ -8,6 +9,12 @@ data class MainHomeTag(
     val userCount: Int
 ) {
     fun toPresentation(): MainHomeTagItemUiState = MainHomeTagItemUiState(
+        name = this.name,
+        imageUrl = this.imageUrl,
+        userCount = this.userCount
+    )
+
+    fun toData(): MainHomeTagData = MainHomeTagData(
         name = this.name,
         imageUrl = this.imageUrl,
         userCount = this.userCount
