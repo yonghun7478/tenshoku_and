@@ -2,6 +2,7 @@ package com.example.tokitoki.di
 
 import com.example.tokitoki.data.repository.AuthRepositoryImpl
 import com.example.tokitoki.data.repository.DbRepositoryImpl
+import com.example.tokitoki.data.repository.MainHomeTagRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
 import com.example.tokitoki.data.repository.PickupUserRepositoryImpl
@@ -9,6 +10,7 @@ import com.example.tokitoki.data.repository.TagRepositoryImpl
 import com.example.tokitoki.data.repository.UserRepositoryImpl
 import com.example.tokitoki.domain.repository.AuthRepository
 import com.example.tokitoki.domain.repository.DbRepository
+import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
 import com.example.tokitoki.domain.repository.PickupUserRepository
@@ -64,4 +66,10 @@ abstract class TokiTokiRepositoryModule {
     abstract fun bindPickupUserRepository(
         pickupRepositoryImpl: PickupUserRepositoryImpl
     ): PickupUserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMainHomeTagRepository(
+        mainHomeTagRepositoryImpl: MainHomeTagRepositoryImpl // 구현체 클래스
+    ): MainHomeTagRepository // 인터페이스
 }
