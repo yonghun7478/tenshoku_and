@@ -165,6 +165,12 @@ class MainHomeMyTagViewModel @Inject constructor(
 
     fun loadTags() {
         viewModelScope.launch {
+            _suggestedTagsUiState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
             val todayTagResult = getTodayTagUseCase()
             val trendingTagsResult = getTrendingTagsUseCase()
             val myTagsResult = getMyTagsUseCase()
@@ -182,10 +188,13 @@ class MainHomeMyTagViewModel @Inject constructor(
                     )
                 }
 
-                _suggestedTagsUiState.value = SuggestedTagsUiState(
-                    tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
-                    canLoadMore = true
-                )
+                _suggestedTagsUiState.update {
+                    it.copy(
+                        tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
+                        canLoadMore = true,
+                        isLoading = false,
+                    )
+                }
             } else {
                 // 에러 처리 (하나라도 실패하면)
                 // 예: todayTagResult.exceptionOrNull() 등을 사용하여 에러 원인 확인

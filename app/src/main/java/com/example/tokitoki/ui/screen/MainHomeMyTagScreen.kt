@@ -141,6 +141,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                         MainHomeMyTagScreen_SuggestedTags(
                             suggestedTags = suggestedTagsUiState.tags,
                             canLoadMore = suggestedTagsUiState.canLoadMore,
+                            isLoading = suggestedTagsUiState.isLoading,
                             onLoadMore = {
                                 viewModel.loadMoreSuggestedTags()
                             }
@@ -622,6 +623,7 @@ fun MainHomeMyTagScreen_PromotionBanner(
 fun MainHomeMyTagScreen_SuggestedTags(
     suggestedTags: List<MainHomeTagItemUiState>,
     canLoadMore: Boolean = false,
+    isLoading: Boolean = false,
     onLoadMore: () -> Unit = {}
 ) {
     Column(
@@ -648,7 +650,7 @@ fun MainHomeMyTagScreen_SuggestedTags(
                 MainHomeMyTagScreen_TagCard(tag)
             }
 
-            if (canLoadMore) {
+            if (!isLoading && canLoadMore) {
                 item(
                     span = { GridItemSpan(maxLineSpan) } // 현재 라인의 최대 span (여기서는 2)
                 ) {
