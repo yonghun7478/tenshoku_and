@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
@@ -71,6 +72,7 @@ import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
 @Composable
 fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
+    val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
     var isExpanded by remember { mutableStateOf(false) } // 검색창 확장 상태
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
 
@@ -136,7 +138,13 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                     }
                     item {
                         // 새로운 태그 추천
-                        MainHomeMyTagScreen_SuggestedTags(uiState.suggestedTags)
+                        MainHomeMyTagScreen_SuggestedTags(
+                            suggestedTags = suggestedTagsUiState.tags,
+                            canLoadMore = suggestedTagsUiState.canLoadMore,
+                            onLoadMore = {
+                                viewModel.loadMoreSuggestedTags()
+                            }
+                        )
                     }
                 }
             }
@@ -612,7 +620,9 @@ fun MainHomeMyTagScreen_PromotionBanner(
 // 새로운 태그 추천
 @Composable
 fun MainHomeMyTagScreen_SuggestedTags(
-    suggestedTags: List<MainHomeTagItemUiState>
+    suggestedTags: List<MainHomeTagItemUiState>,
+    canLoadMore: Boolean = false,
+    onLoadMore: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -625,15 +635,31 @@ fun MainHomeMyTagScreen_SuggestedTags(
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
+
         LazyHorizontalGrid(
             rows = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .heightIn(max = 200.dp) // 최대 높이 제한
+            modifier = Modifier.heightIn(max = 200.dp)
         ) {
-            items(suggestedTags) { tag ->
+            items(items = suggestedTags,
+                //key = { tag -> tag.name } // 필요한 경우 key 지정.  고유한 키를 사용해야 함.
+            ) { tag ->
                 MainHomeMyTagScreen_TagCard(tag)
+            }
+
+            if (canLoadMore) {
+                item(
+                    span = { GridItemSpan(maxLineSpan) } // 현재 라인의 최대 span (여기서는 2)
+                ) {
+                    Button(
+                        onClick = onLoadMore,
+                        modifier = Modifier
+                            .padding(8.dp)
+                    ) {
+                        Text("더 보기")
+                    }
+                }
             }
         }
     }

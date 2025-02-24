@@ -11,7 +11,6 @@ data class MainHomeMyTagUiState(
     val trendingTags: List<MainHomeTagItemUiState> = listOf(),
     val todayTags: MainHomeTagItemUiState = MainHomeTagItemUiState("", "", 0),
     val myTags: List<MainHomeTagItemUiState> = listOf(),
-    val suggestedTags: List<MainHomeTagItemUiState> = listOf()
 )
 
 data class MainHomeTagItemUiState( //임시
@@ -27,3 +26,8 @@ data class MainHomeTagItemUiState( //임시
         )
     }
 }
+
+data class SuggestedTagsUiState(
+    val tags: List<MainHomeTagItemUiState> = listOf(),
+    val canLoadMore: Boolean = true
+)

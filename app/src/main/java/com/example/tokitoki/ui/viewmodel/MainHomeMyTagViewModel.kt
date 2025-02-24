@@ -17,6 +17,7 @@ import com.example.tokitoki.domain.usecase.SaveTempSelectedTagsUseCase
 import com.example.tokitoki.domain.usecase.SearchTagsUseCase
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
+import com.example.tokitoki.ui.state.SuggestedTagsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +44,10 @@ class MainHomeMyTagViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MainHomeMyTagUiState())
     val uiState: StateFlow<MainHomeMyTagUiState> = _uiState.asStateFlow()
+
+    private val _suggestedTagsUiState = MutableStateFlow(SuggestedTagsUiState())
+    val suggestedTagsUiState: StateFlow<SuggestedTagsUiState> = _suggestedTagsUiState.asStateFlow()
+
 
     init {
         loadTags()
@@ -89,7 +94,7 @@ class MainHomeMyTagViewModel @Inject constructor(
         viewModelScope.launch {
             val tagItem = tag.toDomain()
             val result = addSelectedTagUseCase(tagItem)
-            if(result.isSuccess){
+            if (result.isSuccess) {
                 if (!_uiState.value.selectedTags.contains(tag)) {
                     _uiState.update {
                         it.copy(selectedTags = it.selectedTags + tag)
@@ -106,7 +111,7 @@ class MainHomeMyTagViewModel @Inject constructor(
         viewModelScope.launch {
             val tagItem = tag.toDomain()
             val result = removeSelectedTagUseCase(tagItem)
-            if(result.isSuccess){
+            if (result.isSuccess) {
                 _uiState.update {
                     it.copy(selectedTags = it.selectedTags - tag)
                 }
@@ -133,7 +138,8 @@ class MainHomeMyTagViewModel @Inject constructor(
             val result = getRecentSearchesUseCase()
             if (result.isSuccess) {
                 _uiState.update {
-                    it.copy(recentSearches = result.getOrThrow().map { tag -> tag.toPresentation()})
+                    it.copy(
+                        recentSearches = result.getOrThrow().map { tag -> tag.toPresentation() })
                 }
             } else {
                 // 에러 처리
@@ -146,7 +152,8 @@ class MainHomeMyTagViewModel @Inject constructor(
     //최근 검색 usecase
     fun onSearchPerformed() {
         viewModelScope.launch {
-            val currentSelectedTags = _uiState.value.selectedTags.map { it.toDomain() } // List<MainHomeTagItemUiState> -> List<MainHomeTag>
+            val currentSelectedTags =
+                _uiState.value.selectedTags.map { it.toDomain() } // List<MainHomeTagItemUiState> -> List<MainHomeTag>
             if (currentSelectedTags.isNotEmpty()) {
                 val result = addRecentSearchUseCase(currentSelectedTags) // List<MainHomeTag> 전달
                 if (result.isSuccess.not()) {
@@ -169,14 +176,39 @@ class MainHomeMyTagViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         todayTags = todayTagResult.getOrThrow().toPresentation(),
-                        trendingTags = trendingTagsResult.getOrThrow().map { it -> it.toPresentation() },
+                        trendingTags = trendingTagsResult.getOrThrow()
+                            .map { it -> it.toPresentation() },
                         myTags = myTagsResult.getOrThrow().map { it -> it.toPresentation() },
-                        suggestedTags = suggestedTagsResult.getOrThrow().map { it-> it.toPresentation() }
                     )
                 }
+
+                _suggestedTagsUiState.value = SuggestedTagsUiState(
+                    tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
+                    canLoadMore = true
+                )
             } else {
                 // 에러 처리 (하나라도 실패하면)
                 // 예: todayTagResult.exceptionOrNull() 등을 사용하여 에러 원인 확인
+            }
+        }
+    }
+
+    fun loadMoreSuggestedTags() {
+        viewModelScope.launch {
+            val result = getSuggestedTagsUseCase()
+
+            if (result.isSuccess) {
+                val newTags = result.getOrThrow().map { it.toPresentation() }
+                if (newTags.isNotEmpty()) {
+                    _suggestedTagsUiState.update { currentState -> // update 사용
+                        currentState.copy(
+                            tags = currentState.tags + newTags, // 기존 태그에 새 태그 추가
+                            canLoadMore = true
+                        )
+                    }
+                }
+            } else {
+                // 에러 처리
             }
         }
     }
