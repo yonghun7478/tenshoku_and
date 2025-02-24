@@ -68,6 +68,12 @@ class MainHomeMyTagViewModel @Inject constructor(
         }
     }
 
+    fun clearSearchResult() {
+        _uiState.update {
+            it.copy(searchResults = listOf())
+        }
+    }
+
     // 확장 모드 진입 시 현재 선택된 태그를 임시 저장
     fun saveSelectedTags() {
         viewModelScope.launch {

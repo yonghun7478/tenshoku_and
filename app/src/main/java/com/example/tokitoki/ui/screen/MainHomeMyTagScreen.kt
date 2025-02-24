@@ -80,6 +80,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
     BackHandler(enabled = isExpanded) {
         viewModel.restoreSelectedTags()
         viewModel.clearSearchQuery()
+        viewModel.clearSearchResult()
         isExpanded = false // isExpanded를 false로 설정하여 검색창 닫기
     }
 
@@ -111,6 +112,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                             onSearchBarClicked = {
                                 viewModel.saveSelectedTags()
                                 viewModel.clearSearchQuery()
+                                viewModel.clearSearchResult()
                                 isExpanded = true
                             },
                         )
@@ -169,11 +171,13 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                         onSearchPerformed = {  // 추가
                             viewModel.onSearchPerformed()
                             viewModel.clearSearchQuery()
+                            viewModel.clearSearchResult()
                             isExpanded = false
                         },
                         onBackButtonClicked = {
                             viewModel.restoreSelectedTags()
                             viewModel.clearSearchQuery()
+                            viewModel.clearSearchResult()
                             isExpanded = false
                         } // 추가
                     )
