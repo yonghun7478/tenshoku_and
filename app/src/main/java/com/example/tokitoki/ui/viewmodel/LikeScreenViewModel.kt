@@ -62,7 +62,13 @@ class LikeScreenViewModel @Inject constructor(
             val currentTab = _uiState.value.selectedTab
             when (currentTab) {
                 LikeTab.RECEIVED -> {
-                    _uiState.update { it.copy(receivedLikesIsRefreshing = true) }
+                    _uiState.update {
+                        it.copy(
+                            receivedLikesIsRefreshing = true,
+                            receivedLikes = emptyList()
+                        )
+                    }
+
                     delay(2000) // Simulate network delay
                     val newList = createDummyLikes(currentTab)
                     _uiState.update {
@@ -74,15 +80,30 @@ class LikeScreenViewModel @Inject constructor(
                 }
 
                 LikeTab.SENT -> {
-                    _uiState.update { it.copy(sentLikesIsRefreshing = true) }
+                    _uiState.update {
+                        it.copy(
+                            sentLikesIsRefreshing = true,
+                            sentLikes = emptyList()
+                        )
+                    }
                     delay(2000)
                     val newList = createDummyLikes(currentTab)
-                    _uiState.update { it.copy(sentLikes = newList, sentLikesIsRefreshing = false) }
+                    _uiState.update {
+                        it.copy(
+                            sentLikes = newList,
+                            sentLikesIsRefreshing = false
+                        )
+                    }
 
                 }
 
                 LikeTab.MATCHED -> {
-                    _uiState.update { it.copy(matchedLikesIsRefreshing = true) }
+                    _uiState.update {
+                        it.copy(
+                            matchedLikesIsRefreshing = true,
+                            matchedLikes = emptyList()
+                        )
+                    }
                     delay(2000)
                     val newList = createDummyLikes(currentTab)
                     _uiState.update {
