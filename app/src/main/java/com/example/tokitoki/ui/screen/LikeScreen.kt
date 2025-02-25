@@ -38,6 +38,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -116,7 +117,8 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
                 uiState = uiState,
                 listStates = listStates, // listStates를 전달
                 onItemLongClicked = { itemId -> viewModel.onItemLongClicked(itemId) },//viewModel::onItemLongClicked,
-                onSelectItem = viewModel::onSelectItem // Pass item selection handler
+                onSelectItem = viewModel::onSelectItem, // Pass item selection handler
+                onRefresh = { viewModel.refreshLikes() }
             )
             //삭제 다이얼로그
             if (uiState.showDeleteDialog) {
@@ -208,6 +210,7 @@ fun LikeTabContentComponent(
     listStates: Map<LikeTab, LazyListState>, // Map으로 받음
     onItemLongClicked: (Int) -> Unit,
     onSelectItem: (Int) -> Unit, // Add item selection handler
+    onRefresh: () -> Unit
 ) {
     when (uiState.selectedTab) {
         LikeTab.RECEIVED -> LikeReceivedListComponent(
@@ -216,7 +219,9 @@ fun LikeTabContentComponent(
             isDeleteMode = uiState.isDeleteMode, // Pass delete mode
             selectedItems = uiState.selectedItems,   // Pass selected items
             onSelectItem = onSelectItem, // Pass selection handler
-            listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용
+            listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용,
+            isRefreshing = uiState.receivedLikesIsRefreshing,
+            onRefresh = onRefresh
         )
 
         LikeTab.SENT -> LikeSentListComponent(
@@ -226,6 +231,8 @@ fun LikeTabContentComponent(
             selectedItems = uiState.selectedItems,
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.SENT]!!, // 올바른 LazyListState 사용
+            isRefreshing = uiState.sentLikesIsRefreshing,
+            onRefresh = onRefresh
         )
 
         LikeTab.MATCHED -> LikeMatchedListComponent(
@@ -235,11 +242,14 @@ fun LikeTabContentComponent(
             selectedItems = uiState.selectedItems,
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.MATCHED]!!, // 올바른 LazyListState 사용
+            isRefreshing = uiState.matchedLikesIsRefreshing,
+            onRefresh = onRefresh
         )
     }
 }
 
 // List Composables (for each tab)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikeReceivedListComponent(
     likes: List<LikeItemUiState>,
@@ -247,24 +257,33 @@ fun LikeReceivedListComponent(
     isDeleteMode: Boolean,
     onSelectItem: (Int) -> Unit, // Pass item selection handler
     selectedItems: Set<Int> = emptySet(), //선택된 아이템 리스트 파라미터
-    listState: LazyListState
+    listState: LazyListState,
+    isRefreshing: Boolean, // 추가
+    onRefresh: () -> Unit
 ) {
-    LazyColumn(
+    PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
-        state = listState
+        isRefreshing = isRefreshing, // ViewModel의 isRefreshing 상태
+        onRefresh = { onRefresh() } // ViewModel의 refreshLikes() 호출
     ) {
-        items(likes, key = { it.id }) { like ->
-            LikeReceivedItemComponent(
-                like = like,
-                onItemLongClicked = { onItemLongClicked(like.id) },
-                isDeleteMode = isDeleteMode, // Pass delete mode to item
-                onCheckedChange = { onSelectItem(like.id) },
-                isChecked = selectedItems.contains(like.id) // Pass checked state
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState
+        ) {
+            items(likes, key = { it.id }) { like ->
+                LikeReceivedItemComponent(
+                    like = like,
+                    onItemLongClicked = { onItemLongClicked(like.id) },
+                    isDeleteMode = isDeleteMode, // Pass delete mode to item
+                    onCheckedChange = { onSelectItem(like.id) },
+                    isChecked = selectedItems.contains(like.id) // Pass checked state
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikeSentListComponent(
     likes: List<LikeItemUiState>,
@@ -272,24 +291,33 @@ fun LikeSentListComponent(
     isDeleteMode: Boolean,
     selectedItems: Set<Int>,
     onSelectItem: (Int) -> Unit,
-    listState: LazyListState
+    listState: LazyListState,
+    isRefreshing: Boolean, // 추가
+    onRefresh: () -> Unit
 ) {
-    LazyColumn(
+    PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
-        state = listState
+        isRefreshing = isRefreshing, // ViewModel의 isRefreshing 상태
+        onRefresh = { onRefresh() } // ViewModel의 refreshLikes() 호출
     ) {
-        items(likes, key = { it.id }) { like ->
-            LikeSentItemComponent(
-                like = like,
-                onItemLongClicked = { onItemLongClicked(like.id) },
-                isDeleteMode = isDeleteMode,
-                isChecked = selectedItems.contains(like.id), // Pass checked state
-                onCheckedChange = { onSelectItem(like.id) }
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState
+        ) {
+            items(likes, key = { it.id }) { like ->
+                LikeSentItemComponent(
+                    like = like,
+                    onItemLongClicked = { onItemLongClicked(like.id) },
+                    isDeleteMode = isDeleteMode,
+                    isChecked = selectedItems.contains(like.id), // Pass checked state
+                    onCheckedChange = { onSelectItem(like.id) }
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikeMatchedListComponent(
     likes: List<LikeItemUiState>,
@@ -297,20 +325,28 @@ fun LikeMatchedListComponent(
     isDeleteMode: Boolean,
     selectedItems: Set<Int>,
     onSelectItem: (Int) -> Unit,
-    listState: LazyListState
+    listState: LazyListState,
+    isRefreshing: Boolean, // 추가
+    onRefresh: () -> Unit
 ) {
-    LazyColumn(
+    PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
-        state = listState
+        isRefreshing = isRefreshing, // ViewModel의 isRefreshing 상태
+        onRefresh = { onRefresh() } // ViewModel의 refreshLikes() 호출
     ) {
-        items(likes, key = { it.id }) { like ->
-            LikeMatchedItemComponent(
-                like = like,
-                onItemLongClicked = { onItemLongClicked(like.id) },
-                isDeleteMode = isDeleteMode,
-                isChecked = selectedItems.contains(like.id), // Pass checked state
-                onCheckedChange = { onSelectItem(like.id) }
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState
+        ) {
+            items(likes, key = { it.id }) { like ->
+                LikeMatchedItemComponent(
+                    like = like,
+                    onItemLongClicked = { onItemLongClicked(like.id) },
+                    isDeleteMode = isDeleteMode,
+                    isChecked = selectedItems.contains(like.id), // Pass checked state
+                    onCheckedChange = { onSelectItem(like.id) }
+                )
+            }
         }
     }
 }

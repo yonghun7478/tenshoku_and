@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// TODO: 리프레시할떄 아이템이 싹 날라간다음에 스크롤 위치를맨위로, 꾹 누르기 관련 버그 수정하기,무한 스크롤 추가
 @HiltViewModel
 class LikeScreenViewModel @Inject constructor(
 ) : ViewModel() {
@@ -61,31 +62,35 @@ class LikeScreenViewModel @Inject constructor(
             val currentTab = _uiState.value.selectedTab
             when (currentTab) {
                 LikeTab.RECEIVED -> {
-                    // receivedLikes 리스트의 모든 아이템을 isRefreshing = true로 변경
-                    val refreshingList = _uiState.value.receivedLikes.map { it.copy(isRefreshing = true) }
-                    _uiState.update { it.copy(receivedLikes = refreshingList) }
-
+                    _uiState.update { it.copy(receivedLikesIsRefreshing = true) }
                     delay(2000) // Simulate network delay
+                    val newList = createDummyLikes(currentTab)
+                    _uiState.update {
+                        it.copy(
+                            receivedLikes = newList,
+                            receivedLikesIsRefreshing = false
+                        )
+                    }
+                }
 
-                    // 더미 데이터로 갱신 (실제 앱에서는 API 호출)
-                    val newList = createDummyLikes(currentTab)
-                    _uiState.update { it.copy(receivedLikes = newList) }
-                }
                 LikeTab.SENT -> {
-                    // sentLikes 리스트 갱신 (동일한 로직)
-                    val refreshingList = _uiState.value.sentLikes.map { it.copy(isRefreshing = true) }
-                    _uiState.update { it.copy(sentLikes = refreshingList) }
+                    _uiState.update { it.copy(sentLikesIsRefreshing = true) }
                     delay(2000)
                     val newList = createDummyLikes(currentTab)
-                    _uiState.update { it.copy(sentLikes = newList) }
+                    _uiState.update { it.copy(sentLikes = newList, sentLikesIsRefreshing = false) }
+
                 }
+
                 LikeTab.MATCHED -> {
-                    // matchedLikes 리스트 갱신 (동일한 로직)
-                    val refreshingList = _uiState.value.matchedLikes.map { it.copy(isRefreshing = true) }
-                    _uiState.update { it.copy(matchedLikes = refreshingList) }
+                    _uiState.update { it.copy(matchedLikesIsRefreshing = true) }
                     delay(2000)
                     val newList = createDummyLikes(currentTab)
-                    _uiState.update { it.copy(matchedLikes = newList) }
+                    _uiState.update {
+                        it.copy(
+                            matchedLikes = newList,
+                            matchedLikesIsRefreshing = false
+                        )
+                    }
                 }
             }
         }

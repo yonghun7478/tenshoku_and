@@ -10,6 +10,9 @@ data class LikeScreenUiState(
     val selectedItems: Set<Int> = emptySet(), // 선택된 아이템의 ID 저장 (삭제 모드용)
     val showDeleteDialog: Boolean = false,
     val showSnackBar: Boolean = false,
+    val receivedLikesIsRefreshing: Boolean = false,
+    val sentLikesIsRefreshing: Boolean = false,
+    val matchedLikesIsRefreshing: Boolean = false
 )
 
 data class LikeItemUiState(
