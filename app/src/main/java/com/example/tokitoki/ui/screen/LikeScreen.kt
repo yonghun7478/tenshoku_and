@@ -329,7 +329,11 @@ fun LikeReceivedItemComponent(
             .fillMaxWidth()
             .padding(8.dp)
             .combinedClickable( // clickable 대신 combinedClickable 사용
-                onClick = {},
+                onClick = {
+                    if (isDeleteMode) {
+                        onCheckedChange(isChecked)
+                    }
+                },
                 onLongClick = { onItemLongClicked() }
             )
     ) {
@@ -391,7 +395,11 @@ fun LikeSentItemComponent(
             .fillMaxWidth()
             .padding(8.dp)
             .combinedClickable( // clickable 대신 combinedClickable 사용
-                onClick = {},
+                onClick = {
+                    if (isDeleteMode) {
+                        onCheckedChange(isChecked)
+                    }
+                },
                 onLongClick = { onItemLongClicked() }
             )
     ) {
@@ -448,7 +456,11 @@ fun LikeMatchedItemComponent(
             .fillMaxWidth()
             .padding(8.dp)
             .combinedClickable( // clickable 대신 combinedClickable 사용
-                onClick = {},
+                onClick = {
+                    if (isDeleteMode) {
+                        onCheckedChange(isChecked)
+                    }
+                },
                 onLongClick = { onItemLongClicked() }
             )
     ) {
