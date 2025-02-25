@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +67,10 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val listStates = remember {
+        LikeTab.values().associateWith { LazyListState() }.toMutableMap() // MutableMap으로 변경
+    }
 
     Scaffold(
         topBar = {
@@ -108,6 +114,7 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
             // 탭에 따른 리스트 표시
             LikeTabContentComponent(
                 uiState = uiState,
+                listStates = listStates, // listStates를 전달
                 onItemLongClicked = { itemId -> viewModel.onItemLongClicked(itemId) },//viewModel::onItemLongClicked,
                 onSelectItem = viewModel::onSelectItem // Pass item selection handler
             )
@@ -198,6 +205,7 @@ fun LikeTabBarComponent(
 @Composable
 fun LikeTabContentComponent(
     uiState: LikeScreenUiState,
+    listStates: Map<LikeTab, LazyListState>, // Map으로 받음
     onItemLongClicked: (Int) -> Unit,
     onSelectItem: (Int) -> Unit, // Add item selection handler
 ) {
@@ -208,7 +216,7 @@ fun LikeTabContentComponent(
             isDeleteMode = uiState.isDeleteMode, // Pass delete mode
             selectedItems = uiState.selectedItems,   // Pass selected items
             onSelectItem = onSelectItem, // Pass selection handler
-
+            listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용
         )
 
         LikeTab.SENT -> LikeSentListComponent(
@@ -216,7 +224,8 @@ fun LikeTabContentComponent(
             onItemLongClicked = onItemLongClicked,
             isDeleteMode = uiState.isDeleteMode,
             selectedItems = uiState.selectedItems,
-            onSelectItem = onSelectItem
+            onSelectItem = onSelectItem,
+            listState = listStates[LikeTab.SENT]!!, // 올바른 LazyListState 사용
         )
 
         LikeTab.MATCHED -> LikeMatchedListComponent(
@@ -224,7 +233,8 @@ fun LikeTabContentComponent(
             onItemLongClicked = onItemLongClicked,
             isDeleteMode = uiState.isDeleteMode,
             selectedItems = uiState.selectedItems,
-            onSelectItem = onSelectItem
+            onSelectItem = onSelectItem,
+            listState = listStates[LikeTab.MATCHED]!!, // 올바른 LazyListState 사용
         )
     }
 }
@@ -237,8 +247,8 @@ fun LikeReceivedListComponent(
     isDeleteMode: Boolean,
     onSelectItem: (Int) -> Unit, // Pass item selection handler
     selectedItems: Set<Int> = emptySet(), //선택된 아이템 리스트 파라미터
+    listState: LazyListState
 ) {
-    val listState = rememberLazyListState() // Remember LazyListState
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState
@@ -261,10 +271,9 @@ fun LikeSentListComponent(
     onItemLongClicked: (Int) -> Unit,
     isDeleteMode: Boolean,
     selectedItems: Set<Int>,
-    onSelectItem: (Int) -> Unit
+    onSelectItem: (Int) -> Unit,
+    listState: LazyListState
 ) {
-    val listState = rememberLazyListState() // Remember LazyListState
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState
@@ -287,10 +296,9 @@ fun LikeMatchedListComponent(
     onItemLongClicked: (Int) -> Unit,
     isDeleteMode: Boolean,
     selectedItems: Set<Int>,
-    onSelectItem: (Int) -> Unit
+    onSelectItem: (Int) -> Unit,
+    listState: LazyListState
 ) {
-    val listState = rememberLazyListState() // Remember LazyListState
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState
