@@ -19,6 +19,7 @@ data class LikeItemUiState(
     val age: Int,
     val introduction: String,
     val isChecked: Boolean = false, // 삭제 모드에서 체크박스 상태
+    val isRefreshing: Boolean = false // 새로고침 상태 추가
 )
 
 // Tab enum

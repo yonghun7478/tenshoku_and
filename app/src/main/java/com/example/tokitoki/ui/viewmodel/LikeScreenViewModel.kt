@@ -1,13 +1,17 @@
 package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.ui.state.LikeItemUiState
 import com.example.tokitoki.ui.state.LikeScreenUiState
 import com.example.tokitoki.ui.state.LikeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,47 +21,75 @@ class LikeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LikeScreenUiState())
     val uiState: StateFlow<LikeScreenUiState> = _uiState.asStateFlow()
 
-
-    // Dummy data initialization (for testing)
     init {
-        val dummyReceivedLikes = List(20) {
-            LikeItemUiState(
-                id = it,
-                thumbnail = "https://via.placeholder.com/150", // Or R.drawable.placeholder
-                nickname = "Received User $it",
-                age = 20 + it,
-                introduction = "This is a sample introduction for received user $it.  It can be up to two lines long.",
-                isChecked = false
-            )
-        }
-        val dummySentLikes = List(15) {
-            LikeItemUiState(
-                id = 100 + it,
-                thumbnail = "https://via.placeholder.com/150",
-                nickname = "Sent User $it",
-                age = 30 + it,
-                introduction = "This is a sample introduction for sent user $it.",
-                isChecked = false
-            )
-        }
-        val dummyMatchedLikes = List(10) {
-            LikeItemUiState(
-                id = 200 + it,
-                thumbnail = "https://via.placeholder.com/150",
-                nickname = "Matched User $it",
-                age = 25 + it,
-                introduction = "This is a sample introduction for matched user $it.",
-                isChecked = false
-            )
-        }
+        loadLikes() // 초기 데이터 로드
+    }
 
+    // 초기 데이터 로드 함수
+    private fun loadLikes() {
         _uiState.value = _uiState.value.copy(
-            receivedLikes = dummyReceivedLikes,
-            sentLikes = dummySentLikes,
-            matchedLikes = dummyMatchedLikes
+            receivedLikes = createDummyLikes(LikeTab.RECEIVED),
+            sentLikes = createDummyLikes(LikeTab.SENT),
+            matchedLikes = createDummyLikes(LikeTab.MATCHED)
         )
     }
 
+
+    // 각 탭별 더미 데이터 생성 함수
+    private fun createDummyLikes(tab: LikeTab): List<LikeItemUiState> {
+        val baseId = when (tab) {
+            LikeTab.RECEIVED -> 0
+            LikeTab.SENT -> 100
+            LikeTab.MATCHED -> 200
+        }
+        return List(20) {
+            LikeItemUiState(
+                id = baseId + it,
+                thumbnail = "https://via.placeholder.com/150",
+                nickname = "${tab.title} User $it",
+                age = 20 + it,
+                introduction = "This is a sample introduction for ${tab.title} user $it.",
+                isChecked = false,
+                isRefreshing = false // 초기 로딩 상태는 false
+            )
+        }
+    }
+
+    // 새로고침 함수 (현재 선택된 탭의 리스트만 갱신)
+    fun refreshLikes() {
+        viewModelScope.launch {
+            val currentTab = _uiState.value.selectedTab
+            when (currentTab) {
+                LikeTab.RECEIVED -> {
+                    // receivedLikes 리스트의 모든 아이템을 isRefreshing = true로 변경
+                    val refreshingList = _uiState.value.receivedLikes.map { it.copy(isRefreshing = true) }
+                    _uiState.update { it.copy(receivedLikes = refreshingList) }
+
+                    delay(2000) // Simulate network delay
+
+                    // 더미 데이터로 갱신 (실제 앱에서는 API 호출)
+                    val newList = createDummyLikes(currentTab)
+                    _uiState.update { it.copy(receivedLikes = newList) }
+                }
+                LikeTab.SENT -> {
+                    // sentLikes 리스트 갱신 (동일한 로직)
+                    val refreshingList = _uiState.value.sentLikes.map { it.copy(isRefreshing = true) }
+                    _uiState.update { it.copy(sentLikes = refreshingList) }
+                    delay(2000)
+                    val newList = createDummyLikes(currentTab)
+                    _uiState.update { it.copy(sentLikes = newList) }
+                }
+                LikeTab.MATCHED -> {
+                    // matchedLikes 리스트 갱신 (동일한 로직)
+                    val refreshingList = _uiState.value.matchedLikes.map { it.copy(isRefreshing = true) }
+                    _uiState.update { it.copy(matchedLikes = refreshingList) }
+                    delay(2000)
+                    val newList = createDummyLikes(currentTab)
+                    _uiState.update { it.copy(matchedLikes = newList) }
+                }
+            }
+        }
+    }
 
     // Event handling functions (called from UI)
     fun onTabSelected(tab: LikeTab) {
