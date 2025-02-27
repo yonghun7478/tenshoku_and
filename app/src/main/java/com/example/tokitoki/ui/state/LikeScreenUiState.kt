@@ -6,7 +6,6 @@ data class LikeScreenUiState(
     val receivedLikes: List<LikeItemUiState> = emptyList(),
     val sentLikes: List<LikeItemUiState> = emptyList(),
     val matchedLikes: List<LikeItemUiState> = emptyList(),
-    val showDeleteDialog: Boolean = false,
     val showSnackBar: Boolean = false,
     val receivedLikesIsRefreshing: Boolean = false,
     val sentLikesIsRefreshing: Boolean = false,

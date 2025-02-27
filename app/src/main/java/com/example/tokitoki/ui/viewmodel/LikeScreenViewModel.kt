@@ -210,7 +210,6 @@ class LikeScreenViewModel @Inject constructor(
             receivedLikes = currentReceived,
             sentLikes = currentSent,
             matchedLikes = currentMatched,
-            showDeleteDialog = false,
             showSnackBar = true,
             deleteItemState = DeleteItemState()
         )
