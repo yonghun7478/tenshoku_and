@@ -10,8 +10,12 @@ import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.DeleteLikeItemUseCase
+import com.example.tokitoki.domain.usecase.DeleteLikeItemUseCaseImpl
 import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCase
 import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCaseImpl
+import com.example.tokitoki.domain.usecase.DeleteSelectedLikeItemsUseCase
+import com.example.tokitoki.domain.usecase.DeleteSelectedLikeItemsUseCaseImpl
 import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
 import com.example.tokitoki.domain.usecase.DislikePickupUserUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
@@ -22,18 +26,24 @@ import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetMatchedLikesUseCase
+import com.example.tokitoki.domain.usecase.GetMatchedLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetReceivedLikesUseCase
+import com.example.tokitoki.domain.usecase.GetReceivedLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCase
 import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCase
 import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetSelectedTagsUseCase
 import com.example.tokitoki.domain.usecase.GetSelectedTagsUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetSentLikesUseCase
+import com.example.tokitoki.domain.usecase.GetSentLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCase
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
@@ -52,6 +62,8 @@ import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCase
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCaseImpl
 import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
 import com.example.tokitoki.domain.usecase.LikePickupUserUseCaseImpl
+import com.example.tokitoki.domain.usecase.LoadMoreLikesUseCase
+import com.example.tokitoki.domain.usecase.LoadMoreLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.RemoveSelectedTagUseCase
@@ -296,4 +308,22 @@ abstract class UseCaseModule {
     abstract fun bindRestoreTempSelectedTagsUseCase(
         restoreTempSelectedTagsUseCaseImpl: RestoreTempSelectedTagsUseCaseImpl
     ): RestoreTempSelectedTagsUseCase
+
+    @Binds
+    abstract fun bindGetReceivedLikesUseCase(useCase: GetReceivedLikesUseCaseImpl): GetReceivedLikesUseCase
+
+    @Binds
+    abstract fun bindGetSentLikesUseCase(useCase: GetSentLikesUseCaseImpl): GetSentLikesUseCase
+
+    @Binds
+    abstract fun bindGetMatchedLikesUseCase(useCase: GetMatchedLikesUseCaseImpl): GetMatchedLikesUseCase
+
+    @Binds
+    abstract fun bindDeleteLikeItemUseCase(useCase: DeleteLikeItemUseCaseImpl): DeleteLikeItemUseCase
+
+    @Binds
+    abstract fun bindDeleteSelectedLikeItemsUseCase(useCase: DeleteSelectedLikeItemsUseCaseImpl): DeleteSelectedLikeItemsUseCase
+
+    @Binds
+    abstract fun bindLoadMoreLikesUseCase(useCase: LoadMoreLikesUseCaseImpl): LoadMoreLikesUseCase
 }
