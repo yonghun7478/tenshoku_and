@@ -77,7 +77,7 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
         topBar = {
             LikeTopBarComponent(
                 title = "いいね",
-                isDeleteMode = uiState.isDeleteMode,
+                isDeleteMode = uiState.deleteModeState.isDeleteMode,
                 onToggleDeleteMode = { viewModel.onToggleDeleteMode() }
             )
         },
@@ -98,18 +98,20 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
             LikeTabBarComponent(
                 selectedTab = uiState.selectedTab,
                 onTabSelected = { tab -> viewModel.onTabSelected(tab) },
-                isDeleteMode = uiState.isDeleteMode //삭제모드 추가
+                isDeleteMode = uiState.deleteModeState.isDeleteMode
             )
             //삭제모드일때 삭제하기 버튼, 모두선택 체크박스 표시
-            if (uiState.isDeleteMode) {
+            if (uiState.deleteModeState.isDeleteMode) {
                 LikeDeleteModeBarComponent(
-                    selectedItems = uiState.selectedItems,
+                    selectedItems = uiState.deleteModeState.selectedItems,
                     receivedLikes = uiState.receivedLikes,
                     sentLikes = uiState.sentLikes,
                     matchedLikes = uiState.matchedLikes,
                     selectedTab = uiState.selectedTab,
                     onSelectAllItems = { viewModel.onSelectAllItems() },
-                    onConfirmDeleteSelectedItems = { viewModel.onConfirmDeleteSelectedItems() }
+                    onConfirmDeleteSelectedItems = {
+                        viewModel.onDeleteSelectedItems()
+                    }
                 )
             }
             // 탭에 따른 리스트 표시
@@ -121,20 +123,20 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
                 onRefresh = { viewModel.refreshLikes() }
             )
             //삭제 다이얼로그
-            if (uiState.showDeleteDialog) {
-                uiState.selectedItems.firstOrNull()?.let { itemId ->
-                    LikeDeleteConfirmDialogComponent(
-                        onConfirm = {
-                            if (uiState.isDeleteMode) {
-                                viewModel.onConfirmDeleteSelectedItems()
-                            } else {
-                                viewModel.onConfirmDeleteItem(itemId)
-                            }
-                        },
-                        onDismiss = { viewModel.onDismissDeleteDialog() }
-                    )
-                }
+            if (uiState.deleteModeState.showDialog) { // 삭제 모드
+                LikeDeleteConfirmDialogComponent(
+                    onConfirmMultiDelete = { viewModel.onConfirmDeleteSelectedItems() },
+                    onConfirmSingleDelete = {}, // 사용 안 함
+                    onDismiss = { viewModel.onDismissDeleteDialog() }
+                )
+            } else if (uiState.deleteItemState.showDialog) { // 단일 아이템 삭제
+                LikeDeleteConfirmDialogComponent(
+                    onConfirmSingleDelete = { viewModel.onConfirmDeleteItem() },
+                    onConfirmMultiDelete = null, // 사용 안 함
+                    onDismiss = { viewModel.onDismissDeleteDialog() }
+                )
             }
+
             //삭제 스낵바
             if (uiState.showSnackBar) {
                 LaunchedEffect(uiState.showSnackBar) {
@@ -216,8 +218,8 @@ fun LikeTabContentComponent(
         LikeTab.RECEIVED -> LikeReceivedListComponent(
             likes = uiState.receivedLikes,
             onItemLongClicked = onItemLongClicked,
-            isDeleteMode = uiState.isDeleteMode, // Pass delete mode
-            selectedItems = uiState.selectedItems,   // Pass selected items
+            isDeleteMode = uiState.deleteModeState.isDeleteMode, // Pass delete mode
+            selectedItems = uiState.deleteModeState.selectedItems,   // Pass selected items
             onSelectItem = onSelectItem, // Pass selection handler
             listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용,
             isRefreshing = uiState.receivedLikesIsRefreshing,
@@ -227,8 +229,8 @@ fun LikeTabContentComponent(
         LikeTab.SENT -> LikeSentListComponent(
             likes = uiState.sentLikes,
             onItemLongClicked = onItemLongClicked,
-            isDeleteMode = uiState.isDeleteMode,
-            selectedItems = uiState.selectedItems,
+            isDeleteMode = uiState.deleteModeState.isDeleteMode,
+            selectedItems = uiState.deleteModeState.selectedItems,
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.SENT]!!, // 올바른 LazyListState 사용
             isRefreshing = uiState.sentLikesIsRefreshing,
@@ -238,8 +240,8 @@ fun LikeTabContentComponent(
         LikeTab.MATCHED -> LikeMatchedListComponent(
             likes = uiState.matchedLikes,
             onItemLongClicked = onItemLongClicked,
-            isDeleteMode = uiState.isDeleteMode,
-            selectedItems = uiState.selectedItems,
+            isDeleteMode = uiState.deleteModeState.isDeleteMode,
+            selectedItems = uiState.deleteModeState.selectedItems,
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.MATCHED]!!, // 올바른 LazyListState 사용
             isRefreshing = uiState.matchedLikesIsRefreshing,
@@ -602,7 +604,8 @@ fun LikeDeleteModeBarComponent(
 //삭제 확인 다이얼로그
 @Composable
 fun LikeDeleteConfirmDialogComponent(
-    onConfirm: () -> Unit,
+    onConfirmSingleDelete: () -> Unit, // 단일 삭제 콜백
+    onConfirmMultiDelete: (() -> Unit)? = null, // 다중 삭제 콜백 (선택 사항)
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -610,7 +613,15 @@ fun LikeDeleteConfirmDialogComponent(
         title = { Text("削除確認") },
         text = { Text("本当に削除しますか？") },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(
+                onClick = {
+                    if (onConfirmMultiDelete != null) {
+                        onConfirmMultiDelete()
+                    } else {
+                        onConfirmSingleDelete()
+                    }
+                }
+            ) {
                 Text("OK")
             }
         },
@@ -619,8 +630,6 @@ fun LikeDeleteConfirmDialogComponent(
                 Text("Cancel")
             }
         },
-//        icon = {Icon(Icons.Filled.Info, contentDescription = null)} //Material3 Icon
-
     )
 }
 

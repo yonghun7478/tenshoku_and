@@ -2,6 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.ui.state.DeleteItemState
+import com.example.tokitoki.ui.state.DeleteModeState
 import com.example.tokitoki.ui.state.LikeItemUiState
 import com.example.tokitoki.ui.state.LikeScreenUiState
 import com.example.tokitoki.ui.state.LikeTab
@@ -119,36 +121,48 @@ class LikeScreenViewModel @Inject constructor(
 
     // Event handling functions (called from UI)
     fun onTabSelected(tab: LikeTab) {
-        _uiState.value =
-            _uiState.value.copy(selectedTab = tab, selectedItems = emptySet()) // 탭 변경 시 선택된 항목 초기화
+        _uiState.update {
+            it.copy(
+                selectedTab = tab,
+                deleteModeState = DeleteModeState() // 탭 변경 시 삭제 모드 상태 초기화
+            )
+        }
     }
 
     fun onToggleDeleteMode() {
-        _uiState.value = _uiState.value.copy(
-            isDeleteMode = !_uiState.value.isDeleteMode,
-            selectedItems = emptySet() // 삭제 모드 전환 시 선택된 항목 초기화
-        )
+        _uiState.update {
+            it.copy(
+                deleteModeState = it.deleteModeState.copy(
+                    isDeleteMode = !it.deleteModeState.isDeleteMode,
+                    selectedItems = emptySet() // 삭제 모드 전환 시 선택 해제
+                )
+            )
+        }
     }
 
 
     fun onItemLongClicked(itemId: Int) {
-        //_uiState.value = _uiState.value.copy(showDeleteDialog = true)
-        showDeleteConfirmationDialog(itemId)
-    }
-
-    //다이얼로그 표시
-    fun showDeleteConfirmationDialog(itemId: Int) {
-        _uiState.value = _uiState.value.copy(showDeleteDialog = true)
+        if (!uiState.value.deleteModeState.isDeleteMode) {
+            _uiState.update {
+                it.copy(deleteItemState = DeleteItemState(itemId = itemId, showDialog = true))
+            }
+        }
     }
 
     //다이얼로그 닫기
     fun onDismissDeleteDialog() {
-        _uiState.value = _uiState.value.copy(showDeleteDialog = false)
+        _uiState.update {
+            it.copy(
+                deleteItemState = DeleteItemState(), // 둘 다 초기화
+                deleteModeState = it.deleteModeState.copy(showDialog = false)
+            )
+        }
     }
 
-    fun onConfirmDeleteItem(itemId: Int) { //itemId:Int를 인수로 받도록 변경
+    fun onConfirmDeleteItem() { //itemId:Int를 인수로 받도록 변경
         // UseCase 호출 (현재는 구현되지 않았으므로 주석 처리)
         // deleteLikeItemUseCase(itemId)
+        val itemId = _uiState.value.deleteItemState.itemId ?: return
 
         // 임시로 UI에서 직접 삭제 (실제 앱에서는 UseCase에서 처리)
         val currentReceived = _uiState.value.receivedLikes.toMutableList()
@@ -175,7 +189,8 @@ class LikeScreenViewModel @Inject constructor(
             sentLikes = currentSent,
             matchedLikes = currentMatched,
             showDeleteDialog = false,
-            showSnackBar = true
+            showSnackBar = true,
+            deleteItemState = DeleteItemState()
         )
 
         // Show snackbar
@@ -188,13 +203,15 @@ class LikeScreenViewModel @Inject constructor(
 
 
     fun onSelectItem(itemId: Int) {
-        val currentSelected = _uiState.value.selectedItems.toMutableSet()
+        val currentSelected = _uiState.value.deleteModeState.selectedItems.toMutableSet()
         if (currentSelected.contains(itemId)) {
             currentSelected.remove(itemId)
         } else {
             currentSelected.add(itemId)
         }
-        _uiState.value = _uiState.value.copy(selectedItems = currentSelected)
+        _uiState.update {
+            it.copy(deleteModeState = it.deleteModeState.copy(selectedItems = currentSelected))
+        }
     }
 
 
@@ -206,7 +223,7 @@ class LikeScreenViewModel @Inject constructor(
             LikeTab.MATCHED -> _uiState.value.matchedLikes
         }.map { it.id }
 
-        val currentSelected = _uiState.value.selectedItems.toMutableSet()
+        val currentSelected = _uiState.value.deleteModeState.selectedItems.toMutableSet()
         val areAllSelected = currentSelected.containsAll(allItemsInCurrentTab)
 
         if (areAllSelected) {
@@ -217,30 +234,34 @@ class LikeScreenViewModel @Inject constructor(
             currentSelected.addAll(allItemsInCurrentTab)
         }
 
-        _uiState.value = _uiState.value.copy(selectedItems = currentSelected)
+        _uiState.update {
+            it.copy(deleteModeState = it.deleteModeState.copy(selectedItems = currentSelected))
+        }
     }
 
-
+    // 삭제 모드에서 삭제 버튼 클릭
     fun onDeleteSelectedItems() {
-        // Show confirmation dialog before deleting
-        _uiState.value = _uiState.value.copy(showDeleteDialog = true)
+        _uiState.update {
+            it.copy(deleteModeState = it.deleteModeState.copy(showDialog = true)) // DeleteModeState의 showDialog 사용
+        }
     }
 
     fun onConfirmDeleteSelectedItems() {
-        val selectedItems = _uiState.value.selectedItems
+        val selectedItems = _uiState.value.deleteModeState.selectedItems
+
         val currentReceived = _uiState.value.receivedLikes.filterNot { it.id in selectedItems }
         val currentSent = _uiState.value.sentLikes.filterNot { it.id in selectedItems }
         val currentMatched = _uiState.value.matchedLikes.filterNot { it.id in selectedItems }
 
-        _uiState.value = _uiState.value.copy(
-            receivedLikes = currentReceived,
-            sentLikes = currentSent,
-            matchedLikes = currentMatched,
-            selectedItems = emptySet(), // Clear selection after deletion
-            isDeleteMode = false, // Exit delete mode
-            showDeleteDialog = false,  // Close dialog
-            showSnackBar = true
-        )
+        _uiState.update{
+            it.copy(
+                receivedLikes = currentReceived,
+                sentLikes = currentSent,
+                matchedLikes = currentMatched,
+                showSnackBar = true,
+                deleteModeState = DeleteModeState() // DeleteModeState 초기화
+            )
+        }
     }
 
 }
