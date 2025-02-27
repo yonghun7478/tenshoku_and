@@ -42,6 +42,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,7 +121,8 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
                 listStates = listStates, // listStates를 전달
                 onItemLongClicked = { itemId -> viewModel.onItemLongClicked(itemId) },//viewModel::onItemLongClicked,
                 onSelectItem = viewModel::onSelectItem, // Pass item selection handler
-                onRefresh = { viewModel.refreshLikes() }
+                onRefresh = { viewModel.refreshLikes() },
+                onLoadMore = { viewModel.loadMoreLikes() }
             )
             //삭제 다이얼로그
             if (uiState.deleteModeState.showDialog) { // 삭제 모드
@@ -212,7 +214,8 @@ fun LikeTabContentComponent(
     listStates: Map<LikeTab, LazyListState>, // Map으로 받음
     onItemLongClicked: (Int) -> Unit,
     onSelectItem: (Int) -> Unit, // Add item selection handler
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit // onLoadMore 파라미터 추가
 ) {
     when (uiState.selectedTab) {
         LikeTab.RECEIVED -> LikeReceivedListComponent(
@@ -223,7 +226,8 @@ fun LikeTabContentComponent(
             onSelectItem = onSelectItem, // Pass selection handler
             listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용,
             isRefreshing = uiState.receivedLikesIsRefreshing,
-            onRefresh = onRefresh
+            onRefresh = onRefresh,
+            onLoadMore = onLoadMore
         )
 
         LikeTab.SENT -> LikeSentListComponent(
@@ -234,7 +238,8 @@ fun LikeTabContentComponent(
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.SENT]!!, // 올바른 LazyListState 사용
             isRefreshing = uiState.sentLikesIsRefreshing,
-            onRefresh = onRefresh
+            onRefresh = onRefresh,
+            onLoadMore = onLoadMore
         )
 
         LikeTab.MATCHED -> LikeMatchedListComponent(
@@ -245,7 +250,8 @@ fun LikeTabContentComponent(
             onSelectItem = onSelectItem,
             listState = listStates[LikeTab.MATCHED]!!, // 올바른 LazyListState 사용
             isRefreshing = uiState.matchedLikesIsRefreshing,
-            onRefresh = onRefresh
+            onRefresh = onRefresh,
+            onLoadMore = onLoadMore
         )
     }
 }
@@ -261,7 +267,8 @@ fun LikeReceivedListComponent(
     selectedItems: Set<Int> = emptySet(), //선택된 아이템 리스트 파라미터
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit // onLoadMore 파라미터 추가
 ) {
     PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
@@ -282,6 +289,36 @@ fun LikeReceivedListComponent(
                 )
             }
         }
+
+        // LaunchedEffect를 LazyColumn 바깥으로 이동, likes.isNotEmpty() 검사 추가.
+        val isAtBottom = remember {
+            derivedStateOf {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index != null && lastVisibleItem.index == listState.layoutInfo.totalItemsCount - 1
+            }
+        }
+
+        LaunchedEffect(isAtBottom.value) {
+            if (isAtBottom.value && likes.isNotEmpty()) { // likes.isNotEmpty() 조건 검사
+                onLoadMore()
+            }
+        }
+    }
+}
+
+@Composable
+fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
+    val isAtBottom = remember {
+        derivedStateOf { // derivedStateOf를 사용하여 최적화
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != null && lastVisibleItem.index == layoutInfo.totalItemsCount - 1
+        }
+    }
+
+    LaunchedEffect(isAtBottom.value) { // LaunchedEffect를 사용해서 recomposition시에도 감지
+        if (isAtBottom.value) {
+            onLastItemVisible()
+        }
     }
 }
 
@@ -295,7 +332,8 @@ fun LikeSentListComponent(
     onSelectItem: (Int) -> Unit,
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit
 ) {
     PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
@@ -316,6 +354,19 @@ fun LikeSentListComponent(
                 )
             }
         }
+
+        val isAtBottom = remember {
+            derivedStateOf {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index != null && lastVisibleItem.index == listState.layoutInfo.totalItemsCount - 1
+            }
+        }
+
+        LaunchedEffect(isAtBottom.value) {
+            if (isAtBottom.value && likes.isNotEmpty()) { // likes.isNotEmpty() 조건 검사
+                onLoadMore()
+            }
+        }
     }
 }
 
@@ -329,7 +380,8 @@ fun LikeMatchedListComponent(
     onSelectItem: (Int) -> Unit,
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit
 ) {
     PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
         modifier = Modifier.fillMaxSize(),
@@ -348,6 +400,19 @@ fun LikeMatchedListComponent(
                     isChecked = selectedItems.contains(like.id), // Pass checked state
                     onCheckedChange = { onSelectItem(like.id) }
                 )
+            }
+        }
+
+        val isAtBottom = remember {
+            derivedStateOf {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index != null && lastVisibleItem.index == listState.layoutInfo.totalItemsCount - 1
+            }
+        }
+
+        LaunchedEffect(isAtBottom.value) {
+            if (isAtBottom.value && likes.isNotEmpty()) { // likes.isNotEmpty() 조건 검사
+                onLoadMore()
             }
         }
     }

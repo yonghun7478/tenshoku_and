@@ -16,13 +16,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// TODO: 리프레시할떄 아이템이 싹 날라간다음에 스크롤 위치를맨위로, 꾹 누르기 관련 버그 수정하기,무한 스크롤 추가
+
+// TODO: 무한 스크롤 추가
 @HiltViewModel
 class LikeScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LikeScreenUiState())
     val uiState: StateFlow<LikeScreenUiState> = _uiState.asStateFlow()
+    private val PAGE_SIZE = 20 // 한 번에 로드할 아이템 수
 
     init {
         loadLikes() // 초기 데이터 로드
@@ -31,27 +33,24 @@ class LikeScreenViewModel @Inject constructor(
     // 초기 데이터 로드 함수
     private fun loadLikes() {
         _uiState.value = _uiState.value.copy(
-            receivedLikes = createDummyLikes(LikeTab.RECEIVED),
-            sentLikes = createDummyLikes(LikeTab.SENT),
-            matchedLikes = createDummyLikes(LikeTab.MATCHED)
+            receivedLikes = createDummyLikes(LikeTab.RECEIVED, 0),
+            sentLikes = createDummyLikes(LikeTab.SENT, 0),
+            matchedLikes = createDummyLikes(LikeTab.MATCHED, 0)
         )
     }
-
-
-    // 각 탭별 더미 데이터 생성 함수
-    private fun createDummyLikes(tab: LikeTab): List<LikeItemUiState> {
+    private fun createDummyLikes(tab: LikeTab, startIndex: Int): List<LikeItemUiState> {
         val baseId = when (tab) {
             LikeTab.RECEIVED -> 0
             LikeTab.SENT -> 100
             LikeTab.MATCHED -> 200
         }
-        return List(20) {
+        return List(PAGE_SIZE) {
             LikeItemUiState(
-                id = baseId + it,
+                id = baseId + startIndex + it, // startIndex를 사용하여 ID 계산
                 thumbnail = "https://via.placeholder.com/150",
-                nickname = "${tab.title} User $it",
+                nickname = "${tab.title} User ${startIndex + it}",
                 age = 20 + it,
-                introduction = "This is a sample introduction for ${tab.title} user $it.",
+                introduction = "This is a sample introduction for ${tab.title} user ${startIndex + it}.",
                 isChecked = false,
                 isRefreshing = false // 초기 로딩 상태는 false
             )
@@ -72,7 +71,7 @@ class LikeScreenViewModel @Inject constructor(
                     }
 
                     delay(2000) // Simulate network delay
-                    val newList = createDummyLikes(currentTab)
+                    val newList = createDummyLikes(currentTab, 0)
                     _uiState.update {
                         it.copy(
                             receivedLikes = newList,
@@ -89,7 +88,7 @@ class LikeScreenViewModel @Inject constructor(
                         )
                     }
                     delay(2000)
-                    val newList = createDummyLikes(currentTab)
+                    val newList = createDummyLikes(currentTab, 0)
                     _uiState.update {
                         it.copy(
                             sentLikes = newList,
@@ -107,13 +106,36 @@ class LikeScreenViewModel @Inject constructor(
                         )
                     }
                     delay(2000)
-                    val newList = createDummyLikes(currentTab)
+                    val newList = createDummyLikes(currentTab, 0)
                     _uiState.update {
                         it.copy(
                             matchedLikes = newList,
                             matchedLikesIsRefreshing = false
                         )
                     }
+                }
+            }
+        }
+    }
+
+    // 추가 데이터 로드 함수
+    fun loadMoreLikes() {
+        viewModelScope.launch {
+            val currentTab = _uiState.value.selectedTab
+            val currentList = when (currentTab) {
+                LikeTab.RECEIVED -> _uiState.value.receivedLikes
+                LikeTab.SENT -> _uiState.value.sentLikes
+                LikeTab.MATCHED -> _uiState.value.matchedLikes
+            }
+            val nextIndex = currentList.size // 현재 리스트 크기를 기준으로 다음 인덱스 계산
+
+            val newLikes = createDummyLikes(currentTab, nextIndex) // 다음 인덱스부터 데이터 생성
+
+            _uiState.update {
+                when (currentTab) {
+                    LikeTab.RECEIVED -> it.copy(receivedLikes = currentList + newLikes)
+                    LikeTab.SENT -> it.copy(sentLikes = currentList + newLikes)
+                    LikeTab.MATCHED -> it.copy(matchedLikes = currentList + newLikes)
                 }
             }
         }
