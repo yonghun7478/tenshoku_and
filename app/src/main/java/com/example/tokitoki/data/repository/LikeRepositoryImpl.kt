@@ -4,6 +4,7 @@ import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.ui.state.LikeTab
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class LikeRepositoryImpl @Inject constructor() : LikeRepository {
@@ -21,11 +22,20 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     }
 
     // 더미데이터 생성 함수는 인자로 받은 tab, startIndex기반으로 아이템을 생성해서 반환
-    override suspend fun getReceivedLikes(): Result<List<LikeItem>> = Result.success(receivedLikes)
+    override suspend fun getReceivedLikes(): Result<List<LikeItem>> {
+        delay(500)
+        return Result.success(receivedLikes)
+    }
 
-    override suspend fun getSentLikes(): Result<List<LikeItem>> = Result.success(sentLikes)
+    override suspend fun getSentLikes(): Result<List<LikeItem>> {
+        delay(500)
+        return Result.success(sentLikes)
+    }
 
-    override suspend fun getMatchedLikes(): Result<List<LikeItem>> = Result.success(matchedLikes)
+    override suspend fun getMatchedLikes(): Result<List<LikeItem>> {
+        delay(500)
+        return Result.success(matchedLikes)
+    }
 
 
     override suspend fun deleteLikeItem(itemId: Int): Result<Unit> {

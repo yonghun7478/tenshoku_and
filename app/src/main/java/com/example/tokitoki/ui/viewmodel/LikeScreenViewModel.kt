@@ -61,11 +61,10 @@ class LikeScreenViewModel @Inject constructor(
                         )
                     }
                     handleResult(getReceivedLikesUseCase(), currentTab)
-                    _uiState.update { it.copy(receivedLikesIsRefreshing = false) }
-
+                    // _uiState.update { it.copy(receivedLikesIsRefreshing = false) } // 제거!
                 }
 
-                LikeTab.SENT -> {
+                LikeTab.SENT -> { // LikeTab.SENT, LikeTab.MATCHED 도 동일하게 수정
                     _uiState.update {
                         it.copy(
                             sentLikesIsRefreshing = true,
@@ -73,7 +72,7 @@ class LikeScreenViewModel @Inject constructor(
                         )
                     }
                     handleResult(getSentLikesUseCase(), currentTab)
-                    _uiState.update { it.copy(sentLikesIsRefreshing = false) }
+                    //_uiState.update { it.copy(sentLikesIsRefreshing = false) } // 제거
                 }
 
                 LikeTab.MATCHED -> {
@@ -84,7 +83,7 @@ class LikeScreenViewModel @Inject constructor(
                         )
                     }
                     handleResult(getMatchedLikesUseCase(), currentTab)
-                    _uiState.update { it.copy(matchedLikesIsRefreshing = false) }
+                    //_uiState.update { it.copy(matchedLikesIsRefreshing = false) } // 제거
                 }
             }
         }
@@ -245,15 +244,31 @@ class LikeScreenViewModel @Inject constructor(
             .onSuccess { likes ->
                 val uiStateList = likes.map { it.toUiState() }
                 when (tab) {
-                    LikeTab.RECEIVED -> _uiState.update { it.copy(receivedLikes = uiStateList) }
-                    LikeTab.SENT -> _uiState.update { it.copy(sentLikes = uiStateList) }
-                    LikeTab.MATCHED -> _uiState.update { it.copy(matchedLikes = uiStateList) }
+                    LikeTab.RECEIVED -> _uiState.update {
+                        it.copy(
+                            receivedLikes = uiStateList,
+                            receivedLikesIsRefreshing = false
+                        )
+                    } //여기서
+                    LikeTab.SENT -> _uiState.update {
+                        it.copy(
+                            sentLikes = uiStateList,
+                            sentLikesIsRefreshing = false
+                        )
+                    } //여기서
+                    LikeTab.MATCHED -> _uiState.update {
+                        it.copy(
+                            matchedLikes = uiStateList,
+                            matchedLikesIsRefreshing = false
+                        )
+                    } //여기서
                 }
             }
             .onFailure { exception ->
                 // 에러 처리 (예: 스낵바 표시, 로그 출력 등)
                 println("Error loading likes for $tab: $exception")
             }
+
     }
 
     private fun handleLoadMoreResult(
