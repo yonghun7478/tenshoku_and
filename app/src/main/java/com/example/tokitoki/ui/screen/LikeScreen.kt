@@ -720,6 +720,6 @@ fun LikeReceivedItemComponentPreview() {
 @Preview(showBackground = true)
 @Composable
 fun LikeScreenPreview() {
-    val viewModel = LikeScreenViewModel()
+    val viewModel: LikeScreenViewModel = hiltViewModel()
     LikeScreen(viewModel = viewModel)
 }
