@@ -8,6 +8,8 @@ import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCaseImpl
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
+import com.example.tokitoki.domain.usecase.ClearLikeItemsUseCase
+import com.example.tokitoki.domain.usecase.ClearLikeItemsUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.DeleteLikeItemUseCase
@@ -326,4 +328,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindLoadMoreLikesUseCase(useCase: LoadMoreLikesUseCaseImpl): LoadMoreLikesUseCase
+
+    @Binds
+    abstract fun bindClearLikeItemsUseCase(useCase: ClearLikeItemsUseCaseImpl): ClearLikeItemsUseCase
 }

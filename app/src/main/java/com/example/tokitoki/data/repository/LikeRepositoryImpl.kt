@@ -46,6 +46,23 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         return Result.success(Unit)
     }
 
+    override suspend fun clearLikeItem(tab: String): Result<Unit> {
+        when (tab) {
+            LikeTab.RECEIVED.title -> {
+                receivedLikes.clear()
+            }
+
+            LikeTab.SENT.title -> {
+                sentLikes.clear()
+            }
+
+            LikeTab.MATCHED.title -> {
+                matchedLikes.clear()
+            }
+        }
+        return Result.success(Unit)
+    }
+
     override suspend fun deleteSelectedLikeItems(itemIds: Set<Int>): Result<Unit> {
         // 해당 ID들을 가진 아이템을 모든 리스트에서 찾아서 삭제
         receivedLikes.removeAll { it.id in itemIds }
@@ -54,9 +71,10 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         return Result.success(Unit)
     }
 
-    override suspend fun loadMoreLikes(tab: String, startIndex: Int): Result<List<LikeItem>> =
-        Result.success(createDummyLikes(tab, startIndex))
-
+    override suspend fun loadMoreLikes(tab: String, startIndex: Int): Result<List<LikeItem>> {
+        delay(500)
+        return Result.success(createDummyLikes(tab, startIndex))
+    }
 
     // 각 탭별 더미 데이터 생성 함수 (startIndex 파라미터 추가)
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {

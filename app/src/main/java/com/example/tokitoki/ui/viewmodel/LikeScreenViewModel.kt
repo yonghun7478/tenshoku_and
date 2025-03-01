@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.LikeItem
+import com.example.tokitoki.domain.usecase.ClearLikeItemsUseCase
 import com.example.tokitoki.domain.usecase.DeleteLikeItemUseCase
 import com.example.tokitoki.domain.usecase.DeleteSelectedLikeItemsUseCase
 import com.example.tokitoki.domain.usecase.GetMatchedLikesUseCase
@@ -15,6 +16,7 @@ import com.example.tokitoki.ui.state.LikeItemUiState
 import com.example.tokitoki.ui.state.LikeScreenUiState
 import com.example.tokitoki.ui.state.LikeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +32,8 @@ class LikeScreenViewModel @Inject constructor(
     private val getMatchedLikesUseCase: GetMatchedLikesUseCase,
     private val deleteLikeItemUseCase: DeleteLikeItemUseCase,
     private val deleteSelectedLikeItemsUseCase: DeleteSelectedLikeItemsUseCase,
-    private val loadMoreLikesUseCase: LoadMoreLikesUseCase
+    private val loadMoreLikesUseCase: LoadMoreLikesUseCase,
+    private val clearLikeItemsUseCase: ClearLikeItemsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LikeScreenUiState())
@@ -52,6 +55,11 @@ class LikeScreenViewModel @Inject constructor(
     fun refreshLikes() {
         viewModelScope.launch {
             val currentTab = _uiState.value.selectedTab
+            val currentList = when (currentTab) {
+                LikeTab.RECEIVED -> _uiState.value.receivedLikes
+                LikeTab.SENT -> _uiState.value.sentLikes
+                LikeTab.MATCHED -> _uiState.value.matchedLikes
+            }
             when (currentTab) {
                 LikeTab.RECEIVED -> {
                     _uiState.update {
@@ -60,8 +68,15 @@ class LikeScreenViewModel @Inject constructor(
                             receivedLikes = emptyList()
                         )
                     }
-                    handleResult(getReceivedLikesUseCase(), currentTab)
-                    // _uiState.update { it.copy(receivedLikesIsRefreshing = false) } // 제거!
+
+                    delay(500)
+
+                    clearLikeItemsUseCase(currentTab.title)
+                    handleLoadMoreResult(
+                        loadMoreLikesUseCase(currentTab.title, 0),
+                        currentTab,
+                        currentList
+                    )
                 }
 
                 LikeTab.SENT -> { // LikeTab.SENT, LikeTab.MATCHED 도 동일하게 수정
@@ -71,8 +86,15 @@ class LikeScreenViewModel @Inject constructor(
                             sentLikes = emptyList()
                         )
                     }
-                    handleResult(getSentLikesUseCase(), currentTab)
-                    //_uiState.update { it.copy(sentLikesIsRefreshing = false) } // 제거
+
+                    delay(500)
+
+                    clearLikeItemsUseCase(currentTab.title)
+                    handleLoadMoreResult(
+                        loadMoreLikesUseCase(currentTab.title, 0),
+                        currentTab,
+                        currentList
+                    )
                 }
 
                 LikeTab.MATCHED -> {
@@ -82,8 +104,15 @@ class LikeScreenViewModel @Inject constructor(
                             matchedLikes = emptyList()
                         )
                     }
-                    handleResult(getMatchedLikesUseCase(), currentTab)
-                    //_uiState.update { it.copy(matchedLikesIsRefreshing = false) } // 제거
+
+                    delay(500)
+
+                    clearLikeItemsUseCase(currentTab.title)
+                    handleLoadMoreResult(
+                        loadMoreLikesUseCase(currentTab.title, 0),
+                        currentTab,
+                        currentList
+                    )
                 }
             }
         }
@@ -280,9 +309,26 @@ class LikeScreenViewModel @Inject constructor(
             .onSuccess { newLikes ->
                 val uiStateList = newLikes.map { it.toUiState() }
                 when (tab) {
-                    LikeTab.RECEIVED -> _uiState.update { it.copy(receivedLikes = currentList + uiStateList) }
-                    LikeTab.SENT -> _uiState.update { it.copy(sentLikes = currentList + uiStateList) }
-                    LikeTab.MATCHED -> _uiState.update { it.copy(matchedLikes = currentList + uiStateList) }
+                    LikeTab.RECEIVED -> _uiState.update {
+                        it.copy(
+                            receivedLikes = currentList + uiStateList,
+                            receivedLikesIsRefreshing = false
+                        )
+                    }
+
+                    LikeTab.SENT -> _uiState.update {
+                        it.copy(
+                            sentLikes = currentList + uiStateList,
+                            sentLikesIsRefreshing = false
+                        )
+                    }
+
+                    LikeTab.MATCHED -> _uiState.update {
+                        it.copy(
+                            matchedLikes = currentList + uiStateList,
+                            matchedLikesIsRefreshing = false
+                        )
+                    }
                 }
             }
             .onFailure {

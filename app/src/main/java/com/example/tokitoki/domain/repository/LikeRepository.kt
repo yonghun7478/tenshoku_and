@@ -7,6 +7,7 @@ interface LikeRepository {
     suspend fun getSentLikes(): Result<List<LikeItem>>
     suspend fun getMatchedLikes(): Result<List<LikeItem>>
     suspend fun deleteLikeItem(itemId: Int): Result<Unit>
+    suspend fun clearLikeItem(tab: String): Result<Unit>
     suspend fun deleteSelectedLikeItems(itemIds: Set<Int>): Result<Unit>
     suspend fun loadMoreLikes(tab: String, startIndex: Int): Result<List<LikeItem>>
 }
