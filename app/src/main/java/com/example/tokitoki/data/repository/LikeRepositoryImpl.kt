@@ -26,29 +26,20 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
         delay(500)
 
-        // 1. 해당 탭의 데이터 가져오기
-        val data = allLikes[tab] ?: mutableListOf() // 해당 탭 데이터 없으면 빈 리스트
+        val data = allLikes[tab] ?: mutableListOf()
+        val sortedData = data.sortedByDescending { it.receivedTime } // 정렬
 
-        // 2. cursor를 이용하여 startIndex 계산
         val startIndex = if (cursor == null) 0 else {
-            data.indexOfFirst { it.receivedTime <= cursor }
+            sortedData.indexOfFirst { it.receivedTime < cursor } // cursor보다 작은 첫번째 index
         }
 
-        if (startIndex == -1) { // cursor에 해당하는 아이템이 없거나, 더이상 로드할 데이터가 없을때
+        if (startIndex == -1 || startIndex >= sortedData.size) {
             return Result.success(LikeResult(emptyList(), null))
         }
 
-        // 3. endIndex 계산 및 데이터 자르기
-        val endIndex = (startIndex + limit).coerceAtMost(data.size)
+        val endIndex = (startIndex + limit).coerceAtMost(sortedData.size)
+        val newData = sortedData.subList(startIndex, endIndex)
 
-        //startIndex가 data.size보다 크거나 같으면 더이상 data가 없다.
-        if (startIndex >= data.size) {
-            return Result.success(LikeResult(emptyList(), null)) // 더 이상 데이터 없음 or cursor에 해당하는 데이터 없음
-        }
-
-        val newData = data.subList(startIndex, endIndex)
-
-        // 4. nextCursor 계산
         val nextCursor = newData.lastOrNull()?.receivedTime
 
         return Result.success(LikeResult(newData, nextCursor))
