@@ -46,15 +46,18 @@ class LikeScreenViewModel @Inject constructor(
             val currentTab = _uiState.value.selectedTab
             when (currentTab) {
                 LikeTab.RECEIVED -> {
-                    _uiState.update { it.copy(receivedLikesIsRefreshing = true) }
+                    _uiState.update { it.copy(receivedLikesIsRefreshing = true, receivedLikes = emptyList()) }
+                    delay(500)
                     handleResult(getLikesUseCase(currentTab.title, null), currentTab) //데이터를 다시 가져온다.
                 }
                 LikeTab.SENT -> {
-                    _uiState.update { it.copy(sentLikesIsRefreshing = true) }
+                    _uiState.update { it.copy(sentLikesIsRefreshing = true, sentLikes = emptyList()) }
+                    delay(500)
                     handleResult(getLikesUseCase(currentTab.title, null), currentTab)
                 }
                 LikeTab.MATCHED -> {
-                    _uiState.update { it.copy(matchedLikesIsRefreshing = true) }
+                    _uiState.update { it.copy(matchedLikesIsRefreshing = true, matchedLikes = emptyList()) }
+                    delay(500)
                     handleResult(getLikesUseCase(currentTab.title, null), currentTab)
                 }
             }
