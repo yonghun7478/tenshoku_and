@@ -5,7 +5,7 @@ import com.example.tokitoki.domain.repository.LikeRepository
 import javax.inject.Inject
 
 interface GetLikesUseCase {
-    suspend operator fun invoke(tab: String, cursor: Long? = null, limit: Int = 20): Result<LikeResult>
+    suspend operator fun invoke(tab: String, cursor: Long? = null, limit: Int = 10): Result<LikeResult>
 }
 
 class GetLikesUseCaseImpl @Inject constructor(
