@@ -708,11 +708,14 @@ fun LikeReceivedItemComponentPreview() {
             thumbnail = "https://via.placeholder.com/150",
             nickname = "Test User",
             age = 25,
-            introduction = "This is a sample introduction."
+            introduction = "This is a sample introduction.",
+            receivedTime = System.currentTimeMillis(), // 현재 시간 또는 임의의 값
+            isChecked = false, // 기본값 명시해도 좋음
+            isRefreshing = false // 기본값 명시해도 좋음
         ),
         onItemLongClicked = {},
         isDeleteMode = false,
-        isChecked = false, // Preview with checkbox unchecked
+        isChecked = false,
         onCheckedChange = {}
     )
 }

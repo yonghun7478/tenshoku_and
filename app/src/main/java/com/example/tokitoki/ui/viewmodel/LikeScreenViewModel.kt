@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.LikeItem
+import com.example.tokitoki.domain.model.LikeResult
 import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.ui.state.DeleteItemState
 import com.example.tokitoki.ui.state.DeleteModeState
@@ -33,53 +34,28 @@ class LikeScreenViewModel @Inject constructor(
 
     private fun loadLikes() {
         viewModelScope.launch {
+            // UseCases를 사용하여 데이터 로드
+            handleResult(getLikesUseCase(LikeTab.RECEIVED.title, null), LikeTab.RECEIVED)
+            handleResult(getLikesUseCase(LikeTab.SENT.title, null), LikeTab.SENT)
+            handleResult(getLikesUseCase(LikeTab.MATCHED.title, null), LikeTab.MATCHED)
         }
     }
 
     fun refreshLikes() {
         viewModelScope.launch {
             val currentTab = _uiState.value.selectedTab
-            val currentList = when (currentTab) {
-                LikeTab.RECEIVED -> _uiState.value.receivedLikes
-                LikeTab.SENT -> _uiState.value.sentLikes
-                LikeTab.MATCHED -> _uiState.value.matchedLikes
-            }
             when (currentTab) {
                 LikeTab.RECEIVED -> {
-                    _uiState.update {
-                        it.copy(
-                            receivedLikesIsRefreshing = true,
-                            receivedLikes = emptyList()
-                        )
-                    }
-
-                    delay(500)
-
+                    _uiState.update { it.copy(receivedLikesIsRefreshing = true) }
+                    handleResult(getLikesUseCase(currentTab.title, null), currentTab) //데이터를 다시 가져온다.
                 }
-
-                LikeTab.SENT -> { // LikeTab.SENT, LikeTab.MATCHED 도 동일하게 수정
-                    _uiState.update {
-                        it.copy(
-                            sentLikesIsRefreshing = true,
-                            sentLikes = emptyList()
-                        )
-                    }
-
-                    delay(500)
-
-
+                LikeTab.SENT -> {
+                    _uiState.update { it.copy(sentLikesIsRefreshing = true) }
+                    handleResult(getLikesUseCase(currentTab.title, null), currentTab)
                 }
-
                 LikeTab.MATCHED -> {
-                    _uiState.update {
-                        it.copy(
-                            matchedLikesIsRefreshing = true,
-                            matchedLikes = emptyList()
-                        )
-                    }
-
-                    delay(500)
-
+                    _uiState.update { it.copy(matchedLikesIsRefreshing = true) }
+                    handleResult(getLikesUseCase(currentTab.title, null), currentTab)
                 }
             }
         }
@@ -88,31 +64,44 @@ class LikeScreenViewModel @Inject constructor(
     fun loadMoreLikes() {
         viewModelScope.launch {
             val currentTab = _uiState.value.selectedTab
-            val currentList = when (currentTab) {
-                LikeTab.RECEIVED -> _uiState.value.receivedLikes
-                LikeTab.SENT -> _uiState.value.sentLikes
-                LikeTab.MATCHED -> _uiState.value.matchedLikes
+            val cursor = when (currentTab) {
+                LikeTab.RECEIVED -> _uiState.value.receivedCursor
+                LikeTab.SENT -> _uiState.value.sentCursor
+                LikeTab.MATCHED -> _uiState.value.matchedCursor
             }
-            val nextIndex = currentList.size
 
-
-
+            handleLoadMoreResult(
+                getLikesUseCase(currentTab.title, cursor),
+                currentTab
+            )
         }
     }
 
     // 단일 아이템 삭제
     fun onConfirmDeleteItem() {
         val itemId = _uiState.value.deleteItemState.itemId ?: return
-        viewModelScope.launch {
-
+        _uiState.update { currentState ->
+            currentState.copy(
+                receivedLikes = currentState.receivedLikes.filterNot { it.id == itemId },
+                sentLikes = currentState.sentLikes.filterNot { it.id == itemId },
+                matchedLikes = currentState.matchedLikes.filterNot { it.id == itemId },
+                showSnackBar = true,
+                deleteItemState = DeleteItemState()
+            )
         }
     }
 
     // 선택된 아이템들 삭제
     fun onConfirmDeleteSelectedItems() {
-
-        viewModelScope.launch {
-            val selectedItems = _uiState.value.deleteModeState.selectedItems
+        val selectedItems = _uiState.value.deleteModeState.selectedItems
+        _uiState.update { currentState ->
+            currentState.copy(
+                receivedLikes = currentState.receivedLikes.filterNot { it.id in selectedItems },
+                sentLikes = currentState.sentLikes.filterNot { it.id in selectedItems },
+                matchedLikes = currentState.matchedLikes.filterNot { it.id in selectedItems },
+                deleteModeState = DeleteModeState(), // 삭제 모드 상태 초기화
+                showSnackBar = true
+            )
         }
     }
 
@@ -204,28 +193,30 @@ class LikeScreenViewModel @Inject constructor(
             it.copy(deleteModeState = it.deleteModeState.copy(showDialog = true)) // DeleteModeState의 showDialog 사용
         }
     }
-
-    private fun handleResult(result: Result<List<LikeItem>>, tab: LikeTab) {
+    private fun handleResult(result: Result<LikeResult>, tab: LikeTab) {
         result
-            .onSuccess { likes ->
-                val uiStateList = likes.map { it.toUiState() }
+            .onSuccess { (newLikes, nextCursor) ->
+                val uiStateList = newLikes.map { it.toUiState() }
                 when (tab) {
                     LikeTab.RECEIVED -> _uiState.update {
                         it.copy(
                             receivedLikes = uiStateList,
-                            receivedLikesIsRefreshing = false
+                            receivedLikesIsRefreshing = false,
+                            receivedCursor = nextCursor
                         )
                     } //여기서
                     LikeTab.SENT -> _uiState.update {
                         it.copy(
                             sentLikes = uiStateList,
-                            sentLikesIsRefreshing = false
+                            sentLikesIsRefreshing = false,
+                            sentCursor = nextCursor
                         )
                     } //여기서
                     LikeTab.MATCHED -> _uiState.update {
                         it.copy(
                             matchedLikes = uiStateList,
-                            matchedLikesIsRefreshing = false
+                            matchedLikesIsRefreshing = false,
+                            matchedCursor = nextCursor
                         )
                     } //여기서
                 }
@@ -236,34 +227,33 @@ class LikeScreenViewModel @Inject constructor(
             }
 
     }
-
     private fun handleLoadMoreResult(
-        result: Result<List<LikeItem>>,
+        result: Result<LikeResult>,
         tab: LikeTab,
-        currentList: List<LikeItemUiState>
     ) {
         result
-            .onSuccess { newLikes ->
+            .onSuccess { (newLikes, nextCursor) ->
                 val uiStateList = newLikes.map { it.toUiState() }
                 when (tab) {
                     LikeTab.RECEIVED -> _uiState.update {
                         it.copy(
-                            receivedLikes = currentList + uiStateList,
-                            receivedLikesIsRefreshing = false
+                            receivedLikes = it.receivedLikes + uiStateList, // 기존 리스트에 추가
+                            receivedLikesIsRefreshing = false,
+                            receivedCursor = nextCursor // 커서 업데이트
                         )
                     }
-
                     LikeTab.SENT -> _uiState.update {
                         it.copy(
-                            sentLikes = currentList + uiStateList,
-                            sentLikesIsRefreshing = false
+                            sentLikes = it.sentLikes + uiStateList, // 기존 리스트에 추가
+                            sentLikesIsRefreshing = false,
+                            sentCursor = nextCursor // 커서 업데이트
                         )
                     }
-
                     LikeTab.MATCHED -> _uiState.update {
                         it.copy(
-                            matchedLikes = currentList + uiStateList,
-                            matchedLikesIsRefreshing = false
+                            matchedLikes = it.matchedLikes + uiStateList, // 기존 리스트에 추가
+                            matchedLikesIsRefreshing = false,
+                            matchedCursor = nextCursor // 커서 업데이트
                         )
                     }
                 }
@@ -280,7 +270,8 @@ class LikeScreenViewModel @Inject constructor(
             thumbnail = this.thumbnail,
             nickname = this.nickname,
             age = this.age,
-            introduction = this.introduction
+            introduction = this.introduction,
+            receivedTime = this.receivedTime
         )
     }
 }

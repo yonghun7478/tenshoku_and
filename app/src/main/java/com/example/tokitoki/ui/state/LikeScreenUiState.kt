@@ -11,7 +11,10 @@ data class LikeScreenUiState(
     val sentLikesIsRefreshing: Boolean = false,
     val matchedLikesIsRefreshing: Boolean = false,
     val deleteItemState: DeleteItemState = DeleteItemState(),
-    val deleteModeState: DeleteModeState = DeleteModeState()
+    val deleteModeState: DeleteModeState = DeleteModeState(),
+    val receivedCursor: Long? = null, // 추가: 받은 좋아요 커서
+    val sentCursor: Long? = null,     // 추가: 보낸 좋아요 커서
+    val matchedCursor: Long? = null    // 추가: 매칭된 좋아요 커서
 )
 
 data class LikeItemUiState(
@@ -20,6 +23,7 @@ data class LikeItemUiState(
     val nickname: String,
     val age: Int,
     val introduction: String,
+    val receivedTime: Long, // 추가
     val isChecked: Boolean = false, // 삭제 모드에서 체크박스 상태
     val isRefreshing: Boolean = false // 새로고침 상태 추가
 )
