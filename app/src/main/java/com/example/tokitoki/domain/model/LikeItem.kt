@@ -5,5 +5,11 @@ data class LikeItem(
     val thumbnail: String,
     val nickname: String,
     val age: Int,
-    val introduction: String
+    val introduction: String,
+    val receivedTime: Long // 좋아요 받은 시간 추가
+)
+
+data class LikeResult(
+    val likes: List<LikeItem>,
+    val nextCursor: Long?
 )

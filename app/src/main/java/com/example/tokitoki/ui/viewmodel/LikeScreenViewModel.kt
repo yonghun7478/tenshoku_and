@@ -3,13 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.LikeItem
-import com.example.tokitoki.domain.usecase.ClearLikeItemsUseCase
-import com.example.tokitoki.domain.usecase.DeleteLikeItemUseCase
-import com.example.tokitoki.domain.usecase.DeleteSelectedLikeItemsUseCase
-import com.example.tokitoki.domain.usecase.GetMatchedLikesUseCase
-import com.example.tokitoki.domain.usecase.GetReceivedLikesUseCase
-import com.example.tokitoki.domain.usecase.GetSentLikesUseCase
-import com.example.tokitoki.domain.usecase.LoadMoreLikesUseCase
+import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.ui.state.DeleteItemState
 import com.example.tokitoki.ui.state.DeleteModeState
 import com.example.tokitoki.ui.state.LikeItemUiState
@@ -27,13 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LikeScreenViewModel @Inject constructor(
-    private val getReceivedLikesUseCase: GetReceivedLikesUseCase,
-    private val getSentLikesUseCase: GetSentLikesUseCase,
-    private val getMatchedLikesUseCase: GetMatchedLikesUseCase,
-    private val deleteLikeItemUseCase: DeleteLikeItemUseCase,
-    private val deleteSelectedLikeItemsUseCase: DeleteSelectedLikeItemsUseCase,
-    private val loadMoreLikesUseCase: LoadMoreLikesUseCase,
-    private val clearLikeItemsUseCase: ClearLikeItemsUseCase,
+    private val getLikesUseCase: GetLikesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LikeScreenUiState())
@@ -45,10 +33,6 @@ class LikeScreenViewModel @Inject constructor(
 
     private fun loadLikes() {
         viewModelScope.launch {
-            // UseCases를 사용하여 데이터 로드
-            handleResult(getReceivedLikesUseCase(), LikeTab.RECEIVED)
-            handleResult(getSentLikesUseCase(), LikeTab.SENT)
-            handleResult(getMatchedLikesUseCase(), LikeTab.MATCHED)
         }
     }
 
@@ -71,12 +55,6 @@ class LikeScreenViewModel @Inject constructor(
 
                     delay(500)
 
-                    clearLikeItemsUseCase(currentTab.title)
-                    handleLoadMoreResult(
-                        loadMoreLikesUseCase(currentTab.title, 0),
-                        currentTab,
-                        currentList
-                    )
                 }
 
                 LikeTab.SENT -> { // LikeTab.SENT, LikeTab.MATCHED 도 동일하게 수정
@@ -89,12 +67,7 @@ class LikeScreenViewModel @Inject constructor(
 
                     delay(500)
 
-                    clearLikeItemsUseCase(currentTab.title)
-                    handleLoadMoreResult(
-                        loadMoreLikesUseCase(currentTab.title, 0),
-                        currentTab,
-                        currentList
-                    )
+
                 }
 
                 LikeTab.MATCHED -> {
@@ -107,12 +80,6 @@ class LikeScreenViewModel @Inject constructor(
 
                     delay(500)
 
-                    clearLikeItemsUseCase(currentTab.title)
-                    handleLoadMoreResult(
-                        loadMoreLikesUseCase(currentTab.title, 0),
-                        currentTab,
-                        currentList
-                    )
                 }
             }
         }
@@ -128,11 +95,7 @@ class LikeScreenViewModel @Inject constructor(
             }
             val nextIndex = currentList.size
 
-            handleLoadMoreResult(
-                loadMoreLikesUseCase(currentTab.title, nextIndex),
-                currentTab,
-                currentList
-            )
+
 
         }
     }
@@ -142,19 +105,6 @@ class LikeScreenViewModel @Inject constructor(
         val itemId = _uiState.value.deleteItemState.itemId ?: return
         viewModelScope.launch {
 
-            deleteLikeItemUseCase(itemId)
-                .onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            showSnackBar = true,
-                            deleteItemState = DeleteItemState()
-                        )
-                    }
-                    loadLikes()
-                }
-                .onFailure {
-                    //에러 핸들링
-                }
         }
     }
 
@@ -163,19 +113,6 @@ class LikeScreenViewModel @Inject constructor(
 
         viewModelScope.launch {
             val selectedItems = _uiState.value.deleteModeState.selectedItems
-            deleteSelectedLikeItemsUseCase(selectedItems)
-                .onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            deleteModeState = DeleteModeState(),
-                            showSnackBar = true
-                        )
-                    }
-                    loadLikes()
-                }
-                .onFailure {
-                    //에러 핸들링
-                }
         }
     }
 

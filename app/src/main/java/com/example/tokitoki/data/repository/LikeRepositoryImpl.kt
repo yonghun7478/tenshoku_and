@@ -2,81 +2,39 @@ package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
+import com.example.tokitoki.domain.model.LikeResult
 import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.ui.state.LikeTab
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class LikeRepositoryImpl @Inject constructor() : LikeRepository {
+
     private val PAGE_SIZE = 20
 
-    // 각 탭별 데이터를 저장할 MutableList.  초기 데이터 생성.
-    private val receivedLikes = createInitialDummyLikes(LikeTab.RECEIVED.title, 0)
-    private val sentLikes = createInitialDummyLikes(LikeTab.SENT.title, 0)
-    private val matchedLikes = createInitialDummyLikes(LikeTab.MATCHED.title, 0)
-
-
-    // 초기 더미 데이터 생성 (loadLikes()에서 사용)
-    private fun createInitialDummyLikes(tab: String, startIndex: Int): MutableList<LikeItem> {
-        return createDummyLikes(tab, startIndex).toMutableList()
-    }
-
-    // 더미데이터 생성 함수는 인자로 받은 tab, startIndex기반으로 아이템을 생성해서 반환
-    override suspend fun getReceivedLikes(): Result<List<LikeItem>> {
+    override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
         delay(500)
-        return Result.success(receivedLikes)
-    }
 
-    override suspend fun getSentLikes(): Result<List<LikeItem>> {
-        delay(500)
-        return Result.success(sentLikes)
-    }
+        // 더미 데이터 생성 (cursor 사용 안 함, startIndex = 0)
+        val allData = createDummyLikes(tab, 0) // 처음부터 PAGE_SIZE * 3 만큼 생성
+        // 좋아요 받은 시간(receivedTime)으로 내림차순 정렬
+        val sortedData = allData.sortedByDescending { it.receivedTime }
 
-    override suspend fun getMatchedLikes(): Result<List<LikeItem>> {
-        delay(500)
-        return Result.success(matchedLikes)
-    }
+        val startIndex = if (cursor == null) 0 else sortedData.indexOfFirst { it.receivedTime <= cursor }
 
-
-    override suspend fun deleteLikeItem(itemId: Int): Result<Unit> {
-        // 해당 ID를 가진 아이템을 모든 리스트에서 찾아서 삭제
-        receivedLikes.removeAll { it.id == itemId }
-        sentLikes.removeAll { it.id == itemId }
-        matchedLikes.removeAll { it.id == itemId }
-        return Result.success(Unit)
-    }
-
-    override suspend fun clearLikeItem(tab: String): Result<Unit> {
-        when (tab) {
-            LikeTab.RECEIVED.title -> {
-                receivedLikes.clear()
-            }
-
-            LikeTab.SENT.title -> {
-                sentLikes.clear()
-            }
-
-            LikeTab.MATCHED.title -> {
-                matchedLikes.clear()
-            }
+        if (startIndex == -1 || startIndex >= sortedData.size) {
+            return Result.success(LikeResult(emptyList(), null)) // 더 이상 데이터 없음 or cursor에 해당하는 데이터 없음
         }
-        return Result.success(Unit)
+
+        val endIndex = (startIndex + limit).coerceAtMost(sortedData.size) // endIndex 계산
+        val newData = sortedData.subList(startIndex, endIndex) // subList를 사용하여 범위 내 데이터 가져오기
+        val nextCursor = newData.lastOrNull()?.receivedTime // 다음 페이지 커서는 마지막 아이템의 receivedTime
+
+        return Result.success(LikeResult(newData, nextCursor))
     }
 
-    override suspend fun deleteSelectedLikeItems(itemIds: Set<Int>): Result<Unit> {
-        // 해당 ID들을 가진 아이템을 모든 리스트에서 찾아서 삭제
-        receivedLikes.removeAll { it.id in itemIds }
-        sentLikes.removeAll { it.id in itemIds }
-        matchedLikes.removeAll { it.id in itemIds }
-        return Result.success(Unit)
-    }
-
-    override suspend fun loadMoreLikes(tab: String, startIndex: Int): Result<List<LikeItem>> {
-        delay(500)
-        return Result.success(createDummyLikes(tab, startIndex))
-    }
-
-    // 각 탭별 더미 데이터 생성 함수 (startIndex 파라미터 추가)
+    // 각 탭별 더미 데이터 생성 함수, 처음 3페이지 분량(startIndex = 0, 1, 2) 데이터를 생성
+    // 처음 3페이지 분량(startIndex = 0,20,40) 데이터를 생성
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {
         val baseId = when (tab) {
             LikeTab.RECEIVED.title -> 0
@@ -84,13 +42,17 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
             LikeTab.MATCHED.title -> 200
             else -> 0
         }
-        return List(PAGE_SIZE) {
+        val now = System.currentTimeMillis()
+        //startIndex = 0, pageSize = 20으로 고정
+        return List(PAGE_SIZE) { index ->
+            val id = baseId + startIndex + index
             LikeItemData(
-                id = baseId + startIndex + it, // startIndex를 사용하여 ID 계산
+                id = id,
                 thumbnail = "https://via.placeholder.com/150",
-                nickname = "${tab} User ${startIndex + it}",
-                age = 20 + it,
-                introduction = "This is a sample introduction for ${tab} user ${startIndex + it}."
+                nickname = "${tab} User ${startIndex + index}",
+                age = 20 + (id % 10),
+                introduction = "This is a sample introduction for $tab user $id.",
+                receivedTime = now - (startIndex + index) * 60000L // 1분 간격
             ).toDomain()
         }
     }

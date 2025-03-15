@@ -7,7 +7,8 @@ data class LikeItemData(
     val thumbnail: String,
     val nickname: String,
     val age: Int,
-    val introduction: String
+    val introduction: String,
+    val receivedTime: Long // 좋아요 받은 시간 추가
 ) {
     // 도메인 모델로 변환
     fun toDomain(): LikeItem = LikeItem(
@@ -15,6 +16,7 @@ data class LikeItemData(
         thumbnail = thumbnail,
         nickname = nickname,
         age = age,
-        introduction = introduction
+        introduction = introduction,
+        receivedTime = receivedTime // 추가
     )
 }
