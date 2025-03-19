@@ -93,7 +93,7 @@ fun MainContents(
                 }
 
                 MainBottomItem.LIKE -> {
-                    Text("LIKE")
+                    LikeScreen()
                 }
 
                 MainBottomItem.MESSAGE -> {

@@ -22,6 +22,8 @@ import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetLikesUseCase
+import com.example.tokitoki.domain.usecase.GetLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
@@ -296,4 +298,7 @@ abstract class UseCaseModule {
     abstract fun bindRestoreTempSelectedTagsUseCase(
         restoreTempSelectedTagsUseCaseImpl: RestoreTempSelectedTagsUseCaseImpl
     ): RestoreTempSelectedTagsUseCase
+
+    @Binds
+    abstract fun bindGetLikesUseCase(useCase: GetLikesUseCaseImpl): GetLikesUseCase
 }
