@@ -24,12 +24,16 @@ import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.domain.usecase.GetLikesUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetMatchingUsersUseCase
+import com.example.tokitoki.domain.usecase.GetMatchingUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetPreviousChatsUseCase
+import com.example.tokitoki.domain.usecase.GetPreviousChatsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCase
 import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCase
@@ -301,4 +305,14 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetLikesUseCase(useCase: GetLikesUseCaseImpl): GetLikesUseCase
+
+    @Binds
+    abstract fun bindGetMatchingUsersUseCase(
+        useCaseImpl: GetMatchingUsersUseCaseImpl
+    ): GetMatchingUsersUseCase
+
+    @Binds
+    abstract fun bindGetPreviousChatsUseCase(
+        useCaseImpl: GetPreviousChatsUseCaseImpl
+    ): GetPreviousChatsUseCase
 }
