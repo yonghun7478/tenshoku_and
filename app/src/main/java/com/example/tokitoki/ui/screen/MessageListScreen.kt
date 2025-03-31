@@ -11,16 +11,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,44 +45,88 @@ import com.example.tokitoki.domain.model.MatchingUser
 import com.example.tokitoki.domain.model.PreviousChat
 import com.example.tokitoki.ui.state.MessageListUiState
 import com.example.tokitoki.ui.viewmodel.MessageListViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageListScreen(viewModel: MessageListViewModel = hiltViewModel()) {
     // 7. StateFlow로부터 상태를 수집
     val uiState by viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
-    // 8. 화면 전체 구성
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            MessageListTitle(title = "メッセージ") // "메시지" 타이틀
-            Spacer(modifier = Modifier.height(16.dp))
-            MatchingUsersSection(matchingUsers = uiState.matchingUsers) // "매칭" 섹션
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(16.dp))
-            PreviousChatsSection(previousChats = uiState.previousChats) // "이전 채팅" 섹션
+    // 스크롤 상태를 관리하기 위한 LazyListState
+    val previousChatsListState = rememberLazyListState()
+    val matchingUsersListState = rememberLazyListState()
 
-            // 로딩 및 에러 처리 추가
-            if (uiState.isLoading) {
-                // 로딩 인디케이터 표시 (예: CircularProgressIndicator)
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Loading...") // 간단한 로딩 메시지
-                }
-            }
+    // PullToRefresh 상태
+    var isRefreshing by remember { mutableStateOf(false) }
 
-            if (uiState.errorMessage != null) {
-                // 에러 메시지 표시
-                Text(
-                    text = "Error: ${uiState.errorMessage}",
-                    color = MaterialTheme.colorScheme.error
-                )
+    // PullToRefreshBox 래핑
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            coroutineScope.launch {
+                isRefreshing = true // 리프레시 시작 상태로 설정
+                viewModel.refreshData() // ViewModel의 리프레시 함수 호출
+                isRefreshing = false // 리프레시 완료 상태로 설정
             }
         }
+    ) {
+        // 8. 화면 전체 구성
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                MessageListTitle(title = "メッセージ") // "메시지" 타이틀
+                Spacer(modifier = Modifier.height(16.dp))
+                MatchingUsersSection(matchingUsers = uiState.matchingUsers, listState = matchingUsersListState) // "매칭" 섹션
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(16.dp))
+                PreviousChatsSection(previousChats = uiState.previousChats, listState = previousChatsListState) // "이전 채팅" 섹션
+
+                // 로딩 및 에러 처리 추가
+                if (uiState.isLoading) {
+                    // 로딩 인디케이터 표시 (예: CircularProgressIndicator)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Loading...") // 간단한 로딩 메시지
+                    }
+                }
+
+                if (uiState.errorMessage != null) {
+                    // 에러 메시지 표시
+                    Text(
+                        text = "Error: ${uiState.errorMessage}",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        }
+    }
+
+    // MatchingUsersSection의 스크롤 위치를 감지하고, 필요한 경우 추가 데이터를 로드합니다.
+    LaunchedEffect(matchingUsersListState) {
+        snapshotFlow { matchingUsersListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collectLatest { lastVisibleIndex ->
+                if (lastVisibleIndex != null && lastVisibleIndex > uiState.matchingUsers.size - 3 && !uiState.isLoading) { // 마지막 아이템 3개 전에 로드
+                    viewModel.loadMoreMatchingUsers()
+                }
+            }
+    }
+
+    // PreviousChatsSection의 스크롤 위치를 감지하고, 필요한 경우 추가 데이터를 로드합니다.
+    LaunchedEffect(previousChatsListState) {
+        snapshotFlow { previousChatsListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collectLatest { lastVisibleIndex ->
+                if (lastVisibleIndex != null && lastVisibleIndex > uiState.previousChats.size - 3 && !uiState.isLoading) { // 마지막 아이템 3개 전에 로드
+                    viewModel.loadMorePreviousChats()
+                }
+            }
     }
 }
 
@@ -88,7 +142,7 @@ fun MessageListTitle(title: String) {
 
 // 10. "매칭" 섹션 Composable
 @Composable
-fun MatchingUsersSection(matchingUsers: List<MatchingUser>) {
+fun MatchingUsersSection(matchingUsers: List<MatchingUser>, listState: LazyListState) { // LazyListState 추가
     Column {
         Text(
             text = "マッチング", // "매칭" 타이틀
@@ -97,7 +151,7 @@ fun MatchingUsersSection(matchingUsers: List<MatchingUser>) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         if (matchingUsers.isNotEmpty()) {
-            MatchingUserList(users = matchingUsers)
+            MatchingUserList(users = matchingUsers, listState = listState) // LazyListState 전달
         } else {
             Text("No matching users yet.")
         }
@@ -106,8 +160,8 @@ fun MatchingUsersSection(matchingUsers: List<MatchingUser>) {
 
 // 11. 매칭 유저 리스트 Composable
 @Composable
-fun MatchingUserList(users: List<MatchingUser>) {
-    LazyRow {
+fun MatchingUserList(users: List<MatchingUser>, listState: LazyListState) { // LazyListState 추가
+    LazyRow(state = listState) { // LazyRow에 LazyListState 적용
         items(users) { user ->
             MatchingUserItem(user = user)
             Spacer(modifier = Modifier.width(8.dp)) // 아이템 간 간격
@@ -141,7 +195,7 @@ fun MatchingUserItem(user: MatchingUser) {
 
 // 13. "이전 채팅" 섹션 Composable
 @Composable
-fun PreviousChatsSection(previousChats: List<PreviousChat>) {
+fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListState) {  // LazyListState 추가
     Column {
         Text(
             text = "Previous Chats",
@@ -150,7 +204,7 @@ fun PreviousChatsSection(previousChats: List<PreviousChat>) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         if (previousChats.isNotEmpty()) {
-            PreviousChatList(chats = previousChats)
+            PreviousChatList(chats = previousChats, listState = listState) // LazyListState 전달
         } else {
             Text("No previous chats.")
         }
@@ -159,8 +213,8 @@ fun PreviousChatsSection(previousChats: List<PreviousChat>) {
 
 // 14. 이전 채팅 리스트 Composable
 @Composable
-fun PreviousChatList(chats: List<PreviousChat>) {
-    LazyColumn {
+fun PreviousChatList(chats: List<PreviousChat>, listState: LazyListState) { // LazyListState 추가
+    LazyColumn(state = listState) { // LazyColumn에 LazyListState 적용
         items(chats) { chat ->
             PreviousChatItem(chat = chat)
             Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp) // 구분선 추가
@@ -212,11 +266,15 @@ fun MessageListScreenPreview() {
     val dummyUiState = MessageListUiState(
         matchingUsers = listOf(
             MatchingUser("1", "Alice", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
-            MatchingUser("2", "Bob", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg")
+            MatchingUser("2", "Bob", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
+            MatchingUser("3", "Charlie", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 추가 데이터
+            MatchingUser("4", "David", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 추가 데이터
         ),
         previousChats = listOf(
             PreviousChat("4", "David", "Seoul", LocalDate.of(2024, 1, 20), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
-            PreviousChat("5", "Eve", "Busan", LocalDate.of(2024, 1, 15), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg")
+            PreviousChat("5", "Eve", "Busan", LocalDate.of(2024, 1, 15), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
+            PreviousChat("6", "Frank", "Incheon", LocalDate.of(2024, 1, 10), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
+            PreviousChat("7", "Grace", "Daegu", LocalDate.of(2024, 1, 5), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg")
         ),
         isLoading = false,
         errorMessage = null
@@ -226,10 +284,11 @@ fun MessageListScreenPreview() {
     Column {
         MessageListTitle(title = "Messages")
         Spacer(modifier = Modifier.height(16.dp))
-        MatchingUsersSection(matchingUsers = dummyUiState.matchingUsers)
+        MatchingUsersSection(matchingUsers = dummyUiState.matchingUsers, listState = rememberLazyListState())
         Spacer(modifier = Modifier.height(16.dp))
         Divider()
         Spacer(modifier = Modifier.height(16.dp))
-        PreviousChatsSection(previousChats = dummyUiState.previousChats)
+        PreviousChatsSection(previousChats = dummyUiState.previousChats, listState = rememberLazyListState())
     }
 }
+

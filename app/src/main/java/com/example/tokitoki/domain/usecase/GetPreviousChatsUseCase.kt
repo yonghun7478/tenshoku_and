@@ -15,7 +15,7 @@ interface GetPreviousChatsUseCase {
      * @param limit 페이지 당 아이템 수 (기본값 20)
      * @return 이전 대화 목록과 다음 커서를 포함한 Result
      */
-    suspend operator fun invoke(cursor: String?, limit: Int = 20): Result<CursorResult<PreviousChat>>
+    suspend operator fun invoke(cursor: String?, limit: Int = 10): Result<CursorResult<PreviousChat>>
 }
 
 class GetPreviousChatsUseCaseImpl @Inject constructor(
