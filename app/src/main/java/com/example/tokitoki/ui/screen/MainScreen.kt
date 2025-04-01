@@ -97,7 +97,7 @@ fun MainContents(
                 }
 
                 MainBottomItem.MESSAGE -> {
-                    Text("MESSAGE")
+                    MessageListScreen()
                 }
 
                 MainBottomItem.MY_PAGE -> {
