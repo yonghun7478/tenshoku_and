@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
@@ -37,11 +35,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
+import com.example.tokitoki.ui.screen.mypage.MyPageScreen
 import com.example.tokitoki.ui.state.MainBottomItem
 import com.example.tokitoki.ui.state.MainUiEvent
 import com.example.tokitoki.ui.state.MainUiState
-import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.viewmodel.MainViewModel
 
 @Composable
@@ -101,7 +98,7 @@ fun MainContents(
                 }
 
                 MainBottomItem.MY_PAGE -> {
-                    Text("MYPAGE")
+                    MyPageScreen()
                 }
             }
         }
