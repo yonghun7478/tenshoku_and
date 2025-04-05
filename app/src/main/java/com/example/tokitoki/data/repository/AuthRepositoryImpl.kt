@@ -31,7 +31,9 @@ class AuthRepositoryImpl @Inject constructor(
                 myProfile.name,
                 myProfile.birthDay,
                 myProfile.isMale,
-                myProfile.mySelfSentenceId
+                myProfile.mySelfSentenceId,
+                "asdf@asdf.com",
+                "https://img.vogue.co.kr/vogue/2025/03/style_67e0bd4865315-1120x1400.jpg"
             )
         )
     }

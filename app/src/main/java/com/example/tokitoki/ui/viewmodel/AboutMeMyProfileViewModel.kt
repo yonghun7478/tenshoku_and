@@ -12,6 +12,7 @@ import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
@@ -39,7 +40,8 @@ class AboutMeMyProfileViewModel
     private val registerMyProfileUseCase: RegisterMyProfileUseCase,
     private val fileManager: FileManager,
     private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
-    private val saveTokensUseCase: SaveTokensUseCase
+    private val saveTokensUseCase: SaveTokensUseCase,
+    private val setMyProfileUseCase: SetMyProfileUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
@@ -98,11 +100,8 @@ class AboutMeMyProfileViewModel
         val result = registerMyProfileUseCase(myProfile, thumbnailPath)
 
         if (result is ResultWrapper.Success) {
-//            (checkEmailRegisteredUseCase(myProfile.email) as ResultWrapper.Success).let { res ->
-//                saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
-//            }
-
-            (checkEmailRegisteredUseCase("true@asdf.com") as ResultWrapper.Success).let { res ->
+            setMyProfileUseCase(result.data)
+            (checkEmailRegisteredUseCase(myProfile.email) as ResultWrapper.Success).let { res ->
                 saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
             }
         }

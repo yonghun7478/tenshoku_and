@@ -7,7 +7,7 @@ import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.CursorResult
 import com.example.tokitoki.domain.model.MatchingUser
 import com.example.tokitoki.domain.model.PreviousChat
-import com.example.tokitoki.domain.repository.MessageRepository
+import com.example.tokitoki.domain.repository.MessageListRepository
 import kotlinx.coroutines.delay
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
@@ -15,7 +15,7 @@ import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlin.random.Random
 
-class MessageRepositoryImpl @Inject constructor() : MessageRepository {
+class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
     // --- 더미 데이터 생성 ---
     private val dummyMatchingUsersDatabase = List(30) { index ->

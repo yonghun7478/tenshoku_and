@@ -4,7 +4,7 @@ import com.example.tokitoki.domain.model.CursorResult
 import com.example.tokitoki.domain.model.MatchingUser
 import com.example.tokitoki.domain.model.PreviousChat
 
-interface MessageRepository {
+interface MessageListRepository {
     /**
      * 매칭된 유저 목록을 가져옵니다. (페이징)
      * @param cursor 다음 페이지를 위한 커서 (Base64 인코딩), null이면 첫 페이지

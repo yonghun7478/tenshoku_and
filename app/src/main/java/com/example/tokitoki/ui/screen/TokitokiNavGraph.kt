@@ -21,7 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 fun TokitokiNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    startDestination: String = TokitokiDestinations.MAIN_ROUTE,
+    startDestination: String = TokitokiDestinations.SIGN_IN_ROUTE,
     navAction: TokitokiNavigationActions = remember(navController) {
         TokitokiNavigationActions(navController)
     },

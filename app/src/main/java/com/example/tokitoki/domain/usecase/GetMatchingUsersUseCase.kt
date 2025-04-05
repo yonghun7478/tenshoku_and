@@ -2,7 +2,7 @@ package com.example.tokitoki.domain.usecase
 
 import com.example.tokitoki.domain.model.CursorResult
 import com.example.tokitoki.domain.model.MatchingUser
-import com.example.tokitoki.domain.repository.MessageRepository
+import com.example.tokitoki.domain.repository.MessageListRepository
 import javax.inject.Inject
 
 /**
@@ -19,7 +19,7 @@ interface GetMatchingUsersUseCase {
 }
 
 class GetMatchingUsersUseCaseImpl @Inject constructor(
-    private val messageRepository: MessageRepository
+    private val messageListRepository: MessageListRepository
 ) : GetMatchingUsersUseCase { // 인터페이스 상속
 
     /**
@@ -27,7 +27,7 @@ class GetMatchingUsersUseCaseImpl @Inject constructor(
      */
     override suspend operator fun invoke(cursor: String?, limit: Int): Result<CursorResult<MatchingUser>> {
         // Repository의 함수를 호출하고 결과를 그대로 반환
-        return messageRepository.getMatchingUsers(cursor, limit)
+        return messageListRepository.getMatchingUsers(cursor, limit)
         // 필요 시 여기에 추가적인 비즈니스 로직을 넣을 수 있습니다. (예: 데이터 가공, 필터링 등)
     }
 }
