@@ -10,7 +10,9 @@ object MyPageDummyData {
 
 // UI 상태를 위한 데이터 클래스
 data class MyPageState(
-    val profileImageUrl: String,
-    val nickname: String,
-    val bio: String?
+    val isLoading: Boolean = true, // 로딩 MyPageState
+    val profileImageUrl: String = "", // 프로필 이미지 URL
+    val nickname: String = "", // 닉네임
+    val bio: String? = null, // 소개글 (Nullable)
+    val error: String? = null // 에러 메시지 (Nullable)
 )

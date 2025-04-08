@@ -1,6 +1,7 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.local.MyProfileDao
+import com.example.tokitoki.data.local.MyProfileEntity
 import com.example.tokitoki.data.local.MyTagDao
 import com.example.tokitoki.domain.converter.MyProfileConverter
 import com.example.tokitoki.domain.converter.MyTagConverter
@@ -24,6 +25,28 @@ class MyProfileRepositoryImpl @Inject constructor(
 
     override suspend fun deleteUserProfile() {
         myProfileDao.deleteProfile()
+    }
+
+    override suspend fun fetchUserProfileFromApi(): MyProfile {
+        println("Repository: Creating dummy user profile entity...")
+        // 1. 하드코딩된 더미 Entity 생성
+        val dummyEntity = MyProfileEntity(
+            id = 100, // 임의의 ID
+            name = "더미 사용자",
+            birthDay = "1995-08-15",
+            isMale = true,
+            mySelfSentenceId = 99, // 임의의 자기소개 ID
+            email = "dummy@example.com",
+            thumbnailUrl = "https://placehold.co/200x200/E6E6FA/AAAAAA?text=Dummy" // 임의의 이미지 URL
+        )
+        println("Repository: Dummy entity created: $dummyEntity")
+
+        // 2. Entity를 Domain 모델로 변환
+        val domainProfile = MyProfileConverter.entityToDomain(dummyEntity)
+        println("Repository: Converted dummy entity to domain: $domainProfile")
+
+        // 3. 변환된 Domain 모델 반환
+        return domainProfile
     }
 
     override suspend fun addUserTag(tag: MyTag): Boolean {

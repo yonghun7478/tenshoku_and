@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -196,15 +197,28 @@ fun MyPageListItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewMyPageScreen() {
     MaterialTheme {
-        // 직접 ViewModel 인스턴스를 생성하여 전달
-        val viewModel = remember { MyPageViewModel() }
+        // 1. Preview를 위한 가짜(dummy) 상태(State) 생성
+        val dummyState: State<MyPageState> = remember {
+            mutableStateOf(
+                MyPageState(
+                    isLoading = false, // 로딩 완료 상태로 가정
+                    profileImageUrl = "https://placehold.co/200x200/E6E6FA/AAAAAA?text=Preview", // 예시 URL
+                    nickname = "프리뷰 닉네임",
+                    bio = "프리뷰용 자기소개입니다. 여기는 자기소개 글이 표시됩니다.",
+                    error = null // 에러 없음 상태로 가정
+                )
+            )
+        }
+
+        // 2. ViewModel 인스턴스 생성 대신, 가짜 상태를 직접 Content Composable에 전달
         MyPageScreenContent(
-            state = viewModel.myPageState.collectAsState(),
-            onEditProfileClick = { },
+            state = dummyState, // 생성한 가짜 상태 전달
+            onEditProfileClick = { }, // Preview에서는 동작 확인 불필요
             onSeenMeClick = { },
             onFavoritesClick = { },
             onLikedMeClick = { },
