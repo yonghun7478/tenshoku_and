@@ -2,6 +2,8 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.domain.model.MyProfile
+import com.example.tokitoki.domain.model.MySelfSentence
 import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
@@ -47,27 +49,51 @@ class MyPageViewModel @Inject constructor(
                 } catch (e: Exception) {
                     // 저장 중 에러 발생 시 (선택적 처리)
                     println("Error saving profile after fetch: ${e.message}")
-                    // 에러 상태를 업데이트 할 수도 있음
-                    // _myPageState.update { it.copy(error = "프로필 저장 중 오류 발생") }
                 }
             } else {
                 // Fetch 실패 시 (선택적 처리)
                 println("Failed to fetch remote profile.")
-                // 에러 상태를 업데이트 할 수도 있음
-                // _myPageState.update { it.copy(error = "최신 프로필 로딩 실패") }
             }
 
             // 3. 로컬 DB에서 프로필 정보 다시 로드 (Fetch/Save 결과 반영)
             try {
-                val localProfile = getMyProfileUseCase() // 로컬 프로필 가져오기
+                // --- 수정된 부분 시작 ---
+                var localProfile = getMyProfileUseCase() // 로컬 프로필 가져오기
+
+                // 로컬 프로필이 기본값(DB 비어있음 등)인지 확인
+                if (localProfile == MyProfile()) {
+                    println("ViewModel: Local profile is default. Using dummy data for UI.")
+                    // 기본값일 경우, 테스트/UI 표시용 더미 데이터 생성
+                    localProfile = MyProfile(
+                        id = 1, // 테스트용 ID
+                        name = "테스트 사용자",
+                        birthDay = "2000-01-01",
+                        isMale = false,
+                        mySelfSentenceId = 111, // 테스트용 자기소개 ID
+                        email = "test@example.com",
+                        thumbnailUrl = "https://placehold.co/200x200/ADD8E6/000000?text=Test"
+                    )
+                }
+                // --- 수정된 부분 끝 ---
 
                 var bioSentence: String? = null
+                // localProfile은 이제 DB값이거나 위에서 생성된 더미값일 수 있음
                 if (localProfile.mySelfSentenceId > 0) {
                     try {
-                        val selfSentence = getMySelfSentenceUseCase(localProfile.mySelfSentenceId)
+                        var selfSentence = getMySelfSentenceUseCase(localProfile.mySelfSentenceId)
+                        if(selfSentence == MySelfSentence()) {
+                            selfSentence = MySelfSentence(
+                                id = 2,
+                                sentence = "asdfasdf"
+                            )
+                        }
                         bioSentence = selfSentence.sentence
                     } catch (e: Exception) {
+                        // --- 수정된 부분 시작 ---
                         println("Error fetching self sentence (id: ${localProfile.mySelfSentenceId}): ${e.message}")
+                        // 에러 발생 시 더미 bio 할당
+                        bioSentence = "자기소개 로딩 실패 (더미 데이터)"
+                        // --- 수정된 부분 끝 ---
                     }
                 }
 
@@ -78,9 +104,7 @@ class MyPageViewModel @Inject constructor(
                         profileImageUrl = localProfile.thumbnailUrl,
                         nickname = localProfile.name,
                         bio = bioSentence,
-                        // Fetch/Save 실패 시 남겨둔 에러 메시지가 있다면 여기서 null로 덮어쓰지 않도록 주의
-                        // error = if (it.error != null) it.error else null // 기존 에러 유지 또는 null
-                        error = null // 또는 항상 null로 초기화
+                        error = null // 또는 기존 에러 유지
                     )
                 }
 
