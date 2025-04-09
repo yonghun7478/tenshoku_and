@@ -14,6 +14,8 @@ import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCase
 import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCaseImpl
 import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
 import com.example.tokitoki.domain.usecase.DislikePickupUserUseCaseImpl
+import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
+import com.example.tokitoki.domain.usecase.FetchMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
@@ -315,4 +317,9 @@ abstract class UseCaseModule {
     abstract fun bindGetPreviousChatsUseCase(
         useCaseImpl: GetPreviousChatsUseCaseImpl
     ): GetPreviousChatsUseCase
+
+    @Binds
+    abstract fun bindFetchMyProfileUseCase(
+        impl: FetchMyProfileUseCaseImpl
+    ): FetchMyProfileUseCase
 }

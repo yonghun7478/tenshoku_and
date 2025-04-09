@@ -9,6 +9,10 @@ interface MyProfileRepository {
     suspend fun saveUserProfile(profile: MyProfile) // 유저 프로필 저장 (업데이트 포함)
     suspend fun deleteUserProfile() // 유저 프로필 삭제
 
+    // --- API 통신 관련 메서드 ---
+    /** 원격 API로부터 사용자 프로필 정보를 가져옵니다. */
+    suspend fun fetchUserProfileFromApi(): MyProfile
+
     // User Tags 관련 메서드
     suspend fun addUserTag(tag: MyTag): Boolean // 태그 추가
     suspend fun removeUserTag(tagId: Int) // 특정 태그 삭제
