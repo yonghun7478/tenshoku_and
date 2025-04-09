@@ -31,11 +31,7 @@ class MyPageViewModel @Inject constructor(
     private val _myPageState = MutableStateFlow(MyPageState())
     val myPageState: StateFlow<MyPageState> = _myPageState.asStateFlow()
 
-    init {
-        loadMyPageData()
-    }
-
-    private fun loadMyPageData() {
+    fun loadMyPageData() {
         viewModelScope.launch {
             _myPageState.update { it.copy(isLoading = true, error = null) }
 
@@ -80,13 +76,7 @@ class MyPageViewModel @Inject constructor(
                 // localProfile은 이제 DB값이거나 위에서 생성된 더미값일 수 있음
                 if (localProfile.mySelfSentenceId > 0) {
                     try {
-                        var selfSentence = getMySelfSentenceUseCase(localProfile.mySelfSentenceId)
-                        if(selfSentence == MySelfSentence()) {
-                            selfSentence = MySelfSentence(
-                                id = 2,
-                                sentence = "asdfasdf"
-                            )
-                        }
+                        val selfSentence = getMySelfSentenceUseCase(localProfile.mySelfSentenceId)
                         bioSentence = selfSentence.sentence
                     } catch (e: Exception) {
                         // --- 수정된 부분 시작 ---

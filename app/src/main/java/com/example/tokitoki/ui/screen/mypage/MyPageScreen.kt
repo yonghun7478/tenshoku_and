@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,11 @@ import com.example.tokitoki.ui.viewmodel.MyPageViewModel
 @Composable
 fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
     val state = viewModel.myPageState.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.loadMyPageData()
+    }
+
     MyPageScreenContent(
         state = state,
         onEditProfileClick = viewModel::onEditProfileClick,
