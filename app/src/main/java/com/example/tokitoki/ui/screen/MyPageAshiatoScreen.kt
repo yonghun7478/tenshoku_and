@@ -130,7 +130,6 @@ fun MyPageAshiatoListItem(user: UserData, onUserClicked: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun MyPageAshiatoScreenPreview() {
-    val dummyViewModel = AshiatoViewModel()
     MyPageAshiatoScreen()
 }
 
