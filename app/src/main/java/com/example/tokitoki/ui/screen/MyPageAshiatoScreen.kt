@@ -1,16 +1,25 @@
 package com.example.tokitoki.ui.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,11 +40,22 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.UserData
 import com.example.tokitoki.ui.viewmodel.AshiatoViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPageAshiatoScreen(viewModel: AshiatoViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
+    MyPageAshiatoContent(
+        users = state.users,
+        onUserClicked = viewModel::onUserClicked
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyPageAshiatoContent(
+    users: List<UserData>,
+    onUserClicked: (String) -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -61,10 +81,10 @@ fun MyPageAshiatoScreen(viewModel: AshiatoViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(state.users) { user ->
+            items(users) { user ->
                 MyPageAshiatoListItem(
                     user = user,
-                    onUserClicked = { viewModel.onUserClicked(user.id) })
+                    onUserClicked = { onUserClicked(user.id) })
             }
         }
     }
@@ -130,7 +150,32 @@ fun MyPageAshiatoListItem(user: UserData, onUserClicked: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun MyPageAshiatoScreenPreview() {
-    MyPageAshiatoScreen()
+    MyPageAshiatoContent(
+        users = listOf(
+            UserData(
+                id = "1",
+                profileImageUrl = "https://source.unsplash.com/random/300x300?face&1",
+                daysAgoVisited = 1,
+                age = 25,
+                location = "서울"
+            ),
+            UserData(
+                id = "2",
+                profileImageUrl = "https://source.unsplash.com/random/300x300?face&2",
+                daysAgoVisited = 3,
+                age = 28,
+                location = "부산"
+            ),
+            UserData(
+                id = "3",
+                profileImageUrl = "https://source.unsplash.com/random/300x300?face&3",
+                daysAgoVisited = 7,
+                age = 22,
+                location = "대구"
+            )
+        ),
+        onUserClicked = {}
+    )
 }
 
 @Preview(showBackground = true)
