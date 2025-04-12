@@ -75,22 +75,44 @@ fun AshiatoContent(
     // Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) { ... }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        // --- 추가된 부분 ---
+        // 화면 헤더
+        Text(
+            text = "足あと", // 아시아토 헤더 텍스트
+            style = MaterialTheme.typography.headlineSmall, // 헤더 스타일 적용
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp) // 패딩 추가
+        )
+        // 구분선
+        Divider(
+            modifier = Modifier.padding(horizontal = 16.dp), // 좌우 패딩
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant // 구분선 색상
+        )
+        // --- 추가된 부분 끝 ---
+
         // 상단 정보 배너
-        AshiatoInfoBanner()
+        AshiatoInfoBanner() // 헤더와 배너 사이 간격은 Banner의 패딩으로 조절됨
 
         // 로딩 상태 처리
         if (uiState.isLoadingInitial) {
             // 초기 로딩 시 중앙에 프로그레스 바 표시
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가하여 헤더/배너 피함
                 CircularProgressIndicator()
             }
         } else if (uiState.error != null) {
             // 오류 발생 시 오류 메시지 표시 (간단한 Text 예시)
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가
                 Text("오류가 발생했습니다: ${uiState.error.localizedMessage ?: "알 수 없는 오류"}")
                 // TODO: 여기에 '다시 시도' 버튼 추가 고려
             }
-        } else {
+        } else if (uiState.timeline.dailyLogs.isEmpty()) {
+            // 데이터가 없을 때 메시지 표시
+            Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가
+                Text("아직 받은 足跡(아시아토)가 없어요.")
+            }
+        }
+        else {
             // 데이터 목록 표시
             LazyColumn(
                 state = listState,
@@ -139,7 +161,7 @@ fun AshiatoInfoBanner() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 12.dp) // 위쪽 패딩만 적용 (헤더/구분선과 간격)
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -401,6 +423,24 @@ fun PreviewAshiatoContent_Data() {
         )
     }
 }
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+fun PreviewAshiatoContent_Empty() { // 데이터 없을 때 Preview 추가
+    MaterialTheme {
+        AshiatoContent(
+            uiState = AshiatoUiState(
+                isLoadingInitial = false,
+                timeline = AshiatoTimeline(emptyList()), // 빈 리스트
+                canLoadMore = false
+            ),
+            onUserClick = {},
+            onLoadMore = {},
+            onRefresh = {}
+        )
+    }
+}
+
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
