@@ -286,7 +286,17 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.MAIN_ROUTE) {
-            MainScreen()
+            MainScreen(
+                onAshiatoClick = {
+                    navAction.navigateToAshiato()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ASHIATO_ROUTE) {
+            AshiatoScreen(
+                onNavigateToUserProfile = {}
+            )
         }
     }
 }

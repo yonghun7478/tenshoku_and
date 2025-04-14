@@ -44,7 +44,8 @@ import com.example.tokitoki.ui.viewmodel.MainViewModel
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
-) {
+    onAshiatoClick: () -> Unit = {},
+    ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
 
@@ -62,15 +63,17 @@ fun MainScreen(
     // UI 상태를 MainContents에 전달
     MainContents(
         uiState = uiState,
-        onEvent = { viewModel.onEvent(it) }
+        onEvent = { viewModel.onEvent(it) },
+        onAshiatoClick = onAshiatoClick,
     )
 }
 
 @Composable
 fun MainContents(
     uiState: MainUiState,
-    onEvent: (MainUiEvent) -> Unit
-) {
+    onEvent: (MainUiEvent) -> Unit,
+    onAshiatoClick: () -> Unit = {},
+    ) {
     Scaffold(
         bottomBar = {
             MainBottomNavigation(
@@ -98,7 +101,7 @@ fun MainContents(
                 }
 
                 MainBottomItem.MY_PAGE -> {
-                    MyPageScreen()
+                    MyPageScreen(onAshiatoClick = onAshiatoClick)
                 }
             }
         }

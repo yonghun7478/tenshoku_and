@@ -19,11 +19,11 @@ import kotlin.random.Random
  */
 class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
 
-    // 전체 더미 데이터를 AshiatoData 객체에 담아 관리
-    private val fullDummyAshiatoData: AshiatoData = generateFullDummyAshiatoData(30)
-
     // 날짜 포맷터
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE //<y_bin_46>-MM-dd
+
+    // 전체 더미 데이터를 AshiatoData 객체에 담아 관리
+    private val fullDummyAshiatoData: AshiatoData = generateFullDummyAshiatoData(30)
 
     /**
      * 아시아토 목록 페이지를 가져오는 함수 구현 (AshiatoData 기반 더미 데이터 사용)
