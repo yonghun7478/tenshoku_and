@@ -300,11 +300,11 @@ fun AshiatoUserCard(
                     contentDescription = "좋아요",
                     tint = Color.White,
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 8.dp)
+                        .align(Alignment.BottomEnd)
+                        .padding(all = 6.dp)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), CircleShape)
                         .padding(6.dp)
-                        .size(20.dp)
+                        .size(16.dp)
                 )
             } // Box 끝
 

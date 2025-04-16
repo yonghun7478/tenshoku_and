@@ -97,7 +97,7 @@ class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
                 viewers.add(
                     AshiatoViewer(
                         userId = "user_${dateString}_$j",
-                        thumbnailUrl = "https://placehold.co/100x100/E0E0E0/BDBDBD?text=User", // Placeholder 이미지
+                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg", // Placeholder 이미지
                         age = Random.nextInt(20, 40),
                         region = regions.random(),
                         viewedTime = "%02d:%02d".format(hour, minute)
