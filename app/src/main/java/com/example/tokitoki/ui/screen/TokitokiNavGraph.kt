@@ -21,7 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 fun TokitokiNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    startDestination: String = TokitokiDestinations.SIGN_IN_ROUTE,
+    startDestination: String = TokitokiDestinations.MAIN_ROUTE,
     navAction: TokitokiNavigationActions = remember(navController) {
         TokitokiNavigationActions(navController)
     },
@@ -286,7 +286,17 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.MAIN_ROUTE) {
-            MainScreen()
+            MainScreen(
+                onAshiatoClick = {
+                    navAction.navigateToAshiato()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.ASHIATO_ROUTE) {
+            AshiatoScreen(
+                onNavigateToUserProfile = {}
+            )
         }
     }
 }

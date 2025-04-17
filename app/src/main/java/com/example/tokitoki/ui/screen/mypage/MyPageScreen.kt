@@ -31,7 +31,10 @@ import com.example.tokitoki.ui.state.MyPageState
 import com.example.tokitoki.ui.viewmodel.MyPageViewModel
 
 @Composable
-fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
+fun MyPageScreen(
+    viewModel: MyPageViewModel = hiltViewModel(),
+    onAshiatoClick: () -> Unit = {},
+) {
     val state = viewModel.myPageState.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
@@ -41,7 +44,7 @@ fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
     MyPageScreenContent(
         state = state,
         onEditProfileClick = viewModel::onEditProfileClick,
-        onSeenMeClick = viewModel::onSeenMeClick,
+        onSeenMeClick = onAshiatoClick,
         onFavoritesClick = viewModel::onFavoritesClick,
         onLikedMeClick = viewModel::onLikedMeClick,
         onLogoutClick = viewModel::onLogoutClick
