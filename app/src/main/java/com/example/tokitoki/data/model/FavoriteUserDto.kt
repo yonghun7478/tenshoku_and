@@ -1,13 +1,31 @@
 package com.example.tokitoki.data.model
 
+import com.example.tokitoki.domain.model.FavoriteUser
+
 data class FavoriteUserDto(
-    val thumbnail_url: String?, // 섬네일 URL (nullable)
-    val name: String?,         // 이름 (nullable)
-    val age: Int?,            // 나이 (nullable)
-    val location: String?,      // 위치 (nullable)
-    val height: Int?,          // 신장 (nullable)
-    val job: String?,           // 직업 (nullable)
-    val has_roommate: Boolean?, // 동거인 여부 (nullable)
-    val siblings: String?,      // 형제자매 (nullable)
-    val blood_type: String?     // 혈액형 (nullable)
+    val thumbnail_url: String?,
+    val name: String?,
+    val age: Int?,
+    val location: String?,
+    val height: Int?,
+    val job: String?,
+    val has_roommate: Boolean?,
+    val siblings: String?,
+    val blood_type: String?,
+    val timestamp: Long? // 추가된 timestamp 필드
 )
+
+fun FavoriteUserDto.toDomainModel(): FavoriteUser {
+    return FavoriteUser(
+        thumbnailUrl = this.thumbnail_url ?: "",
+        name = this.name ?: "",
+        age = this.age ?: 0,
+        location = this.location ?: "",
+        height = this.height ?: 0,
+        job = this.job ?: "",
+        hasRoommate = this.has_roommate ?: false,
+        siblings = this.siblings ?: "",
+        bloodType = this.blood_type ?: "",
+        timestamp = this.timestamp ?: 0L // 매핑 시 timestamp 처리
+    )
+}

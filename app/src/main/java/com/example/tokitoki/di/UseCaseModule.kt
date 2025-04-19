@@ -26,6 +26,8 @@ import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetAshiatoPageUseCase
 import com.example.tokitoki.domain.usecase.GetAshiatoPageUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetFavoriteUsersUseCase
+import com.example.tokitoki.domain.usecase.GetFavoriteUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.domain.usecase.GetLikesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMatchingUsersUseCase
@@ -329,4 +331,9 @@ abstract class UseCaseModule {
     abstract fun bindGetAshiatoPageUseCase(
         useCaseImpl: GetAshiatoPageUseCaseImpl // 실제 구현체 클래스
     ): GetAshiatoPageUseCase // 제공할 인터페이스 타입
+
+    @Binds
+    abstract fun bindGetFavoriteUsersUseCase(
+        useCaseImpl: GetFavoriteUsersUseCaseImpl
+    ): GetFavoriteUsersUseCase
 }
