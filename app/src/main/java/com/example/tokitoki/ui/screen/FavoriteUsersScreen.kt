@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -36,8 +37,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +84,22 @@ fun FavoriteUsersContents(
     onBackClick: () -> Unit,
     onMoreClick: () -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            lastVisibleItemIndex >= layoutInfo.totalItemsCount - 2 // Load when 2 items away from the end
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value && uiState.hasMore && !uiState.isLoading) {
+            loadFavoriteUsers()
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -98,8 +118,9 @@ fun FavoriteUsersContents(
         }
     ) { paddingValues ->
         when {
-            uiState.isLoading -> {
-                // 로딩 중 화면 표시 (예: CircularProgressIndicator)
+            uiState.isLoading && uiState.favoriteUsers.isEmpty() -> {
+                // 로딩중이며 item이 비어있을때
+                // 로딩 중 화면 표시
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -118,19 +139,22 @@ fun FavoriteUsersContents(
                         .fillMaxSize()
                         .padding(paddingValues),
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    state = listState, // Add the state to the LazyColumn
                 ) {
                     items(uiState.favoriteUsers) { user ->
                         FavoriteUserItem(user = user)
                     }
-                    if (uiState.hasMore) {
+
+                    if (uiState.isLoading && uiState.favoriteUsers.isNotEmpty()) {
                         item {
-                            Button(
-                                onClick = { loadFavoriteUsers() },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                Text("Load More")
+                                CircularProgressIndicator()
                             }
                         }
                     }
