@@ -285,10 +285,24 @@ fun TokitokiNavGraph(
             )
         }
 
+        composable(TokitokiDestinations.FAVORITE_USERS_ROUTE) {
+            FavoriteUsersScreen(
+                onBackClick = {
+
+                },
+                onMoreClick = {
+
+                }
+            )
+        }
+
         composable(TokitokiDestinations.MAIN_ROUTE) {
             MainScreen(
                 onAshiatoClick = {
                     navAction.navigateToAshiato()
+                },
+                onFavoriteUsersClick = {
+                    navAction.navigateToFavoriteUsers()
                 }
             )
         }
