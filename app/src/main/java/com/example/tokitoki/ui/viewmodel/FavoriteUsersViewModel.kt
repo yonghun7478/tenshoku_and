@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetFavoriteUsersUseCase
 import com.example.tokitoki.ui.state.FavoriteUsersUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -32,17 +33,20 @@ class FavoriteUsersViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
+            delay(2000)
             val result = getFavoriteUsersUseCase(limit, cursor)
             if (result.isNotEmpty()) {
                 _uiState.value = _uiState.value.copy(
                     favoriteUsers = _uiState.value.favoriteUsers + result,
                     isLoading = false,
+                    isRefreshing = false,
                     hasMore = result.size == limit // 결과가 limit과 같으면 다음 페이지가 있을 수 있음
                 )
                 cursor = result.lastOrNull()?.timestamp ?: cursor // 다음 커서 업데이트
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    isRefreshing = false,
                     hasMore = false // 더 이상 데이터가 없음
                 )
             }
@@ -51,7 +55,7 @@ class FavoriteUsersViewModel @Inject constructor(
 
     fun refreshFavoriteUsers() {
         cursor = 0 // 커서 초기화
-        _uiState.value = FavoriteUsersUiState(isLoading = true) // 상태 초기화
+        _uiState.value = FavoriteUsersUiState(isRefreshing = true) // 상태 초기화
         loadFavoriteUsers()
     }
 

@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,6 +72,7 @@ fun FavoriteUsersScreen(
     FavoriteUsersContents(
         uiState = uiState,
         loadFavoriteUsers = viewModel::loadFavoriteUsers,
+        refreshFavoriteUsers = viewModel::refreshFavoriteUsers,
         onBackClick = onBackClick,
         onMoreClick = onMoreClick
     )
@@ -82,7 +84,8 @@ fun FavoriteUsersContents(
     uiState:FavoriteUsersUiState,
     loadFavoriteUsers: () -> Unit,
     onBackClick: () -> Unit,
-    onMoreClick: () -> Unit
+    onMoreClick: () -> Unit,
+    refreshFavoriteUsers: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -100,61 +103,65 @@ fun FavoriteUsersContents(
         }
     }
 
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "お気に入り") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        // 뒤로 가기 아이콘 (예: Icons.AutoMirrored.Filled.ArrowBack)
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowLeft,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-            )
-        }
-    ) { paddingValues ->
-        when {
-            uiState.isLoading && uiState.favoriteUsers.isEmpty() -> {
-                // 로딩중이며 item이 비어있을때
-                // 로딩 중 화면 표시
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+    PullToRefreshBox(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = {refreshFavoriteUsers()},
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = "お気に入り") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            // 뒤로 가기 아이콘 (예: Icons.AutoMirrored.Filled.ArrowBack)
+                            Icon(
+                                imageVector = Icons.Filled.KeyboardArrowLeft,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                )
             }
-
-            uiState.error != null -> {
-                // 에러 화면 표시 (예: Text(uiState.error))
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Error: ${uiState.error}")
-                }
-            }
-
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    state = listState, // Add the state to the LazyColumn
-                ) {
-                    items(uiState.favoriteUsers) { user ->
-                        FavoriteUserItem(user = user)
+        ) { paddingValues ->
+            when {
+                uiState.isLoading && uiState.favoriteUsers.isEmpty() -> {
+                    // 로딩중이며 item이 비어있을때
+                    // 로딩 중 화면 표시
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
+                }
 
-                    if (uiState.isLoading && uiState.favoriteUsers.isNotEmpty()) {
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                CircularProgressIndicator()
+                uiState.error != null -> {
+                    // 에러 화면 표시 (예: Text(uiState.error))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Error: ${uiState.error}")
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        state = listState, // Add the state to the LazyColumn
+                    ) {
+                        items(uiState.favoriteUsers) { user ->
+                            FavoriteUserItem(user = user)
+                        }
+
+                        if (uiState.isLoading && uiState.favoriteUsers.isNotEmpty()) {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         }
                     }
@@ -282,7 +289,8 @@ fun FavoriteUsersScreenPreview() {
             uiState = uiState,
             loadFavoriteUsers = {},
             onBackClick = {},
-            onMoreClick = {}
+            onMoreClick = {},
+            refreshFavoriteUsers = {}
         )
     }
 }
