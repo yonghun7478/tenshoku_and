@@ -1,0 +1,101 @@
+---
+description: Data 레이어 코드 가이드라인
+globs: 
+alwaysApply: false
+---
+클린 아키텍처 기반 Data 레이어 코드 가이드라인Data 레이어는 애플리케이션의 데이터 처리 및 외부 데이터 소스(네트워크, 데이터베이스, 파일 등)와의 상호작용을 담당합니다. 클린 아키텍처에서 Data 레이어는 Domain 레이어에 정의된 Repository 인터페이스를 구현하며, 구체적인 데이터 처리 로직을 캡슐화합니다.핵심 원칙:구현 중심: Data 레이어는 Domain 레이어에서 정의한 추상화(Repository 인터페이스)에 대한 구체적인 구현을 제공합니다.의존성 규칙: Data 레이어는 Domain 레이어에만 의존합니다. UI 레이어나 다른 외부 프레임워크에 직접 의존해서는 안 됩니다.데이터 접근 관리: 현재 시점에서는 실제 외부 데이터 소스(네트워크 API, 로컬 DB 등)와의 통신은 구현하지 않습니다. 대신, 미리 정의된 더미 데이터 사용을 원칙으로 합니다.가이드라인 상세:1. Repository 구현체 (Repository Implementation):인터페이스 구현: Domain 레이어에 정의된 Repository 인터페이스를 구현합니다.데이터 접근 객체 의존 (현재 없음): 현 단계에서는 Retrofit API Service나 Room DAO와 같은 실제 데이터 접근 객체를 사용하거나 주입받지 않습니다. 모든 데이터는 Repository 구현체 내에서 직접 생성된 더미 데이터를 기반으로 합니다.데이터 매핑 책임: 더미 데이터 모델(DTO)을 직접 생성하고, 이를 Domain 모델(Entity)로 변환하여 반환합니다.[규칙] 더미 데이터 사용 및 반환 (필수): 실제 API 통신이나 DB 접근 로직은 작성하지 않습니다. Repository 구현체는 반드시 해당 구현체 내부에서 직접 더미 데이터 모델(DTO) 객체를 생성하고, 이를 사용하여 요청된 작업을 시뮬레이션한 후 결과를 반환해야 합니다. 별도의 더미 데이터 소스 클래스를 만들지 않습니다. 이는 백엔드나 DB 구현 없이 프론트엔드 개발을 진행하기 위함입니다.[규칙] 데이터 반환 프로세스:더미 데이터 모델 생성 (Repository 내부): Repository 구현체 메서드 내에서 해당 작업에 맞는 더미 데이터 모델(DTO) 객체를 직접 생성하고 데이터를 채웁니다.도메인 모델로 변환: 생성된 더미 데이터 모델 객체를 **확장 함수(Mapper)**를 사용하여 **도메인 모델(Entity)**로 변환합니다.도메인 모델 반환: 변환된 도메인 모델을 UseCase(호출자)에게 반환합니다.// Data Layer
+package com.example.data.repository
+
+import com.example.data.model.UserDto // 데이터 모델
+import com.example.data.mapper.toUser // 매핑 확장 함수
+import com.example.domain.model.User // 도메인 모델
+import com.example.domain.repository.UserRepository // 도메인 레포 인터페이스
+// import javax.inject.Inject // Hilt 사용 안 함
+
+// @Inject constructor() 제거
+class UserRepositoryImpl : UserRepository {
+
+    override suspend fun getUser(userId: String): User? {
+        // --- 더미 데이터 반환 로직 ---
+        // 1. 더미 데이터 모델 생성 및 데이터 채우기 (Repository 내부에서 직접 생성)
+        println("Repository: getUser 호출됨 (더미 데이터 사용)")
+        val dummyUserDto = UserDto( // <- Repository 구현체 내에서 직접 생성
+            id = userId,
+            name = "더미 사용자",
+            email = "dummy@example.com",
+            registrationTimestamp = System.currentTimeMillis()
+        )
+
+        // 2. 도메인 모델로 변환 (확장 함수 사용)
+        return dummyUserDto.toUser() // 3. 도메인 모델 반환
+    }
+
+    override suspend fun getAllUsers(): List<User> {
+        // --- 더미 데이터 반환 로직 ---
+        // 1. 더미 데이터 모델 리스트 생성 (Repository 내부에서 직접 생성)
+        println("Repository: getAllUsers 호출됨 (더미 데이터 사용)")
+        val dummyUserDtoList = listOf( // <- Repository 구현체 내에서 직접 생성
+            UserDto("1", "사용자 1", "user1@example.com", System.currentTimeMillis()),
+            UserDto("2", "사용자 2", "user2@example.com", System.currentTimeMillis())
+        )
+
+        // 2. 도메인 모델 리스트로 변환
+        return dummyUserDtoList.map { it.toUser() } // 3. 도메인 모델 리스트 반환
+    }
+
+    override suspend fun saveUser(user: User): Result<Unit> {
+        // 실제 저장 로직 대신 더미 로직 수행
+        // val userDto = user.toUserDto() // 필요 시 변환하여 사용
+        println("더미 데이터: 사용자 저장 시뮬레이션 - ${user.name}")
+        // Repository 내에서 저장 관련 더미 로직 처리 (예: 로그 출력)
+        return Result.success(Unit) // 더미 성공 결과 반환
+    }
+
+    override suspend fun deleteUser(userId: String): Result<Unit> {
+        // 실제 삭제 로직 대신 더미 로직 수행
+        println("더미 데이터: 사용자 삭제 시뮬레이션 - ID: $userId")
+        // Repository 내에서 삭제 관련 더미 로직 처리 (예: 로그 출력)
+        return Result.success(Unit) // 더미 성공 결과 반환
+    }
+}
+2. 데이터 모델 (Data Model / DTO - Data Transfer Object):역할: 가상의 데이터 소스(API 응답, DB 테이블 등) 구조를 나타내는 데이터 구조입니다. Repository 구현체 내에서 더미 데이터를 구성하는 데 사용됩니다.구조: 예상되는 데이터 소스의 구조를 반영합니다. 실제 라이브러리(Retrofit, Room 등)를 사용하지 않으므로 관련 어노테이션은 참고용으로만 남겨두거나 제거해도 무방합니다.단순성: 복잡한 비즈니스 로직을 포함하지 않고, 주로 데이터 필드만 가집니다.위치: Data 레이어 내부에 정의됩니다.// Data Layer
+package com.example.data.model
+
+// import androidx.room.Entity // 실제 Room 사용 안 함
+// import com.google.gson.annotations.SerializedName // 실제 Gson 사용 안 함
+
+// @Entity(tableName = "users") // 실제 DB 매핑 안 함
+data class UserDto(
+    // @SerializedName("user_id") // 실제 JSON 매핑 안 함
+    val id: String,
+    // @SerializedName("user_name")
+    val name: String,
+    val email: String?, // Nullable 필드 가능
+    val registrationTimestamp: Long // 가상 데이터 소스에 맞는 타입 사용
+)
+3. 매퍼 (Mapper / Extension Functions):역할: 데이터 모델(DTO)과 도메인 모델(Entity) 간의 변환 로직을 담당합니다. Repository에서 생성된 더미 DTO를 올바른 도메인 객체로 변환하는 데 필수적입니다.구현: **Kotlin의 확장 함수(Extension Function)**를 사용하는 것을 적극 권장합니다.[규칙] 변환 방향: 데이터 모델을 도메인 모델로 변환하는 확장 함수(fun UserDto.toUser(): User), 그리고 필요한 경우 도메인 모델을 데이터 모델로 변환하는 확장 함수(fun User.toUserDto(): UserDto)를 작성합니다.위치: Data 레이어 내부에 mapper 패키지 등을 만들어 관리하는 것이 일반적입니다.// Data Layer
+package com.example.data.mapper
+
+import com.example.data.model.UserDto
+import com.example.domain.model.User
+
+// 데이터 모델(UserDto)을 도메인 모델(User)로 변환하는 확장 함수
+fun UserDto.toUser(): User {
+    return User(
+        id = this.id,
+        name = this.name, // 필드 매핑
+        email = this.email ?: "N/A" // Null 처리 등 필요한 로직 추가
+    )
+}
+
+// 도메인 모델(User)을 데이터 모델(UserDto)로 변환하는 확장 함수 (필요한 경우)
+fun User.toUserDto(): UserDto {
+    return UserDto(
+        id = this.id,
+        name = this.name,
+        email = this.email,
+        registrationTimestamp = 0L // DTO에만 있는 필드는 기본값 또는 다른 로직으로 채움
+    )
+}
+
+(데이터 접근 객체 섹션 제거됨)4. 결론:Data 레이어를 이 가이드라인에 따라 구성하면, 데이터 처리 로직을 명확하게 분리하고 Domain 레이어를 보호할 수 있습니다. 현재 단계에서는 실제 외부 라이브러리(Retrofit, Room 등)나 데이터베이스 연동 없이 오직 Repository 구현체 내부에서 직접 생성된 더미 데이터를 사용하는 것을 원칙으로 합니다. **데이터 모델(DTO)과 도메인 모델(Entity) 간의 명확한 매핑(확장 함수 사용 권장)**은 이 과정에서 핵심적인 역할을 수행하며, 향후 실제 데이터 소스로 전환할 때의 기반을 마련합니다.
