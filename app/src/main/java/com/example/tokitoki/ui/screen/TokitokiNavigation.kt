@@ -21,6 +21,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_THIRD_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.AGREEMENT_CONFIRMATION_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ASHIATO_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.EMAIL_VERIFICATION_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.FAVORITE_USERS_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.FAVORITE_TAG_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MAIN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.REGISTER_WITH_EMAIL_SCREEN
@@ -44,6 +45,7 @@ private object TokitokiScreens {
     const val FAVORITE_TAG_SCREEN = "FavoriteTagScreen"
     const val MAIN_SCREEN = "MainScreen"
     const val ASHIATO_SCREEN = "AshiatoScreen"
+    const val FAVORITE_USERS_SCREEN = "FavoriteUsersScreen"
 }
 
 object TokitokiArgs {
@@ -71,6 +73,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}&$SELF_SENTENCE_IDS={$SELF_SENTENCE_IDS}"
     const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}"
     const val FAVORITE_TAG_ROUTE = FAVORITE_TAG_SCREEN
+    const val FAVORITE_USERS_ROUTE = FAVORITE_USERS_SCREEN
     const val MAIN_ROUTE = MAIN_SCREEN
     const val ASHIATO_ROUTE = ASHIATO_SCREEN
 }
@@ -138,5 +141,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToAshiato() {
         navController.navigate(ASHIATO_SCREEN)
+    }
+
+    fun navigateToFavoriteUsers() {
+        navController.navigate(FAVORITE_USERS_SCREEN)
     }
 }
