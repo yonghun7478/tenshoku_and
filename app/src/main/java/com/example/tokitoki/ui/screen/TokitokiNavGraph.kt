@@ -312,5 +312,10 @@ fun TokitokiNavGraph(
                 onNavigateToUserProfile = {}
             )
         }
+
+        composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
+            IineSitaHitoScreen(
+            )
+        }
     }
 }

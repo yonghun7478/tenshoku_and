@@ -22,6 +22,60 @@ alwaysApply: false
 
 작고 집중된 함수: 각 Composable 함수는 단일 책임 원칙(SRP)에 따라 하나의 특정 UI 요소나 작은 UI 그룹을 렌더링하는 데 집중합니다. 복잡한 화면은 여러 개의 작은 Composable 함수로 분리합니다.
 
+컴포저블 분리 패턴: 화면 단위의 컴포저블은 다음과 같이 두 개의 컴포저블로 분리합니다:
+
+1) Screen 컴포저블 (예: MyScreen):
+   - ViewModel 주입 및 상태 관리 담당
+   - hiltViewModel()을 통한 ViewModel 주입
+   - StateFlow를 State로 변환
+   - 이벤트 핸들러와 ViewModel 함수 연결
+   - Contents 컴포저블 호출
+
+2) Contents 컴포저블 (예: MyScreenContents):
+   - 실제 UI 렌더링 담당
+   - UI 상태를 파라미터로 받음
+   - 모든 이벤트 핸들러를 파라미터로 받음
+   - ViewModel에 직접적인 의존성이 없음
+   - Preview 지원
+
+예시:
+```kotlin
+@Composable
+fun MyScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MyViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    MyScreenContents(
+        uiState = uiState,
+        onRefresh = viewModel::refresh,
+        onItemClick = { id -> viewModel.onItemClicked(id) },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MyScreenContents(
+    uiState: MyScreenUiState,
+    onRefresh: () -> Unit,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // UI 렌더링
+}
+
+@Preview
+@Composable
+fun MyScreenContentsPreview() {
+    MyScreenContents(
+        uiState = MyScreenUiState(...),
+        onRefresh = {},
+        onItemClick = {},
+    )
+}
+```
+
 상태 비소유 (Stateless) 선호: 가능하면 Composable 함수는 자체적으로 상태를 가지지 않도록 설계합니다. 필요한 데이터는 파라미터로 전달받고, 사용자 이벤트는 람다(lambda) 콜백 함수를 통해 상위로 전달합니다 ((event: T) -> Unit 형태).
 
 예시: 버튼 클릭 이벤트는 onClick: () -> Unit 파라미터로 받습니다.
@@ -92,6 +146,41 @@ fun MyScreenContent(
 
 Preview 활용: @Preview를 통해 다양한 상태의 Composable을 시각적으로 테스트합니다.
 
+프리뷰 작성 가이드라인:
+- Screen 컴포저블이 아닌 Contents 컴포저블에 대해 프리뷰 작성
+- 다양한 상태 조합에 대한 프리뷰 제공 (빈 상태, 로딩 상태, 데이터 있는 상태, 에러 상태 등)
+- 모든 이벤트 핸들러에 대해 빈 람다({}) 제공
+- 실제 데이터와 유사한 더미 데이터 사용
+
+예시:
+```kotlin
+@Preview(showBackground = true)
+@Composable
+fun MyScreenContentsEmptyPreview() {
+    MyScreenContents(
+        uiState = MyScreenUiState(
+            isLoading = false,
+            items = emptyList()
+        ),
+        onRefresh = {},
+        onItemClick = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MyScreenContentsLoadingPreview() {
+    MyScreenContents(
+        uiState = MyScreenUiState(
+            isLoading = true,
+            items = emptyList()
+        ),
+        onRefresh = {},
+        onItemClick = {}
+    )
+}
+```
+
 UI 테스트: ComposeTestRule을 사용하여 특정 Composable 또는 전체 화면의 동작(UI 요소 존재 여부, 상태 변화에 따른 UI 변경, 이벤트 핸들러 호출 등)을 검증합니다. 테스트 시에는 실제 ViewModel 대신 Mock 또는 Fake ViewModel을 주입하여 UI 로직만 격리하여 테스트합니다.
 
 ViewModel 테스트: ViewModel은 UI와 분리되어 있으므로 일반적인 유닛 테스트(Unit Test)로 로직을 검증합니다.
@@ -105,6 +194,5 @@ UI 상태 클래스: ScreenNameUiState 또는 FeatureUiState 와 같이 명명�
 이벤트 핸들러 람다: on + 동사 형태로 명명합니다 (e.g., onLoginClick, onValueChange).
 
 6. 결론:
-
 
 이 가이드라인은 클린 아키텍처의 원칙을 Jetpack Compose UI 개발에 적용하여, 테스트 가능하고, 유지보수하기 쉬우며, 재사용성 높은 UI 코드를 작성하는 데 도움을 줄 것입니다. 핵심은 UI 레이어를 최대한 '단순하게(Dumb)' 유지하고, 상태 관리와 비즈니스 로직 처리는 ViewModel 및 하위 레이어에 위임하는 것입니다.

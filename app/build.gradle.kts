@@ -118,6 +118,12 @@ dependencies {
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
 
+    // Accompanist
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.32.0")
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

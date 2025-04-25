@@ -26,6 +26,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.FAVORITE_TAG_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MAIN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.REGISTER_WITH_EMAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.SIGN_IN_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.IINE_SITA_HITO_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -46,6 +47,7 @@ private object TokitokiScreens {
     const val MAIN_SCREEN = "MainScreen"
     const val ASHIATO_SCREEN = "AshiatoScreen"
     const val FAVORITE_USERS_SCREEN = "FavoriteUsersScreen"
+    const val IINE_SITA_HITO_SCREEN = "IineSitaHitoScreen"
 }
 
 object TokitokiArgs {
@@ -76,6 +78,7 @@ object TokitokiDestinations {
     const val FAVORITE_USERS_ROUTE = FAVORITE_USERS_SCREEN
     const val MAIN_ROUTE = MAIN_SCREEN
     const val ASHIATO_ROUTE = ASHIATO_SCREEN
+    const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -145,5 +148,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToFavoriteUsers() {
         navController.navigate(FAVORITE_USERS_SCREEN)
+    }
+
+    fun navigateToIineSitaHito() {
+        navController.navigate(IINE_SITA_HITO_SCREEN)
     }
 }
