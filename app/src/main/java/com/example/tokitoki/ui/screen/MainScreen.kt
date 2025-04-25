@@ -46,6 +46,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
+    onIineSitaHitoClick: () -> Unit = {},
     ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -67,6 +68,7 @@ fun MainScreen(
         onEvent = { viewModel.onEvent(it) },
         onAshiatoClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
+        onIineSitaHitoClick = onIineSitaHitoClick,
     )
 }
 
@@ -76,7 +78,8 @@ fun MainContents(
     onEvent: (MainUiEvent) -> Unit,
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
-    ) {
+    onIineSitaHitoClick: () -> Unit = {},
+) {
     Scaffold(
         bottomBar = {
             MainBottomNavigation(
@@ -106,7 +109,8 @@ fun MainContents(
                 MainBottomItem.MY_PAGE -> {
                     MyPageScreen(
                         onAshiatoClick = onAshiatoClick,
-                        onFavoriteUsersClick = onFavoriteUsersClick
+                        onFavoriteUsersClick = onFavoriteUsersClick,
+                        onIineSitaHitoClick = onIineSitaHitoClick
                     )
                 }
             }

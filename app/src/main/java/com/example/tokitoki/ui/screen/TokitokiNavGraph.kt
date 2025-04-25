@@ -303,6 +303,9 @@ fun TokitokiNavGraph(
                 },
                 onFavoriteUsersClick = {
                     navAction.navigateToFavoriteUsers()
+                },
+                onIineSitaHitoClick = {
+                    navAction.navigateToIineSitaHito()
                 }
             )
         }
@@ -314,8 +317,7 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
-            IineSitaHitoScreen(
-            )
+            IineSitaHitoScreen()
         }
     }
 }

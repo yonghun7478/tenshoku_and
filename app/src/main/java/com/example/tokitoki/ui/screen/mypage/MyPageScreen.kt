@@ -35,6 +35,7 @@ fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel(),
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
+    onIineSitaHitoClick: () -> Unit = {},
     ) {
     val state = viewModel.myPageState.collectAsState()
 
@@ -47,7 +48,7 @@ fun MyPageScreen(
         onEditProfileClick = viewModel::onEditProfileClick,
         onSeenMeClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
-        onLikedMeClick = viewModel::onLikedMeClick,
+        onIineSitaHitoClick = onIineSitaHitoClick,
         onLogoutClick = viewModel::onLogoutClick
     )
 }
@@ -58,7 +59,7 @@ fun MyPageScreenContent(
     onEditProfileClick: () -> Unit,
     onSeenMeClick: () -> Unit,
     onFavoriteUsersClick: () -> Unit = {},
-    onLikedMeClick: () -> Unit,
+    onIineSitaHitoClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -80,7 +81,7 @@ fun MyPageScreenContent(
         val myListItems = listOf(  // 리스트 생성
             MyPageListItemData(text = "나를 본 사람", icon = Icons.Filled.Face, onClick = onSeenMeClick),
             MyPageListItemData(text = "즐겨찾기", icon = Icons.Filled.Favorite, onClick = onFavoriteUsersClick),
-            MyPageListItemData(text = "내가 좋아요 한 사람", icon = Icons.Filled.ThumbUp, onClick = onLikedMeClick),
+            MyPageListItemData(text = "내가 좋아요 한 사람", icon = Icons.Filled.ThumbUp, onClick = onIineSitaHitoClick),
             MyPageListItemData(text = "로그아웃", icon = Icons.Filled.ExitToApp, onClick = onLogoutClick)
         )
 
@@ -230,7 +231,7 @@ fun PreviewMyPageScreen() {
             state = dummyState, // 생성한 가짜 상태 전달
             onEditProfileClick = { }, // Preview에서는 동작 확인 불필요
             onSeenMeClick = { },
-            onLikedMeClick = { },
+            onIineSitaHitoClick = { },
             onLogoutClick = { }
         )
     }
