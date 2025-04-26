@@ -82,7 +82,15 @@ class IineSitaHitoViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true, error = null) }
+            _uiState.update { 
+                IineSitaHitoUiState(
+                    users = emptyList(),
+                    isLoading = true,
+                    isRefreshing = true,
+                    hasMoreItems = false,
+                    error = null
+                )
+            }
             try {
                 currentCursor = null
                 val users = getLikedUsersUseCase(cursor = null, pageSize = pageSize)
@@ -90,6 +98,7 @@ class IineSitaHitoViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isRefreshing = false,
+                        isLoading = false,
                         users = users,
                         hasMoreItems = users.size >= pageSize
                     )
@@ -98,6 +107,7 @@ class IineSitaHitoViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isRefreshing = false,
+                        isLoading = false,
                         error = error.message ?: "알 수 없는 오류가 발생했습니다."
                     )
                 }
