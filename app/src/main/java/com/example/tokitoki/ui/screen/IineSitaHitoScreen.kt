@@ -31,7 +31,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun IineSitaHitoScreen(
     modifier: Modifier = Modifier,
-    viewModel: IineSitaHitoViewModel = hiltViewModel()
+    viewModel: IineSitaHitoViewModel = hiltViewModel(),
+    onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -40,6 +41,7 @@ fun IineSitaHitoScreen(
         onRefresh = viewModel::refresh,
         onLoadMore = viewModel::loadMoreUsers,
         onUnlike = { user -> viewModel.updateLikeStatus(user, false) },
+        onBackClick = onBackClick,
         modifier = modifier
     )
 }
@@ -51,6 +53,7 @@ fun IineSitaHitoContents(
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onUnlike: (LikedUser) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     SwipeRefresh(
@@ -65,7 +68,7 @@ fun IineSitaHitoContents(
                 TopAppBar(
                     title = { Text("あなたから") },
                     navigationIcon = {
-                        IconButton(onClick = { /* TODO: Add navigation handler */ }) {
+                        IconButton(onClick = onBackClick) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back"
@@ -328,7 +331,8 @@ private fun IineSitaHitoContentsEmptyPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {}
+            onUnlike = {},
+            onBackClick = {}
         )
     }
 }
@@ -344,7 +348,8 @@ private fun IineSitaHitoContentsLoadingPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {}
+            onUnlike = {},
+            onBackClick = {}
         )
     }
 }
@@ -381,7 +386,8 @@ private fun IineSitaHitoContentsWithDataPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {}
+            onUnlike = {},
+            onBackClick = {}
         )
     }
 }
@@ -398,7 +404,8 @@ private fun IineSitaHitoContentsErrorPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {}
+            onUnlike = {},
+            onBackClick = {}
         )
     }
 }

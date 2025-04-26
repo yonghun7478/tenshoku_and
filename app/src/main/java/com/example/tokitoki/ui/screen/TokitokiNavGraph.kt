@@ -317,7 +317,11 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
-            IineSitaHitoScreen()
+            IineSitaHitoScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }

@@ -22,7 +22,7 @@ class LikedUserRepositoryImpl @Inject constructor() : LikedUserRepository {
                 nickname = "사용자$index",
                 age = Random.nextInt(20, 40),
                 location = listOf("서울", "부산", "대구", "인천", "광주").random(),
-                profileImageUrl = "https://example.com/profile/$index.jpg",
+                profileImageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ee/2023_MMA_IVE_Wonyoung_1.jpg",
                 introduction = if (Random.nextBoolean()) "안녕하세요! 저는 사용자${index}입니다." else null,
                 occupation = if (Random.nextBoolean()) listOf("회사원", "학생", "프리랜서", "공무원").random() else null,
                 likedAt = currentTime - randomTimeOffset
