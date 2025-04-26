@@ -90,6 +90,10 @@ import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
+import com.example.tokitoki.domain.usecase.GetLikedUsersUseCaseImpl
+import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCase
+import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -336,4 +340,16 @@ abstract class UseCaseModule {
     abstract fun bindGetFavoriteUsersUseCase(
         useCaseImpl: GetFavoriteUsersUseCaseImpl
     ): GetFavoriteUsersUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetLikedUsersUseCase(
+        impl: GetLikedUsersUseCaseImpl
+    ): GetLikedUsersUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateLikeStatusUseCase(
+        impl: UpdateLikeStatusUseCaseImpl
+    ): UpdateLikeStatusUseCase
 }

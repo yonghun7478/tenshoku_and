@@ -303,6 +303,9 @@ fun TokitokiNavGraph(
                 },
                 onFavoriteUsersClick = {
                     navAction.navigateToFavoriteUsers()
+                },
+                onIineSitaHitoClick = {
+                    navAction.navigateToIineSitaHito()
                 }
             )
         }
@@ -310,6 +313,14 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.ASHIATO_ROUTE) {
             AshiatoScreen(
                 onNavigateToUserProfile = {}
+            )
+        }
+
+        composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
+            IineSitaHitoScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
     }
