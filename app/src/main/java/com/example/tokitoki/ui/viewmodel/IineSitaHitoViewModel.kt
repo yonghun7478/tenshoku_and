@@ -24,7 +24,7 @@ class IineSitaHitoViewModel @Inject constructor(
     val uiState: StateFlow<IineSitaHitoUiState> = _uiState.asStateFlow()
 
     private var currentCursor: Long? = null
-    private val pageSize = 20
+    private val pageSize = 10
 
     init {
         loadInitialUsers()
