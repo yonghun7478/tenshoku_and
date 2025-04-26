@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,8 +26,6 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.IineSitaHitoViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,7 +34,7 @@ fun IineSitaHitoScreen(
     viewModel: IineSitaHitoViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     IineSitaHitoContents(
         uiState = uiState,
         onRefresh = viewModel::refresh,
@@ -45,6 +44,7 @@ fun IineSitaHitoScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IineSitaHitoContents(
     uiState: IineSitaHitoUiState,
@@ -58,54 +58,73 @@ fun IineSitaHitoContents(
         onRefresh = onRefresh,
         modifier = modifier.fillMaxSize()
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            AnimatedVisibility(
-                visible = uiState.users.isEmpty() && !uiState.isLoading,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                EmptyState(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Header
+                TopAppBar(
+                    title = { Text("あなたから") },
+                    navigationIcon = {
+                        IconButton(onClick = { /* TODO: Add navigation handler */ }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 )
-            }
 
-            AnimatedVisibility(
-                visible = uiState.users.isNotEmpty() || uiState.isLoading,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                AnimatedVisibility(
+                    visible = uiState.users.isEmpty() && !uiState.isLoading,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    items(
-                        items = uiState.users,
-                        key = { user -> user.id }
-                    ) { user ->
-                        LikedUserCard(
-                            user = user,
-                            onUnlike = { onUnlike(user) }
-                        )
+                    EmptyState(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
 
-                        if (user == uiState.users.lastOrNull() && !uiState.isLoading && uiState.hasMoreItems) {
-                            LaunchedEffect(user.id) {
-                                onLoadMore()
+                AnimatedVisibility(
+                    visible = uiState.users.isNotEmpty() || uiState.isLoading,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(
+                            items = uiState.users,
+                            key = { user -> user.id }
+                        ) { user ->
+                            LikedUserCard(
+                                user = user,
+                                onUnlike = { onUnlike(user) }
+                            )
+
+                            if (user == uiState.users.lastOrNull() && !uiState.isLoading && uiState.hasMoreItems) {
+                                LaunchedEffect(user.id) {
+                                    onLoadMore()
+                                }
                             }
                         }
-                    }
 
-                    if (uiState.isLoading) {
-                        item {
-                            LoadingIndicator()
+                        if (uiState.isLoading) {
+                            item {
+                                LoadingIndicator()
+                            }
                         }
                     }
                 }
             }
 
             AnimatedVisibility(
+                modifier = modifier.align(Alignment.BottomCenter),
                 visible = uiState.error != null,
                 enter = slideInVertically { it } + fadeIn(),
                 exit = slideOutVertically { it } + fadeOut()
@@ -156,7 +175,7 @@ private fun LikedUserCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 IconButton(
                     onClick = {
                         if (isLiked) {
