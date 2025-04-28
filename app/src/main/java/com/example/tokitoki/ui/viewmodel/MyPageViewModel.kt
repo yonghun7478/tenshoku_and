@@ -8,6 +8,8 @@ import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.ClearTokensUseCase
+import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCase
 import com.example.tokitoki.ui.state.MyPageDummyData
 import com.example.tokitoki.ui.state.MyPageState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 // ViewModel
 @HiltViewModel
@@ -25,11 +29,16 @@ class MyPageViewModel @Inject constructor(
     private val fetchMyProfileUseCase: FetchMyProfileUseCase, // 신규 Fetch UseCase
     private val setMyProfileUseCase: SetMyProfileUseCase,     // 신규 Save UseCase
     private val getMyProfileUseCase: GetMyProfileUseCase,     // 기존 Local Get UseCase
-    private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase // 기존 Sentence Get UseCase
+    private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase, // 기존 Sentence Get UseCase
+    private val clearTokensUseCase: ClearTokensUseCase, // 추가
+    private val deleteUserProfileUseCase: DeleteUserProfileUseCase // 추가
 ) : ViewModel() {
 
     private val _myPageState = MutableStateFlow(MyPageState())
     val myPageState: StateFlow<MyPageState> = _myPageState.asStateFlow()
+
+    private val _logoutCompleted = MutableSharedFlow<Unit>()
+    val logoutCompleted: SharedFlow<Unit> = _logoutCompleted
 
     fun loadMyPageData() {
         viewModelScope.launch {
@@ -112,8 +121,11 @@ class MyPageViewModel @Inject constructor(
 
     // --- 이벤트 핸들러 ---
     fun onEditProfileClick() { println("ViewModel: 프로필 수정 클릭") }
-    fun onSeenMeClick() { println("ViewModel: 나를 본 사람 클릭") }
-    fun onFavoritesClick() { println("ViewModel: 즐겨찾기 클릭") }
-    fun onLikedMeClick() { println("ViewModel: 내가 좋아요 한 사람 클릭") }
-    fun onLogoutClick() { println("ViewModel: 로그아웃 클릭") }
+    fun onLogoutClick() {
+        viewModelScope.launch {
+            clearTokensUseCase()
+            deleteUserProfileUseCase()
+            _logoutCompleted.emit(Unit)
+        }
+    }
 }

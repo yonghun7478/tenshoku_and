@@ -47,7 +47,8 @@ fun MainScreen(
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
-    ) {
+    onNavigateToSignIn: () -> Unit = {},
+) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
 
@@ -69,6 +70,7 @@ fun MainScreen(
         onAshiatoClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
         onIineSitaHitoClick = onIineSitaHitoClick,
+        onNavigateToSignIn = onNavigateToSignIn
     )
 }
 
@@ -79,6 +81,7 @@ fun MainContents(
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
+    onNavigateToSignIn: () -> Unit = {},
 ) {
     Scaffold(
         bottomBar = {
@@ -110,7 +113,8 @@ fun MainContents(
                     MyPageScreen(
                         onAshiatoClick = onAshiatoClick,
                         onFavoriteUsersClick = onFavoriteUsersClick,
-                        onIineSitaHitoClick = onIineSitaHitoClick
+                        onIineSitaHitoClick = onIineSitaHitoClick,
+                        onNavigateToSignIn = onNavigateToSignIn,
                     )
                 }
             }

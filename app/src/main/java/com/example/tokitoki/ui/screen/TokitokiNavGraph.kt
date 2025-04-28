@@ -243,38 +243,39 @@ fun TokitokiNavGraph(
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
 
-            val uri = if (isFromEditMode) Uri.parse(
+            val uri = (if (isFromEditMode) Uri.parse(
                 Uri.decode(
                     navController
                         .currentBackStackEntry?.savedStateHandle?.get("uri") ?: Uri.EMPTY.toString()
                 )
 
-            ) else uriFromArg
+            ) else uriFromArg).apply {
 
-            AboutMeMyProfileScreen(
-                uri = uri,
-                onAboutMeProfInputScreen = {
-                    navAction.navigateToAboutMeProfInput(selfSentenceId = it)
-                },
-                onAboutMeNameScreen = {
-                    navAction.navigateToAboutMeName(it)
-                },
-                onAboutMeBirthDayScreen = {
-                    navAction.navigateToAboutMeBirthday(it)
-                },
-                onAboutMeTagScreen = {
-                    navAction.navigateToAboutMeTag(it)
-                },
-                onAboutMePhotoUploadScreen = {
-                    navAction.navigateToAboutMePhotoUpload(it, true)
-                },
-                onFavoriteTagScreen = {
-                    navAction.navigateToFavoriteTag()
-                },
-                onMainScreen = {
-                    navAction.navigateToMain()
-                }
-            )
+                AboutMeMyProfileScreen(
+                    uri = this,
+                    onAboutMeProfInputScreen = {
+                        navAction.navigateToAboutMeProfInput(selfSentenceId = it)
+                    },
+                    onAboutMeNameScreen = {
+                        navAction.navigateToAboutMeName(it)
+                    },
+                    onAboutMeBirthDayScreen = {
+                        navAction.navigateToAboutMeBirthday(it)
+                    },
+                    onAboutMeTagScreen = {
+                        navAction.navigateToAboutMeTag(it)
+                    },
+                    onAboutMePhotoUploadScreen = {
+                        navAction.navigateToAboutMePhotoUpload(it, true)
+                    },
+                    onFavoriteTagScreen = {
+                        navAction.navigateToFavoriteTag()
+                    },
+                    onMainScreen = {
+                        navAction.navigateToMain()
+                    }
+                )
+            }
         }
 
         composable(TokitokiDestinations.FAVORITE_TAG_ROUTE) {
@@ -306,6 +307,9 @@ fun TokitokiNavGraph(
                 },
                 onIineSitaHitoClick = {
                     navAction.navigateToIineSitaHito()
+                },
+                onNavigateToSignIn = {
+                    navAction.navigateToSignInAndClearBackStack()
                 }
             )
         }

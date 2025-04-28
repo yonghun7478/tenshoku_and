@@ -36,11 +36,19 @@ fun MyPageScreen(
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
-    ) {
+    onNavigateToSignIn: () -> Unit = {},
+) {
     val state = viewModel.myPageState.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.loadMyPageData()
+    }
+
+    // 로그아웃 완료시 콜백 호출
+    LaunchedEffect(Unit) {
+        viewModel.logoutCompleted.collect {
+            onNavigateToSignIn()
+        }
     }
 
     MyPageScreenContent(
@@ -49,7 +57,7 @@ fun MyPageScreen(
         onSeenMeClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
         onIineSitaHitoClick = onIineSitaHitoClick,
-        onLogoutClick = viewModel::onLogoutClick
+        onLogoutClick = { viewModel.onLogoutClick() },
     )
 }
 
@@ -60,7 +68,7 @@ fun MyPageScreenContent(
     onSeenMeClick: () -> Unit,
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -80,9 +88,21 @@ fun MyPageScreenContent(
         Spacer(modifier = Modifier.height(24.dp)) // 간격 증가
         val myListItems = listOf(  // 리스트 생성
             MyPageListItemData(text = "나를 본 사람", icon = Icons.Filled.Face, onClick = onSeenMeClick),
-            MyPageListItemData(text = "즐겨찾기", icon = Icons.Filled.Favorite, onClick = onFavoriteUsersClick),
-            MyPageListItemData(text = "내가 좋아요 한 사람", icon = Icons.Filled.ThumbUp, onClick = onIineSitaHitoClick),
-            MyPageListItemData(text = "로그아웃", icon = Icons.Filled.ExitToApp, onClick = onLogoutClick)
+            MyPageListItemData(
+                text = "즐겨찾기",
+                icon = Icons.Filled.Favorite,
+                onClick = onFavoriteUsersClick
+            ),
+            MyPageListItemData(
+                text = "내가 좋아요 한 사람",
+                icon = Icons.Filled.ThumbUp,
+                onClick = onIineSitaHitoClick
+            ),
+            MyPageListItemData(
+                text = "로그아웃",
+                icon = Icons.Filled.ExitToApp,
+                onClick = onLogoutClick
+            )
         )
 
         LazyColumn { // LazyColumn으로 변경
@@ -92,7 +112,6 @@ fun MyPageScreenContent(
         }
     }
 }
-
 
 
 @Composable
@@ -106,7 +125,10 @@ fun MyPageProfileSection(
         horizontalAlignment = Alignment.CenterHorizontally, // 내부 Column 중앙 정렬
         modifier = Modifier.fillMaxWidth()
     ) {
-        MyPageProfilePicture(profileImageUrl = profileImageUrl, onEditProfileClick = onEditProfileClick)
+        MyPageProfilePicture(
+            profileImageUrl = profileImageUrl,
+            onEditProfileClick = onEditProfileClick
+        )
         Spacer(modifier = Modifier.height(16.dp)) // 간격 증가
         Text(
             text = nickname,
@@ -166,7 +188,10 @@ fun MyPageBanner() {
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp) // 높이 증가
-            .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) // 배경색 및 둥근 모서리 적용
+            .background(
+                MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.medium
+            ) // 배경색 및 둥근 모서리 적용
             .padding(24.dp), // 패딩 증가
         contentAlignment = Alignment.CenterStart
     ) {
@@ -199,11 +224,27 @@ fun MyPageListItem(text: String, icon: ImageVector, onClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.primary) // 아이콘 크기, 색상 변경
+                Icon(
+                    imageVector = icon,
+                    contentDescription = text,
+                    modifier = Modifier.size(28.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                ) // 아이콘 크기, 색상 변경
                 Spacer(modifier = Modifier.width(24.dp)) // 간격 증가
-                Text(text = text, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Medium)) // 폰트 크기, 굵기 변경
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                ) // 폰트 크기, 굵기 변경
             }
-            Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "다음", modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) // 아이콘 크기, 색상 변경
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowRight,
+                contentDescription = "다음",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            ) // 아이콘 크기, 색상 변경
         }
     }
 }
@@ -232,7 +273,7 @@ fun PreviewMyPageScreen() {
             onEditProfileClick = { }, // Preview에서는 동작 확인 불필요
             onSeenMeClick = { },
             onIineSitaHitoClick = { },
-            onLogoutClick = { }
+            onLogoutClick = { },
         )
     }
 }
