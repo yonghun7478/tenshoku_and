@@ -153,4 +153,11 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
     fun navigateToIineSitaHito() {
         navController.navigate(IINE_SITA_HITO_SCREEN)
     }
+
+    fun navigateToSignInAndClearBackStack() {
+        navController.navigate(TokitokiScreens.SIGN_IN_SCREEN) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
 }

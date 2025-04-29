@@ -94,6 +94,10 @@ import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
 import com.example.tokitoki.domain.usecase.GetLikedUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCase
 import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCaseImpl
+import com.example.tokitoki.domain.usecase.ClearTokensUseCase
+import com.example.tokitoki.domain.usecase.ClearTokensUseCaseImpl
+import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCase
+import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -352,4 +356,16 @@ abstract class UseCaseModule {
     abstract fun bindUpdateLikeStatusUseCase(
         impl: UpdateLikeStatusUseCaseImpl
     ): UpdateLikeStatusUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindClearTokensUseCase(
+        impl: ClearTokensUseCaseImpl
+    ): ClearTokensUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindDeleteUserProfileUseCase(
+        impl: DeleteUserProfileUseCaseImpl
+    ): DeleteUserProfileUseCase
 }

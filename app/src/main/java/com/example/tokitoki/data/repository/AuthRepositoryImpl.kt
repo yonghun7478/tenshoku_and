@@ -65,6 +65,11 @@ class AuthRepositoryImpl @Inject constructor(
         return Tokens(accessToken, refreshToken)
     }
 
+    override fun clearTokens() {
+        tokenPreferences.clearTokens()
+    }
+
+
     override fun saveRegistrationToken(registrationToken: String) {
         tokenPreferences.saveRegistrationToken(registrationToken)
     }
