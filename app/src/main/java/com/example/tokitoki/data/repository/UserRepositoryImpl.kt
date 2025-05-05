@@ -27,8 +27,9 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    // 반환된 유저 id를 캐싱할 리스트
-    private val cachedUserIds: MutableList<String> = mutableListOf()
+    // 반환된 유저 id를 정렬 기준별로 캐싱할 리스트
+    private val cachedUserIdsByLastLogin: MutableList<String> = mutableListOf()
+    private val cachedUserIdsByCreatedAt: MutableList<String> = mutableListOf()
 
     // UserDetail 캐시 (id -> UserDetail)
     private val userDetailCache = LruCache<String, UserDetail>(100)
@@ -60,8 +61,12 @@ class UserRepositoryImpl @Inject constructor(
 
             val mappedUsers = pagedUsers.map { it.copy(thumbnailUrl = thumbnailUrl) }
 
-            // 캐싱: 반환되는 유저 id를 리스트에 추가
-            cachedUserIds.addAll(mappedUsers.map { it.id })
+            // 정렬 기준에 따라 각각의 리스트에 캐싱
+            if (orderBy == "lastLoginAt") {
+                cachedUserIdsByLastLogin.addAll(mappedUsers.map { it.id })
+            } else {
+                cachedUserIdsByCreatedAt.addAll(mappedUsers.map { it.id })
+            }
 
             val nextCursor = mappedUsers.lastOrNull()?.id
             val isLastPage = (startIndex + mappedUsers.size) >= sortedUsers.size
@@ -112,12 +117,22 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUsersByIds(userIds: List<String>): List<String>? {
-        val foundIds = dummyUsers.filter { userIds.contains(it.id) }.map { it.id }
-        return if (foundIds.isNotEmpty()) foundIds else null
+    override fun clearCachedUserIds(orderBy: String?) {
+        when (orderBy) {
+            "lastLoginAt" -> cachedUserIdsByLastLogin.clear()
+            "createdAt" -> cachedUserIdsByCreatedAt.clear()
+            null -> {
+                cachedUserIdsByLastLogin.clear()
+                cachedUserIdsByCreatedAt.clear()
+            }
+        }
     }
 
-    override fun clearCachedUserIds() {
-        cachedUserIds.clear()
+    override fun getCachedUserIds(orderBy: String): List<String> {
+        return when (orderBy) {
+            "lastLoginAt" -> cachedUserIdsByLastLogin.toList()
+            "createdAt" -> cachedUserIdsByCreatedAt.toList()
+            else -> emptyList()
+        }
     }
 }
