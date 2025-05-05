@@ -6,7 +6,11 @@ import com.example.tokitoki.domain.converter.UserConverter
 import com.example.tokitoki.domain.model.UserList
 import com.example.tokitoki.domain.repository.UserRepository
 import javax.inject.Inject
+import android.util.LruCache
+import com.example.tokitoki.domain.model.UserDetail
+import javax.inject.Singleton
 
+@Singleton
 class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
     // 150개 더미 데이터 생성 (id는 1~150)
@@ -22,6 +26,12 @@ class UserRepositoryImpl @Inject constructor(
             lastLoginAt = (1672531200..1704067199).random().toLong()
         )
     }
+
+    // 반환된 유저 id를 캐싱할 리스트
+    private val cachedUserIds: MutableList<String> = mutableListOf()
+
+    // UserDetail 캐시 (id -> UserDetail)
+    private val userDetailCache = LruCache<String, UserDetail>(100)
 
     override suspend fun getUsers(
         cursor: String?,
@@ -50,6 +60,9 @@ class UserRepositoryImpl @Inject constructor(
 
             val mappedUsers = pagedUsers.map { it.copy(thumbnailUrl = thumbnailUrl) }
 
+            // 캐싱: 반환되는 유저 id를 리스트에 추가
+            cachedUserIds.addAll(mappedUsers.map { it.id })
+
             val nextCursor = mappedUsers.lastOrNull()?.id
             val isLastPage = (startIndex + mappedUsers.size) >= sortedUsers.size
 
@@ -67,5 +80,44 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
+
+    override suspend fun getUserDetail(userId: String): ResultWrapper<UserDetail> {
+        return try {
+            // 1. LruCache에서 먼저 조회
+            val cached = userDetailCache.get(userId)
+            if (cached != null) {
+                return ResultWrapper.Success(cached)
+            }
+            // 2. 없으면 dummyUsers에서 조회
+            val user = dummyUsers.find { it.id == userId }
+            if (user != null) {
+                val detail = UserDetail(
+                    id = user.id,
+                    name = "User${user.id}",
+                    birthDay = "1990-01-01",
+                    isMale = user.id.toIntOrNull()?.rem(2) == 0,
+                    mySelfSentenceId = 0,
+                    email = "user${user.id}@example.com",
+                    thumbnailUrl = user.thumbnailUrl
+                )
+                // 3. 캐시에 저장
+                userDetailCache.put(userId, detail)
+                ResultWrapper.Success(detail)
+            } else {
+                ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError("User not found"))
+            }
+        } catch (e: Exception) {
+            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getUsersByIds(userIds: List<String>): List<String>? {
+        val foundIds = dummyUsers.filter { userIds.contains(it.id) }.map { it.id }
+        return if (foundIds.isNotEmpty()) foundIds else null
+    }
+
+    override fun clearCachedUserIds() {
+        cachedUserIds.clear()
     }
 }
