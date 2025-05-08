@@ -1,7 +1,7 @@
 ---
-description: 컴포저블, ui 코드를 생성할때 참고할 내용
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 클린 아키텍처 기반 Jetpack Compose UI 코드 가이드라인 (네비게이션 제외)
 클린 아키텍처 원칙을 따르면서 Jetpack Compose로 UI를 효과적으로 구축하기 위한 코드 가이드라인입니다. 이 가이드라인은 특정 UI에 국한되지 않고 범용적으로 적용될 수 있도록 작성되었습니다.

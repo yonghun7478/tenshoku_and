@@ -1,7 +1,7 @@
 ---
-description: 도메인 레이어 작성 가이드
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 클린 아키텍처 기반 Domain 레이어 (Repository & UseCase) 가이드라인
 Domain 레이어는 클린 아키텍처의 핵심으로, 애플리케이션의 순수한 비즈니스 로직과 규칙을 담고 있습니다. 이 레이어는 다른 어떤 레이어(UI, Data, Framework)에도 의존하지 않아야 하며, 애플리케이션의 가장 안정적인 부분이 됩니다. 이 가이드라인은 Domain 레이어의 주요 구성 요소인 Repository 인터페이스와 UseCase를 효과적으로 작성하는 데 도움을 줍니다.

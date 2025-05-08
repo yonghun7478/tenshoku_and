@@ -1,7 +1,7 @@
 ---
-description: 뷰모델, viewmodel 생성시 참고할 룰
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 클린 아키텍처 기반 ViewModel 코드 가이드라인클린 아키텍처에서 ViewModel(Presentation 레이어)은 UI에 표시할 상태를 관리하고, UI 이벤트를 처리하여 비즈니스 로직(UseCase)을 실행하는 역할을 담당합니다. 다음은 일관성 있고 유지보수 가능한 ViewModel을 작성하기 위한 공통 가이드라인입니다.핵심 원칙:UI 상태 소유: ViewModel은 UI가 관찰하고 렌더링하는 데 필요한 상태(State)를 소유하고 노출합니다.비즈니스 로직 위임: ViewModel은 직접 비즈니스 로직을 수행하지 않고, UseCase(Domain 레이어)를 호출하여 로직 실행을 위임합니다.Android 프레임워크 의존성 최소화: ViewModel은 안드로이드 프레임워크(Context, View 등)에 직접 의존하지 않아야 합니다. (AndroidViewModel 사용은 필요한 경우로 제한). 이는 테스트 용이성을 높입니다.생명주기 인식: ViewModel은 자체 생명주기(viewModelScope)를 가지며, 이를 활용하여 비동기 작업을 관리합니다.가이드라인 상세:1. 책임 및 역할:상태 관리: UI에 필요한 데이터를 가공하여 UI 상태(UiState) 형태로 만들어 StateFlow 또는 State를 통해 노출합니다.이벤트 처리: UI로부터 사용자 입력(클릭, 텍스트 변경 등) 이벤트를 받아 처리합니다.UseCase 호출: 처리된 UI 이벤트를 바탕으로 적절한 UseCase를 실행합니다. ViewModel은 필요한 UseCase들을 Hilt를 통해 주입받아 사용합니다.결과 반영: UseCase 실행 결과를 받아 UiState를 업데이트하여 UI에 반영합니다.해야 할 일:UI 상태 홀딩 및 노출UI 이벤트 수신 및 UseCase 호출viewModelScope를 이용한 코루틴 관리하지 말아야 할 일:안드로이드 프레임워크 클래스 직접 참조 (Context, View, Resource ID 등) - 필요한 경우 DI를 통해 추상화된 형태로 주입받습니다.데이터 레이어(Repository) 직접 접근 (UseCase를 통해 접근)복잡한 비즈니스 로직 직접 구현 (UseCase에 위임)네비게이션 로직 직접 포함 (이벤트 발행 후 Activity/Fragment에서 처리)2. 상태 관리 (State Management):UI 상태 클래스 정의: 화면에 필요한 모든 데이터를 포함하는 불변(immutable) data class를 정의합니다. 로딩 상태, 데이터, 오류 메시지 등을 명시적으로 포함합니다.// 예시: 로그인 화면 UI 상태
 data class LoginUiState(
