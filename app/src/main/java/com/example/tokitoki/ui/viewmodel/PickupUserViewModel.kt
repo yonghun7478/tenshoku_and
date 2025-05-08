@@ -45,6 +45,8 @@ class PickupUserViewModel @Inject constructor(
                 is ResultWrapper.Error -> {
                     _uiState.value = _uiState.value.copy(errorMessage = "Failed to load users")
                 }
+
+                ResultWrapper.Loading -> TODO()
             }
             _uiState.value = _uiState.value.copy(
                 state = PickupUserState.COMPLETE

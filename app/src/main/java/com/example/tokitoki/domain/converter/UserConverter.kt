@@ -7,7 +7,8 @@ object UserConverter {
     fun dataToDomain(userEntity: UserEntity): User {
         return User(
             thumbnailUrl = userEntity.thumbnailUrl,
-            age = userEntity.age
+            age = userEntity.age,
+            id = userEntity.id,
         )
     }
 }

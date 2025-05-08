@@ -48,6 +48,7 @@ fun MainScreen(
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -70,7 +71,8 @@ fun MainScreen(
         onAshiatoClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
         onIineSitaHitoClick = onIineSitaHitoClick,
-        onNavigateToSignIn = onNavigateToSignIn
+        onNavigateToSignIn = onNavigateToSignIn,
+        onNavigateToUserDetail = onNavigateToUserDetail
     )
 }
 
@@ -82,6 +84,8 @@ fun MainContents(
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
+
 ) {
     Scaffold(
         bottomBar = {
@@ -98,7 +102,9 @@ fun MainContents(
         ) {
             when (uiState.selectedBottomItem) {
                 MainBottomItem.HOME -> {
-                    MainHomeScreen()
+                    MainHomeScreen(
+                        onNavigateToUserDetail = onNavigateToUserDetail
+                    )
                 }
 
                 MainBottomItem.LIKE -> {

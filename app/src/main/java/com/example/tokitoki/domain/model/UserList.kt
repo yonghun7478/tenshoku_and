@@ -8,5 +8,6 @@ data class UserList(
 
 data class User(
     val thumbnailUrl: String,
-    val age: Int
+    val age: Int,
+    val id: String
 )

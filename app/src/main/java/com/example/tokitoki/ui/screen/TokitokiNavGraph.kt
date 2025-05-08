@@ -310,6 +310,9 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToSignIn = {
                     navAction.navigateToSignInAndClearBackStack()
+                },
+                onNavigateToUserDetail = { userId, orderBy ->
+                    navAction.navigateToUserDetail(userId, orderBy)
                 }
             )
         }
@@ -322,6 +325,25 @@ fun TokitokiNavGraph(
 
         composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
             IineSitaHitoScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable(
+            TokitokiDestinations.USER_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.USER_ID) { type = NavType.StringType },
+                navArgument(TokitokiArgs.ORDER_BY) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString(TokitokiArgs.USER_ID) ?: ""
+            val orderBy = backStackEntry.arguments?.getString(TokitokiArgs.ORDER_BY) ?: ""
+
+            UserDetailScreen(
+                selectedUserId = userId,
+                orderBy = orderBy,
                 onBackClick = {
                     navController.navigateUp()
                 }

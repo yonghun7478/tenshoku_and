@@ -80,6 +80,8 @@ class MainHomeSearchViewModel @Inject constructor(
                 is ResultWrapper.Error -> {
                     it.updateData(currentData.copy(state = MainHomeSearchState.ERROR))
                 }
+
+                ResultWrapper.Loading -> TODO()
             }
         }
     }
