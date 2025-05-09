@@ -87,7 +87,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserDetail(userId: String): ResultWrapper<UserDetail> {
+    override suspend fun getUserDetail(userId: String, orderBy: String): ResultWrapper<UserDetail> {
         return try {
             // 1. LruCache에서 먼저 조회
             val cached = userDetailCache.get(userId)
@@ -97,6 +97,12 @@ class UserRepositoryImpl @Inject constructor(
             // 2. 없으면 dummyUsers에서 조회
             val user = dummyUsers.find { it.id == userId }
             if (user != null) {
+                // orderBy에 따라 thumbnailUrl 설정
+                val thumbnailUrl = if (orderBy == "lastLoginAt")
+                    "https://cdn.mhnse.com/news/photo/202412/359056_419545_1841.jpg"
+                else
+                    "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg"
+
                 val detail = UserDetail(
                     id = user.id,
                     name = "User${user.id}",
@@ -104,7 +110,7 @@ class UserRepositoryImpl @Inject constructor(
                     isMale = user.id.toIntOrNull()?.rem(2) == 0,
                     mySelfSentenceId = 0,
                     email = "user${user.id}@example.com",
-                    thumbnailUrl = user.thumbnailUrl
+                    thumbnailUrl = thumbnailUrl
                 )
                 // 3. 캐시에 저장
                 userDetailCache.put(userId, detail)
