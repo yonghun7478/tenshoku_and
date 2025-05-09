@@ -95,7 +95,7 @@ fun MainHomeSearchScreen(
                         val selectedUser = latestData.users[event.index]
                         onNavigateToUserDetail(
                             selectedUser.id,
-                            if (uiState.orderType == OrderType.LOGIN) "login" else "registration"
+                            if (uiState.orderType == OrderType.LOGIN) "lastLoginAt" else "createdAt"
                         )
                     }
                 }
