@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCase
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCase
+import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCase
 import com.example.tokitoki.ui.converter.UserUiMapper
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainHomeSearchViewModel @Inject constructor(
     private val getUsersByLoginUseCase: GetUsersByLoginUseCase,
-    private val getUsersBySignupUseCase: GetUsersBySignupUseCase
+    private val getUsersBySignupUseCase: GetUsersBySignupUseCase,
+    private val clearCachedUserIdsUseCase: ClearCachedUserIdsUseCase
 ) : ViewModel() {
 
     // UI 상태(StateFlow)
@@ -111,9 +113,12 @@ class MainHomeSearchViewModel @Inject constructor(
 
     suspend fun onPullToRefreshTrigger() {
         _uiState.update { it.updateData(it.currentData().copy(isRefreshing = true)) }
-
+        
+        // 현재 정렬 순서에 따라 캐시 초기화
+        val orderBy = if (_uiState.value.orderType == OrderType.LOGIN) "lastLoginAt" else "createdAt"
+        clearCachedUserIdsUseCase(orderBy)
+        
         fetchUsers(showLoading = true)
-
         _uiState.update { it.updateData(it.currentData().copy(isRefreshing = false)) }
     }
 }

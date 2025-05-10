@@ -38,7 +38,12 @@ fun UserDetailScreen(
     val currentPage by viewModel.currentPage.collectAsState()
 
     // Pager 상태 설정
-    val pagerState = rememberPagerState(initialPage = currentPage) { userDetails.size }
+    val pagerState = rememberPagerState { userDetails.size }
+
+    // currentPage가 변경될 때 pagerState 업데이트
+    LaunchedEffect(currentPage) {
+        pagerState.scrollToPage(currentPage)
+    }
 
     // 페이지 변경 감지
     LaunchedEffect(pagerState.currentPage) {

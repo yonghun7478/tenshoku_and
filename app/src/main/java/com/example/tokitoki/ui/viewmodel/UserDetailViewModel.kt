@@ -22,7 +22,7 @@ class UserDetailViewModel @Inject constructor(
     private val _userDetails = MutableStateFlow<List<ResultWrapper<UserDetail>>>(emptyList())
     val userDetails: StateFlow<List<ResultWrapper<UserDetail>>> = _userDetails.asStateFlow()
 
-    private val _currentPage = MutableStateFlow(0)
+    private val _currentPage = MutableStateFlow(1)
     val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
 
     private var cachedUserIds: List<String> = emptyList()
