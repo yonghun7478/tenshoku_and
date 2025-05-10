@@ -343,6 +343,7 @@ fun TokitokiNavGraph(
 
             UserDetailScreen(
                 selectedUserId = userId,
+                orderBy = orderBy,
                 onBackClick = {
                     navController.navigateUp()
                 }

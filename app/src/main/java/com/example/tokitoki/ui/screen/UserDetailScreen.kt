@@ -23,13 +23,14 @@ import coil.compose.AsyncImage
 @Composable
 fun UserDetailScreen(
     selectedUserId: String,
+    orderBy: String,
     onBackClick: () -> Unit,
     viewModel: UserDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     // ViewModel 초기화
-    LaunchedEffect(selectedUserId) {
-        viewModel.initialize(selectedUserId)
+    LaunchedEffect(selectedUserId, orderBy) {
+        viewModel.initialize(selectedUserId, orderBy)
     }
 
     // ViewModel의 상태를 수집

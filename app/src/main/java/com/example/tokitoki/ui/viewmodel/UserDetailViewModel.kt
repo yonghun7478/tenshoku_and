@@ -27,11 +27,13 @@ class UserDetailViewModel @Inject constructor(
 
     private var cachedUserIds: List<String> = emptyList()
     private val preloadBuffer = 2 // 현재 페이지 기준 앞뒤로 2명씩 프리로드
+    private var currentOrderBy: String = "createdAt" // 기본값
 
-    fun initialize(selectedUserId: String) {
+    fun initialize(selectedUserId: String, orderBy: String) {
         viewModelScope.launch {
             // 1. 캐시된 유저 ID 목록 가져오기
-            cachedUserIds = getCachedUserIdsUseCase("createdAt") // 기본값으로 createdAt 사용
+            currentOrderBy = orderBy
+            cachedUserIds = getCachedUserIdsUseCase(orderBy)
             
             // 2. 선택된 유저의 인덱스 찾기
             val selectedIndex = cachedUserIds.indexOf(selectedUserId)
