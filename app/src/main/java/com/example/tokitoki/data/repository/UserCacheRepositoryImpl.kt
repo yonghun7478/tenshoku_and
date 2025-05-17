@@ -27,8 +27,8 @@ class UserCacheRepositoryImpl @Inject constructor() : UserCacheRepository {
     }
 
     override fun addUserIdsToCache(screenName: String, userIds: List<String>) {
-        val existingList = cachedUserIdsMap.getOrPut(screenName) { mutableListOf() }
-        existingList.addAll(userIds)
+        // 기존 데이터를 모두 지우고 새로운 데이터로 교체
+        cachedUserIdsMap[screenName] = userIds.toMutableList()
     }
 
     override fun addUserDetailToCache(userId: String, userDetail: UserDetail) {
