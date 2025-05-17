@@ -96,7 +96,7 @@ fun MainHomeSearchScreen(
                         viewModel.addUserIdsToCache()
                         onNavigateToUserDetail(
                             selectedUser.id,
-                            if (uiState.orderType == OrderType.LOGIN) "lastLoginAt" else "createdAt"
+                            "MainHomeSearchScreen"
                         )
                     }
                 }

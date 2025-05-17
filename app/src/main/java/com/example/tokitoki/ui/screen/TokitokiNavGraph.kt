@@ -311,8 +311,8 @@ fun TokitokiNavGraph(
                 onNavigateToSignIn = {
                     navAction.navigateToSignInAndClearBackStack()
                 },
-                onNavigateToUserDetail = { userId, orderBy ->
-                    navAction.navigateToUserDetail(userId, orderBy)
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
                 }
             )
         }
@@ -335,15 +335,15 @@ fun TokitokiNavGraph(
             TokitokiDestinations.USER_DETAIL_ROUTE,
             arguments = listOf(
                 navArgument(TokitokiArgs.USER_ID) { type = NavType.StringType },
-                navArgument(TokitokiArgs.ORDER_BY) { type = NavType.StringType }
+                navArgument(TokitokiArgs.SCREEN_NAME) { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString(TokitokiArgs.USER_ID) ?: ""
-            val orderBy = backStackEntry.arguments?.getString(TokitokiArgs.ORDER_BY) ?: ""
+            val screenName = backStackEntry.arguments?.getString(TokitokiArgs.SCREEN_NAME) ?: ""
 
             UserDetailScreen(
                 selectedUserId = userId,
-                orderBy = orderBy,
+                screenName = screenName,
                 onBackClick = {
                     navController.navigateUp()
                 }

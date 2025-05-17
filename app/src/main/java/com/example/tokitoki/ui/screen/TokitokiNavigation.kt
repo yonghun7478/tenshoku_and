@@ -9,7 +9,7 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.SELF_SENTENCE_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiArgs.USER_ID
-import com.example.tokitoki.ui.screen.TokitokiArgs.ORDER_BY
+import com.example.tokitoki.ui.screen.TokitokiArgs.SCREEN_NAME
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -62,7 +62,7 @@ object TokitokiArgs {
     const val SELF_SENTENCE_IDS = "selfSentenceIds"
     const val IS_EDIT_MODE = "isEditMode"
     const val USER_ID = "userId"
-    const val ORDER_BY = "orderBy"
+    const val SCREEN_NAME = "screenName"
 }
 
 object TokitokiDestinations {
@@ -85,7 +85,7 @@ object TokitokiDestinations {
     const val MAIN_ROUTE = MAIN_SCREEN
     const val ASHIATO_ROUTE = ASHIATO_SCREEN
     const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
-    const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$ORDER_BY={$ORDER_BY}"
+    const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -168,7 +168,7 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToUserDetail(userId: String, orderBy: String) {
-        navController.navigate("$USER_DETAIL_SCREEN?$USER_ID=$userId&$ORDER_BY=$orderBy")
+    fun navigateToUserDetail(userId: String, screenName: String) {
+        navController.navigate("$USER_DETAIL_SCREEN?$USER_ID=${userId}&$SCREEN_NAME=${screenName}")
     }
 }
