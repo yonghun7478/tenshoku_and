@@ -319,7 +319,9 @@ fun TokitokiNavGraph(
 
         composable(TokitokiDestinations.ASHIATO_ROUTE) {
             AshiatoScreen(
-                onNavigateToUserProfile = {}
+                onNavigateToUserProfile = {
+                    navAction.navigateToUserDetail(userId = it, screenName = "AshiatoScreen")
+                }
             )
         }
 

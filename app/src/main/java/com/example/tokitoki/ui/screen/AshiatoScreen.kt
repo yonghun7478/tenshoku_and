@@ -53,7 +53,10 @@ fun AshiatoScreen(
     // 실제 UI 레이아웃은 AshiatoContent에 위임
     AshiatoContent(
         uiState = uiState,
-        onUserClick = onNavigateToUserProfile, // 클릭 이벤트 전달
+        onUserClick = { date, userId ->
+            viewModel.addUserIdsToCache(date) // 사용자 ID를 캐시에 추가
+            onNavigateToUserProfile(userId) // 사용자 프로필 화면으로 이동
+        }, // 클릭 이벤트 전달
         onLoadMore = viewModel::loadMore,      // 더 로드하기 이벤트 전달
         onRefresh = viewModel::refresh         // 새로고침 이벤트 전달 (PullRefresh 라이브러리와 연동 가정)
     )
@@ -67,7 +70,7 @@ fun AshiatoScreen(
 @Composable
 fun AshiatoContent(
     uiState: AshiatoUiState,
-    onUserClick: (userId: String) -> Unit,
+    onUserClick: (date: String, userId: String) -> Unit,
     onLoadMore: () -> Unit,
     onRefresh: () -> Unit // 새로고침 콜백 추가
 ) {
@@ -104,22 +107,36 @@ fun AshiatoContent(
             // 로딩 상태 처리
             if (uiState.isLoadingInitial) {
                 // 초기 로딩 시 중앙에 프로그레스 바 표시
-                Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가하여 헤더/배너 피함
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 50.dp),
+                    contentAlignment = Alignment.Center
+                ) { // 패딩 추가하여 헤더/배너 피함
                     CircularProgressIndicator()
                 }
             } else if (uiState.error != null) {
                 // 오류 발생 시 오류 메시지 표시 (간단한 Text 예시)
-                Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 50.dp),
+                    contentAlignment = Alignment.Center
+                ) { // 패딩 추가
                     Text("오류가 발생했습니다: ${uiState.error.localizedMessage ?: "알 수 없는 오류"}")
                     // TODO: 여기에 '다시 시도' 버튼 추가 고려
                 }
             } else if (uiState.timeline.dailyLogs.isEmpty()) {
                 // 데이터가 없을 때 메시지 표시
-                Box(modifier = Modifier.fillMaxSize().padding(top=50.dp), contentAlignment = Alignment.Center) { // 패딩 추가
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 50.dp),
+                    contentAlignment = Alignment.Center
+                ) { // 패딩 추가
                     Text("아직 받은 足跡(아시아토)가 없어요.")
                 }
-            }
-            else {
+            } else {
                 // 데이터 목록 표시
                 LazyColumn(
                     state = listState,
@@ -194,7 +211,7 @@ fun AshiatoInfoBanner() {
 @Composable
 fun DailyAshiatoSection(
     dailyLog: DailyAshiatoLog,
-    onUserClick: (userId: String) -> Unit
+    onUserClick: (date: String, userId: String) -> Unit
 ) {
     Column {
         // 날짜 헤더
@@ -214,6 +231,7 @@ fun DailyAshiatoSection(
                 key = { it.id } // 사용자 ID를 고유 키로 사용
             ) { viewer ->
                 AshiatoUserCard(
+                    date = dailyLog.date,
                     viewerInfo = viewer,
                     onUserClick = onUserClick
                 )
@@ -241,13 +259,14 @@ fun formatDateString(dateStr: String): String {
 @OptIn(ExperimentalMaterial3Api::class) // Badge 사용을 위해 필요
 @Composable
 fun AshiatoUserCard(
+    date: String,
     viewerInfo: AshiatoViewerInfo,
-    onUserClick: (userId: String) -> Unit
+    onUserClick: (date: String, userId: String) -> Unit
 ) {
     Card(
         modifier = Modifier
             .width(150.dp) // 카드 너비 고정 (디자인에 맞게 조절)
-            .clickable { onUserClick(viewerInfo.id) },
+            .clickable { onUserClick(date, viewerInfo.id) },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -302,7 +321,10 @@ fun AshiatoUserCard(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(all = 6.dp)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), CircleShape)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                            CircleShape
+                        )
                         .padding(6.dp)
                         .size(16.dp)
                 )
@@ -375,7 +397,7 @@ fun PreviewAshiatoUserCard() {
         viewedTime = "10:33"
     )
     MaterialTheme { // Preview에서도 Theme 적용
-        AshiatoUserCard(viewerInfo = dummyViewer, onUserClick = {})
+        AshiatoUserCard(date = "", viewerInfo = dummyViewer, onUserClick = { _, _ -> })
     }
 }
 
@@ -394,7 +416,7 @@ fun PreviewDailyAshiatoSection() {
     val dummyLog = DailyAshiatoLog(date = "2025-10-21", viewers = dummyViewers)
 
     MaterialTheme {
-        DailyAshiatoSection(dailyLog = dummyLog, onUserClick = {})
+        DailyAshiatoSection(dailyLog = dummyLog, onUserClick = { _, _ -> })
     }
 }
 
@@ -404,7 +426,7 @@ fun PreviewAshiatoContent_Loading() {
     MaterialTheme {
         AshiatoContent(
             uiState = AshiatoUiState(isLoadingInitial = true),
-            onUserClick = {},
+            onUserClick = { _, _ -> },
             onLoadMore = {},
             onRefresh = {}
         )
@@ -415,8 +437,12 @@ fun PreviewAshiatoContent_Loading() {
 @Composable
 fun PreviewAshiatoContent_Data() {
     val dummyLogs = listOf(
-        DailyAshiatoLog(date = "2025-10-21", viewers = List(3) { AshiatoViewerInfo("u1$it", "url", 25+it, "도쿄", "1$it:00") }),
-        DailyAshiatoLog(date = "2025-10-20", viewers = List(2) { AshiatoViewerInfo("u2$it", "url", 30+it, "오사카", "0$it:30") })
+        DailyAshiatoLog(
+            date = "2025-10-21",
+            viewers = List(3) { AshiatoViewerInfo("u1$it", "url", 25 + it, "도쿄", "1$it:00") }),
+        DailyAshiatoLog(
+            date = "2025-10-20",
+            viewers = List(2) { AshiatoViewerInfo("u2$it", "url", 30 + it, "오사카", "0$it:30") })
     )
     MaterialTheme {
         AshiatoContent(
@@ -425,7 +451,7 @@ fun PreviewAshiatoContent_Data() {
                 timeline = AshiatoTimeline(dailyLogs = dummyLogs),
                 canLoadMore = true
             ),
-            onUserClick = {},
+            onUserClick = { _, _ -> },
             onLoadMore = {},
             onRefresh = {}
         )
@@ -442,7 +468,7 @@ fun PreviewAshiatoContent_Empty() { // 데이터 없을 때 Preview 추가
                 timeline = AshiatoTimeline(emptyList()), // 빈 리스트
                 canLoadMore = false
             ),
-            onUserClick = {},
+            onUserClick = { _, _ -> },
             onLoadMore = {},
             onRefresh = {}
         )
@@ -459,7 +485,7 @@ fun PreviewAshiatoContent_Error() {
                 isLoadingInitial = false,
                 error = RuntimeException("네트워크 오류 테스트")
             ),
-            onUserClick = {},
+            onUserClick = { _, _ -> },
             onLoadMore = {},
             onRefresh = {}
         )
