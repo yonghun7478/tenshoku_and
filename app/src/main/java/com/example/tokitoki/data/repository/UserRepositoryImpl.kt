@@ -6,13 +6,11 @@ import com.example.tokitoki.domain.converter.UserConverter
 import com.example.tokitoki.domain.model.UserList
 import com.example.tokitoki.domain.repository.UserRepository
 import javax.inject.Inject
-import android.util.LruCache
 import com.example.tokitoki.domain.model.UserDetail
 import javax.inject.Singleton
 
 @Singleton
-class UserRepositoryImpl @Inject constructor(
-) : UserRepository {
+class UserRepositoryImpl @Inject constructor() : UserRepository {
     private val thumbnailUrls = listOf(
         "https://cdn.mhnse.com/news/photo/202411/354069_409655_3737.jpg",
         "https://img.hankyung.com/photo/202411/03.38739677.1.jpg",
@@ -35,13 +33,6 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    // 반환된 유저 id를 정렬 기준별로 캐싱할 리스트
-    private val cachedUserIdsByLastLogin: MutableList<String> = mutableListOf()
-    private val cachedUserIdsByCreatedAt: MutableList<String> = mutableListOf()
-
-    // UserDetail 캐시 (id -> UserDetail)
-    private val userDetailCache = LruCache<String, UserDetail>(100)
-
     override suspend fun getUsers(
         cursor: String?,
         limit: Int,
@@ -60,13 +51,6 @@ class UserRepositoryImpl @Inject constructor(
             } ?: 0
 
             val pagedUsers = sortedUsers.drop(startIndex).take(limit)
-
-            // 정렬 기준에 따라 각각의 리스트에 캐싱
-            if (orderBy == "lastLoginAt") {
-                cachedUserIdsByLastLogin.addAll(pagedUsers.map { it.id })
-            } else {
-                cachedUserIdsByCreatedAt.addAll(pagedUsers.map { it.id })
-            }
 
             val nextCursor = pagedUsers.lastOrNull()?.id
             val isLastPage = (startIndex + pagedUsers.size) >= sortedUsers.size
@@ -89,12 +73,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getUserDetail(userId: String): ResultWrapper<UserDetail> {
         return try {
-            // 1. LruCache에서 먼저 조회
-            val cached = userDetailCache.get(userId)
-            if (cached != null) {
-                return ResultWrapper.Success(cached)
-            }
-            // 2. 없으면 dummyUsers에서 조회
             val user = dummyUsers.find { it.id == userId }
             if (user != null) {
                 val detail = UserDetail(
@@ -106,33 +84,12 @@ class UserRepositoryImpl @Inject constructor(
                     email = "user${user.id}@example.com",
                     thumbnailUrl = user.thumbnailUrl
                 )
-                // 3. 캐시에 저장
-                userDetailCache.put(userId, detail)
                 ResultWrapper.Success(detail)
             } else {
                 ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError("User not found"))
             }
         } catch (e: Exception) {
             ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
-        }
-    }
-
-    override fun clearCachedUserIds(orderBy: String?) {
-        when (orderBy) {
-            "lastLoginAt" -> cachedUserIdsByLastLogin.clear()
-            "createdAt" -> cachedUserIdsByCreatedAt.clear()
-            null -> {
-                cachedUserIdsByLastLogin.clear()
-                cachedUserIdsByCreatedAt.clear()
-            }
-        }
-    }
-
-    override fun getCachedUserIds(orderBy: String): List<String> {
-        return when (orderBy) {
-            "lastLoginAt" -> cachedUserIdsByLastLogin.toList()
-            "createdAt" -> cachedUserIdsByCreatedAt.toList()
-            else -> emptyList()
         }
     }
 }

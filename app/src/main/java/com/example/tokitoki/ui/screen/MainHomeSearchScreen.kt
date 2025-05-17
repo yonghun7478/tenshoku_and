@@ -93,6 +93,7 @@ fun MainHomeSearchScreen(
                     val latestData = uiState.currentData()
                     if (latestData.users.isNotEmpty() && event.index < latestData.users.size) {
                         val selectedUser = latestData.users[event.index]
+                        viewModel.addUserIdsToCache()
                         onNavigateToUserDetail(
                             selectedUser.id,
                             if (uiState.orderType == OrderType.LOGIN) "lastLoginAt" else "createdAt"

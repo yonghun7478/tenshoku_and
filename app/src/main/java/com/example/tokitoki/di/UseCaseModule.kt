@@ -104,6 +104,12 @@ import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCase
 import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCase
 import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCase
+import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
+import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -392,4 +398,22 @@ abstract class UseCaseModule {
     abstract fun bindGetCachedUserIdsUseCase(
         impl: GetCachedUserIdsUseCaseImpl
     ): GetCachedUserIdsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddUserIdsToCacheUseCase(
+        impl: AddUserIdsToCacheUseCaseImpl
+    ): AddUserIdsToCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddUserDetailToCacheUseCase(
+        impl: AddUserDetailToCacheUseCaseImpl
+    ): AddUserDetailToCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetUserDetailFromCacheUseCase(
+        impl: GetUserDetailFromCacheUseCaseImpl
+    ): GetUserDetailFromCacheUseCase
 }
