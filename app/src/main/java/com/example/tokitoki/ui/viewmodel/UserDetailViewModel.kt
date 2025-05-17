@@ -6,6 +6,8 @@ import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.model.UserDetail
 import com.example.tokitoki.domain.usecase.GetUserDetailUseCase
 import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCase
+import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCase
+import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,7 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class UserDetailViewModel @Inject constructor(
     private val getUserDetailUseCase: GetUserDetailUseCase,
-    private val getCachedUserIdsUseCase: GetCachedUserIdsUseCase
+    private val getCachedUserIdsUseCase: GetCachedUserIdsUseCase,
+    private val addUserDetailToCacheUseCase: AddUserDetailToCacheUseCase,
+    private val getUserDetailFromCacheUseCase: GetUserDetailFromCacheUseCase
 ) : ViewModel() {
 
     private val _userDetails = MutableStateFlow<List<ResultWrapper<UserDetail>>>(emptyList())
@@ -74,7 +78,19 @@ class UserDetailViewModel @Inject constructor(
             val results = indicesToLoad.map { index ->
                 async {
                     val userId = cachedUserIds[index]
-                    index to getUserDetailUseCase(userId)
+                    // 먼저 캐시에서 확인
+                    val cachedDetail = getUserDetailFromCacheUseCase(userId)
+                    if (cachedDetail != null) {
+                        index to ResultWrapper.Success(cachedDetail)
+                    } else {
+                        // 캐시에 없으면 API 호출
+                        val result = getUserDetailUseCase(userId)
+                        // 성공한 경우 캐시에 저장
+                        if (result is ResultWrapper.Success) {
+                            addUserDetailToCacheUseCase(userId, result.data)
+                        }
+                        index to result
+                    }
                 }
             }.awaitAll()
 
