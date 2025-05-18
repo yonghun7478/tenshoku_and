@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +33,8 @@ import kotlinx.coroutines.launch
 fun IineSitaHitoScreen(
     modifier: Modifier = Modifier,
     viewModel: IineSitaHitoViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -41,6 +43,10 @@ fun IineSitaHitoScreen(
         onRefresh = viewModel::refresh,
         onLoadMore = viewModel::loadMoreUsers,
         onBackClick = onBackClick,
+        onNavigateToUserDetail = { userId ->
+            viewModel.onUserClick(userId)
+            onNavigateToUserDetail(userId, "IineSitaHitoScreen")
+        },
         modifier = modifier
     )
 }
@@ -52,6 +58,7 @@ fun IineSitaHitoContents(
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onBackClick: () -> Unit,
+    onNavigateToUserDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SwipeRefresh(
@@ -105,6 +112,7 @@ fun IineSitaHitoContents(
                         ) { user ->
                             LikedUserCard(
                                 user = user,
+                                onNavigateToUserDetail = onNavigateToUserDetail,
                                 modifier = Modifier
                             )
 
@@ -142,10 +150,13 @@ fun IineSitaHitoContents(
 @Composable
 private fun LikedUserCard(
     user: LikedUser,
+    onNavigateToUserDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onNavigateToUserDetail(user.id) },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -298,7 +309,8 @@ private fun IineSitaHitoContentsEmptyPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -314,7 +326,8 @@ private fun IineSitaHitoContentsLoadingPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -351,7 +364,8 @@ private fun IineSitaHitoContentsWithDataPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -368,7 +382,8 @@ private fun IineSitaHitoContentsErrorPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }

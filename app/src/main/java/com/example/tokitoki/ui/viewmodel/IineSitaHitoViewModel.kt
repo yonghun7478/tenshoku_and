@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.LikedUser
 import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IineSitaHitoViewModel @Inject constructor(
-    private val getLikedUsersUseCase: GetLikedUsersUseCase
+    private val getLikedUsersUseCase: GetLikedUsersUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(IineSitaHitoUiState())
@@ -111,5 +113,11 @@ class IineSitaHitoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onUserClick(userId: String) {
+        // 현재 화면의 모든 사용자 ID를 캐시에 저장
+        val userIds = _uiState.value.users.map { it.id }
+        addUserIdsToCacheUseCase("IineSitaHitoScreen", userIds)
     }
 } 

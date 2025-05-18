@@ -332,6 +332,9 @@ fun TokitokiNavGraph(
             IineSitaHitoScreen(
                 onBackClick = {
                     navController.navigateUp()
+                },
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
                 }
             )
         }
