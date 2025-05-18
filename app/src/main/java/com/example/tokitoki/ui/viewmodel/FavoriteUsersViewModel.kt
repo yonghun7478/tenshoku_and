@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetFavoriteUsersUseCase
 import com.example.tokitoki.domain.usecase.SendMitenUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.FavoriteUsersUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoriteUsersViewModel @Inject constructor(
     private val getFavoriteUsersUseCase: GetFavoriteUsersUseCase,
-    private val sendMitenUseCase: SendMitenUseCase
+    private val sendMitenUseCase: SendMitenUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoriteUsersUiState())
@@ -88,6 +90,12 @@ class FavoriteUsersViewModel @Inject constructor(
 
     fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }
+    }
+
+    fun onUserClick(userId: String) {
+        // 현재 화면의 모든 사용자 ID를 캐시에 저장
+        val userIds = _uiState.value.favoriteUsers.map { it.id }
+        addUserIdsToCacheUseCase("FavoriteUsersScreen", userIds)
     }
 
     // 필요한 추가 인터랙션 (예: 사용자 상세 화면 이동)은 여기에 추가

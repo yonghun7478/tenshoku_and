@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,7 @@ import com.example.tokitoki.ui.viewmodel.FavoriteUsersViewModel
 fun FavoriteUsersScreen(
     viewModel: FavoriteUsersViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isSendingMiten by viewModel.isSendingMiten.collectAsState()
@@ -83,7 +85,11 @@ fun FavoriteUsersScreen(
         refreshFavoriteUsers = viewModel::refreshFavoriteUsers,
         onBackClick = onBackClick,
         isSendingMiten = isSendingMiten,
-        onMitenClick = viewModel::sendMiten
+        onMitenClick = viewModel::sendMiten,
+        onUserClick = { userId ->
+            viewModel.onUserClick(userId)
+            onNavigateToUserDetail(userId, "FavoriteUsersScreen")
+        }
     )
 }
 
@@ -95,7 +101,8 @@ fun FavoriteUsersContents(
     onBackClick: () -> Unit,
     refreshFavoriteUsers: () -> Unit,
     isSendingMiten: Boolean,
-    onMitenClick: (String) -> Unit
+    onMitenClick: (String) -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -123,7 +130,6 @@ fun FavoriteUsersContents(
                     title = { Text(text = "お気に入り") },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
-                            // 뒤로 가기 아이콘 (예: Icons.AutoMirrored.Filled.ArrowBack)
                             Icon(
                                 imageVector = Icons.Filled.KeyboardArrowLeft,
                                 contentDescription = "Back"
@@ -156,13 +162,14 @@ fun FavoriteUsersContents(
                             .padding(paddingValues),
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        state = listState, // Add the state to the LazyColumn
+                        state = listState,
                     ) {
                         items(uiState.favoriteUsers) { user ->
                             FavoriteUserItem(
                                 user = user,
                                 isSendingMiten = isSendingMiten,
-                                onMitenClick = { onMitenClick(user.id) }
+                                onMitenClick = { onMitenClick(user.id) },
+                                onUserClick = onUserClick
                             )
                         }
 
@@ -190,7 +197,8 @@ fun FavoriteUsersContents(
 fun FavoriteUserItem(
     user: FavoriteUser,
     isSendingMiten: Boolean,
-    onMitenClick: (String) -> Unit
+    onMitenClick: (String) -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -198,7 +206,12 @@ fun FavoriteUserItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            // 썸네일 영역을 클릭 가능하게 설정
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onUserClick(user.id) }
+            ) {
                 Image(
                     painter = rememberImagePainter(user.thumbnailUrl),
                     contentDescription = "User Thumbnail",
@@ -239,7 +252,6 @@ fun FavoriteUserItem(
                 DetailItem(label = "동거인", value = if (user.hasRoommate) "있음" else "없음")
                 DetailItem(label = "형제자매", value = user.siblings)
                 DetailItem(label = "혈액형", value = user.bloodType)
-                // 나머지 정보들...
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -312,7 +324,8 @@ fun FavoriteUsersScreenPreview() {
             onBackClick = {},
             refreshFavoriteUsers = {},
             isSendingMiten = false,
-            onMitenClick = {}
+            onMitenClick = {},
+            onUserClick = {}
         )
     }
 }
