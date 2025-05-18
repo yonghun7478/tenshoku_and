@@ -289,7 +289,7 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.FAVORITE_USERS_ROUTE) {
             FavoriteUsersScreen(
                 onBackClick = {
-
+                    navController.navigateUp()
                 },
                 onMoreClick = {
 
