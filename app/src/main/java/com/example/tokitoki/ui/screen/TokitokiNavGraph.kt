@@ -321,6 +321,9 @@ fun TokitokiNavGraph(
             AshiatoScreen(
                 onNavigateToUserProfile = {
                     navAction.navigateToUserDetail(userId = it, screenName = "AshiatoScreen")
+                },
+                onBackClick = {
+                    navController.navigateUp()
                 }
             )
         }

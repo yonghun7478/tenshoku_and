@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
@@ -46,7 +47,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AshiatoScreen(
     viewModel: AshiatoViewModel = hiltViewModel(),
-    onNavigateToUserProfile: (userId: String) -> Unit // 사용자 프로필 화면 이동 콜백
+    onNavigateToUserProfile: (userId: String) -> Unit, // 사용자 프로필 화면 이동 콜백
+    onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -58,7 +60,8 @@ fun AshiatoScreen(
             onNavigateToUserProfile(userId) // 사용자 프로필 화면으로 이동
         }, // 클릭 이벤트 전달
         onLoadMore = viewModel::loadMore,      // 더 로드하기 이벤트 전달
-        onRefresh = viewModel::refresh         // 새로고침 이벤트 전달 (PullRefresh 라이브러리와 연동 가정)
+        onRefresh = viewModel::refresh,         // 새로고침 이벤트 전달 (PullRefresh 라이브러리와 연동 가정)
+        onBackClick =onBackClick
     )
 }
 
@@ -72,7 +75,8 @@ fun AshiatoContent(
     uiState: AshiatoUiState,
     onUserClick: (date: String, userId: String) -> Unit,
     onLoadMore: () -> Unit,
-    onRefresh: () -> Unit // 새로고침 콜백 추가
+    onRefresh: () -> Unit, // 새로고침 콜백 추가
+    onBackClick: () -> Unit
 ) {
     val listState = rememberLazyListState() // LazyColumn 스크롤 상태
 
@@ -85,14 +89,19 @@ fun AshiatoContent(
         onRefresh = onRefresh
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // --- 추가된 부분 ---
-            // 화면 헤더
-            Text(
-                text = "足あと", // 아시아토 헤더 텍스트
-                style = MaterialTheme.typography.headlineSmall, // 헤더 스타일 적용
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp) // 패딩 추가
+            TopAppBar(
+                title = { Text(text = "足あと") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        // 뒤로 가기 아이콘 (예: Icons.AutoMirrored.Filled.ArrowBack)
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowLeft,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
             )
+
             // 구분선
             Divider(
                 modifier = Modifier.padding(horizontal = 16.dp), // 좌우 패딩
@@ -428,7 +437,8 @@ fun PreviewAshiatoContent_Loading() {
             uiState = AshiatoUiState(isLoadingInitial = true),
             onUserClick = { _, _ -> },
             onLoadMore = {},
-            onRefresh = {}
+            onRefresh = {},
+            onBackClick = {}
         )
     }
 }
@@ -453,7 +463,8 @@ fun PreviewAshiatoContent_Data() {
             ),
             onUserClick = { _, _ -> },
             onLoadMore = {},
-            onRefresh = {}
+            onRefresh = {},
+            onBackClick = {}
         )
     }
 }
@@ -470,7 +481,8 @@ fun PreviewAshiatoContent_Empty() { // 데이터 없을 때 Preview 추가
             ),
             onUserClick = { _, _ -> },
             onLoadMore = {},
-            onRefresh = {}
+            onRefresh = {},
+            onBackClick = {}
         )
     }
 }
@@ -487,7 +499,8 @@ fun PreviewAshiatoContent_Error() {
             ),
             onUserClick = { _, _ -> },
             onLoadMore = {},
-            onRefresh = {}
+            onRefresh = {},
+            onBackClick = {}
         )
     }
 }
