@@ -92,4 +92,15 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
             ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
         }
     }
+
+    override suspend fun sendMiten(userId: String): ResultWrapper<Unit> {
+        return try {
+            // API 호출 시뮬레이션 (실제 서버가 없으므로)
+            kotlinx.coroutines.delay(1000) // API 호출 시뮬레이션
+            
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
+        }
+    }
 }

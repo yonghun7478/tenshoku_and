@@ -110,6 +110,8 @@ import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCase
 import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
 import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.SendMitenUseCase
+import com.example.tokitoki.domain.usecase.SendMitenUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -416,4 +418,10 @@ abstract class UseCaseModule {
     abstract fun bindGetUserDetailFromCacheUseCase(
         impl: GetUserDetailFromCacheUseCaseImpl
     ): GetUserDetailFromCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSendMitenUseCase(
+        sendMitenUseCaseImpl: SendMitenUseCaseImpl
+    ): SendMitenUseCase
 }

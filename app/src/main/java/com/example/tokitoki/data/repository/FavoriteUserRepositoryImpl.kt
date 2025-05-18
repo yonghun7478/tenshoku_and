@@ -9,6 +9,7 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
 
     private val dummyUsers = (1..30).map {
         FavoriteUser(
+            id = it.toString(),
             thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ee/2023_MMA_IVE_Wonyoung_1.jpg",
             name = "User $it",
             age = (20..40).random(),

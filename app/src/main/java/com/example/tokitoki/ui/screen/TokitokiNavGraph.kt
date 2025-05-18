@@ -291,9 +291,6 @@ fun TokitokiNavGraph(
                 onBackClick = {
                     navController.navigateUp()
                 },
-                onMoreClick = {
-
-                }
             )
         }
 

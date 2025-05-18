@@ -9,4 +9,7 @@ interface UserRepository {
 
     // 유저 상세 데이터 조회
     suspend fun getUserDetail(userId: String): ResultWrapper<UserDetail>
+
+    // みてね 전송
+    suspend fun sendMiten(userId: String): ResultWrapper<Unit>
 }
