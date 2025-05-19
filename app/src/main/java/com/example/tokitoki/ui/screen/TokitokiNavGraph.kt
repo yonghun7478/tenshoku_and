@@ -289,10 +289,10 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.FAVORITE_USERS_ROUTE) {
             FavoriteUsersScreen(
                 onBackClick = {
-
+                    navController.navigateUp()
                 },
-                onMoreClick = {
-
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
                 }
             )
         }
@@ -310,18 +310,48 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToSignIn = {
                     navAction.navigateToSignInAndClearBackStack()
+                },
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
                 }
             )
         }
 
         composable(TokitokiDestinations.ASHIATO_ROUTE) {
             AshiatoScreen(
-                onNavigateToUserProfile = {}
+                onNavigateToUserProfile = {
+                    navAction.navigateToUserDetail(userId = it, screenName = "AshiatoScreen")
+                },
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
 
         composable(TokitokiDestinations.IINE_SITA_HITO_ROUTE) {
             IineSitaHitoScreen(
+                onBackClick = {
+                    navController.navigateUp()
+                },
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
+                }
+            )
+        }
+
+        composable(
+            TokitokiDestinations.USER_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.USER_ID) { type = NavType.StringType },
+                navArgument(TokitokiArgs.SCREEN_NAME) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString(TokitokiArgs.USER_ID) ?: ""
+            val screenName = backStackEntry.arguments?.getString(TokitokiArgs.SCREEN_NAME) ?: ""
+
+            UserDetailScreen(
+                selectedUserId = userId,
+                screenName = screenName,
                 onBackClick = {
                     navController.navigateUp()
                 }

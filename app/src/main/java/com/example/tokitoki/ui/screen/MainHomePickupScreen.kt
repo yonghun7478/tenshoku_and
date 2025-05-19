@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,6 +67,7 @@ import kotlin.math.roundToInt
 @Composable
 fun MainHomePickupScreen(
     viewModel: PickupUserViewModel = hiltViewModel(),
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -75,7 +77,9 @@ fun MainHomePickupScreen(
             onLike = { viewModel.likePickupUser() },
             onDislike = { viewModel.dislikePickupUser() },
             onRefresh = { viewModel.loadPickupUsers() },
-            triggerRemove = { viewModel.triggerAutoRemove(it) }
+            triggerRemove = { viewModel.triggerAutoRemove(it) },
+            onNavigateToUserDetail = onNavigateToUserDetail,
+            onUserClick = { viewModel.onUserClick(it) }
         )
     }
 }
@@ -87,6 +91,8 @@ fun MainHomePickupContents(
     onDislike: () -> Unit,
     onRefresh: () -> Unit,
     triggerRemove: (CardDirection) -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    onUserClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -118,6 +124,10 @@ fun MainHomePickupContents(
                         CardDirection.AUTO_RIGHT, CardDirection.RIGHT -> onLike()
                         CardDirection.NONE -> {}
                     }
+                },
+                onCardClick = { userId ->
+                    onUserClick(userId)
+                    onNavigateToUserDetail(userId, "MainHomePickupScreen")
                 }
             )
         } else {
@@ -182,10 +192,11 @@ fun MainHomePickupContents(
 
 @Composable
 fun DraggableCardStack(
-    modifier: Modifier = Modifier, // Modifier 추가
+    modifier: Modifier = Modifier,
     cardStates: List<PickupUserItem>,
     onCardRemoved: (PickupUserItem) -> Unit,
-    cardContent: @Composable (PickupUserItem) -> Unit = { DefaultCardContent(it) }
+    onCardClick: (String) -> Unit,
+    cardContent: @Composable (PickupUserItem, () -> Unit) -> Unit = { item, onClick -> DefaultCardContent(item, onClick) }
 ) {
     Box(
         modifier = modifier,
@@ -198,7 +209,8 @@ fun DraggableCardStack(
                 cardState = cardState,
                 isFrontCard = isFrontCard,
                 onRemove = { onCardRemoved(cardState) },
-                content = { cardContent(cardState) }
+                onCardClick = { onCardClick(cardState.id) },
+                content = { cardContent(cardState, { onCardClick(cardState.id) }) }
             )
         }
     }
@@ -209,6 +221,7 @@ fun DraggableCard(
     cardState: PickupUserItem,
     isFrontCard: Boolean,
     onRemove: () -> Unit,
+    onCardClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val animatedOffset by animateOffsetAsState(
@@ -355,7 +368,10 @@ fun DraggableCard(
 }
 
 @Composable
-fun DefaultCardContent(item: PickupUserItem) {
+fun DefaultCardContent(
+    item: PickupUserItem,
+    onCardClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -372,18 +388,40 @@ fun DefaultCardContent(item: PickupUserItem) {
             modifier = Modifier
                 .padding(bottom = 20.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color.White)
-                .align(Alignment.BottomCenter),
+                .background(Color.Gray.copy(alpha = 0.5f))
+                .align(Alignment.BottomCenter)
+                .clickable { onCardClick() },
         ) {
-            Text(
+            Column(
                 modifier = Modifier
-                    .height(35.dp)
-                    .width(70.dp),
-                text = "${item.age}歳",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = item.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = Color.White
+                )
+                Row(
+                    modifier = Modifier.padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "${item.age}歳",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    )
+                    Text(
+                        text = item.location,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }

@@ -125,7 +125,8 @@ import kotlin.math.roundToInt
 
 @Composable
 fun MainHomeScreen(
-    viewModel: MainHomeViewModel = hiltViewModel()
+    viewModel: MainHomeViewModel = hiltViewModel(),
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     // StateFlow 상태 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -140,14 +141,16 @@ fun MainHomeScreen(
     // UI 전달
     MainHomeContents(
         uiState = uiState,
-        onEvent = { viewModel.onEvent(it) }
+        onEvent = { viewModel.onEvent(it) },
+        onNavigateToUserDetail = onNavigateToUserDetail
     )
 }
 
 @Composable
 fun MainHomeContents(
     uiState: MainHomeUiState,
-    onEvent: (MainHomeUiEvent) -> Unit
+    onEvent: (MainHomeUiEvent) -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -212,8 +215,12 @@ fun MainHomeContents(
                 .fillMaxSize()
         ) {
             when (uiState.selectedTab) {
-                MainHomeTab.SEARCH -> MainHomeSearchScreen()
-                MainHomeTab.PICKUP -> MainHomePickupScreen()
+                MainHomeTab.SEARCH -> MainHomeSearchScreen(
+                    onNavigateToUserDetail = onNavigateToUserDetail
+                )
+                MainHomeTab.PICKUP -> MainHomePickupScreen(
+                    onNavigateToUserDetail = onNavigateToUserDetail
+                )
                 MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
             }
         }

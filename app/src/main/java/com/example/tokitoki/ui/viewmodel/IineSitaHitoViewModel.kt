@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.LikedUser
 import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
-import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class IineSitaHitoViewModel @Inject constructor(
     private val getLikedUsersUseCase: GetLikedUsersUseCase,
-    private val updateLikeStatusUseCase: UpdateLikeStatusUseCase
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(IineSitaHitoUiState())
@@ -115,22 +115,9 @@ class IineSitaHitoViewModel @Inject constructor(
         }
     }
 
-    fun updateLikeStatus(user: LikedUser, isLiked: Boolean) {
-        viewModelScope.launch {
-            updateLikeStatusUseCase(user.id, isLiked)
-                .onSuccess {
-                    if (!isLiked) {
-                        // 좋아요 취소 시 목록에서 제거
-                        _uiState.update {
-                            it.copy(users = it.users.filter { u -> u.id != user.id })
-                        }
-                    }
-                }
-                .onFailure { error ->
-                    _uiState.update {
-                        it.copy(error = error.message ?: "좋아요 상태 업데이트에 실패했습니다.")
-                    }
-                }
-        }
+    fun onUserClick(userId: String) {
+        // 현재 화면의 모든 사용자 ID를 캐시에 저장
+        val userIds = _uiState.value.users.map { it.id }
+        addUserIdsToCacheUseCase("IineSitaHitoScreen", userIds)
     }
 } 

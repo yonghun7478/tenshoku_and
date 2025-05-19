@@ -14,7 +14,7 @@ class LikedUserRepositoryImpl @Inject constructor() : LikedUserRepository {
     init {
         // 더미 데이터 초기화
         repeat(50) { index ->
-            val userId = "user_$index"
+            val userId = "$index"
             val currentTime = System.currentTimeMillis()
             val randomTimeOffset = Random.nextLong(0, 7 * 24 * 60 * 60 * 1000) // 최대 1주일 전
             dummyUsers[userId] = LikedUserDto(

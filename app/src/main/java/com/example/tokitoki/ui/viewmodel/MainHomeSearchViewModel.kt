@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCase
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCase
+import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.converter.UserUiMapper
 import com.example.tokitoki.ui.state.MainHomeSearchState
 import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
@@ -28,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainHomeSearchViewModel @Inject constructor(
     private val getUsersByLoginUseCase: GetUsersByLoginUseCase,
-    private val getUsersBySignupUseCase: GetUsersBySignupUseCase
+    private val getUsersBySignupUseCase: GetUsersBySignupUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     // UI 상태(StateFlow)
@@ -80,10 +83,20 @@ class MainHomeSearchViewModel @Inject constructor(
                 is ResultWrapper.Error -> {
                     it.updateData(currentData.copy(state = MainHomeSearchState.ERROR))
                 }
+
+                ResultWrapper.Loading -> TODO()
             }
         }
     }
 
+    fun addUserIdsToCache() {
+        val userIds = if (_uiState.value.orderType == OrderType.LOGIN) {
+            _uiState.value.dataByLogin.users.map { it.id }
+        } else {
+            _uiState.value.dataByRegister.users.map { it.id }
+        }
+        addUserIdsToCacheUseCase("MainHomeSearchScreen", userIds)
+    }
 
     // UI 이벤트 처리
     fun onEvent(event: MainHomeSearchUiEvent) {

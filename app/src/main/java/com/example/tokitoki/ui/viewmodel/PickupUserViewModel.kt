@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
 import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class PickupUserViewModel @Inject constructor(
     private val fetchPickupUsersUseCase: FetchPickupUsersUseCase,
     private val likePickupUserUseCase: LikePickupUserUseCase,
-    private val dislikePickupUserUseCase: DislikePickupUserUseCase
+    private val dislikePickupUserUseCase: DislikePickupUserUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PickupUserUiState())
@@ -40,15 +42,23 @@ class PickupUserViewModel @Inject constructor(
 
             when (val result = fetchPickupUsersUseCase()) {
                 is ResultWrapper.Success -> {
-                    _uiState.value = _uiState.value.copy(users = result.data.map { PickupUserMapper.toPresentation(it) })
+                    _uiState.value = _uiState.value.copy(
+                        users = result.data.map { PickupUserMapper.toPresentation(it) },
+                        state = PickupUserState.COMPLETE
+                    )
                 }
                 is ResultWrapper.Error -> {
-                    _uiState.value = _uiState.value.copy(errorMessage = "Failed to load users")
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = "Failed to load users",
+                        state = PickupUserState.COMPLETE
+                    )
+                }
+                ResultWrapper.Loading -> {
+                    _uiState.value = _uiState.value.copy(
+                        state = PickupUserState.LOADING
+                    )
                 }
             }
-            _uiState.value = _uiState.value.copy(
-                state = PickupUserState.COMPLETE
-            )
         }
     }
 
@@ -78,7 +88,6 @@ class PickupUserViewModel @Inject constructor(
         )
     }
 
-    // 자동 제거 트리거 (좋아요 / 싫어요 버튼 클릭 시)
     fun triggerAutoRemove(direction: CardDirection) {
         _uiState.update { currentState ->
             // 리스트가 비어있지 않다면 첫 번째 카드의 autoRemoveDirection 업데이트
@@ -86,6 +95,13 @@ class PickupUserViewModel @Inject constructor(
                 currentState.users.first().cardDirection.value = direction
             }
             currentState
+        }
+    }
+
+    fun onUserClick(userId: String) {
+        if(_uiState.value.users.isNotEmpty()) {
+            val pickupUserId = _uiState.value.users.first().id
+            addUserIdsToCacheUseCase("MainHomePickupScreen", listOf(pickupUserId))
         }
     }
 }

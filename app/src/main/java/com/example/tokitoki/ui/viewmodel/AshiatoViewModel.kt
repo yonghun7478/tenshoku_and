@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.AshiatoTimeline
 import com.example.tokitoki.domain.usecase.GetAshiatoPageUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.AshiatoUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AshiatoViewModel @Inject constructor(
-    private val getAshiatoPageUseCase: GetAshiatoPageUseCase // UseCase 주입
+    private val getAshiatoPageUseCase: GetAshiatoPageUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     // UI 상태를 관리하는 StateFlow
@@ -130,6 +132,26 @@ class AshiatoViewModel @Inject constructor(
 
             // 로딩 완료 상태로 변경
             isCurrentlyLoading = false
+        }
+    }
+
+    /**
+     * 특정 날짜의 방문자 ID들을 캐시에 추가합니다.
+     * @param date 캐시에 추가할 방문자 ID들의 날짜
+     */
+    fun addUserIdsToCache(date: String) {
+        viewModelScope.launch {
+            // 현재 timeline에서 해당 날짜의 dailyLog를 찾습니다
+            val dailyLog = _uiState.value.timeline.dailyLogs.find { it.date == date }
+            
+            // 해당 날짜의 dailyLog가 존재하면 viewer들의 ID를 추출하여 캐시에 추가
+            dailyLog?.let { log ->
+                val userIds = log.viewers.map { it.id }
+                addUserIdsToCacheUseCase(
+                    userIds = userIds,
+                    screenName = "AshiatoScreen"
+                )
+            }
         }
     }
 }

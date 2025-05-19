@@ -74,10 +74,10 @@ import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 
 @Composable
 fun MainHomeSearchScreen(
-    viewModel: MainHomeSearchViewModel = hiltViewModel()
+    viewModel: MainHomeSearchViewModel = hiltViewModel(),
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
     val currentData = uiState.currentData()
 
     LaunchedEffect(Unit) {
@@ -89,7 +89,16 @@ fun MainHomeSearchScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is MainHomeSearchUiEvent.UserSelected -> {
-                    println("userSelected ${event.index}")
+                    // 현재 상태에서 최신 데이터를 가져옴
+                    val latestData = uiState.currentData()
+                    if (latestData.users.isNotEmpty() && event.index < latestData.users.size) {
+                        val selectedUser = latestData.users[event.index]
+                        viewModel.addUserIdsToCache()
+                        onNavigateToUserDetail(
+                            selectedUser.id,
+                            "MainHomeSearchScreen"
+                        )
+                    }
                 }
 
                 is MainHomeSearchUiEvent.OrderSelected -> {

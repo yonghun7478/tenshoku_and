@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +33,8 @@ import kotlinx.coroutines.launch
 fun IineSitaHitoScreen(
     modifier: Modifier = Modifier,
     viewModel: IineSitaHitoViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -40,8 +42,11 @@ fun IineSitaHitoScreen(
         uiState = uiState,
         onRefresh = viewModel::refresh,
         onLoadMore = viewModel::loadMoreUsers,
-        onUnlike = { user -> viewModel.updateLikeStatus(user, false) },
         onBackClick = onBackClick,
+        onNavigateToUserDetail = { userId ->
+            viewModel.onUserClick(userId)
+            onNavigateToUserDetail(userId, "IineSitaHitoScreen")
+        },
         modifier = modifier
     )
 }
@@ -52,8 +57,8 @@ fun IineSitaHitoContents(
     uiState: IineSitaHitoUiState,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
-    onUnlike: (LikedUser) -> Unit,
     onBackClick: () -> Unit,
+    onNavigateToUserDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SwipeRefresh(
@@ -107,7 +112,8 @@ fun IineSitaHitoContents(
                         ) { user ->
                             LikedUserCard(
                                 user = user,
-                                onUnlike = { onUnlike(user) }
+                                onNavigateToUserDetail = onNavigateToUserDetail,
+                                modifier = Modifier
                             )
 
                             if (user == uiState.users.lastOrNull() && !uiState.isLoading && uiState.hasMoreItems) {
@@ -144,17 +150,13 @@ fun IineSitaHitoContents(
 @Composable
 private fun LikedUserCard(
     user: LikedUser,
-    onUnlike: () -> Unit,
+    onNavigateToUserDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isLiked by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-    val scale = remember { Animatable(1f) }
-
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .scale(scale.value),
+            .clickable { onNavigateToUserDetail(user.id) },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -176,30 +178,6 @@ private fun LikedUserCard(
                         text = user.location,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                IconButton(
-                    onClick = {
-                        if (isLiked) {
-                            scope.launch {
-                                scale.animateTo(
-                                    targetValue = 0f,
-                                    animationSpec = tween(
-                                        durationMillis = 300,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                )
-                                isLiked = false
-                                onUnlike()
-                            }
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = "Unlike",
-                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -331,8 +309,8 @@ private fun IineSitaHitoContentsEmptyPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -348,8 +326,8 @@ private fun IineSitaHitoContentsLoadingPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -386,8 +364,8 @@ private fun IineSitaHitoContentsWithDataPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }
@@ -404,28 +382,8 @@ private fun IineSitaHitoContentsErrorPreview() {
             ),
             onRefresh = {},
             onLoadMore = {},
-            onUnlike = {},
-            onBackClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LikedUserCardPreview() {
-    TokitokiTheme {
-        LikedUserCard(
-            user = LikedUser(
-                id = "1",
-                nickname = "하나코",
-                age = 28,
-                location = "도쿄",
-                profileImageUrl = "",
-                introduction = "안녕하세요! 취미는 여행과 요리입니다.",
-                occupation = "디자이너",
-                likedAt = System.currentTimeMillis()
-            ),
-            onUnlike = {}
+            onBackClick = {},
+            onNavigateToUserDetail = {}
         )
     }
 }

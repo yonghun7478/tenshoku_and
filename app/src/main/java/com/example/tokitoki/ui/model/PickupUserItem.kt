@@ -9,6 +9,8 @@ data class PickupUserItem(
     val id: String,
     val thumbnail: String,
     val age: Int,
+    val name: String,
+    val location: String,
     val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
     val rotation: MutableState<Float> = mutableStateOf(0f),
     val isOut: MutableState<Boolean> = mutableStateOf(false),

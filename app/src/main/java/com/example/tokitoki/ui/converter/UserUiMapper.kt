@@ -7,7 +7,8 @@ object UserUiMapper {
     fun domainToUi(user: User): UserUiModel {
         return UserUiModel(
             thumbnailUrl = user.thumbnailUrl,
-            age = user.age
+            age = user.age,
+            id = user.id
         )
     }
 }

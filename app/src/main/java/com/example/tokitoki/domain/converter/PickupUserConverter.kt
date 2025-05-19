@@ -5,6 +5,12 @@ import com.example.tokitoki.domain.model.PickupUser
 
 object PickupUserConverter {
     fun fromResponse(response: PickupUserResponse): PickupUser {
-        return PickupUser(id = response.id, thumbnail = response.thumbnail, age = response.age)
+        return PickupUser(
+            id = response.id,
+            thumbnail = response.thumbnail,
+            age = response.age,
+            name = response.name,
+            location = response.location
+        )
     }
 }

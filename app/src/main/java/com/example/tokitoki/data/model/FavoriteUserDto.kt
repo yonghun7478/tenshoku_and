@@ -3,6 +3,7 @@ package com.example.tokitoki.data.model
 import com.example.tokitoki.domain.model.FavoriteUser
 
 data class FavoriteUserDto(
+    val id: String,
     val thumbnail_url: String?,
     val name: String?,
     val age: Int?,
@@ -17,6 +18,7 @@ data class FavoriteUserDto(
 
 fun FavoriteUserDto.toDomainModel(): FavoriteUser {
     return FavoriteUser(
+        id = this.id,
         thumbnailUrl = this.thumbnail_url ?: "",
         name = this.name ?: "",
         age = this.age ?: 0,

@@ -1,0 +1,225 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 클린 아키텍처 Presentation 레이어 가이드라인
+
+Presentation 레이어는 UI와 비즈니스 로직을 연결하는 역할을 담당합니다. 이 레이어는 ViewModel, UI 상태, 이벤트 처리 등을 포함하며, 사용자 인터페이스와 도메인 로직 사이의 중재자 역할을 합니다.
+
+## 핵심 원칙
+
+1. **단방향 데이터 흐름 (Unidirectional Data Flow)**
+   - UI 상태는 ViewModel에서 관리
+   - 이벤트는 UI에서 ViewModel로 전달
+   - 상태 변경은 ViewModel에서만 수행
+
+2. **관심사 분리 (Separation of Concerns)**
+   - UI 로직과 비즈니스 로직 분리
+   - 상태 관리와 이벤트 처리 분리
+   - 화면별 독립적인 컴포넌트 구성
+
+3. **상태 관리 (State Management)**
+   - UI 상태를 불변 객체로 관리
+   - 상태 변경은 명시적인 이벤트를 통해 수행
+   - 상태 업데이트는 원자적으로 처리
+
+## 가이드라인 상세
+
+### 1. ViewModel 구현
+
+#### 기본 구조
+```kotlin
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val getUserUseCase: GetUserUseCase,
+    private val updateUserUseCase: UpdateUserUseCase
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(UserUiState())
+    val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
+
+    fun onEvent(event: UserEvent) {
+        when (event) {
+            is UserEvent.LoadUser -> loadUser(event.userId)
+            is UserEvent.UpdateUser -> updateUser(event.user)
+        }
+    }
+
+    private fun loadUser(userId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            getUserUseCase(userId)
+                .onSuccess { user ->
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        user = user
+                    ) }
+                }
+                .onFailure { error ->
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        error = error.message
+                    ) }
+                }
+        }
+    }
+}
+```
+
+#### 주요 특징
+- **상태 관리**: StateFlow를 사용하여 UI 상태 관리
+- **이벤트 처리**: sealed class를 사용한 이벤트 정의
+- **UseCase 사용**: 비즈니스 로직은 UseCase에 위임
+- **코루틴 스코프**: viewModelScope를 사용한 비동기 작업 관리
+
+### 2. UI 상태 정의
+
+#### 상태 클래스
+```kotlin
+data class UserUiState(
+    val isLoading: Boolean = false,
+    val user: User? = null,
+    val error: String? = null
+)
+```
+
+#### 이벤트 정의
+```kotlin
+sealed class UserEvent {
+    data class LoadUser(val userId: String) : UserEvent()
+    data class UpdateUser(val user: User) : UserEvent()
+    object Refresh : UserEvent()
+}
+```
+
+### 3. UI 구현 (Compose)
+
+#### 화면 구현
+```kotlin
+@Composable
+fun UserScreen(
+    viewModel: UserViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(UserEvent.LoadUser("current-user"))
+    }
+
+    UserContent(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+private fun UserContent(
+    uiState: UserUiState,
+    onEvent: (UserEvent) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            uiState.isLoading -> LoadingIndicator()
+            uiState.error != null -> ErrorMessage(uiState.error)
+            uiState.user != null -> UserProfile(uiState.user)
+        }
+    }
+}
+```
+
+### 4. 의존성 주입 (Hilt)
+
+#### ViewModel 모듈
+```kotlin
+@Module
+@InstallIn(ViewModelComponent::class)
+object PresentationModule {
+    @Provides
+    fun provideUserViewModel(
+        getUserUseCase: GetUserUseCase,
+        updateUserUseCase: UpdateUserUseCase
+    ): UserViewModel {
+        return UserViewModel(getUserUseCase, updateUserUseCase)
+    }
+}
+```
+
+### 5. 테스트
+
+#### ViewModel 테스트
+```kotlin
+class UserViewModelTest {
+    private lateinit var viewModel: UserViewModel
+    private lateinit var getUserUseCase: FakeGetUserUseCase
+    private lateinit var updateUserUseCase: FakeUpdateUserUseCase
+
+    @Before
+    fun setup() {
+        getUserUseCase = FakeGetUserUseCase()
+        updateUserUseCase = FakeUpdateUserUseCase()
+        viewModel = UserViewModel(getUserUseCase, updateUserUseCase)
+    }
+
+    @Test
+    fun `when loading user succeeds, update state with user`() = runTest {
+        // Given
+        val userId = "test-user"
+        val user = User(userId, "Test User")
+        getUserUseCase.setUser(user)
+
+        // When
+        viewModel.onEvent(UserEvent.LoadUser(userId))
+
+        // Then
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertEquals(user, state.user)
+        assertNull(state.error)
+    }
+}
+```
+
+### 6. 네비게이션
+
+#### 네비게이션 구현
+```kotlin
+@Composable
+fun AppNavigation(
+    navController: NavHostController = rememberNavController()
+) {
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        composable("home") {
+            HomeScreen(
+                onNavigateToUser = { userId ->
+                    navController.navigate("user/$userId")
+                }
+            )
+        }
+        composable(
+            "user/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            UserScreen(
+                userId = backStackEntry.arguments?.getString("userId") ?: "",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+```
+
+## 결론
+
+이 가이드라인을 따르면 다음과 같은 이점을 얻을 수 있습니다:
+
+1. **일관된 상태 관리**: 단방향 데이터 흐름으로 인한 예측 가능한 상태 관리
+2. **테스트 용이성**: ViewModel과 UI 로직의 명확한 분리로 인한 쉬운 테스트
+3. **유지보수성**: 관심사 분리로 인한 쉬운 유지보수
+4. **재사용성**: 컴포넌트 기반 설계로 인한 높은 재사용성
+
+실제 구현 시에는 프로젝트의 요구사항과 규모에 따라 이 가이드라인을 적절히 조정하여 사용하시기 바랍니다.
+
+

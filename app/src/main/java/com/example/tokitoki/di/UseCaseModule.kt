@@ -98,6 +98,20 @@ import com.example.tokitoki.domain.usecase.ClearTokensUseCase
 import com.example.tokitoki.domain.usecase.ClearTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCase
 import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUserDetailUseCase
+import com.example.tokitoki.domain.usecase.GetUserDetailUseCaseImpl
+import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCase
+import com.example.tokitoki.domain.usecase.ClearCachedUserIdsUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCase
+import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCase
+import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
+import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCaseImpl
+import com.example.tokitoki.domain.usecase.SendMitenUseCase
+import com.example.tokitoki.domain.usecase.SendMitenUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -368,4 +382,46 @@ abstract class UseCaseModule {
     abstract fun bindDeleteUserProfileUseCase(
         impl: DeleteUserProfileUseCaseImpl
     ): DeleteUserProfileUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetUserDetailUseCase(
+        impl: GetUserDetailUseCaseImpl
+    ): GetUserDetailUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindClearCachedUserIdsUseCase(
+        impl: ClearCachedUserIdsUseCaseImpl
+    ): ClearCachedUserIdsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetCachedUserIdsUseCase(
+        impl: GetCachedUserIdsUseCaseImpl
+    ): GetCachedUserIdsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddUserIdsToCacheUseCase(
+        impl: AddUserIdsToCacheUseCaseImpl
+    ): AddUserIdsToCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddUserDetailToCacheUseCase(
+        impl: AddUserDetailToCacheUseCaseImpl
+    ): AddUserDetailToCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetUserDetailFromCacheUseCase(
+        impl: GetUserDetailFromCacheUseCaseImpl
+    ): GetUserDetailFromCacheUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSendMitenUseCase(
+        sendMitenUseCaseImpl: SendMitenUseCaseImpl
+    ): SendMitenUseCase
 }

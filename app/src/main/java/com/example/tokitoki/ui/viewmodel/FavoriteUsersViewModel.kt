@@ -3,22 +3,32 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.activity.result.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetFavoriteUsersUseCase
+import com.example.tokitoki.domain.usecase.SendMitenUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.FavoriteUsersUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteUsersViewModel @Inject constructor(
-    private val getFavoriteUsersUseCase: GetFavoriteUsersUseCase
+    private val getFavoriteUsersUseCase: GetFavoriteUsersUseCase,
+    private val sendMitenUseCase: SendMitenUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoriteUsersUiState())
-    val uiState: StateFlow<FavoriteUsersUiState> = _uiState
+    val uiState: StateFlow<FavoriteUsersUiState> = _uiState.asStateFlow()
+
+    private val _isSendingMiten = MutableStateFlow(false)
+    val isSendingMiten: StateFlow<Boolean> = _isSendingMiten.asStateFlow()
 
     private var cursor: Long = 0 // 초기 커서 값
     private val limit: Int = 10 // 한 번에 가져올 사용자 수
@@ -57,6 +67,35 @@ class FavoriteUsersViewModel @Inject constructor(
         cursor = 0 // 커서 초기화
         _uiState.value = FavoriteUsersUiState(isRefreshing = true) // 상태 초기화
         loadFavoriteUsers()
+    }
+
+    fun sendMiten(userId: String) {
+        viewModelScope.launch {
+            if (_isSendingMiten.value) return@launch // 이미 전송 중이면 무시
+            
+            _isSendingMiten.value = true
+            when (val result = sendMitenUseCase(userId)) {
+                is ResultWrapper.Success -> {
+                    _uiState.update { it.copy(toastMessage = "みてねを送信しました") }
+                }
+                is ResultWrapper.Error -> {
+                    _uiState.update { it.copy(toastMessage = "送信に失敗しました") }
+                }
+
+                ResultWrapper.Loading -> TODO()
+            }
+            _isSendingMiten.value = false
+        }
+    }
+
+    fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
+    }
+
+    fun onUserClick(userId: String) {
+        // 현재 화면의 모든 사용자 ID를 캐시에 저장
+        val userIds = _uiState.value.favoriteUsers.map { it.id }
+        addUserIdsToCacheUseCase("FavoriteUsersScreen", userIds)
     }
 
     // 필요한 추가 인터랙션 (예: 사용자 상세 화면 이동)은 여기에 추가

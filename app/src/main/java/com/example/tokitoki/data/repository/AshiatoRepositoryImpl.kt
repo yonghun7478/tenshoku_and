@@ -96,7 +96,7 @@ class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
                 val minute = Random.nextInt(0, 60)
                 viewers.add(
                     AshiatoViewer(
-                        userId = "user_${dateString}_$j",
+                        userId = "${(1..150).random()}",
                         thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg", // Placeholder 이미지
                         age = Random.nextInt(20, 40),
                         region = regions.random(),

@@ -8,6 +8,8 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.SELF_SENTENCE_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.URI
+import com.example.tokitoki.ui.screen.TokitokiArgs.USER_ID
+import com.example.tokitoki.ui.screen.TokitokiArgs.SCREEN_NAME
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -27,6 +29,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.MAIN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.REGISTER_WITH_EMAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.SIGN_IN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.IINE_SITA_HITO_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.USER_DETAIL_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -48,6 +51,7 @@ private object TokitokiScreens {
     const val ASHIATO_SCREEN = "AshiatoScreen"
     const val FAVORITE_USERS_SCREEN = "FavoriteUsersScreen"
     const val IINE_SITA_HITO_SCREEN = "IineSitaHitoScreen"
+    const val USER_DETAIL_SCREEN = "UserDetailScreen"
 }
 
 object TokitokiArgs {
@@ -57,6 +61,8 @@ object TokitokiArgs {
     const val TAG_IDS = "tagIds"
     const val SELF_SENTENCE_IDS = "selfSentenceIds"
     const val IS_EDIT_MODE = "isEditMode"
+    const val USER_ID = "userId"
+    const val SCREEN_NAME = "screenName"
 }
 
 object TokitokiDestinations {
@@ -79,6 +85,7 @@ object TokitokiDestinations {
     const val MAIN_ROUTE = MAIN_SCREEN
     const val ASHIATO_ROUTE = ASHIATO_SCREEN
     const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
+    const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -159,5 +166,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
             popUpTo(0) { inclusive = true }
             launchSingleTop = true
         }
+    }
+
+    fun navigateToUserDetail(userId: String, screenName: String) {
+        navController.navigate("$USER_DETAIL_SCREEN?$USER_ID=${userId}&$SCREEN_NAME=${screenName}")
     }
 }
