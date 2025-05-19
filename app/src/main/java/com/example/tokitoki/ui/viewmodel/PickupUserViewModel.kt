@@ -99,8 +99,9 @@ class PickupUserViewModel @Inject constructor(
     }
 
     fun onUserClick(userId: String) {
-        // 현재 화면의 모든 사용자 ID를 캐시에 저장
-        val userIds = _uiState.value.users.map { it.id }
-        addUserIdsToCacheUseCase("MainHomePickupScreen", userIds)
+        if(_uiState.value.users.isNotEmpty()) {
+            val pickupUserId = _uiState.value.users.first().id
+            addUserIdsToCacheUseCase("MainHomePickupScreen", listOf(pickupUserId))
+        }
     }
 }

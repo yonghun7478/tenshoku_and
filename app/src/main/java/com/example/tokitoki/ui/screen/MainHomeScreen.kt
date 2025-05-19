@@ -218,7 +218,9 @@ fun MainHomeContents(
                 MainHomeTab.SEARCH -> MainHomeSearchScreen(
                     onNavigateToUserDetail = onNavigateToUserDetail
                 )
-                MainHomeTab.PICKUP -> MainHomePickupScreen()
+                MainHomeTab.PICKUP -> MainHomePickupScreen(
+                    onNavigateToUserDetail = onNavigateToUserDetail
+                )
                 MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
             }
         }
