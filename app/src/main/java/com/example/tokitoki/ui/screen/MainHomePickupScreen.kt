@@ -372,7 +372,7 @@ fun DefaultCardContent(item: PickupUserItem) {
             modifier = Modifier
                 .padding(bottom = 20.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color.White)
+                .background(Color.Gray.copy(alpha = 0.5f))
                 .align(Alignment.BottomCenter),
         ) {
             Column(
@@ -384,7 +384,8 @@ fun DefaultCardContent(item: PickupUserItem) {
                     text = item.name,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = Color.White
                 )
                 Row(
                     modifier = Modifier.padding(top = 4.dp),
@@ -393,12 +394,14 @@ fun DefaultCardContent(item: PickupUserItem) {
                     Text(
                         text = "${item.age}歳",
                         fontSize = 16.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = Color.White
                     )
                     Text(
                         text = item.location,
                         fontSize = 16.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = Color.White
                     )
                 }
             }
