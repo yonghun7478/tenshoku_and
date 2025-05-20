@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.domain.model.LikeResult
@@ -23,7 +24,6 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         allLikes[LikeTab.MATCHED.title] = createDummyLikes(LikeTab.MATCHED.title, 0).toMutableList()
     }
 
-
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
         delay(500)
 
@@ -46,6 +46,15 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         return Result.success(LikeResult(newData, nextCursor))
     }
 
+    override suspend fun likeUser(userId: String): ResultWrapper<Unit> {
+        return try {
+            // TODO: 실제 API 호출 구현
+            delay(500) // API 호출 시뮬레이션
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "좋아요 처리 중 오류가 발생했습니다.")
+        }
+    }
 
     // 각 탭별 더미 데이터 생성 함수
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {

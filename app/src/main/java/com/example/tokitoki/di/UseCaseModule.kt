@@ -108,6 +108,12 @@ import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
 import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCaseImpl
 import com.example.tokitoki.domain.usecase.SendMitenUseCase
 import com.example.tokitoki.domain.usecase.SendMitenUseCaseImpl
+import com.example.tokitoki.domain.usecase.LikeUserUseCase
+import com.example.tokitoki.domain.usecase.LikeUserUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
+import com.example.tokitoki.domain.usecase.AddToFavoritesUseCaseImpl
+import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
+import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -410,4 +416,22 @@ abstract class UseCaseModule {
     abstract fun bindSendMitenUseCase(
         sendMitenUseCaseImpl: SendMitenUseCaseImpl
     ): SendMitenUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindLikeUserUseCase(
+        impl: LikeUserUseCaseImpl
+    ): LikeUserUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddToFavoritesUseCase(
+        impl: AddToFavoritesUseCaseImpl
+    ): AddToFavoritesUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoveFromFavoritesUseCase(
+        impl: RemoveFromFavoritesUseCaseImpl
+    ): RemoveFromFavoritesUseCase
 }

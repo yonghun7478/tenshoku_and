@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.model.FavoriteUser
 import com.example.tokitoki.domain.repository.FavoriteUserRepository
 import kotlinx.coroutines.delay
@@ -30,6 +31,26 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
             dummyUsers.take(limit)
         } else {
             dummyUsers.filter { it.timestamp < cursor }.take(limit)
+        }
+    }
+
+    override suspend fun addToFavorites(userId: String): ResultWrapper<Unit> {
+        return try {
+            // TODO: 실제 API 호출 구현
+            delay(500) // API 호출 시뮬레이션
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다.")
+        }
+    }
+
+    override suspend fun removeFromFavorites(userId: String): ResultWrapper<Unit> {
+        return try {
+            // TODO: 실제 API 호출 구현
+            delay(500) // API 호출 시뮬레이션
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "즐겨찾기 제거 중 오류가 발생했습니다.")
         }
     }
 }
