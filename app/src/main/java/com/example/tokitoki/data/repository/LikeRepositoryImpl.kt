@@ -1,6 +1,7 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.common.ResultWrapper.ErrorType
 import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.domain.model.LikeResult
@@ -52,7 +53,7 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
             delay(500) // API 호출 시뮬레이션
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
-            ResultWrapper.Error(e.message ?: "좋아요 처리 중 오류가 발생했습니다.")
+            ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "좋아요 추가 중 오류가 발생했습니다."))
         }
     }
 
