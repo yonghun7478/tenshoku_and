@@ -1,12 +1,15 @@
 package com.example.tokitoki.domain.model
 
 data class LikeItem(
-    val id: Int,
+    val id: String,
     val thumbnail: String,
     val nickname: String,
     val age: Int,
     val introduction: String,
-    val receivedTime: Long // 좋아요 받은 시간 추가
+    val receivedTime: Long,
+    val location: String,
+    val occupation: String?,
+    val likedAt: Long
 )
 
 data class LikeResult(

@@ -129,8 +129,7 @@ class LikeScreenViewModel @Inject constructor(
         }
     }
 
-
-    fun onItemLongClicked(itemId: Int) {
+    fun onItemLongClicked(itemId: String) {
         if (!uiState.value.deleteModeState.isDeleteMode) {
             _uiState.update {
                 it.copy(deleteItemState = DeleteItemState(itemId = itemId, showDialog = true))
@@ -152,8 +151,7 @@ class LikeScreenViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showSnackBar = false)
     }
 
-
-    fun onSelectItem(itemId: Int) {
+    fun onSelectItem(itemId: String) {
         val currentSelected = _uiState.value.deleteModeState.selectedItems.toMutableSet()
         if (currentSelected.contains(itemId)) {
             currentSelected.remove(itemId)
@@ -164,7 +162,6 @@ class LikeScreenViewModel @Inject constructor(
             it.copy(deleteModeState = it.deleteModeState.copy(selectedItems = currentSelected))
         }
     }
-
 
     fun onSelectAllItems() {
         val currentTab = _uiState.value.selectedTab

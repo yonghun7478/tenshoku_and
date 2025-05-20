@@ -18,7 +18,7 @@ data class LikeScreenUiState(
 )
 
 data class LikeItemUiState(
-    val id: Int,
+    val id: String,
     val thumbnail: String, // Image resource ID (Int) or URL (String)
     val nickname: String,
     val age: Int,
@@ -30,12 +30,12 @@ data class LikeItemUiState(
 
 data class DeleteModeState(
     val isDeleteMode: Boolean = false,
-    val selectedItems: Set<Int> = emptySet(),
+    val selectedItems: Set<String> = emptySet(),
     val showDialog: Boolean = false // 대화상자 표시 여부
 )
 
 data class DeleteItemState(
-    val itemId: Int? = null, // 삭제할 아이템의 ID (null이면 삭제할 아이템이 없음을 의미)
+    val itemId: String? = null, // 삭제할 아이템의 ID (null이면 삭제할 아이템이 없음을 의미)
     val showDialog: Boolean = false // 대화상자 표시 여부
 )
 

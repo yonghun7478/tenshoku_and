@@ -7,6 +7,7 @@ import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.ui.state.LikeTab
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlin.random.Random
 
 class LikeRepositoryImpl @Inject constructor() : LikeRepository {
 
@@ -57,14 +58,17 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         val now = System.currentTimeMillis()
 
         return List(PAGE_SIZE) { index ->
-            val id = baseId + startIndex + index  // startIndex 반영
+            val id = index  // startIndex 반영
             LikeItemData(
-                id = id,
+                id = id.toString(),
                 thumbnail = "https://via.placeholder.com/150",
                 nickname = "${tab} User ${startIndex + index}", // startIndex 반영
                 age = 20 + (id % 10),
                 introduction = "This is a sample introduction for $tab user $id.",
-                receivedTime = now - (startIndex + index) * 60000L // startIndex 반영
+                receivedTime = now - (startIndex + index) * 60000L, // startIndex 반영
+                location = listOf("서울", "부산", "대구", "인천", "광주").random(),
+                occupation = if (Random.nextBoolean()) listOf("회사원", "학생", "프리랜서", "공무원").random() else null,
+                likedAt = now - (startIndex + index) * 60000L
             ).toDomain()
         }
     }

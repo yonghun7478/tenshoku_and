@@ -2,10 +2,11 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.model.LikedUser
-import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
+
+import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
+import com.example.tokitoki.ui.state.LikeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IineSitaHitoViewModel @Inject constructor(
-    private val getLikedUsersUseCase: GetLikedUsersUseCase,
+    private val getLikesUseCase: GetLikesUseCase,
     private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
@@ -34,14 +35,23 @@ class IineSitaHitoViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val users = getLikedUsersUseCase(cursor = null, pageSize = pageSize)
-                currentCursor = users.lastOrNull()?.likedAt
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        users = users,
-                        hasMoreItems = users.size >= pageSize
-                    )
+                val result = getLikesUseCase(LikeTab.SENT.title, null, pageSize)
+                result.getOrNull()?.let { likeResult ->
+                    currentCursor = likeResult.nextCursor
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            users = likeResult.likes,
+                            hasMoreItems = likeResult.nextCursor != null
+                        )
+                    }
+                } ?: run {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "데이터를 불러오는데 실패했습니다."
+                        )
+                    }
                 }
             } catch (error: Exception) {
                 _uiState.update {
@@ -60,14 +70,23 @@ class IineSitaHitoViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val newUsers = getLikedUsersUseCase(cursor = currentCursor, pageSize = pageSize)
-                currentCursor = newUsers.lastOrNull()?.likedAt
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        users = it.users + newUsers,
-                        hasMoreItems = newUsers.size >= pageSize
-                    )
+                val result = getLikesUseCase(LikeTab.SENT.title, currentCursor, pageSize)
+                result.getOrNull()?.let { likeResult ->
+                    currentCursor = likeResult.nextCursor
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            users = it.users + likeResult.likes,
+                            hasMoreItems = likeResult.nextCursor != null
+                        )
+                    }
+                } ?: run {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "데이터를 불러오는데 실패했습니다."
+                        )
+                    }
                 }
             } catch (error: Exception) {
                 _uiState.update {
@@ -93,15 +112,25 @@ class IineSitaHitoViewModel @Inject constructor(
             }
             try {
                 currentCursor = null
-                val users = getLikedUsersUseCase(cursor = null, pageSize = pageSize)
-                currentCursor = users.lastOrNull()?.likedAt
-                _uiState.update {
-                    it.copy(
-                        isRefreshing = false,
-                        isLoading = false,
-                        users = users,
-                        hasMoreItems = users.size >= pageSize
-                    )
+                val result = getLikesUseCase(LikeTab.RECEIVED.title, null, pageSize)
+                result.getOrNull()?.let { likeResult ->
+                    currentCursor = likeResult.nextCursor
+                    _uiState.update {
+                        it.copy(
+                            isRefreshing = false,
+                            isLoading = false,
+                            users = likeResult.likes,
+                            hasMoreItems = likeResult.nextCursor != null
+                        )
+                    }
+                } ?: run {
+                    _uiState.update {
+                        it.copy(
+                            isRefreshing = false,
+                            isLoading = false,
+                            error = "데이터를 불러오는데 실패했습니다."
+                        )
+                    }
                 }
             } catch (error: Exception) {
                 _uiState.update {

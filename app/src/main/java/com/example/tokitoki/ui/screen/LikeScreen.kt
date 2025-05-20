@@ -212,8 +212,8 @@ fun LikeTabBarComponent(
 fun LikeTabContentComponent(
     uiState: LikeScreenUiState,
     listStates: Map<LikeTab, LazyListState>, // Map으로 받음
-    onItemLongClicked: (Int) -> Unit,
-    onSelectItem: (Int) -> Unit, // Add item selection handler
+    onItemLongClicked: (String) -> Unit,
+    onSelectItem: (String) -> Unit, // Add item selection handler
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit // onLoadMore 파라미터 추가
 ) {
@@ -261,10 +261,10 @@ fun LikeTabContentComponent(
 @Composable
 fun LikeReceivedListComponent(
     likes: List<LikeItemUiState>,
-    onItemLongClicked: (Int) -> Unit,
+    onItemLongClicked: (String) -> Unit,
     isDeleteMode: Boolean,
-    onSelectItem: (Int) -> Unit, // Pass item selection handler
-    selectedItems: Set<Int> = emptySet(), //선택된 아이템 리스트 파라미터
+    onSelectItem: (String) -> Unit, // Pass item selection handler
+    selectedItems: Set<String> = emptySet(), //선택된 아이템 리스트 파라미터
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
     onRefresh: () -> Unit,
@@ -326,10 +326,10 @@ fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
 @Composable
 fun LikeSentListComponent(
     likes: List<LikeItemUiState>,
-    onItemLongClicked: (Int) -> Unit,
+    onItemLongClicked: (String) -> Unit,
     isDeleteMode: Boolean,
-    selectedItems: Set<Int>,
-    onSelectItem: (Int) -> Unit,
+    selectedItems: Set<String>,
+    onSelectItem: (String) -> Unit,
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
     onRefresh: () -> Unit,
@@ -374,10 +374,10 @@ fun LikeSentListComponent(
 @Composable
 fun LikeMatchedListComponent(
     likes: List<LikeItemUiState>,
-    onItemLongClicked: (Int) -> Unit,
+    onItemLongClicked: (String) -> Unit,
     isDeleteMode: Boolean,
-    selectedItems: Set<Int>,
-    onSelectItem: (Int) -> Unit,
+    selectedItems: Set<String>,
+    onSelectItem: (String) -> Unit,
     listState: LazyListState,
     isRefreshing: Boolean, // 추가
     onRefresh: () -> Unit,
@@ -615,7 +615,7 @@ fun LikeMatchedItemComponent(
 // 삭제모드 활성화시 보여지는 뷰
 @Composable
 fun LikeDeleteModeBarComponent(
-    selectedItems: Set<Int>,
+    selectedItems: Set<String>,
     receivedLikes: List<LikeItemUiState>,
     sentLikes: List<LikeItemUiState>,
     matchedLikes: List<LikeItemUiState>,
@@ -704,7 +704,7 @@ fun LikeDeleteConfirmDialogComponent(
 fun LikeReceivedItemComponentPreview() {
     LikeReceivedItemComponent(
         like = LikeItemUiState(
-            id = 1,
+            id = "1",
             thumbnail = "https://via.placeholder.com/150",
             nickname = "Test User",
             age = 25,
