@@ -72,9 +72,10 @@ fun MainHomePickupScreen(
     // pickupEvent 처리
     LaunchedEffect(pickupEvent) {
         pickupEvent?.let { event ->
+            delay(500) // 1초 딜레이 추가
             when (event) {
-                is PickupEvent.Like -> viewModel.likePickupUser()
-                is PickupEvent.Dislike -> viewModel.dislikePickupUser()
+                is PickupEvent.Like -> viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
+                is PickupEvent.Dislike -> viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
             }
         }
     }
