@@ -49,7 +49,8 @@ fun MainScreen(
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null
+    pickupEvent: PickupEvent? = null,
+    onPickupEventProcessed: () -> Unit = {}
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -59,7 +60,10 @@ fun MainScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is MainUiEvent.SelectBottomItem -> {
-
+                    // 탭이 변경될 때 pickupEvent 초기화
+                    if (event.item != MainBottomItem.HOME) {
+                        onPickupEventProcessed()
+                    }
                 }
             }
         }
@@ -74,7 +78,8 @@ fun MainScreen(
         onIineSitaHitoClick = onIineSitaHitoClick,
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToUserDetail = onNavigateToUserDetail,
-        pickupEvent = pickupEvent
+        pickupEvent = pickupEvent,
+        onPickupEventProcessed = onPickupEventProcessed
     )
 }
 
@@ -87,7 +92,8 @@ fun MainContents(
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null
+    pickupEvent: PickupEvent? = null,
+    onPickupEventProcessed: () -> Unit = {}
 ) {
     Scaffold(
         bottomBar = {
@@ -106,7 +112,8 @@ fun MainContents(
                 MainBottomItem.HOME -> {
                     MainHomeScreen(
                         onNavigateToUserDetail = onNavigateToUserDetail,
-                        pickupEvent = pickupEvent
+                        pickupEvent = pickupEvent,
+                        onPickupEventProcessed = onPickupEventProcessed
                     )
                 }
 

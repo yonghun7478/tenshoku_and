@@ -18,6 +18,7 @@ import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 @Composable
 fun TokitokiNavGraph(
@@ -300,11 +301,11 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.MAIN_ROUTE) {
-            val pickupEvent = remember { mutableStateOf<PickupEvent?>(null) }
+            var pickupEvent by remember { mutableStateOf<PickupEvent?>(null) }
             
-            LaunchedEffect(Unit) {
+            LaunchedEffect(navController.currentBackStackEntry) {
                 navController.currentBackStackEntry?.savedStateHandle?.get<String>(TokitokiArgs.CARD_DIRECTION)?.let { direction ->
-                    pickupEvent.value = when (direction) {
+                    pickupEvent = when (direction) {
                         UserDetailNavigation.DISLIKE.name -> PickupEvent.Dislike
                         UserDetailNavigation.LIKE.name -> PickupEvent.Like
                         else -> null
@@ -329,7 +330,8 @@ fun TokitokiNavGraph(
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
                 },
-                pickupEvent = pickupEvent.value
+                pickupEvent = pickupEvent,
+                onPickupEventProcessed = { pickupEvent = null }
             )
         }
 

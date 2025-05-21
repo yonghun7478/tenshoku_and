@@ -65,7 +65,8 @@ import kotlin.math.roundToInt
 fun MainHomePickupScreen(
     viewModel: PickupUserViewModel = hiltViewModel(),
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null
+    pickupEvent: PickupEvent? = null,
+    onPickupEventProcessed: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -77,6 +78,7 @@ fun MainHomePickupScreen(
                 is PickupEvent.Like -> viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
                 is PickupEvent.Dislike -> viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
             }
+            onPickupEventProcessed()
         }
     }
 

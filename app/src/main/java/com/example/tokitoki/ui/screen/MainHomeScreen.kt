@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,7 +45,8 @@ import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
 fun MainHomeScreen(
     viewModel: MainHomeViewModel = hiltViewModel(),
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null
+    pickupEvent: PickupEvent? = null,
+    onPickupEventProcessed: () -> Unit = {}
 ) {
     // StateFlow 상태 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -60,7 +63,8 @@ fun MainHomeScreen(
         uiState = uiState,
         onEvent = { viewModel.onEvent(it) },
         onNavigateToUserDetail = onNavigateToUserDetail,
-        pickupEvent = pickupEvent
+        pickupEvent = pickupEvent,
+        onPickupEventProcessed = onPickupEventProcessed
     )
 }
 
@@ -69,7 +73,8 @@ fun MainHomeContents(
     uiState: MainHomeUiState,
     onEvent: (MainHomeUiEvent) -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null
+    pickupEvent: PickupEvent? = null,
+    onPickupEventProcessed: () -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -139,7 +144,8 @@ fun MainHomeContents(
                 )
                 MainHomeTab.PICKUP -> MainHomePickupScreen(
                     onNavigateToUserDetail = onNavigateToUserDetail,
-                    pickupEvent = pickupEvent
+                    pickupEvent = pickupEvent,
+                    onPickupEventProcessed = onPickupEventProcessed
                 )
                 MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
             }
