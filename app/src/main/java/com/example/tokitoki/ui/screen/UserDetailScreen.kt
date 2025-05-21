@@ -22,6 +22,13 @@ import android.widget.Toast
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.platform.LocalContext
 
+enum class UserDetailNavigation {
+    DISLIKE,  // いまいち
+    LIKE;     // いいね
+
+    override fun toString(): String = name
+}
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailScreen(
@@ -135,14 +142,14 @@ fun UserDetailScreen(
                     // 왼쪽 화살표 버튼
                     IconButton(
                         onClick = { 
-                            onArrowClick("LEFT")
+                            onArrowClick(UserDetailNavigation.DISLIKE.toString())
                             onBackClick()
                         },
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "이전",
+                            contentDescription = "いまいち",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -150,14 +157,14 @@ fun UserDetailScreen(
                     // 오른쪽 화살표 버튼
                     IconButton(
                         onClick = { 
-                            onArrowClick("RIGHT")
+                            onArrowClick(UserDetailNavigation.LIKE.toString())
                             onBackClick()
                         },
                         modifier = Modifier.padding(end = 16.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "다음",
+                            contentDescription = "いいね",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

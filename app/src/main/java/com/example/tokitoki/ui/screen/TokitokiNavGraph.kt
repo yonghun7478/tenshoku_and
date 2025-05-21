@@ -303,13 +303,13 @@ fun TokitokiNavGraph(
             val pickupEvent = remember { mutableStateOf<PickupEvent?>(null) }
             
             LaunchedEffect(Unit) {
-                navController.currentBackStackEntry?.savedStateHandle?.get<String>("cardDirection")?.let { direction ->
+                navController.currentBackStackEntry?.savedStateHandle?.get<String>(TokitokiArgs.CARD_DIRECTION)?.let { direction ->
                     pickupEvent.value = when (direction) {
-                        "LEFT" -> PickupEvent.Dislike
-                        "RIGHT" -> PickupEvent.Like
+                        UserDetailNavigation.DISLIKE.name -> PickupEvent.Dislike
+                        UserDetailNavigation.LIKE.name -> PickupEvent.Like
                         else -> null
                     }
-                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>("cardDirection")
+                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(TokitokiArgs.CARD_DIRECTION)
                 }
             }
 
@@ -372,7 +372,7 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 onArrowClick = { direction ->
-                    navController.previousBackStackEntry?.savedStateHandle?.set("cardDirection", direction)
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.CARD_DIRECTION, direction)
                 }
             )
         }
