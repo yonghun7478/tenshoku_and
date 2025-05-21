@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +17,7 @@ import com.example.tokitoki.ui.model.MyTagItem
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
+import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun TokitokiNavGraph(
@@ -298,6 +300,19 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.MAIN_ROUTE) {
+            val pickupEvent = remember { mutableStateOf<PickupEvent?>(null) }
+            
+            LaunchedEffect(Unit) {
+                navController.currentBackStackEntry?.savedStateHandle?.get<String>("cardDirection")?.let { direction ->
+                    pickupEvent.value = when (direction) {
+                        "LEFT" -> PickupEvent.Dislike
+                        "RIGHT" -> PickupEvent.Like
+                        else -> null
+                    }
+                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>("cardDirection")
+                }
+            }
+
             MainScreen(
                 onAshiatoClick = {
                     navAction.navigateToAshiato()
@@ -313,7 +328,8 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
-                }
+                },
+                pickupEvent = pickupEvent.value
             )
         }
 
@@ -354,8 +370,16 @@ fun TokitokiNavGraph(
                 screenName = screenName,
                 onBackClick = {
                     navController.navigateUp()
+                },
+                onArrowClick = { direction ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set("cardDirection", direction)
                 }
             )
         }
     }
+}
+
+sealed class PickupEvent {
+    object Like : PickupEvent()
+    object Dislike : PickupEvent()
 }

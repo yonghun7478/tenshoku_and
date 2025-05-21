@@ -28,6 +28,7 @@ fun UserDetailScreen(
     selectedUserId: String,
     screenName: String,
     onBackClick: () -> Unit,
+    onArrowClick: (String) -> Unit = { _ -> },
     viewModel: UserDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -121,19 +122,61 @@ fun UserDetailScreen(
                 }
             }
 
-            // 좋아요 버튼
-            FloatingActionButton(
-                onClick = { viewModel.toggleLike() },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-                containerColor = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-            ) {
-                Icon(
-                    imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "좋아요",
-                    tint = if (isLiked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
-                )
+            // 하단 버튼 영역
+            if (screenName == "MainHomePickupScreen") {
+                // 픽업화면에서 왔을 때는 좌우 화살표 버튼 표시
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // 왼쪽 화살표 버튼
+                    IconButton(
+                        onClick = { 
+                            onArrowClick("LEFT")
+                            onBackClick()
+                        },
+                        modifier = Modifier.padding(start = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "이전",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    // 오른쪽 화살표 버튼
+                    IconButton(
+                        onClick = { 
+                            onArrowClick("RIGHT")
+                            onBackClick()
+                        },
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "다음",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            } else {
+                // 그 외의 경우 기존 좋아요 버튼 표시
+                FloatingActionButton(
+                    onClick = { viewModel.toggleLike() },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp),
+                    containerColor = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                ) {
+                    Icon(
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "좋아요",
+                        tint = if (isLiked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }

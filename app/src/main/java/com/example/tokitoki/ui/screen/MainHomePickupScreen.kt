@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,10 +35,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,9 +64,20 @@ import kotlin.math.roundToInt
 @Composable
 fun MainHomePickupScreen(
     viewModel: PickupUserViewModel = hiltViewModel(),
-    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    pickupEvent: PickupEvent? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // pickupEvent 처리
+    LaunchedEffect(pickupEvent) {
+        pickupEvent?.let { event ->
+            when (event) {
+                is PickupEvent.Like -> viewModel.likePickupUser()
+                is PickupEvent.Dislike -> viewModel.dislikePickupUser()
+            }
+        }
+    }
 
     if (uiState.state == PickupUserState.COMPLETE) {
         MainHomePickupContents(
@@ -444,15 +452,6 @@ fun calculateRotation(offsetX: Float, maxRotation: Float = 30f): Float {
     val normalizedOffset = offsetX / halfWidth
     return (maxRotation * normalizedOffset).coerceIn(-maxRotation, maxRotation)
 }
-
-// 카드 상태 데이터 클래스
-data class CardState(
-    val color: Color,
-    val offset: MutableState<Offset> = mutableStateOf(Offset.Zero),
-    val rotation: MutableState<Float> = mutableStateOf(0f),
-    val isOut: MutableState<Boolean> = mutableStateOf(false),
-    val cardDirection: MutableState<CardDirection> = mutableStateOf(CardDirection.NONE) // 자동 제거 방향 추가
-)
 
 enum class CardDirection {
     AUTO_LEFT, AUTO_RIGHT, NONE, LEFT, RIGHT
