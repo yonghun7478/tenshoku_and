@@ -90,10 +90,6 @@ import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCase
 import com.example.tokitoki.domain.usecase.UpdateDatabaseUseCaseImpl
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCase
 import com.example.tokitoki.domain.usecase.ValidateEmailFormatUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetLikedUsersUseCase
-import com.example.tokitoki.domain.usecase.GetLikedUsersUseCaseImpl
-import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCase
-import com.example.tokitoki.domain.usecase.UpdateLikeStatusUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearTokensUseCase
 import com.example.tokitoki.domain.usecase.ClearTokensUseCaseImpl
 import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCase
@@ -112,6 +108,12 @@ import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
 import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCaseImpl
 import com.example.tokitoki.domain.usecase.SendMitenUseCase
 import com.example.tokitoki.domain.usecase.SendMitenUseCaseImpl
+import com.example.tokitoki.domain.usecase.LikeUserUseCase
+import com.example.tokitoki.domain.usecase.LikeUserUseCaseImpl
+import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
+import com.example.tokitoki.domain.usecase.AddToFavoritesUseCaseImpl
+import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
+import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -332,7 +334,9 @@ abstract class UseCaseModule {
     ): RestoreTempSelectedTagsUseCase
 
     @Binds
-    abstract fun bindGetLikesUseCase(useCase: GetLikesUseCaseImpl): GetLikesUseCase
+    abstract fun bindGetLikesUseCase(
+        impl: GetLikesUseCaseImpl
+    ): GetLikesUseCase
 
     @Binds
     abstract fun bindGetMatchingUsersUseCase(
@@ -358,18 +362,6 @@ abstract class UseCaseModule {
     abstract fun bindGetFavoriteUsersUseCase(
         useCaseImpl: GetFavoriteUsersUseCaseImpl
     ): GetFavoriteUsersUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindGetLikedUsersUseCase(
-        impl: GetLikedUsersUseCaseImpl
-    ): GetLikedUsersUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindUpdateLikeStatusUseCase(
-        impl: UpdateLikeStatusUseCaseImpl
-    ): UpdateLikeStatusUseCase
 
     @Binds
     @Singleton
@@ -424,4 +416,22 @@ abstract class UseCaseModule {
     abstract fun bindSendMitenUseCase(
         sendMitenUseCaseImpl: SendMitenUseCaseImpl
     ): SendMitenUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindLikeUserUseCase(
+        impl: LikeUserUseCaseImpl
+    ): LikeUserUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindAddToFavoritesUseCase(
+        impl: AddToFavoritesUseCaseImpl
+    ): AddToFavoritesUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoveFromFavoritesUseCase(
+        impl: RemoveFromFavoritesUseCaseImpl
+    ): RemoveFromFavoritesUseCase
 }

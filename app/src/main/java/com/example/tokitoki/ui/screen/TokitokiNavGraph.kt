@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +17,10 @@ import com.example.tokitoki.ui.model.MyTagItem
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
 fun TokitokiNavGraph(
@@ -28,6 +33,9 @@ fun TokitokiNavGraph(
 ) {
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
+    
+    // Create SharedViewModel at NavGraph level
+    val sharedViewModel: SharedPickupViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -313,7 +321,8 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
-                }
+                },
+                sharedViewModel = sharedViewModel
             )
         }
 
@@ -354,7 +363,8 @@ fun TokitokiNavGraph(
                 screenName = screenName,
                 onBackClick = {
                     navController.navigateUp()
-                }
+                },
+                sharedViewModel = sharedViewModel
             )
         }
     }

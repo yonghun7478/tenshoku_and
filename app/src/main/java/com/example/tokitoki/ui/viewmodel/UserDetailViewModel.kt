@@ -8,6 +8,9 @@ import com.example.tokitoki.domain.usecase.GetUserDetailUseCase
 import com.example.tokitoki.domain.usecase.GetCachedUserIdsUseCase
 import com.example.tokitoki.domain.usecase.AddUserDetailToCacheUseCase
 import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
+import com.example.tokitoki.domain.usecase.LikeUserUseCase
+import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
+import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,7 +23,10 @@ class UserDetailViewModel @Inject constructor(
     private val getUserDetailUseCase: GetUserDetailUseCase,
     private val getCachedUserIdsUseCase: GetCachedUserIdsUseCase,
     private val addUserDetailToCacheUseCase: AddUserDetailToCacheUseCase,
-    private val getUserDetailFromCacheUseCase: GetUserDetailFromCacheUseCase
+    private val getUserDetailFromCacheUseCase: GetUserDetailFromCacheUseCase,
+    private val likeUserUseCase: LikeUserUseCase,
+    private val addToFavoritesUseCase: AddToFavoritesUseCase,
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _userDetails = MutableStateFlow<List<ResultWrapper<UserDetail>>>(emptyList())
@@ -28,6 +34,15 @@ class UserDetailViewModel @Inject constructor(
 
     private val _currentPage = MutableStateFlow(0)
     val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
+
+    private val _isLiked = MutableStateFlow(false)
+    val isLiked: StateFlow<Boolean> = _isLiked.asStateFlow()
+
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+
+    private val _toastMessage = MutableStateFlow<String?>(null)
+    val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
 
     private var cachedUserIds: List<String> = emptyList()
     private val preloadBuffer = 2 // 현재 페이지 기준 앞뒤로 2명씩 프리로드
@@ -101,5 +116,62 @@ class UserDetailViewModel @Inject constructor(
             }
             _userDetails.value = updatedList
         }
+    }
+
+    fun toggleLike() {
+        // 이미 좋아요를 누른 상태라면 아무 동작도 하지 않음
+        if (_isLiked.value) return
+
+        val currentUser = userDetails.value.getOrNull(currentPage.value)?.let {
+            if (it is ResultWrapper.Success) it.data else null
+        } ?: return
+
+        viewModelScope.launch {
+            when (val result = likeUserUseCase(currentUser.id)) {
+                is ResultWrapper.Success -> {
+                    _isLiked.value = true
+                    _toastMessage.value = "좋아요를 보냈습니다"
+                }
+                is ResultWrapper.Error -> {
+                    _toastMessage.value = when (result.errorType) {
+                        is ResultWrapper.ErrorType.ServerError -> "서버 오류가 발생했습니다"
+                        is ResultWrapper.ErrorType.ExceptionError -> result.errorType.message
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun toggleFavorite() {
+        val currentUser = userDetails.value.getOrNull(currentPage.value)?.let {
+            if (it is ResultWrapper.Success) it.data else null
+        } ?: return
+
+        viewModelScope.launch {
+            val result = if (_isFavorite.value) {
+                removeFromFavoritesUseCase(currentUser.id)
+            } else {
+                addToFavoritesUseCase(currentUser.id)
+            }
+
+            when (result) {
+                is ResultWrapper.Success -> {
+                    _isFavorite.value = !_isFavorite.value
+                    _toastMessage.value = if (_isFavorite.value) "즐겨찾기에 추가했습니다" else "즐겨찾기에서 제거했습니다"
+                }
+                is ResultWrapper.Error -> {
+                    _toastMessage.value = when (result.errorType) {
+                        is ResultWrapper.ErrorType.ServerError -> "서버 오류가 발생했습니다"
+                        is ResultWrapper.ErrorType.ExceptionError -> result.errorType.message
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
     }
 } 

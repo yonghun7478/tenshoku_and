@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.tokitoki.domain.model.LikedUser
+import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.IineSitaHitoViewModel
@@ -149,7 +149,7 @@ fun IineSitaHitoContents(
 
 @Composable
 private fun LikedUserCard(
-    user: LikedUser,
+    user: LikeItem,
     onNavigateToUserDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -190,16 +190,14 @@ private fun LikedUserCard(
                 )
             }
 
-            user.introduction?.let { introduction ->
-                Text(
-                    text = introduction,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+            Text(
+                text = user.introduction,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
 
             AsyncImage(
-                model = user.profileImageUrl,
+                model = user.thumbnail,
                 contentDescription = "Profile image of ${user.nickname}",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -340,24 +338,26 @@ private fun IineSitaHitoContentsWithDataPreview() {
             uiState = IineSitaHitoUiState(
                 isLoading = false,
                 users = listOf(
-                    LikedUser(
+                    LikeItem(
                         id = "1",
                         nickname = "하나코",
                         age = 28,
                         location = "도쿄",
-                        profileImageUrl = "",
+                        thumbnail = "",
                         introduction = "안녕하세요! 취미는 여행과 요리입니다.",
                         occupation = "디자이너",
+                        receivedTime = System.currentTimeMillis(),
                         likedAt = System.currentTimeMillis()
                     ),
-                    LikedUser(
+                    LikeItem(
                         id = "2",
                         nickname = "유이",
                         age = 25,
                         location = "오사카",
-                        profileImageUrl = "",
+                        thumbnail = "",
                         introduction = "음악을 좋아합니다.",
                         occupation = "회사원",
+                        receivedTime = System.currentTimeMillis(),
                         likedAt = System.currentTimeMillis()
                     )
                 )

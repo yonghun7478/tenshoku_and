@@ -1,5 +1,7 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.common.ResultWrapper.ErrorType
 import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.domain.model.LikeResult
@@ -7,6 +9,7 @@ import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.ui.state.LikeTab
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlin.random.Random
 
 class LikeRepositoryImpl @Inject constructor() : LikeRepository {
 
@@ -21,7 +24,6 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         allLikes[LikeTab.SENT.title] = createDummyLikes(LikeTab.SENT.title, 0).toMutableList()
         allLikes[LikeTab.MATCHED.title] = createDummyLikes(LikeTab.MATCHED.title, 0).toMutableList()
     }
-
 
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
         delay(500)
@@ -45,6 +47,15 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         return Result.success(LikeResult(newData, nextCursor))
     }
 
+    override suspend fun likeUser(userId: String): ResultWrapper<Unit> {
+        return try {
+            // TODO: 실제 API 호출 구현
+            delay(500) // API 호출 시뮬레이션
+            ResultWrapper.Success(Unit)
+        } catch (e: Exception) {
+            ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "좋아요 추가 중 오류가 발생했습니다."))
+        }
+    }
 
     // 각 탭별 더미 데이터 생성 함수
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {
@@ -57,14 +68,17 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         val now = System.currentTimeMillis()
 
         return List(PAGE_SIZE) { index ->
-            val id = baseId + startIndex + index  // startIndex 반영
+            val id = index  // startIndex 반영
             LikeItemData(
-                id = id,
+                id = id.toString(),
                 thumbnail = "https://via.placeholder.com/150",
                 nickname = "${tab} User ${startIndex + index}", // startIndex 반영
                 age = 20 + (id % 10),
                 introduction = "This is a sample introduction for $tab user $id.",
-                receivedTime = now - (startIndex + index) * 60000L // startIndex 반영
+                receivedTime = now - (startIndex + index) * 60000L, // startIndex 반영
+                location = listOf("서울", "부산", "대구", "인천", "광주").random(),
+                occupation = if (Random.nextBoolean()) listOf("회사원", "학생", "프리랜서", "공무원").random() else null,
+                likedAt = now - (startIndex + index) * 60000L
             ).toDomain()
         }
     }

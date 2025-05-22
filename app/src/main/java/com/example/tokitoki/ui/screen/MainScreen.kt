@@ -40,15 +40,17 @@ import com.example.tokitoki.ui.state.MainBottomItem
 import com.example.tokitoki.ui.state.MainUiEvent
 import com.example.tokitoki.ui.state.MainUiState
 import com.example.tokitoki.ui.viewmodel.MainViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
+    sharedViewModel: SharedPickupViewModel,
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
-    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -58,7 +60,7 @@ fun MainScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is MainUiEvent.SelectBottomItem -> {
-
+                    // 탭이 변경될 때 처리
                 }
             }
         }
@@ -72,7 +74,8 @@ fun MainScreen(
         onFavoriteUsersClick = onFavoriteUsersClick,
         onIineSitaHitoClick = onIineSitaHitoClick,
         onNavigateToSignIn = onNavigateToSignIn,
-        onNavigateToUserDetail = onNavigateToUserDetail
+        onNavigateToUserDetail = onNavigateToUserDetail,
+        sharedViewModel = sharedViewModel
     )
 }
 
@@ -84,8 +87,8 @@ fun MainContents(
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
-    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> }
-
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    sharedViewModel: SharedPickupViewModel
 ) {
     Scaffold(
         bottomBar = {
@@ -103,7 +106,8 @@ fun MainContents(
             when (uiState.selectedBottomItem) {
                 MainBottomItem.HOME -> {
                     MainHomeScreen(
-                        onNavigateToUserDetail = onNavigateToUserDetail
+                        onNavigateToUserDetail = onNavigateToUserDetail,
+                        sharedViewModel = sharedViewModel
                     )
                 }
 
