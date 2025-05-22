@@ -76,10 +76,12 @@ fun MainHomePickupScreen(
     LaunchedEffect(pickupDirection) {
         when (pickupDirection) {
             PickupDirection.LEFT -> {
+                delay(500)
                 viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
                 sharedViewModel.consumePickupDirection()
             }
             PickupDirection.RIGHT -> {
+                delay(500)
                 viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
                 sharedViewModel.consumePickupDirection()
             }
