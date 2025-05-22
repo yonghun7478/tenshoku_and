@@ -509,29 +509,27 @@ fun MainHomeMyTagScreen_TagCarousel(
 @Composable
 fun MainHomeMyTagScreen_TagCard(
     tag: MainHomeTagItemUiState,
-    onClick: () -> Unit = {} // 기본값 추가
+    onClick: () -> Unit = {}
 ) {
     Surface(
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant, // 배경색
+        color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier
-            .width(150.dp) // 너비 고정
-            .height(100.dp) // 높이 고정
-            .clickable(onClick = onClick) //클릭 리스너
+            .width(150.dp)
+            .height(100.dp)
+            .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
-            // 이미지
             Image(
-                painter = painterResource(R.drawable.couple_3), // 임시 이미지
+                painter = painterResource(R.drawable.couple_3),
                 contentDescription = "Tag Image",
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(4.dp)), // 둥근 모서리
-                contentScale = ContentScale.Crop // 이미지를 꽉 채우도록
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(8.dp))
 
-            // 텍스트 (태그 이름, 사용자 수)
             Column {
                 Text(
                     text = tag.name,
@@ -540,14 +538,13 @@ fun MainHomeMyTagScreen_TagCard(
                     maxLines = 1
                 )
                 Text(
-                    text = "${tag.userCount} 명",
+                    text = "${tag.subscriberCount} 명",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
             }
         }
     }
-
 }
 
 // 내가 선택한 태그
@@ -689,8 +686,20 @@ fun MainHomeMyTagScreen_NormalSearchBarWithTagsPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_NormalSearchBar(
             selectedTags = listOf(
-                MainHomeTagItemUiState("태그1", "image1", 10),
-                MainHomeTagItemUiState("태그2", "image2", 25)
+                MainHomeTagItemUiState(
+                    id = "tag_1",
+                    name = "태그1",
+                    description = "태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagItemUiState(
+                    id = "tag_2",
+                    name = "태그2",
+                    description = "태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 25
+                )
             ),
             onSearchBarClicked = {}
         )
@@ -733,10 +742,28 @@ fun MainHomeMyTagScreen_SelectedTagsRowPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_SelectedTagsRow(
             selectedTags = listOf(
-                MainHomeTagItemUiState("태그1", "image1", 10),
-                MainHomeTagItemUiState("태그2", "image2", 25),
-                MainHomeTagItemUiState("태그3", "image3", 5)
-            ),
+                MainHomeTagItemUiState(
+                    id = "tag_1",
+                    name = "태그1",
+                    description = "태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagItemUiState(
+                    id = "tag_2",
+                    name = "태그2",
+                    description = "태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 25
+                ),
+                MainHomeTagItemUiState(
+                    id = "tag_3",
+                    name = "태그3",
+                    description = "태그3 설명",
+                    imageUrl = "image3",
+                    subscriberCount = 5
+                )
+            )
         )
     }
 }
@@ -747,23 +774,77 @@ fun MainHomeMyTagScreen_SelectedTagsRowPreview() {
 fun MainHomeMyTagScreen_ExpandedSearchContentPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_ExpandedSearchContent(
-            searchQuery = "", // 빈 검색어
+            searchQuery = "",
             recentSearches = listOf(
-                MainHomeTagItemUiState("최근검색1", "recent1", 1),
-                MainHomeTagItemUiState("최근검색2", "recent2", 2)
+                MainHomeTagItemUiState(
+                    id = "recent_1",
+                    name = "최근검색1",
+                    description = "최근검색1 설명",
+                    imageUrl = "recent1",
+                    subscriberCount = 1
+                ),
+                MainHomeTagItemUiState(
+                    id = "recent_2",
+                    name = "최근검색2",
+                    description = "최근검색2 설명",
+                    imageUrl = "recent2",
+                    subscriberCount = 2
+                )
             ),
             trendingTags = listOf(
-                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
-                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
-                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+                MainHomeTagItemUiState(
+                    id = "trend_1",
+                    name = "트렌딩 태그1",
+                    description = "트렌딩 태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 50
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_2",
+                    name = "트렌딩 태그2",
+                    description = "트렌딩 태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 120
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_3",
+                    name = "트렌딩 태그3",
+                    description = "트렌딩 태그3 설명",
+                    imageUrl = "image3",
+                    subscriberCount = 80
+                )
             ),
             searchResults = listOf(
-                MainHomeTagItemUiState("검색결과1", "search_result_image1", 10),
-                MainHomeTagItemUiState("검색결과2", "search_result_image2", 20)
+                MainHomeTagItemUiState(
+                    id = "search_1",
+                    name = "검색결과1",
+                    description = "검색결과1 설명",
+                    imageUrl = "search_result_image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagItemUiState(
+                    id = "search_2",
+                    name = "검색결과2",
+                    description = "검색결과2 설명",
+                    imageUrl = "search_result_image2",
+                    subscriberCount = 20
+                )
             ),
             selectedTags = listOf(
-                MainHomeTagItemUiState("선택된태그1", "selected_image1", 100),
-                MainHomeTagItemUiState("선택된태그2", "selected_image2", 200)
+                MainHomeTagItemUiState(
+                    id = "selected_1",
+                    name = "선택된태그1",
+                    description = "선택된태그1 설명",
+                    imageUrl = "selected_image1",
+                    subscriberCount = 100
+                ),
+                MainHomeTagItemUiState(
+                    id = "selected_2",
+                    name = "선택된태그2",
+                    description = "선택된태그2 설명",
+                    imageUrl = "selected_image2",
+                    subscriberCount = 200
+                )
             ),
             onTagSelected = {},
             onTagRemoved = {},
@@ -777,23 +858,77 @@ fun MainHomeMyTagScreen_ExpandedSearchContentPreview() {
 fun MainHomeMyTagScreen_ExpandedSearchContentSearchQueryPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_ExpandedSearchContent(
-            searchQuery = "검색어있음", // 검색어 있음
+            searchQuery = "검색어있음",
             recentSearches = listOf(
-                MainHomeTagItemUiState("최근검색1", "recent1", 1),
-                MainHomeTagItemUiState("최근검색2", "recent2", 2)
+                MainHomeTagItemUiState(
+                    id = "recent_1",
+                    name = "최근검색1",
+                    description = "최근검색1 설명",
+                    imageUrl = "recent1",
+                    subscriberCount = 1
+                ),
+                MainHomeTagItemUiState(
+                    id = "recent_2",
+                    name = "최근검색2",
+                    description = "최근검색2 설명",
+                    imageUrl = "recent2",
+                    subscriberCount = 2
+                )
             ),
             trendingTags = listOf(
-                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
-                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
-                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+                MainHomeTagItemUiState(
+                    id = "trend_1",
+                    name = "트렌딩 태그1",
+                    description = "트렌딩 태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 50
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_2",
+                    name = "트렌딩 태그2",
+                    description = "트렌딩 태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 120
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_3",
+                    name = "트렌딩 태그3",
+                    description = "트렌딩 태그3 설명",
+                    imageUrl = "image3",
+                    subscriberCount = 80
+                )
             ),
             searchResults = listOf(
-                MainHomeTagItemUiState("검색결과1", "search_result_image1", 10),
-                MainHomeTagItemUiState("검색결과2", "search_result_image2", 20)
+                MainHomeTagItemUiState(
+                    id = "search_1",
+                    name = "검색결과1",
+                    description = "검색결과1 설명",
+                    imageUrl = "search_result_image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagItemUiState(
+                    id = "search_2",
+                    name = "검색결과2",
+                    description = "검색결과2 설명",
+                    imageUrl = "search_result_image2",
+                    subscriberCount = 20
+                )
             ),
             selectedTags = listOf(
-                MainHomeTagItemUiState("선택된태그1", "selected_image1", 100),
-                MainHomeTagItemUiState("선택된태그2", "selected_image2", 200)
+                MainHomeTagItemUiState(
+                    id = "selected_1",
+                    name = "선택된태그1",
+                    description = "선택된태그1 설명",
+                    imageUrl = "selected_image1",
+                    subscriberCount = 100
+                ),
+                MainHomeTagItemUiState(
+                    id = "selected_2",
+                    name = "선택된태그2",
+                    description = "선택된태그2 설명",
+                    imageUrl = "selected_image2",
+                    subscriberCount = 200
+                )
             ),
             onTagSelected = {},
             onTagRemoved = {},
@@ -810,9 +945,27 @@ fun MainHomeMyTagScreen_TagSectionPreview() {
         MainHomeMyTagScreen_TagSection(
             title = "섹션 제목",
             tags = listOf(
-                MainHomeTagItemUiState("태그1", "image1", 10),
-                MainHomeTagItemUiState("태그2", "image2", 20),
-                MainHomeTagItemUiState("태그3", "image3", 30)
+                MainHomeTagItemUiState(
+                    id = "section_1",
+                    name = "태그1",
+                    description = "태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagItemUiState(
+                    id = "section_2",
+                    name = "태그2",
+                    description = "태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 20
+                ),
+                MainHomeTagItemUiState(
+                    id = "section_3",
+                    name = "태그3",
+                    description = "태그3 설명",
+                    imageUrl = "image3",
+                    subscriberCount = 30
+                )
             ),
             onTagClick = {},
             isRemovable = false
@@ -821,12 +974,18 @@ fun MainHomeMyTagScreen_TagSectionPreview() {
 }
 
 // 8. MainHomeMyTagScreen_TagChip: isRemovable = true, false  2가지
-@Preview(showBackground = true, name = "Tag Chip Removable")
+@Preview(showBackground = true, name = "Tag Chip Preview")
 @Composable
-fun MainHomeMyTagScreen_TagChipRemovablePreview() {
+fun MainHomeMyTagScreen_TagChipPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_TagChip(
-            tag = MainHomeTagItemUiState("태그", "image1", 10),
+            tag = MainHomeTagItemUiState(
+                id = "preview_1",
+                name = "태그",
+                description = "태그 설명",
+                imageUrl = "image1",
+                subscriberCount = 10
+            ),
             onTagClick = {},
             isRemovable = true
         )
@@ -838,7 +997,13 @@ fun MainHomeMyTagScreen_TagChipRemovablePreview() {
 fun MainHomeMyTagScreen_TagChipNotRemovablePreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_TagChip(
-            tag = MainHomeTagItemUiState("태그", "image1", 10),
+            tag = MainHomeTagItemUiState(
+                id = "preview_2",
+                name = "태그",
+                description = "태그 설명",
+                imageUrl = "image1",
+                subscriberCount = 10
+            ),
             onTagClick = {},
             isRemovable = false
         )
@@ -850,14 +1015,36 @@ fun MainHomeMyTagScreen_TagChipNotRemovablePreview() {
 fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_TodayAndTrendingTags(
-            // 더 이상 todayTag, trendingTags를 분리하지 않음.
             tags = listOf(
-                MainHomeTagItemUiState("오늘의 태그", "", 100),
-                MainHomeTagItemUiState("트렌딩 태그1", "image1", 50),
-                MainHomeTagItemUiState("트렌딩 태그2", "image2", 120),
-                MainHomeTagItemUiState("트렌딩 태그3", "image3", 80)
+                MainHomeTagItemUiState(
+                    id = "today_1",
+                    name = "오늘의 태그",
+                    description = "오늘의 태그 설명",
+                    imageUrl = "",
+                    subscriberCount = 100
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_1",
+                    name = "트렌딩 태그1",
+                    description = "트렌딩 태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 50
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_2",
+                    name = "트렌딩 태그2",
+                    description = "트렌딩 태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 120
+                ),
+                MainHomeTagItemUiState(
+                    id = "trend_3",
+                    name = "트렌딩 태그3",
+                    description = "트렌딩 태그3 설명",
+                    imageUrl = "image3",
+                    subscriberCount = 80
+                )
             )
-
         )
     }
 }
@@ -867,7 +1054,13 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
 fun MainHomeMyTagScreen_TagCardPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_TagCard(
-            tag = MainHomeTagItemUiState("태그 이름", "image_url", 123),
+            tag = MainHomeTagItemUiState(
+                id = "preview_3",
+                name = "태그 이름",
+                description = "태그 설명",
+                imageUrl = "image_url",
+                subscriberCount = 123
+            ),
             onClick = {}
         )
     }
@@ -879,10 +1072,34 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_MySelectedTags(
             myTags = listOf(
-                MainHomeTagItemUiState("선택한 태그1", "", 30),
-                MainHomeTagItemUiState("선택한 태그2", "", 45),
-                MainHomeTagItemUiState("선택한 태그3", "", 60),
-                MainHomeTagItemUiState("선택한 태그4", "", 22)
+                MainHomeTagItemUiState(
+                    id = "my_1",
+                    name = "선택한 태그1",
+                    description = "선택한 태그1 설명",
+                    imageUrl = "",
+                    subscriberCount = 30
+                ),
+                MainHomeTagItemUiState(
+                    id = "my_2",
+                    name = "선택한 태그2",
+                    description = "선택한 태그2 설명",
+                    imageUrl = "",
+                    subscriberCount = 45
+                ),
+                MainHomeTagItemUiState(
+                    id = "my_3",
+                    name = "선택한 태그3",
+                    description = "선택한 태그3 설명",
+                    imageUrl = "",
+                    subscriberCount = 60
+                ),
+                MainHomeTagItemUiState(
+                    id = "my_4",
+                    name = "선택한 태그4",
+                    description = "선택한 태그4 설명",
+                    imageUrl = "",
+                    subscriberCount = 22
+                )
             )
         )
     }
@@ -905,8 +1122,20 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_SuggestedTags(
             suggestedTags = listOf(
-                MainHomeTagItemUiState("추천 태그1", "image1", 15),
-                MainHomeTagItemUiState("추천 태그2", "image2", 33)
+                MainHomeTagItemUiState(
+                    id = "suggest_1",
+                    name = "추천 태그1",
+                    description = "추천 태그1 설명",
+                    imageUrl = "image1",
+                    subscriberCount = 15
+                ),
+                MainHomeTagItemUiState(
+                    id = "suggest_2",
+                    name = "추천 태그2",
+                    description = "추천 태그2 설명",
+                    imageUrl = "image2",
+                    subscriberCount = 33
+                )
             )
         )
     }

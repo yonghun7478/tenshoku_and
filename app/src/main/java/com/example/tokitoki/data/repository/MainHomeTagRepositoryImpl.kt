@@ -1,40 +1,123 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.model.MainHomeTagData
+import com.example.tokitoki.data.model.MainHomeTagDetailData
+import com.example.tokitoki.data.model.MainHomeTagSubscriberData
+import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.MainHomeTag
+import com.example.tokitoki.domain.model.MainHomeTagDetail
+import com.example.tokitoki.domain.model.MainHomeTagSubscriber
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
 
-    private val todayTag = MainHomeTagData("오늘의 태그", "today_image", 100).toDomain()
+    private val todayTag = MainHomeTagData(
+        id = "today_1",
+        name = "오늘의 태그",
+        description = "오늘 가장 인기있는 태그입니다.",
+        imageUrl = "today_image",
+        subscriberCount = 100
+    ).toDomain()
+
     private val trendingTags = listOf(
-        MainHomeTagData("트렌딩 태그1", "image1", 50),
-        MainHomeTagData("트렌딩 태그2", "image2", 120),
-        MainHomeTagData("트렌딩 태그3", "image3", 80)
+        MainHomeTagData(
+            id = "trend_1",
+            name = "트렌딩 태그1",
+            description = "현재 가장 인기있는 태그입니다.",
+            imageUrl = "image1",
+            subscriberCount = 50
+        ),
+        MainHomeTagData(
+            id = "trend_2",
+            name = "트렌딩 태그2",
+            description = "두 번째로 인기있는 태그입니다.",
+            imageUrl = "image2",
+            subscriberCount = 120
+        )
     ).map { it.toDomain() }
+
     private val myTags = listOf(
-        MainHomeTagData("선택한 태그1", "my_image1", 30),
-        MainHomeTagData("선택한 태그2", "my_image2", 45),
+        MainHomeTagData(
+            id = "my_1",
+            name = "선택한 태그1",
+            description = "내가 선택한 첫 번째 태그입니다.",
+            imageUrl = "my_image1",
+            subscriberCount = 30
+        ),
+        MainHomeTagData(
+            id = "my_2",
+            name = "선택한 태그2",
+            description = "내가 선택한 두 번째 태그입니다.",
+            imageUrl = "my_image2",
+            subscriberCount = 45
+        )
     ).map { it.toDomain() }
 
     private val suggestedTags = listOf(
-        MainHomeTagData("추천 태그1", "suggested_image1", 15),
-        MainHomeTagData("추천 태그2", "suggested_image2", 33),
-        MainHomeTagData("추천 태그3", "suggested_image3", 77),
-        MainHomeTagData("추천 태그4", "suggested_image3", 77),
-        MainHomeTagData("추천 태그5", "suggested_image3", 77),
-        MainHomeTagData("추천 태그6", "suggested_image3", 77),
-        MainHomeTagData("추천 태그7", "suggested_image3", 77),
-        MainHomeTagData("추천 태그8", "suggested_image3", 77),
+        MainHomeTagData(
+            id = "suggest_1",
+            name = "추천 태그1",
+            description = "첫 번째 추천 태그입니다.",
+            imageUrl = "suggested_image1",
+            subscriberCount = 15
+        ),
+        MainHomeTagData(
+            id = "suggest_2",
+            name = "추천 태그2",
+            description = "두 번째 추천 태그입니다.",
+            imageUrl = "suggested_image2",
+            subscriberCount = 33
+        )
     ).map { it.toDomain() }
 
+    private val tagDetails = mapOf(
+        "today_1" to MainHomeTagDetailData(
+            id = "today_1",
+            name = "오늘의 태그",
+            description = "오늘 가장 인기있는 태그입니다.",
+            imageUrl = "today_image",
+            subscriberCount = 100
+        ),
+        "trend_1" to MainHomeTagDetailData(
+            id = "trend_1",
+            name = "트렌딩 태그1",
+            description = "현재 가장 인기있는 태그입니다.",
+            imageUrl = "image1",
+            subscriberCount = 50
+        )
+    )
+
+    private val tagSubscribers = mapOf(
+        "today_1" to listOf(
+            MainHomeTagSubscriberData(
+                userId = "user1",
+                profileImageUrl = "profile1",
+                age = 25,
+                location = "서울시 강남구"
+            ),
+            MainHomeTagSubscriberData(
+                userId = "user2",
+                profileImageUrl = "profile2",
+                age = 30,
+                location = "서울시 서초구"
+            )
+        ),
+        "trend_1" to listOf(
+            MainHomeTagSubscriberData(
+                userId = "user3",
+                profileImageUrl = "profile3",
+                age = 28,
+                location = "서울시 송파구"
+            )
+        )
+    )
 
     private var recentSearches: List<MainHomeTagData> = listOf()
-
     private var selectedTags: MutableList<MainHomeTag> = mutableListOf()
     private var tempSelectedTags: List<MainHomeTag> = listOf()
+
     override suspend fun getTodayTag(): Result<MainHomeTag> {
         delay(500)
         return Result.success(todayTag)
@@ -59,11 +142,23 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
         delay(200)
         val results = if (query.isNotBlank()) {
             listOf(
-                MainHomeTagData("검색결과1_$query", "search_result_image1", 10),
-                MainHomeTagData("검색결과2_$query", "search_result_image2", 20)
+                MainHomeTagData(
+                    id = "search_1",
+                    name = "검색결과1_$query",
+                    description = "검색 결과 태그입니다.",
+                    imageUrl = "search_result_image1",
+                    subscriberCount = 10
+                ),
+                MainHomeTagData(
+                    id = "search_2",
+                    name = "검색결과2_$query",
+                    description = "검색 결과 태그입니다.",
+                    imageUrl = "search_result_image2",
+                    subscriberCount = 20
+                )
             ).map { it.toDomain() }
         } else {
-            listOf() // 빈 검색어면 빈 결과
+            listOf()
         }
         return Result.success(results)
     }
@@ -75,7 +170,7 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
 
     override suspend fun addRecentSearch(tags: List<MainHomeTag>): Result<Unit> {
         delay(100)
-        recentSearches = (tags.map { it.toData() } + recentSearches) // 리스트 + 리스트
+        recentSearches = (tags.map { it.toData() } + recentSearches)
             .distinctBy { it.name }
             .take(5)
             .toMutableList()
@@ -83,7 +178,9 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
     }
 
     override suspend fun deleteRecentSearch(tag: MainHomeTag): Result<Unit> {
-        TODO("Not yet implemented")
+        delay(100)
+        recentSearches = recentSearches.filter { it.name != tag.name }
+        return Result.success(Unit)
     }
 
     override suspend fun addSelectedTag(tag: MainHomeTag): Result<Unit> {
@@ -100,14 +197,28 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
 
     override suspend fun getSelectedTags(): Result<List<MainHomeTag>> {
         delay(100)
-        return Result.success(selectedTags.toList()) // Return a copy
+        return Result.success(selectedTags.toList())
     }
 
     override suspend fun saveTempSelectedTags(tags: List<MainHomeTag>) {
-        tempSelectedTags = tags.toList() // Make a copy
+        tempSelectedTags = tags.toList()
     }
 
     override suspend fun restoreTempSelectedTags(): Result<List<MainHomeTag>> {
         return Result.success(tempSelectedTags)
+    }
+
+    override suspend fun getTagDetail(tagId: String): Result<MainHomeTagDetail> {
+        delay(500)
+        return tagDetails[tagId]?.let {
+            Result.success(it.toDomain())
+        } ?: Result.failure(IllegalArgumentException("Tag not found"))
+    }
+
+    override suspend fun getTagSubscribers(tagId: String): Result<List<MainHomeTagSubscriber>> {
+        delay(300)
+        return tagSubscribers[tagId]?.let {
+            Result.success(it.map { subscriber -> subscriber.toDomain() })
+        } ?: Result.success(emptyList())
     }
 }
