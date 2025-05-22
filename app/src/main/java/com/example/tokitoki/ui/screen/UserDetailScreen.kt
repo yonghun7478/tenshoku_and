@@ -21,13 +21,8 @@ import coil.compose.AsyncImage
 import android.widget.Toast
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.platform.LocalContext
-
-enum class UserDetailNavigation {
-    DISLIKE,  // いまいち
-    LIKE;     // いいね
-
-    override fun toString(): String = name
-}
+import com.example.tokitoki.ui.viewmodel.PickupDirection
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -35,8 +30,8 @@ fun UserDetailScreen(
     selectedUserId: String,
     screenName: String,
     onBackClick: () -> Unit,
-    onArrowClick: (String) -> Unit = { _ -> },
     viewModel: UserDetailViewModel = hiltViewModel(),
+    sharedViewModel: SharedPickupViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -142,7 +137,7 @@ fun UserDetailScreen(
                     // 왼쪽 화살표 버튼
                     IconButton(
                         onClick = { 
-                            onArrowClick(UserDetailNavigation.DISLIKE.toString())
+                            sharedViewModel.setPickupDirection(PickupDirection.LEFT)
                             onBackClick()
                         },
                         modifier = Modifier.padding(start = 16.dp)
@@ -157,7 +152,7 @@ fun UserDetailScreen(
                     // 오른쪽 화살표 버튼
                     IconButton(
                         onClick = { 
-                            onArrowClick(UserDetailNavigation.LIKE.toString())
+                            sharedViewModel.setPickupDirection(PickupDirection.RIGHT)
                             onBackClick()
                         },
                         modifier = Modifier.padding(end = 16.dp)

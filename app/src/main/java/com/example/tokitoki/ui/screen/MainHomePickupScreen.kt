@@ -56,7 +56,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.tokitoki.ui.model.PickupUserItem
 import com.example.tokitoki.ui.state.PickupUserState
 import com.example.tokitoki.ui.state.PickupUserUiState
+import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.PickupUserViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -64,21 +66,24 @@ import kotlin.math.roundToInt
 @Composable
 fun MainHomePickupScreen(
     viewModel: PickupUserViewModel = hiltViewModel(),
+    sharedViewModel: SharedPickupViewModel,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null,
-    onPickupEventProcessed: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val pickupDirection by sharedViewModel.pickupDirection.collectAsState()
 
-    // pickupEvent 처리
-    LaunchedEffect(pickupEvent) {
-        pickupEvent?.let { event ->
-            delay(500) // 1초 딜레이 추가
-            when (event) {
-                is PickupEvent.Like -> viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
-                is PickupEvent.Dislike -> viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
+    // pickupDirection 변경 감지
+    LaunchedEffect(pickupDirection) {
+        when (pickupDirection) {
+            PickupDirection.LEFT -> {
+                viewModel.triggerAutoRemove(CardDirection.AUTO_LEFT)
+                sharedViewModel.consumePickupDirection()
             }
-            onPickupEventProcessed()
+            PickupDirection.RIGHT -> {
+                viewModel.triggerAutoRemove(CardDirection.AUTO_RIGHT)
+                sharedViewModel.consumePickupDirection()
+            }
+            PickupDirection.NONE -> {}
         }
     }
 

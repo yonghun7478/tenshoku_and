@@ -40,17 +40,17 @@ import com.example.tokitoki.ui.state.MainBottomItem
 import com.example.tokitoki.ui.state.MainUiEvent
 import com.example.tokitoki.ui.state.MainUiState
 import com.example.tokitoki.ui.viewmodel.MainViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
+    sharedViewModel: SharedPickupViewModel,
     onAshiatoClick: () -> Unit = {},
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null,
-    onPickupEventProcessed: () -> Unit = {}
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -60,10 +60,7 @@ fun MainScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is MainUiEvent.SelectBottomItem -> {
-                    // 탭이 변경될 때 pickupEvent 초기화
-                    if (event.item != MainBottomItem.HOME) {
-                        onPickupEventProcessed()
-                    }
+                    // 탭이 변경될 때 처리
                 }
             }
         }
@@ -78,8 +75,7 @@ fun MainScreen(
         onIineSitaHitoClick = onIineSitaHitoClick,
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToUserDetail = onNavigateToUserDetail,
-        pickupEvent = pickupEvent,
-        onPickupEventProcessed = onPickupEventProcessed
+        sharedViewModel = sharedViewModel
     )
 }
 
@@ -92,8 +88,7 @@ fun MainContents(
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null,
-    onPickupEventProcessed: () -> Unit = {}
+    sharedViewModel: SharedPickupViewModel
 ) {
     Scaffold(
         bottomBar = {
@@ -112,8 +107,7 @@ fun MainContents(
                 MainBottomItem.HOME -> {
                     MainHomeScreen(
                         onNavigateToUserDetail = onNavigateToUserDetail,
-                        pickupEvent = pickupEvent,
-                        onPickupEventProcessed = onPickupEventProcessed
+                        sharedViewModel = sharedViewModel
                     )
                 }
 

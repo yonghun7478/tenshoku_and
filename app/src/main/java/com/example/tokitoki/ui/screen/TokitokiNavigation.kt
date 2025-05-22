@@ -63,7 +63,6 @@ object TokitokiArgs {
     const val IS_EDIT_MODE = "isEditMode"
     const val USER_ID = "userId"
     const val SCREEN_NAME = "screenName"
-    const val CARD_DIRECTION = "cardDirection"
 }
 
 object TokitokiDestinations {

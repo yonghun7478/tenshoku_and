@@ -40,13 +40,13 @@ import com.example.tokitoki.ui.state.MainHomeUiState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.util.DrawableSemantics
 import com.example.tokitoki.ui.viewmodel.MainHomeViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
 fun MainHomeScreen(
     viewModel: MainHomeViewModel = hiltViewModel(),
+    sharedViewModel: SharedPickupViewModel,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null,
-    onPickupEventProcessed: () -> Unit = {}
 ) {
     // StateFlow 상태 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -63,8 +63,7 @@ fun MainHomeScreen(
         uiState = uiState,
         onEvent = { viewModel.onEvent(it) },
         onNavigateToUserDetail = onNavigateToUserDetail,
-        pickupEvent = pickupEvent,
-        onPickupEventProcessed = onPickupEventProcessed
+        sharedViewModel = sharedViewModel
     )
 }
 
@@ -73,8 +72,7 @@ fun MainHomeContents(
     uiState: MainHomeUiState,
     onEvent: (MainHomeUiEvent) -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
-    pickupEvent: PickupEvent? = null,
-    onPickupEventProcessed: () -> Unit = {}
+    sharedViewModel: SharedPickupViewModel
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -144,8 +142,7 @@ fun MainHomeContents(
                 )
                 MainHomeTab.PICKUP -> MainHomePickupScreen(
                     onNavigateToUserDetail = onNavigateToUserDetail,
-                    pickupEvent = pickupEvent,
-                    onPickupEventProcessed = onPickupEventProcessed
+                    sharedViewModel = sharedViewModel
                 )
                 MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
             }

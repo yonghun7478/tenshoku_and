@@ -19,6 +19,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
 fun TokitokiNavGraph(
@@ -31,6 +33,9 @@ fun TokitokiNavGraph(
 ) {
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
+    
+    // Create SharedViewModel at NavGraph level
+    val sharedViewModel: SharedPickupViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -301,19 +306,6 @@ fun TokitokiNavGraph(
         }
 
         composable(TokitokiDestinations.MAIN_ROUTE) {
-            var pickupEvent by remember { mutableStateOf<PickupEvent?>(null) }
-            
-            LaunchedEffect(navController.currentBackStackEntry) {
-                navController.currentBackStackEntry?.savedStateHandle?.get<String>(TokitokiArgs.CARD_DIRECTION)?.let { direction ->
-                    pickupEvent = when (direction) {
-                        UserDetailNavigation.DISLIKE.name -> PickupEvent.Dislike
-                        UserDetailNavigation.LIKE.name -> PickupEvent.Like
-                        else -> null
-                    }
-                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(TokitokiArgs.CARD_DIRECTION)
-                }
-            }
-
             MainScreen(
                 onAshiatoClick = {
                     navAction.navigateToAshiato()
@@ -330,8 +322,7 @@ fun TokitokiNavGraph(
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
                 },
-                pickupEvent = pickupEvent,
-                onPickupEventProcessed = { pickupEvent = null }
+                sharedViewModel = sharedViewModel
             )
         }
 
@@ -373,15 +364,8 @@ fun TokitokiNavGraph(
                 onBackClick = {
                     navController.navigateUp()
                 },
-                onArrowClick = { direction ->
-                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.CARD_DIRECTION, direction)
-                }
+                sharedViewModel = sharedViewModel
             )
         }
     }
-}
-
-sealed class PickupEvent {
-    object Like : PickupEvent()
-    object Dislike : PickupEvent()
 }
