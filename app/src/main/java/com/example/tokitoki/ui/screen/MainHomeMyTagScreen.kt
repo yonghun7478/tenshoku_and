@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -67,6 +69,11 @@ import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
+import coil.compose.AsyncImage
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.filled.AddCircle
 
 
 @Composable
@@ -133,7 +140,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                     item {
                         // 프로모션 배너 (임시)
                         MainHomeMyTagScreen_PromotionBanner(
-                            imageUrl = "https://via.placeholder.com/350x150", // 임시 이미지
+                            imageUrl = "https://picsum.photos/400/100",
                             onClick = { /* TODO: Handle banner click */ }
                         )
                         Divider()
@@ -236,17 +243,16 @@ fun MainHomeMyTagScreen_NormalSearchBar(
 }
 
 // 검색 바 (확장 상태)
-// 검색 바 (확장 상태)
 @Composable
 fun MainHomeMyTagScreen_ExpandedSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     focusRequester: FocusRequester,
-    onSearchPerformed: () -> Unit, // 추가
-    onBackButtonClicked: () -> Unit, // 추가
+    onSearchPerformed: () -> Unit,
+    onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) { // Column 추가
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -264,7 +270,7 @@ fun MainHomeMyTagScreen_ExpandedSearchBar(
                 cursorBrush = SolidColor(Color.Black),
                 singleLine = true,
                 modifier = Modifier
-                    .weight(1f) // 남은 공간 모두 차지
+                    .weight(1f)
                     .focusRequester(focusRequester),
                 decorationBox = { innerTextField ->
                     Box(
@@ -282,18 +288,18 @@ fun MainHomeMyTagScreen_ExpandedSearchBar(
                 }
             )
         }
-        Row( // 버튼들을 위한 Row
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.End // 오른쪽 정렬
+            horizontalArrangement = Arrangement.End
         ) {
             Button(onClick = onSearchPerformed) {
-                Text("검색")
+                Text("検索")
             }
-            Spacer(modifier = Modifier.width(8.dp)) // 버튼 사이 간격
+            Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = onBackButtonClicked) {
-                Text("돌아가기")
+                Text("戻る")
             }
         }
     }
@@ -337,32 +343,28 @@ fun MainHomeMyTagScreen_ExpandedSearchContent(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            // 선택된 태그
             MainHomeMyTagScreen_TagSection(
-                title = "선택된 태그",
+                title = "選択したタグ",
                 tags = selectedTags,
                 onTagClick = onTagRemoved,
                 isRemovable = true
             )
 
-            // 검색 결과
             MainHomeMyTagScreen_TagSection(
-                title = "검색 결과",
+                title = "検索結果",
                 tags = searchResults,
                 onTagClick = onTagSelected
             )
 
             if (searchQuery.isBlank()) {
-                // 최근 검색 태그
                 MainHomeMyTagScreen_TagSection(
-                    title = "최근 검색 태그",
+                    title = "最近の検索",
                     tags = recentSearches,
                     onTagClick = onTagSelected
                 )
 
-                // 최근 검색 태그
                 MainHomeMyTagScreen_TagSection(
-                    title = "급상승 태그",
+                    title = "人気のタグ",
                     tags = trendingTags,
                     onTagClick = onTagSelected
                 )
@@ -376,8 +378,8 @@ fun MainHomeMyTagScreen_ExpandedSearchContent(
 @Composable
 fun MainHomeMyTagScreen_TagSection(
     title: String,
-    tags: List<MainHomeTagItemUiState>, // List<String> -> List<TagItemUiState>
-    onTagClick: (MainHomeTagItemUiState) -> Unit, // (String) -> Unit 에서 변경
+    tags: List<MainHomeTagItemUiState>,
+    onTagClick: (MainHomeTagItemUiState) -> Unit,
     isRemovable: Boolean = false
 ) {
     Column(
@@ -393,23 +395,20 @@ fun MainHomeMyTagScreen_TagSection(
         Spacer(modifier = Modifier.height(8.dp))
         if (tags.isEmpty()) {
             Text(
-                text = "없음",
+                text = "なし",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
         } else {
-            // MainHomeMyTagScreen_ChipRow(tags = tags, onTagClick = onTagClick, isRemovable = isRemovable)
-            // 여기
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 maxItemsInEachRow = 3
             ) {
                 tags.forEach { tag ->
-                    MainHomeMyTagScreen_TagChip( // 변경
+                    MainHomeMyTagScreen_TagChip(
                         tag = tag,
                         onTagClick = {
-                            onTagClick(tag) // 클릭 시 전체 객체 전달
-
+                            onTagClick(tag)
                         },
                         isRemovable = isRemovable
                     )
@@ -468,79 +467,272 @@ fun MainHomeMyTagScreen_TagChip(
 }
 
 // 오늘의 태그 & 트렌딩 태그 (Carousel)
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_TodayAndTrendingTags(
-    tags: List<MainHomeTagItemUiState> // 단일 리스트로 변경
+    tags: List<MainHomeTagItemUiState>
 ) {
+    // pageCount를 tags.size로 직접 지정
+    val pagerState = rememberPagerState(initialPage = 0) {
+        tags.size
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
         Text(
-            text = "오늘의 태그 & 트렌딩 태그",
+            text = "今日のタグ & 人気のタグ",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        MainHomeMyTagScreen_TagCarousel(
-            tags = tags // 단일 리스트 전달
-        )
-    }
-}
 
-// Carousel 구현 (LazyRow 사용)
-@Composable
-fun MainHomeMyTagScreen_TagCarousel(
-    tags: List<MainHomeTagItemUiState> // 단일 리스트로 받음
-) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(tags) { tag ->
-            MainHomeMyTagScreen_TagCard(tag = tag)
+        if (tags.isNotEmpty()) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 40.dp),
+                pageSpacing = 15.dp
+            ) { page ->
+                val tag = tags[page]
+                MainHomeMyTagScreen_TrendingTagCard(
+                    tag = tag
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 페이지 표시기 개선
+            Row(
+                Modifier
+                    .height(20.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(tags.size) { iteration ->
+                    val color = if (pagerState.currentPage == iteration) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.AddCircle,
+                            contentDescription = "Page Indicator",
+                            tint = color,
+                            modifier = Modifier.size(8.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            Text(
+                text = "利用可能なタグがありません。",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 16.dp)
+            )
         }
     }
 }
 
-// 태그 카드 (섬네일, 태그 이름, 사용자 수)
+// 오늘의 태그 및 인기 태그용 카드
 @Composable
-fun MainHomeMyTagScreen_TagCard(
+fun MainHomeMyTagScreen_TrendingTagCard(
+    tag: MainHomeTagItemUiState,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 썸네일 이미지 (왼쪽)
+            AsyncImage(
+                model = tag.imageUrl,
+                contentDescription = "Tag Image",
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                error = painterResource(R.drawable.no_image_icon)
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // 태그 정보 (오른쪽)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = tag.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Subscriber Icon",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${tag.subscriberCount}人",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+// 마이태그용 카드
+@Composable
+fun MainHomeMyTagScreen_MyTagCard(
     tag: MainHomeTagItemUiState,
     onClick: () -> Unit = {}
 ) {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier
-            .width(150.dp)
-            .height(100.dp)
+            .width(120.dp)
+            .height(160.dp)
             .clickable(onClick = onClick)
     ) {
-        Row(modifier = Modifier.padding(8.dp)) {
-            Image(
-                painter = painterResource(R.drawable.couple_3),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AsyncImage(
+                model = tag.imageUrl,
                 contentDescription = "Tag Image",
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                error = painterResource(R.drawable.no_image_icon)
             )
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column {
-                Text(
-                    text = tag.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = tag.name,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Subscriber Icon",
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${tag.subscriberCount} 명",
+                    text = "${tag.subscriberCount}人",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+// 추천 태그용 카드
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagCard(
+    tag: MainHomeTagItemUiState,
+    onClick: () -> Unit = {}
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier
+            .width(100.dp)
+            .height(140.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AsyncImage(
+                model = tag.imageUrl,
+                contentDescription = "Tag Image",
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                error = painterResource(R.drawable.no_image_icon)
+            )
+            
+            Spacer(modifier = Modifier.height(6.dp))
+            
+            Text(
+                text = tag.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(2.dp))
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Subscriber Icon",
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = "${tag.subscriberCount}人",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -565,12 +757,12 @@ fun MainHomeMyTagScreen_MySelectedTags(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "내가 선택한 태그",
+                text = "マイタグ",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "더보기",
+                text = "もっと見る",
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
@@ -579,43 +771,43 @@ fun MainHomeMyTagScreen_MySelectedTags(
         Spacer(modifier = Modifier.height(8.dp))
         if (myTags.isEmpty()) {
             Text(
-                text = "프로필에서 태그를 선택해주세요.",
+                text = "プロフィールでタグを選択してください。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 modifier = Modifier.padding(start = 16.dp)
             )
         } else {
             LazyHorizontalGrid(
-                rows = GridCells.Fixed(3), // 3행 그리드
+                rows = GridCells.Fixed(3),
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.heightIn(max = 250.dp)
             ) {
                 items(myTags) { tag ->
-                    MainHomeMyTagScreen_TagCard(tag = tag)
+                    MainHomeMyTagScreen_MyTagCard(tag = tag)
                 }
             }
         }
-
     }
 }
 
 // 프로모션 배너
 @Composable
 fun MainHomeMyTagScreen_PromotionBanner(
-    imageUrl: String,
+    imageUrl: String = "https://picsum.photos/400/100",
     onClick: () -> Unit
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.couple_3), // 임시 이미지
+    AsyncImage(
+        model = imageUrl,
         contentDescription = "Promotion Banner",
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .clickable(onClick = onClick)
             .padding(16.dp),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        error = painterResource(R.drawable.no_image_icon)
     )
 }
 
@@ -633,7 +825,7 @@ fun MainHomeMyTagScreen_SuggestedTags(
             .padding(16.dp)
     ) {
         Text(
-            text = "새로운 태그 추천",
+            text = "おすすめタグ",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -645,22 +837,20 @@ fun MainHomeMyTagScreen_SuggestedTags(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.heightIn(max = 200.dp)
         ) {
-            items(items = suggestedTags,
-                //key = { tag -> tag.name } // 필요한 경우 key 지정.  고유한 키를 사용해야 함.
-            ) { tag ->
-                MainHomeMyTagScreen_TagCard(tag)
+            items(items = suggestedTags) { tag ->
+                MainHomeMyTagScreen_SuggestedTagCard(tag)
             }
 
             if (!isLoading && canLoadMore) {
                 item(
-                    span = { GridItemSpan(maxLineSpan) } // 현재 라인의 최대 span (여기서는 2)
+                    span = { GridItemSpan(maxLineSpan) }
                 ) {
                     Button(
                         onClick = onLoadMore,
                         modifier = Modifier
                             .padding(8.dp)
                     ) {
-                        Text("더 보기")
+                        Text("もっと見る")
                     }
                 }
             }
@@ -1049,23 +1239,6 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Tag Card Preview")
-@Composable
-fun MainHomeMyTagScreen_TagCardPreview() {
-    TokitokiTheme {
-        MainHomeMyTagScreen_TagCard(
-            tag = MainHomeTagItemUiState(
-                id = "preview_3",
-                name = "태그 이름",
-                description = "태그 설명",
-                imageUrl = "image_url",
-                subscriberCount = 123
-            ),
-            onClick = {}
-        )
-    }
-}
-
 @Preview(showBackground = true, name = "My Selected Tags Preview")
 @Composable
 fun MainHomeMyTagScreen_MySelectedTagsPreview() {
@@ -1110,7 +1283,7 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
 fun MainHomeMyTagScreen_PromotionBannerPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_PromotionBanner(
-            imageUrl = "https://via.placeholder.com/350x150",
+            imageUrl = "https://picsum.photos/400/100",
             onClick = {}
         )
     }
