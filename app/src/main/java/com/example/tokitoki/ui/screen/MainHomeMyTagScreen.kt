@@ -1089,9 +1089,8 @@ fun MainHomeMyTagScreen_PromotionBanner(
         contentDescription = "Promotion Banner",
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+            .height(120.dp)
+            .clickable(onClick = onClick),
         contentScale = ContentScale.Crop,
         error = painterResource(R.drawable.no_image_icon)
     )
