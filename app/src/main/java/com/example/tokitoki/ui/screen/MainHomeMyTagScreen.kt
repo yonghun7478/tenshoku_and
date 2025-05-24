@@ -42,6 +42,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -83,6 +85,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
 
 
@@ -90,8 +93,20 @@ import androidx.compose.ui.geometry.Offset
 fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
-    var isExpanded by remember { mutableStateOf(false) } // 검색창 확장 상태
+    var isExpanded by remember { mutableStateOf(false) }
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 스낵바 메시지 처리
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.clearSnackbarMessage()
+        }
+    }
 
     // BackHandler 추가: 물리적 뒤로 가기 버튼 처리
     BackHandler(enabled = isExpanded) {
@@ -108,9 +123,10 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
         }
     }
 
-    Scaffold { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) { // Box 추가: 전체를 감싸는 역할
-
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             // 원래의 컨텐츠 (LazyColumn)
             AnimatedVisibility(
                 visible = !isExpanded, // isExpanded가 false일 때만 보임
@@ -662,6 +678,7 @@ fun MainHomeMyTagScreen_TrendingTagCard(
     modifier: Modifier = Modifier
 ) {
     var isChecked by remember { mutableStateOf(false) }
+    val viewModel: MainHomeMyTagViewModel = hiltViewModel()
 
     Surface(
         shape = RoundedCornerShape(12.dp),
@@ -736,7 +753,10 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                     .size(32.dp)
                     .align(Alignment.CenterEnd)
                     .absoluteOffset(x = (-16).dp)
-                    .clickable { isChecked = !isChecked }
+                    .clickable { 
+                        isChecked = !isChecked
+                        viewModel.onTagToggle(tag, isChecked)
+                    }
             ) {
                 Icon(
                     imageVector = if (isChecked) Icons.Default.Check else Icons.Default.Add,

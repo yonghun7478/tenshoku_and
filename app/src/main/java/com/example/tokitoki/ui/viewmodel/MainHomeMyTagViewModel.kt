@@ -238,4 +238,27 @@ class MainHomeMyTagViewModel @Inject constructor(
             }
         }
     }
+
+    // 스낵바 메시지 표시
+    fun showSnackbarMessage(message: String) {
+        _uiState.update {
+            it.copy(snackbarMessage = message)
+        }
+    }
+
+    // 스낵바 메시지 초기화
+    fun clearSnackbarMessage() {
+        _uiState.update {
+            it.copy(snackbarMessage = null)
+        }
+    }
+
+    // 태그 선택 토글
+    fun onTagToggle(tag: MainHomeTagItemUiState, isSelected: Boolean) {
+        if (isSelected) {
+            showSnackbarMessage("タグが登録されました")
+        } else {
+            showSnackbarMessage("タグが解除されました")
+        }
+    }
 }

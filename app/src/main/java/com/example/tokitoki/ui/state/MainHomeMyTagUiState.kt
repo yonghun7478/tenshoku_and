@@ -13,7 +13,8 @@ data class MainHomeMyTagUiState(
     val recentSearches: List<MainHomeTagItemUiState> = listOf(),
     val isLoadingTodayAndTrending: Boolean = false,
     val isLoadingMyTags: Boolean = false,
-    val isLoadingSuggestedTags: Boolean = false
+    val isLoadingSuggestedTags: Boolean = false,
+    val snackbarMessage: String? = null
 )
 
 data class MainHomeTagItemUiState(
