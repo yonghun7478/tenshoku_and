@@ -171,9 +171,13 @@ class MainHomeMyTagViewModel @Inject constructor(
 
     fun loadTags() {
         viewModelScope.launch {
-            // 오늘의 태그와 트렌딩 태그 로딩 시작
+            // 모든 로딩 상태를 true로 설정
             _uiState.update {
-                it.copy(isLoadingTodayAndTrending = true)
+                it.copy(
+                    isLoadingTodayAndTrending = true,
+                    isLoadingMyTags = true,
+                    isLoadingSuggestedTags = true
+                )
             }
 
             val todayTagResult = getTodayTagUseCase()

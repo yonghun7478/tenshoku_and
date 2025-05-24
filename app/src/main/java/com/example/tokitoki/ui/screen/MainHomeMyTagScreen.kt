@@ -85,6 +85,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.border
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
@@ -163,7 +164,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                     }
                     item {
                         // 내가 선택한 태그
-                        MainHomeMyTagScreen_MySelectedTags(uiState.myTags)
+                        MainHomeMyTagScreen_MySelectedTags(uiState.myTags, uiState.isLoadingMyTags)
                         Divider()
                     }
 
@@ -540,10 +541,15 @@ fun TrendingTagShimmerCard(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = Color.Transparent,
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
+            .border(
+                width = 1.dp,
+                color = Color.Gray.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
         Row(
             modifier = Modifier
@@ -683,11 +689,16 @@ fun MainHomeMyTagScreen_TrendingTagCard(
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = Color.Transparent,
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
             .clickable(onClick = onClick)
+            .border(
+                width = 1.dp,
+                color = Color.Gray.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -781,7 +792,7 @@ fun MainHomeMyTagScreen_MyTagCard(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = Color.Transparent,
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
@@ -910,7 +921,8 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_MySelectedTags(
-    myTags: List<MainHomeTagItemUiState>
+    myTags: List<MainHomeTagItemUiState>,
+    isLoading: Boolean = false
 ) {
     val itemsPerPage = 4
     val maxPages = 3
@@ -949,7 +961,37 @@ fun MainHomeMyTagScreen_MySelectedTags(
                 .fillMaxWidth()
                 .height(328.dp) // 1열 4행 기준 고정 높이
         ) {
-            if (myTags.isEmpty()) {
+            if (isLoading) {
+                // 로딩 중일 때 시머 이펙트 표시
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    pageSpacing = 16.dp,
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) { page ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        repeat(itemsPerPage) {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.Transparent,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                            ) {
+                                MyTagShimmerCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            } else if (myTags.isEmpty()) {
+                // 로딩이 끝났고 아이템이 없을 때
                 Column(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -963,6 +1005,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
                     )
                 }
             } else {
+                // 로딩이 끝났고 아이템이 있을 때
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
@@ -977,12 +1020,20 @@ fun MainHomeMyTagScreen_MySelectedTags(
                         val endIndex = minOf(startIndex + itemsPerPage, totalItems)
                         for (index in startIndex until endIndex) {
                             val tag = myTags[index]
-                            MainHomeMyTagScreen_MyTagCard(
-                                tag = tag,
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.Transparent,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(72.dp)
-                            )
+                            ) {
+                                MainHomeMyTagScreen_MyTagCard(
+                                    tag = tag,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                )
+                            }
                         }
                         // 아이템이 4개 미만일 때 빈 공간 채우기
                         repeat(itemsPerPage - (endIndex - startIndex)) {
@@ -1546,5 +1597,48 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
                 )
             )
         )
+    }
+}
+
+@Composable
+fun MyTagShimmerCard(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Shimmer for image
+        ShimmerEffect(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        // Shimmer for text content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            ShimmerEffect(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(20.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            ShimmerEffect(
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .height(16.dp)
+            )
+        }
     }
 }
