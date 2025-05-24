@@ -652,7 +652,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 페이지 표시기 - 높이 유지하면서 조건부 표시
         Box(
