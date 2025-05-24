@@ -87,6 +87,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
+import kotlin.math.ceil
 
 
 @Composable
@@ -775,60 +776,68 @@ fun MainHomeMyTagScreen_TrendingTagCard(
 @Composable
 fun MainHomeMyTagScreen_MyTagCard(
     tag: MainHomeTagItemUiState,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier
-            .width(120.dp)
-            .height(160.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .height(72.dp)
             .clickable(onClick = onClick)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            // 섬네일 (왼쪽)
             AsyncImage(
                 model = tag.imageUrl,
                 contentDescription = "Tag Image",
                 modifier = Modifier
-                    .size(90.dp)
+                    .size(56.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 error = painterResource(R.drawable.no_image_icon)
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
-            Text(
-                text = tag.name,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
+            // 태그 정보 (오른쪽)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Subscriber Icon",
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${tag.subscriberCount}人",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = tag.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Subscriber Icon",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${tag.subscriberCount}人",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }
@@ -898,10 +907,17 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
 }
 
 // 내가 선택한 태그
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_MySelectedTags(
     myTags: List<MainHomeTagItemUiState>
 ) {
+    val itemsPerPage = 4
+    val maxPages = 3
+    val totalItems = minOf(myTags.size, itemsPerPage * maxPages)
+    val pageCount = ceil(totalItems.toFloat() / itemsPerPage).toInt().coerceAtLeast(1)
+    val pagerState = rememberPagerState(initialPage = 0) { pageCount }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -927,23 +943,84 @@ fun MainHomeMyTagScreen_MySelectedTags(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        if (myTags.isEmpty()) {
-            Text(
-                text = "プロフィールでタグを選択してください。",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        } else {
-            LazyHorizontalGrid(
-                rows = GridCells.Fixed(3),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.heightIn(max = 250.dp)
-            ) {
-                items(myTags) { tag ->
-                    MainHomeMyTagScreen_MyTagCard(tag = tag)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(328.dp) // 1열 4행 기준 고정 높이
+        ) {
+            if (myTags.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "プロフィールでタグを選択してください。",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    pageSpacing = 16.dp,
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) { page ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val startIndex = page * itemsPerPage
+                        val endIndex = minOf(startIndex + itemsPerPage, totalItems)
+                        for (index in startIndex until endIndex) {
+                            val tag = myTags[index]
+                            MainHomeMyTagScreen_MyTagCard(
+                                tag = tag,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                            )
+                        }
+                        // 아이템이 4개 미만일 때 빈 공간 채우기
+                        repeat(itemsPerPage - (endIndex - startIndex)) {
+                            Spacer(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(72.dp))
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            Modifier
+                .height(20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.AddCircle,
+                        contentDescription = "Page Indicator",
+                        tint = color,
+                        modifier = Modifier.size(8.dp)
+                    )
                 }
             }
         }
