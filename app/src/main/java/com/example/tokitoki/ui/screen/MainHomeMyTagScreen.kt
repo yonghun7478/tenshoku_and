@@ -615,64 +615,78 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
 
-        if (isLoading) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 40.dp),
-                pageSpacing = 15.dp
-            ) { page ->
-                TrendingTagShimmerCard()
-            }
-        } else if (tags.isNotEmpty()) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 40.dp),
-                pageSpacing = 15.dp
-            ) { page ->
-                val tag = tags[page]
-                MainHomeMyTagScreen_TrendingTagCard(
-                    tag = tag
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp) // 고정된 높이 설정
+        ) {
+            if (isLoading) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 40.dp),
+                    pageSpacing = 15.dp
+                ) { page ->
+                    TrendingTagShimmerCard()
+                }
+            } else if (tags.isNotEmpty()) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 40.dp),
+                    pageSpacing = 15.dp
+                ) { page ->
+                    val tag = tags[page]
+                    MainHomeMyTagScreen_TrendingTagCard(
+                        tag = tag
+                    )
+                }
+            } else {
+                Text(
+                    text = "利用可能なタグがありません。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .align(Alignment.CenterStart)
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-            // 페이지 표시기 개선
-            Row(
-                Modifier
-                    .height(20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(tags.size) { iteration ->
-                    val color = if (pagerState.currentPage == iteration) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .size(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Page Indicator",
-                            tint = color,
-                            modifier = Modifier.size(8.dp)
-                        )
+        // 페이지 표시기 - 높이 유지하면서 조건부 표시
+        Box(
+            modifier = Modifier
+                .height(20.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (!isLoading && tags.isNotEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(tags.size) { iteration ->
+                        val color = if (pagerState.currentPage == iteration) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .size(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.AddCircle,
+                                contentDescription = "Page Indicator",
+                                tint = color,
+                                modifier = Modifier.size(8.dp)
+                            )
+                        }
                     }
                 }
             }
-        } else {
-            Text(
-                text = "利用可能なタグがありません。",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(start = 16.dp)
-            )
         }
     }
 }
