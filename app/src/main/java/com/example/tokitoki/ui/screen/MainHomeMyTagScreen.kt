@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -77,6 +77,13 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.geometry.Offset
 
 
 @Composable
@@ -131,7 +138,10 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
 
                     item {
                         // 오늘의 태그 & 트렌딩 태그
-                        MainHomeMyTagScreen_TodayAndTrendingTags(listOf(uiState.todayTags) + uiState.trendingTags)
+                        MainHomeMyTagScreen_TodayAndTrendingTags(
+                            listOfNotNull(uiState.todayTag) + uiState.trendingTags,
+                            uiState.isLoadingTodayAndTrending
+                        )
                         Divider()
                     }
                     item {
@@ -469,15 +479,105 @@ fun MainHomeMyTagScreen_TagChip(
     }
 }
 
+// Shimmer effect composable
+@Composable
+fun ShimmerEffect(
+    modifier: Modifier = Modifier
+) {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1200,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer"
+    )
+
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f),
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset.Zero,
+        end = Offset(x = translateAnim.value, y = translateAnim.value)
+    )
+
+    Box(
+        modifier = modifier
+            .background(brush)
+    )
+}
+
+// Shimmer card for trending tags
+@Composable
+fun TrendingTagShimmerCard(
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Shimmer for image
+            ShimmerEffect(
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // Shimmer for text content
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                ShimmerEffect(
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(20.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                ShimmerEffect(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .height(16.dp)
+                )
+            }
+        }
+    }
+}
+
 // 오늘의 태그 & 트렌딩 태그 (Carousel)
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_TodayAndTrendingTags(
-    tags: List<MainHomeTagItemUiState>
+    tags: List<MainHomeTagItemUiState>,
+    isLoading: Boolean = false
 ) {
     // pageCount를 tags.size로 직접 지정
     val pagerState = rememberPagerState(initialPage = 0) {
-        tags.size
+        if (isLoading) 3 else tags.size
     }
 
     Column(
@@ -492,7 +592,16 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
 
-        if (tags.isNotEmpty()) {
+        if (isLoading) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 40.dp),
+                pageSpacing = 15.dp
+            ) { page ->
+                TrendingTagShimmerCard()
+            }
+        } else if (tags.isNotEmpty()) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxWidth(),

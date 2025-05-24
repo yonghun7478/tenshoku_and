@@ -4,13 +4,16 @@ import com.example.tokitoki.domain.model.MainHomeTag
 
 // UiState
 data class MainHomeMyTagUiState(
+    val todayTag: MainHomeTagItemUiState? = null,
+    val trendingTags: List<MainHomeTagItemUiState> = listOf(),
+    val myTags: List<MainHomeTagItemUiState> = listOf(),
     val selectedTags: List<MainHomeTagItemUiState> = listOf(),
     val searchQuery: String = "",
     val searchResults: List<MainHomeTagItemUiState> = listOf(),
     val recentSearches: List<MainHomeTagItemUiState> = listOf(),
-    val trendingTags: List<MainHomeTagItemUiState> = listOf(),
-    val todayTags: MainHomeTagItemUiState = MainHomeTagItemUiState("", "", "", "", 0),
-    val myTags: List<MainHomeTagItemUiState> = listOf(),
+    val isLoadingTodayAndTrending: Boolean = false,
+    val isLoadingMyTags: Boolean = false,
+    val isLoadingSuggestedTags: Boolean = false
 )
 
 data class MainHomeTagItemUiState(

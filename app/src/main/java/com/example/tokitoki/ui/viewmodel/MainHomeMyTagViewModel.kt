@@ -171,10 +171,9 @@ class MainHomeMyTagViewModel @Inject constructor(
 
     fun loadTags() {
         viewModelScope.launch {
-            _suggestedTagsUiState.update {
-                it.copy(
-                    isLoading = true
-                )
+            // 오늘의 태그와 트렌딩 태그 로딩 시작
+            _uiState.update {
+                it.copy(isLoadingTodayAndTrending = true)
             }
 
             val todayTagResult = getTodayTagUseCase()
@@ -187,10 +186,13 @@ class MainHomeMyTagViewModel @Inject constructor(
             ) {
                 _uiState.update {
                     it.copy(
-                        todayTags = todayTagResult.getOrThrow().toPresentation(),
+                        todayTag = todayTagResult.getOrThrow().toPresentation(),
                         trendingTags = trendingTagsResult.getOrThrow()
                             .map { it -> it.toPresentation() },
                         myTags = myTagsResult.getOrThrow().map { it -> it.toPresentation() },
+                        isLoadingTodayAndTrending = false,
+                        isLoadingMyTags = false,
+                        isLoadingSuggestedTags = false
                     )
                 }
 
@@ -198,12 +200,21 @@ class MainHomeMyTagViewModel @Inject constructor(
                     it.copy(
                         tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
                         canLoadMore = true,
-                        isLoading = false,
+                        isLoading = false
                     )
                 }
             } else {
                 // 에러 처리 (하나라도 실패하면)
-                // 예: todayTagResult.exceptionOrNull() 등을 사용하여 에러 원인 확인
+                _uiState.update {
+                    it.copy(
+                        isLoadingTodayAndTrending = false,
+                        isLoadingMyTags = false,
+                        isLoadingSuggestedTags = false
+                    )
+                }
+                _suggestedTagsUiState.update {
+                    it.copy(isLoading = false)
+                }
             }
         }
     }
