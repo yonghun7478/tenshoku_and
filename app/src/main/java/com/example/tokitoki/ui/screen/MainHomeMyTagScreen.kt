@@ -34,6 +34,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -74,6 +76,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.foundation.layout.absoluteOffset
 
 
 @Composable
@@ -549,6 +552,8 @@ fun MainHomeMyTagScreen_TrendingTagCard(
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var isChecked by remember { mutableStateOf(false) }
+
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -557,57 +562,81 @@ fun MainHomeMyTagScreen_TrendingTagCard(
             .height(100.dp)
             .clickable(onClick = onClick)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // 썸네일 이미지 (왼쪽)
-            AsyncImage(
-                model = tag.imageUrl,
-                contentDescription = "Tag Image",
+            Row(
                 modifier = Modifier
-                    .size(76.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                error = painterResource(R.drawable.no_image_icon)
-            )
-            
-            Spacer(modifier = Modifier.width(12.dp))
-            
-            // 태그 정보 (오른쪽)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = tag.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
+                // 썸네일 이미지 (왼쪽)
+                AsyncImage(
+                    model = tag.imageUrl,
+                    contentDescription = "Tag Image",
+                    modifier = Modifier
+                        .size(76.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(R.drawable.no_image_icon)
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                // 태그 정보 (오른쪽)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Subscriber Icon",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${tag.subscriberCount}人",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = tag.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Subscriber Icon",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${tag.subscriberCount}人",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
+            }
+
+            // 우측 중앙 동그란 버튼
+            Surface(
+                shape = CircleShape,
+                color = if (isChecked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .size(32.dp)
+                    .align(Alignment.CenterEnd)
+                    .absoluteOffset(x = (-16).dp)
+                    .clickable { isChecked = !isChecked }
+            ) {
+                Icon(
+                    imageVector = if (isChecked) Icons.Default.Check else Icons.Default.Add,
+                    contentDescription = if (isChecked) "Tag Added" else "Add Tag",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(16.dp)
+                )
             }
         }
     }
