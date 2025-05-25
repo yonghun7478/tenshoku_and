@@ -74,6 +74,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.example.tokitoki.data.model.TagType
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
 
@@ -1056,7 +1057,8 @@ fun MainHomeMyTagScreenPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 1000,
                     description = "",
-                    categoryId = "1"
+                    categoryId = "1",
+                    tagType = TagType.HOBBY
                 ),
                 trendingTags = listOf(
                     MainHomeTagItemUiState(
@@ -1065,7 +1067,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 800,
                         description = "",
-                        categoryId = "1"
+                        categoryId = "1",
+                        tagType = TagType.LIFESTYLE
                     ),
                     MainHomeTagItemUiState(
                         id = "3",
@@ -1073,7 +1076,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 600,
                         description = "",
-                        categoryId = "1"
+                        categoryId = "1",
+                        tagType = TagType.VALUE
                     )
                 ),
                 myTags = listOf(
@@ -1083,7 +1087,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 400,
                         description = "",
-                        categoryId = "2"
+                        categoryId = "2",
+                        tagType = TagType.HOBBY
                     ),
                     MainHomeTagItemUiState(
                         id = "5",
@@ -1091,7 +1096,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 300,
                         description = "",
-                        categoryId = "2"
+                        categoryId = "2",
+                        tagType = TagType.LIFESTYLE
                     )
                 ),
                 isLoadingTodayAndTrending = false,
@@ -1106,7 +1112,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 200,
                         description = "",
-                        categoryId = "3"
+                        categoryId = "3",
+                        tagType = TagType.VALUE
                     ),
                     MainHomeTagItemUiState(
                         id = "7",
@@ -1114,7 +1121,8 @@ fun MainHomeMyTagScreenPreview() {
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 150,
                         description = "",
-                        categoryId = "3"
+                        categoryId = "3",
+                        tagType = TagType.HOBBY
                     )
                 ),
                 canLoadMore = true
@@ -1180,7 +1188,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 1000,
                     description = "",
-                    categoryId = "1"
+                    categoryId = "1",
+                    tagType = TagType.HOBBY
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
@@ -1188,7 +1197,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 800,
                     description = "",
-                    categoryId = "1"
+                    categoryId = "1",
+                    tagType = TagType.LIFESTYLE
                 )
             ),
             isLoading = false
@@ -1219,7 +1229,8 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 400,
                     description = "",
-                    categoryId = "2"
+                    categoryId = "2",
+                    tagType = TagType.HOBBY
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
@@ -1227,7 +1238,8 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 300,
                     description = "",
-                    categoryId = "2"
+                    categoryId = "2",
+                    tagType = TagType.LIFESTYLE
                 )
             ),
             isLoading = false
@@ -1280,7 +1292,8 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 200,
                     description = "",
-                    categoryId = "3"
+                    categoryId = "3",
+                    tagType = TagType.VALUE
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
@@ -1288,7 +1301,8 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 150,
                     description = "",
-                    categoryId = "3"
+                    categoryId = "3",
+                    tagType = TagType.HOBBY
                 )
             ),
             canLoadMore = true,
@@ -1335,7 +1349,8 @@ fun MainHomeMyTagScreen_TrendingTagCardPreview() {
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 1000,
                 description = "",
-                categoryId = "1"
+                categoryId = "1",
+                tagType = TagType.HOBBY
             )
         )
     }
@@ -1352,7 +1367,8 @@ fun MainHomeMyTagScreen_MyTagCardPreview() {
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 500,
                 description = "",
-                categoryId = "2"
+                categoryId = "2",
+                tagType = TagType.LIFESTYLE
             )
         )
     }
@@ -1369,7 +1385,8 @@ fun MainHomeMyTagScreen_SuggestedTagCardPreview() {
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 300,
                 description = "",
-                categoryId = "3"
+                categoryId = "3",
+                tagType = TagType.VALUE
             )
         )
     }

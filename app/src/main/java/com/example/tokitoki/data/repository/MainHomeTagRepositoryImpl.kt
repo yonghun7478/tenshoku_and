@@ -3,6 +3,7 @@ package com.example.tokitoki.data.repository
 import com.example.tokitoki.data.model.MainHomeTagData
 import com.example.tokitoki.data.model.MainHomeTagDetailData
 import com.example.tokitoki.data.model.MainHomeTagSubscriberData
+import com.example.tokitoki.data.model.TagType
 import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.model.MainHomeTagDetail
@@ -21,7 +22,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "お気に入りのカフェを探して、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/1/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "2"  // 食べ物・飲み物
+            categoryId = "2",  // 食べ物・飲み物
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "2",
@@ -29,7 +31,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "新しい場所を発見し、素晴らしい思い出を作りましょう。",
             imageUrl = "https://picsum.photos/id/2/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "3",
@@ -37,7 +40,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "美味しい料理を作って、大切な人と共有しましょう。",
             imageUrl = "https://picsum.photos/id/3/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "2"  // 食べ物・飲み物
+            categoryId = "2",  // 食べ物・飲み物
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "4",
@@ -45,7 +49,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "本の世界に浸り、新しい知識と感動を得ましょう。",
             imageUrl = "https://picsum.photos/id/4/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "5",
@@ -53,7 +58,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "様々な映画を観て、感動と刺激を受けましょう。",
             imageUrl = "https://picsum.photos/id/5/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "6",
@@ -61,7 +67,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "音楽を通じて、心を癒し、活力を得ましょう。",
             imageUrl = "https://picsum.photos/id/6/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "7",
@@ -69,7 +76,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "体を動かして、健康な生活を送りましょう。",
             imageUrl = "https://picsum.photos/id/7/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "8",
@@ -77,7 +85,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "素敵な瞬間を写真に残し、思い出を大切にしましょう。",
             imageUrl = "https://picsum.photos/id/8/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "9",
@@ -85,7 +94,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "芸術作品に触れ、感性を磨きましょう。",
             imageUrl = "https://picsum.photos/id/9/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "10",
@@ -93,7 +103,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "植物を育て、自然と触れ合いましょう。",
             imageUrl = "https://picsum.photos/id/10/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "11",
@@ -101,7 +112,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "かわいいペットと一緒に、幸せな時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/11/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "12",
@@ -109,7 +121,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "おしゃれを楽しみ、自分らしいスタイルを見つけましょう。",
             imageUrl = "https://picsum.photos/id/12/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "5"  // ファッション・美容
+            categoryId = "5",  // ファッション・美容
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "13",
@@ -117,7 +130,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "心と体のバランスを取り、リラックスしましょう。",
             imageUrl = "https://picsum.photos/id/13/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "14",
@@ -125,7 +139,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "美味しいお酒を楽しみ、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/14/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "2"  // 食べ物・飲み物
+            categoryId = "2",  // 食べ物・飲み物
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "15",
@@ -133,7 +148,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "ゲームを通じて、新しい世界を体験しましょう。",
             imageUrl = "https://picsum.photos/id/15/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "16",
@@ -141,7 +157,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "自分で作る喜びを体験しましょう。",
             imageUrl = "https://picsum.photos/id/16/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "1"  // 趣味・スポーツ
+            categoryId = "1",  // 趣味・スポーツ
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "17",
@@ -149,7 +166,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "美味しいコーヒーで、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/17/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "2"  // 食べ物・飲み物
+            categoryId = "2",  // 食べ物・飲み物
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "18",
@@ -157,7 +175,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "甘いものを通じて、幸せな時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/18/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "2"  // 食べ物・飲み物
+            categoryId = "2",  // 食べ物・飲み物
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "19",
@@ -165,7 +184,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "温泉で心身を癒し、リフレッシュしましょう。",
             imageUrl = "https://picsum.photos/id/19/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "20",
@@ -173,7 +193,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "自然を感じながら、新しい景色を発見しましょう。",
             imageUrl = "https://picsum.photos/id/20/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "21",
@@ -181,7 +202,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "自然の中で、素敵な思い出を作りましょう。",
             imageUrl = "https://picsum.photos/id/21/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "22",
@@ -189,7 +211,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "海や川で、のんびりとした時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/22/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "23",
@@ -197,7 +220,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "ゴルフを通じて、新しい出会いを楽しみましょう。",
             imageUrl = "https://picsum.photos/id/23/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "24",
@@ -205,7 +229,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "テニスで体を動かし、爽快感を味わいましょう。",
             imageUrl = "https://picsum.photos/id/24/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "3"  // 旅行・観光
+            categoryId = "3",  // 旅行・観光
+            tagType = TagType.HOBBY
         ),
         MainHomeTagData(
             id = "25",
@@ -213,7 +238,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "音楽に合わせて、楽しく体を動かしましょう。",
             imageUrl = "https://picsum.photos/id/25/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "26",
@@ -221,7 +247,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "音楽を奏で、心を豊かにしましょう。",
             imageUrl = "https://picsum.photos/id/26/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "27",
@@ -229,7 +256,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "絵を描いて、表現する喜びを感じましょう。",
             imageUrl = "https://picsum.photos/id/27/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "28",
@@ -237,7 +265,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "土と向き合い、ものづくりの楽しさを体験しましょう。",
             imageUrl = "https://picsum.photos/id/28/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "29",
@@ -245,7 +274,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "日本の伝統文化に触れ、心を落ち着けましょう。",
             imageUrl = "https://picsum.photos/id/29/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         ),
         MainHomeTagData(
             id = "30",
@@ -253,7 +283,8 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             description = "文字を書くことで、心を整えましょう。",
             imageUrl = "https://picsum.photos/id/30/100/100",
             subscriberCount = (50..300).random(),
-            categoryId = "4"  // 音楽・映画
+            categoryId = "4",  // 音楽・映画
+            tagType = TagType.LIFESTYLE
         )
     )
 
@@ -468,6 +499,16 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
                 it.name.contains(query, ignoreCase = true) ||
                 it.description.contains(query, ignoreCase = true)
             }
+            Result.success(filtered.map { it.toDomain() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getTagsByType(tagType: TagType): Result<List<MainHomeTag>> {
+        return try {
+            delay(500)
+            val filtered = allTags.filter { it.tagType == tagType }
             Result.success(filtered.map { it.toDomain() })
         } catch (e: Exception) {
             Result.failure(e)

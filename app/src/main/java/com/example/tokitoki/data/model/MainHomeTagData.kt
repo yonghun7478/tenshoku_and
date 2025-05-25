@@ -8,7 +8,8 @@ data class MainHomeTagData(
     val description: String,
     val imageUrl: String,
     val subscriberCount: Int,
-    val categoryId: String
+    val categoryId: String,
+    val tagType: TagType
 )
 
 fun MainHomeTagData.toDomain(): MainHomeTag {
@@ -18,7 +19,8 @@ fun MainHomeTagData.toDomain(): MainHomeTag {
         description = description,
         imageUrl = imageUrl,
         subscriberCount = subscriberCount,
-        categoryId = categoryId
+        categoryId = categoryId,
+        tagType = tagType
     )
 }
 
@@ -29,6 +31,7 @@ fun MainHomeTag.toData(): MainHomeTagData {
         description = description,
         imageUrl = imageUrl,
         subscriberCount = subscriberCount,
-        categoryId = categoryId
+        categoryId = categoryId,
+        tagType = tagType
     )
 }

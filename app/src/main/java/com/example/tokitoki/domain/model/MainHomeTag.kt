@@ -2,6 +2,7 @@ package com.example.tokitoki.domain.model
 
 import com.example.tokitoki.data.model.MainHomeTagData
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
+import com.example.tokitoki.data.model.TagType
 
 data class MainHomeTag(
     val id: String,
@@ -9,7 +10,8 @@ data class MainHomeTag(
     val description: String,
     val imageUrl: String,
     val subscriberCount: Int,
-    val categoryId: String
+    val categoryId: String,
+    val tagType: TagType
 ) {
     fun toPresentation(): MainHomeTagItemUiState = MainHomeTagItemUiState(
         id = this.id,
@@ -17,7 +19,8 @@ data class MainHomeTag(
         description = this.description,
         imageUrl = this.imageUrl,
         subscriberCount = this.subscriberCount,
-        categoryId = this.categoryId
+        categoryId = this.categoryId,
+        tagType = this.tagType
     )
 
     fun toData(): MainHomeTagData = MainHomeTagData(
@@ -26,6 +29,7 @@ data class MainHomeTag(
         description = this.description,
         imageUrl = this.imageUrl,
         subscriberCount = this.subscriberCount,
-        categoryId = this.categoryId
+        categoryId = this.categoryId,
+        tagType = this.tagType
     )
 }
