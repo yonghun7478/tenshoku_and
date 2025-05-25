@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -144,7 +145,7 @@ fun TagSearchBar(
                 tint = Color.Gray
             )
             Spacer(modifier = Modifier.width(8.dp))
-            androidx.compose.material3.BasicTextField(
+            BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
