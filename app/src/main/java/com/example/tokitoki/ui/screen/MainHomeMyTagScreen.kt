@@ -89,8 +89,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 
 @Composable
@@ -1155,12 +1157,20 @@ fun MainHomeMyTagScreen_SuggestedTags(
                     item(
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
-                        Button(
-                            onClick = onLoadMore,
+                        Box(
                             modifier = Modifier
                                 .padding(8.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { onLoadMore() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text("もっと見る")
+                            Text(
+                                text = "もっと見る",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
