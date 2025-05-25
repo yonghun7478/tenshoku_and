@@ -185,7 +185,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                         MainHomeMyTagScreen_SuggestedTags(
                             suggestedTags = suggestedTagsUiState.tags,
                             canLoadMore = suggestedTagsUiState.canLoadMore,
-                            isLoading = suggestedTagsUiState.isLoading,
+                            isLoading = uiState.isLoadingSuggestedTags,
                             onLoadMore = {
                                 viewModel.loadMoreSuggestedTags()
                             }
@@ -1149,28 +1149,54 @@ fun MainHomeMyTagScreen_SuggestedTags(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(items = suggestedTags) { tag ->
-                    MainHomeMyTagScreen_SuggestedTagCard(tag)
-                }
-
-                if (!isLoading && canLoadMore) {
+                if (isLoading) {
+                    // Show 6 shimmer cards (2 rows x 3 columns)
+                    items(6) {
+                        SuggestedTagShimmerCard()
+                    }
+                    
+                    // Show shimmer for "more" button
                     item(
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) { onLoadMore() },
+                                .fillMaxWidth()
+                                .height(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "もっと見る",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
+                            ShimmerEffect(
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .height(24.dp)
                             )
+                        }
+                    }
+                } else {
+                    items(items = suggestedTags) { tag ->
+                        MainHomeMyTagScreen_SuggestedTagCard(tag)
+                    }
+
+                    if (canLoadMore && !isLoading) {
+                        item(
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) { onLoadMore() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "もっと見る",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
@@ -1675,5 +1701,44 @@ fun MyTagShimmerCard(
                     .height(16.dp)
             )
         }
+    }
+}
+
+@Composable
+fun SuggestedTagShimmerCard(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .width(100.dp)
+            .wrapContentHeight()
+            .padding(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Shimmer for image
+        ShimmerEffect(
+            modifier = Modifier
+                .size(84.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        // Shimmer for tag name
+        ShimmerEffect(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+        )
+        
+        Spacer(modifier = Modifier.height(2.dp))
+        
+        // Shimmer for subscriber count
+        ShimmerEffect(
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(12.dp)
+        )
     }
 }

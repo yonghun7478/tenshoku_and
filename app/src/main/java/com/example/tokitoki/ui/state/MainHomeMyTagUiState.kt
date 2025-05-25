@@ -38,5 +38,4 @@ data class MainHomeTagItemUiState(
 data class SuggestedTagsUiState(
     val tags: List<MainHomeTagItemUiState> = listOf(),
     val canLoadMore: Boolean = true,
-    val isLoading: Boolean = false
 )

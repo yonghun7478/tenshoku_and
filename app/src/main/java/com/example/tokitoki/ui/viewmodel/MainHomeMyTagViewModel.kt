@@ -204,7 +204,6 @@ class MainHomeMyTagViewModel @Inject constructor(
                     it.copy(
                         tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
                         canLoadMore = true,
-                        isLoading = false
                     )
                 }
             } else {
@@ -215,9 +214,6 @@ class MainHomeMyTagViewModel @Inject constructor(
                         isLoadingMyTags = false,
                         isLoadingSuggestedTags = false
                     )
-                }
-                _suggestedTagsUiState.update {
-                    it.copy(isLoading = false)
                 }
             }
         }
