@@ -375,6 +375,28 @@ fun TokitokiNavGraph(
             TagSearchScreen(
                 onNavigateUp = {
                     navController.navigateUp()
+                },
+                onNavigateToCategory = { categoryId, categoryName ->
+                    navAction.navigateToCategoryTag(categoryId, categoryName)
+                }
+            )
+        }
+
+        composable(
+            TokitokiDestinations.CATEGORY_TAG_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.CATEGORY_ID) { type = NavType.StringType },
+                navArgument(TokitokiArgs.CATEGORY_NAME) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString(TokitokiArgs.CATEGORY_ID) ?: ""
+            val categoryName = backStackEntry.arguments?.getString(TokitokiArgs.CATEGORY_NAME) ?: ""
+
+            CategoryTagScreen(
+                categoryId = categoryId,
+                categoryName = categoryName,
+                onNavigateUp = {
+                    navController.navigateUp()
                 }
             )
         }

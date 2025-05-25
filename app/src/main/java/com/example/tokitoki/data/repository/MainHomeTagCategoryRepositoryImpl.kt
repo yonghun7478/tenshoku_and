@@ -39,6 +39,36 @@ class MainHomeTagCategoryRepositoryImpl @Inject constructor() : MainHomeTagCateg
             name = "ファッション・美容",
             description = "ファッションや美容に関するタグ",
             imageUrl = "https://picsum.photos/id/5/100/100"
+        ),
+        MainHomeTagCategoryData(
+            id = "6",
+            name = "テクノロジー・IT",
+            description = "テクノロジーやITに関するタグ",
+            imageUrl = "https://picsum.photos/id/6/100/100"
+        ),
+        MainHomeTagCategoryData(
+            id = "7",
+            name = "ビジネス・キャリア",
+            description = "ビジネスやキャリアに関するタグ",
+            imageUrl = "https://picsum.photos/id/7/100/100"
+        ),
+        MainHomeTagCategoryData(
+            id = "8",
+            name = "教育・学習",
+            description = "教育や学習に関するタグ",
+            imageUrl = "https://picsum.photos/id/8/100/100"
+        ),
+        MainHomeTagCategoryData(
+            id = "9",
+            name = "健康・ウェルネス",
+            description = "健康やウェルネスに関するタグ",
+            imageUrl = "https://picsum.photos/id/9/100/100"
+        ),
+        MainHomeTagCategoryData(
+            id = "10",
+            name = "アート・クリエイティブ",
+            description = "アートやクリエイティブに関するタグ",
+            imageUrl = "https://picsum.photos/id/10/100/100"
         )
     )
 

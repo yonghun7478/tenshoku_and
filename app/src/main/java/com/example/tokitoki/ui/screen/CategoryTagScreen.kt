@@ -1,13 +1,11 @@
 package com.example.tokitoki.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -23,53 +21,46 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.tokitoki.R
+import com.example.tokitoki.ui.state.CategoryTagResultUiState
 import com.example.tokitoki.ui.state.TagCategoryUiState
-import com.example.tokitoki.ui.state.TagResultUiState
-import com.example.tokitoki.ui.viewmodel.TagSearchViewModel
+import com.example.tokitoki.ui.viewmodel.CategoryTagViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 
-// --- Main Screen ---
 @Composable
-fun TagSearchScreen(
-    viewModel: TagSearchViewModel = hiltViewModel(),
-    onNavigateToCategory: (String, String) -> Unit = { _, _ -> },
+fun CategoryTagScreen(
+    categoryId: String,
+    categoryName: String,
+    viewModel: CategoryTagViewModel = hiltViewModel(),
     onNavigateUp: () -> Unit = {}
 ) {
-    val categories by viewModel.categories.collectAsState()
     val tags by viewModel.tags.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-    val selectedCategoryId by viewModel.selectedCategoryId.collectAsState()
 
-    TagSearchScreenContents(
+    LaunchedEffect(Unit) {
+        viewModel.initialize(categoryId)
+    }
+
+    CategoryTagScreenContents(
+        categoryName = categoryName,
         searchQuery = searchQuery,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        categories = categories,
-        searchResults = tags,
-        isSearching = searchQuery.isNotBlank(),
-        onCategoryClick = { category -> onNavigateToCategory(category.id, category.name) },
-        onTagClick = {},
+        tags = tags,
         isLoading = isLoading,
         errorMessage = errorMessage
     )
 }
 
-// --- Contents ---
 @Composable
-fun TagSearchScreenContents(
+fun CategoryTagScreenContents(
+    categoryName: String,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    categories: List<TagCategoryUiState>,
-    searchResults: List<TagResultUiState>,
-    isSearching: Boolean,
-    onCategoryClick: (TagCategoryUiState) -> Unit,
-    onTagClick: (TagResultUiState) -> Unit,
+    tags: List<CategoryTagResultUiState>,
     isLoading: Boolean = false,
     errorMessage: String? = null,
     modifier: Modifier = Modifier
@@ -79,14 +70,27 @@ fun TagSearchScreenContents(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        TagSearchBar(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
+        // Category Name
+        Text(
+            text = categoryName,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         )
+
+        // Search Bar
+        CategoryTagSearchBar(
+            value = searchQuery,
+            onValueChange = onSearchQueryChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Tags Grid
         when {
             isLoading -> {
                 Box(
@@ -104,17 +108,10 @@ fun TagSearchScreenContents(
                     Text(errorMessage, color = Color.Red)
                 }
             }
-            !isSearching -> {
-                TagCategoryGrid(
-                    categories = categories,
-                    onCategoryClick = onCategoryClick,
-                    modifier = Modifier.weight(1f)
-                )
-            }
             else -> {
                 TagSearchResultGrid(
-                    tags = searchResults,
-                    onTagClick = onTagClick,
+                    tags = tags,
+                    onTagClick = {},
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -122,9 +119,8 @@ fun TagSearchScreenContents(
     }
 }
 
-// --- Search Bar ---
 @Composable
-fun TagSearchBar(
+fun CategoryTagSearchBar(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -156,7 +152,7 @@ fun TagSearchBar(
                 decorationBox = { innerTextField ->
                     if (value.isEmpty()) {
                         Text(
-                            text = "興味のあるマイタグを検索",
+                            text = "タグを検索",
                             color = Color.Gray
                         )
                     }
@@ -167,66 +163,10 @@ fun TagSearchBar(
     }
 }
 
-// --- Category Grid ---
-@Composable
-fun TagCategoryGrid(
-    categories: List<TagCategoryUiState>,
-    onCategoryClick: (TagCategoryUiState) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
-        contentPadding = PaddingValues(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(categories) { category ->
-            TagCategoryItem(category = category, onClick = { onCategoryClick(category) })
-        }
-    }
-}
-
-@Composable
-fun TagCategoryItem(
-    category: TagCategoryUiState,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .background(Color(0xFFF8F8F8))
-            .padding(8.dp)
-            .width(100.dp)
-    ) {
-        AsyncImage(
-            model = category.imageUrl,
-            contentDescription = category.name,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop,
-            error = painterResource(R.drawable.no_image_icon)
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = category.name,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1
-        )
-    }
-}
-
-// --- Tag Result Grid ---
 @Composable
 fun TagSearchResultGrid(
-    tags: List<TagResultUiState>,
-    onTagClick: (TagResultUiState) -> Unit,
+    tags: List<CategoryTagResultUiState>,
+    onTagClick: (CategoryTagResultUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -246,7 +186,7 @@ fun TagSearchResultGrid(
 
 @Composable
 fun TagResultItem(
-    tag: TagResultUiState,
+    tag: CategoryTagResultUiState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -281,11 +221,4 @@ fun TagResultItem(
             color = Color.Gray
         )
     }
-}
-
-// --- Preview ---
-@Preview(showBackground = true)
-@Composable
-fun TagSearchScreenPreview() {
-    TagSearchScreen()
 } 

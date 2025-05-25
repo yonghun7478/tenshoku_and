@@ -10,6 +10,8 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_IDS
 import com.example.tokitoki.ui.screen.TokitokiArgs.URI
 import com.example.tokitoki.ui.screen.TokitokiArgs.USER_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.SCREEN_NAME
+import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_ID
+import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_NAME
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -31,6 +33,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.SIGN_IN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.IINE_SITA_HITO_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.USER_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_SEARCH_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.CATEGORY_TAG_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -54,6 +57,7 @@ private object TokitokiScreens {
     const val IINE_SITA_HITO_SCREEN = "IineSitaHitoScreen"
     const val USER_DETAIL_SCREEN = "UserDetailScreen"
     const val TAG_SEARCH_SCREEN = "tag_search_screen"
+    const val CATEGORY_TAG_SCREEN = "category_tag_screen"
 }
 
 object TokitokiArgs {
@@ -65,6 +69,8 @@ object TokitokiArgs {
     const val IS_EDIT_MODE = "isEditMode"
     const val USER_ID = "userId"
     const val SCREEN_NAME = "screenName"
+    const val CATEGORY_ID = "categoryId"
+    const val CATEGORY_NAME = "categoryName"
 }
 
 object TokitokiDestinations {
@@ -89,6 +95,7 @@ object TokitokiDestinations {
     const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
     const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
     const val TAG_SEARCH_ROUTE = TAG_SEARCH_SCREEN
+    const val CATEGORY_TAG_ROUTE = "$CATEGORY_TAG_SCREEN?$CATEGORY_ID={$CATEGORY_ID}&$CATEGORY_NAME={$CATEGORY_NAME}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -177,5 +184,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToTagSearch() {
         navController.navigate(TokitokiScreens.TAG_SEARCH_SCREEN)
+    }
+
+    fun navigateToCategoryTag(categoryId: String, categoryName: String) {
+        navController.navigate("$CATEGORY_TAG_SCREEN?$CATEGORY_ID=${categoryId}&$CATEGORY_NAME=${categoryName}")
     }
 }
