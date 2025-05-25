@@ -2,19 +2,10 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.domain.usecase.AddRecentSearchUseCase
-import com.example.tokitoki.domain.usecase.AddSelectedTagUseCase
-import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCase
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
-import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCase
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCase
 import com.example.tokitoki.domain.usecase.GetTodayTagUseCase
 import com.example.tokitoki.domain.usecase.GetTrendingTagsUseCase
-import com.example.tokitoki.domain.usecase.RemoveSelectedTagUseCase
-import com.example.tokitoki.domain.usecase.RestoreTempSelectedTagsUseCase
-import com.example.tokitoki.domain.usecase.SaveTempSelectedTagsUseCase
-import com.example.tokitoki.domain.usecase.SearchTagsUseCase
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
