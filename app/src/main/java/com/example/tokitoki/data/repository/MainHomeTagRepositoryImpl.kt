@@ -399,6 +399,15 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
     private var selectedTags: MutableList<MainHomeTag> = mutableListOf()
     private var tempSelectedTags: List<MainHomeTag> = listOf()
 
+    // 카테고리별 태그 매핑
+    private val categoryTagMapping = mapOf(
+        "1" to listOf("1", "2", "3", "4", "5", "6"),  // 趣味・スポーツ
+        "2" to listOf("7", "8", "9", "10", "11", "12"),  // 食べ物・飲み物
+        "3" to listOf("13", "14", "15", "16", "17", "18"),  // 旅行・観光
+        "4" to listOf("19", "20", "21", "22", "23", "24"),  // 音楽・映画
+        "5" to listOf("25", "26", "27", "28", "29", "30")   // ファッション・美容
+    )
+
     override suspend fun getTodayTag(): Result<MainHomeTag> {
         delay(500)
         return Result.success(todayTag)
@@ -417,5 +426,19 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
     override suspend fun getSuggestedTags(): Result<List<MainHomeTag>> {
         delay(400)
         return Result.success(suggestedTags)
+    }
+
+    override suspend fun getTagsByCategory(categoryId: String): Result<List<MainHomeTag>> {
+        return try {
+            // API 호출을 시뮬레이션하기 위한 딜레이
+            delay(1000)
+            
+            val tagIds = categoryTagMapping[categoryId] ?: emptyList()
+            val tags = allTags.filter { it.id in tagIds }
+            
+            Result.success(tags.map { it.toDomain() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

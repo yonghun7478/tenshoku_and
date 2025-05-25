@@ -96,6 +96,8 @@ import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
 import com.example.tokitoki.domain.usecase.AddToFavoritesUseCaseImpl
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCase
+import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -105,6 +107,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class UseCaseModule {
+    @Binds
+    @Singleton
+    abstract fun bindGetTagCategoriesUseCase(
+        impl: GetTagCategoriesUseCaseImpl
+    ): GetTagCategoriesUseCase
+
     @Binds
     @Singleton
     abstract fun bindGetCategoriesUseCase(
