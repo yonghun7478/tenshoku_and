@@ -441,4 +441,17 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun getTagsByQuery(query: String): Result<List<MainHomeTag>> {
+        return try {
+            delay(500)
+            val filtered = allTags.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                it.description.contains(query, ignoreCase = true)
+            }
+            Result.success(filtered.map { it.toDomain() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

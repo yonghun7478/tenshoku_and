@@ -98,6 +98,8 @@ import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -383,4 +385,10 @@ abstract class UseCaseModule {
     abstract fun bindRemoveFromFavoritesUseCase(
         impl: RemoveFromFavoritesUseCaseImpl
     ): RemoveFromFavoritesUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagsByQueryUseCase(
+        impl: GetTagsByQueryUseCaseImpl
+    ): GetTagsByQueryUseCase
 }
