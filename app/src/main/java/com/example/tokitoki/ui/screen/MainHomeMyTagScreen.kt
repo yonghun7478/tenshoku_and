@@ -86,6 +86,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
@@ -876,30 +878,33 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = Color.Transparent,
         modifier = Modifier
             .width(100.dp)
-            .height(140.dp)
+            .wrapContentHeight()
             .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            // 섬네일 (1:1 비율)
             AsyncImage(
                 model = tag.imageUrl,
                 contentDescription = "Tag Image",
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(84.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 error = painterResource(R.drawable.no_image_icon)
             )
             
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             
+            // 태그 이름
             Text(
                 text = tag.name,
                 style = MaterialTheme.typography.bodyMedium,
@@ -910,6 +915,7 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
             
             Spacer(modifier = Modifier.height(2.dp))
             
+            // 구독자 수 (아이콘 + 텍스트)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -1130,26 +1136,32 @@ fun MainHomeMyTagScreen_SuggestedTags(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyHorizontalGrid(
-            rows = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.heightIn(max = 200.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
         ) {
-            items(items = suggestedTags) { tag ->
-                MainHomeMyTagScreen_SuggestedTagCard(tag)
-            }
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = suggestedTags) { tag ->
+                    MainHomeMyTagScreen_SuggestedTagCard(tag)
+                }
 
-            if (!isLoading && canLoadMore) {
-                item(
-                    span = { GridItemSpan(maxLineSpan) }
-                ) {
-                    Button(
-                        onClick = onLoadMore,
-                        modifier = Modifier
-                            .padding(8.dp)
+                if (!isLoading && canLoadMore) {
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
                     ) {
-                        Text("もっと見る")
+                        Button(
+                            onClick = onLoadMore,
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            Text("もっと見る")
+                        }
                     }
                 }
             }
