@@ -47,6 +47,7 @@ fun MainHomeScreen(
     viewModel: MainHomeViewModel = hiltViewModel(),
     sharedViewModel: SharedPickupViewModel,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    onNavigateToTagSearch: () -> Unit = {}
 ) {
     // StateFlow 상태 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -63,6 +64,7 @@ fun MainHomeScreen(
         uiState = uiState,
         onEvent = { viewModel.onEvent(it) },
         onNavigateToUserDetail = onNavigateToUserDetail,
+        onNavigateToTagSearch = onNavigateToTagSearch,
         sharedViewModel = sharedViewModel
     )
 }
@@ -72,6 +74,7 @@ fun MainHomeContents(
     uiState: MainHomeUiState,
     onEvent: (MainHomeUiEvent) -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    onNavigateToTagSearch: () -> Unit = {},
     sharedViewModel: SharedPickupViewModel
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -144,7 +147,9 @@ fun MainHomeContents(
                     onNavigateToUserDetail = onNavigateToUserDetail,
                     sharedViewModel = sharedViewModel
                 )
-                MainHomeTab.MY_TAG -> MainHomeMyTagScreen()
+                MainHomeTab.MY_TAG -> MainHomeMyTagScreen(
+                    onNavigateToTagSearch = onNavigateToTagSearch
+                )
             }
         }
     }

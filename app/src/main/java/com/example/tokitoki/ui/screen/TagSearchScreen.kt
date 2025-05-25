@@ -36,7 +36,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 // --- Main Screen ---
 @Composable
 fun TagSearchScreen(
-    viewModel: TagSearchViewModel = hiltViewModel()
+    viewModel: TagSearchViewModel = hiltViewModel(),
+    onNavigateUp: () -> Unit = {}
 ) {
     val categories by viewModel.categories.collectAsState()
     val tags by viewModel.tags.collectAsState()

@@ -30,6 +30,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.REGISTER_WITH_EMAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.SIGN_IN_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.IINE_SITA_HITO_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.USER_DETAIL_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_SEARCH_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -52,6 +53,7 @@ private object TokitokiScreens {
     const val FAVORITE_USERS_SCREEN = "FavoriteUsersScreen"
     const val IINE_SITA_HITO_SCREEN = "IineSitaHitoScreen"
     const val USER_DETAIL_SCREEN = "UserDetailScreen"
+    const val TAG_SEARCH_SCREEN = "tag_search_screen"
 }
 
 object TokitokiArgs {
@@ -86,6 +88,7 @@ object TokitokiDestinations {
     const val ASHIATO_ROUTE = ASHIATO_SCREEN
     const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
     const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
+    const val TAG_SEARCH_ROUTE = TAG_SEARCH_SCREEN
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -170,5 +173,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToUserDetail(userId: String, screenName: String) {
         navController.navigate("$USER_DETAIL_SCREEN?$USER_ID=${userId}&$SCREEN_NAME=${screenName}")
+    }
+
+    fun navigateToTagSearch() {
+        navController.navigate(TokitokiScreens.TAG_SEARCH_SCREEN)
     }
 }

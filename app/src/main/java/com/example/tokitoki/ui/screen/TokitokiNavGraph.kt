@@ -322,6 +322,9 @@ fun TokitokiNavGraph(
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
                 },
+                onNavigateToTagSearch = {
+                    navAction.navigateToTagSearch()
+                },
                 sharedViewModel = sharedViewModel
             )
         }
@@ -365,6 +368,14 @@ fun TokitokiNavGraph(
                     navController.navigateUp()
                 },
                 sharedViewModel = sharedViewModel
+            )
+        }
+
+        composable(TokitokiDestinations.TAG_SEARCH_ROUTE) {
+            TagSearchScreen(
+                onNavigateUp = {
+                    navController.navigateUp()
+                }
             )
         }
     }

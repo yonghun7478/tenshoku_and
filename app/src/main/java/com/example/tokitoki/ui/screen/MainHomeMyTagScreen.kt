@@ -80,9 +80,13 @@ import com.example.tokitoki.ui.state.SuggestedTagsUiState
 /**
  * 메인 홈 화면의 마이태그 섹션을 표시하는 메인 컴포저블
  * @param viewModel 마이태그 관련 데이터와 로직을 관리하는 ViewModel
+ * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
  */
 @Composable
-fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
+fun MainHomeMyTagScreen(
+    viewModel: MainHomeMyTagViewModel = hiltViewModel(),
+    onNavigateToTagSearch: () -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsState()
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -102,7 +106,8 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
         uiState = uiState,
         suggestedTagsUiState = suggestedTagsUiState,
         snackbarHostState = snackbarHostState,
-        onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() }
+        onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() },
+        onNavigateToTagSearch = onNavigateToTagSearch
     )
 }
 
@@ -112,13 +117,15 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
  * @param suggestedTagsUiState 추천 태그 UI 상태
  * @param snackbarHostState 스낵바 호스트 상태
  * @param onLoadMoreSuggestedTags 더 불러오기 클릭 시 호출될 콜백
+ * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
  */
 @Composable
 fun MainHomeMyTagScreenContent(
     uiState: MainHomeMyTagUiState,
     suggestedTagsUiState: SuggestedTagsUiState,
     snackbarHostState: SnackbarHostState,
-    onLoadMoreSuggestedTags: () -> Unit
+    onLoadMoreSuggestedTags: () -> Unit,
+    onNavigateToTagSearch: () -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -131,8 +138,7 @@ fun MainHomeMyTagScreenContent(
                 item {
                     // 상단 태그 검색 바 (isExpanded == false 일때만)
                     MainHomeMyTagScreen_NormalSearchBar(
-                        onSearchBarClicked = {
-                        },
+                        onSearchBarClicked = onNavigateToTagSearch,
                     )
                     Divider()
                 }
@@ -175,17 +181,16 @@ fun MainHomeMyTagScreenContent(
 
 /**
  * 일반 상태의 검색 바를 표시하는 컴포저블
- * @param selectedTags 현재 선택된 태그 목록
  * @param onSearchBarClicked 검색 바 클릭 시 호출될 콜백
  * @param modifier 외부에서 전달받은 Modifier
  */
 @Composable
 fun MainHomeMyTagScreen_NormalSearchBar(
     onSearchBarClicked: () -> Unit,
-    modifier: Modifier = Modifier, // 추가: 외부에서 Modifier를 받을 수 있도록
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier // 외부에서 Modifier 적용
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .clickable { onSearchBarClicked() }
@@ -1108,7 +1113,8 @@ fun MainHomeMyTagScreenPreview() {
                 canLoadMore = true
             ),
             snackbarHostState = remember { SnackbarHostState() },
-            onLoadMoreSuggestedTags = {}
+            onLoadMoreSuggestedTags = {},
+            onNavigateToTagSearch = {}
         )
     }
 }
@@ -1125,7 +1131,8 @@ fun MainHomeMyTagScreenLoadingPreview() {
             ),
             suggestedTagsUiState = SuggestedTagsUiState(),
             snackbarHostState = remember { SnackbarHostState() },
-            onLoadMoreSuggestedTags = {}
+            onLoadMoreSuggestedTags = {},
+            onNavigateToTagSearch = {}
         )
     }
 }
@@ -1138,7 +1145,8 @@ fun MainHomeMyTagScreenEmptyPreview() {
             uiState = MainHomeMyTagUiState(),
             suggestedTagsUiState = SuggestedTagsUiState(),
             snackbarHostState = remember { SnackbarHostState() },
-            onLoadMoreSuggestedTags = {}
+            onLoadMoreSuggestedTags = {},
+            onNavigateToTagSearch = {}
         )
     }
 }
