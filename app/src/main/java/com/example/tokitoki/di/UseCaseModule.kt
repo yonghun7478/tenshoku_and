@@ -98,6 +98,8 @@ import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTagsByCategoryUseCase
+import com.example.tokitoki.domain.usecase.GetTagsByCategoryUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCaseImpl
 import dagger.Binds
@@ -391,4 +393,10 @@ abstract class UseCaseModule {
     abstract fun bindGetTagsByQueryUseCase(
         impl: GetTagsByQueryUseCaseImpl
     ): GetTagsByQueryUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagsByCategoryUseCase(
+        impl: GetTagsByCategoryUseCaseImpl
+    ): GetTagsByCategoryUseCase
 }

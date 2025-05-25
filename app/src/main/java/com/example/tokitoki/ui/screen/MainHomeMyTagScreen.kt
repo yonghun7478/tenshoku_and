@@ -1,16 +1,10 @@
 package com.example.tokitoki.ui.screen
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,26 +12,21 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,18 +45,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
@@ -75,7 +59,6 @@ import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.MainHomeMyTagViewModel
 import coil.compose.AsyncImage
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.foundation.layout.absoluteOffset
@@ -86,13 +69,13 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.TextButton
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.example.tokitoki.ui.state.MainHomeMyTagUiState
+import com.example.tokitoki.ui.state.SuggestedTagsUiState
 
 /**
  * 메인 홈 화면의 마이태그 섹션을 표시하는 메인 컴포저블
@@ -115,11 +98,32 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
         }
     }
 
+    MainHomeMyTagScreenContent(
+        uiState = uiState,
+        suggestedTagsUiState = suggestedTagsUiState,
+        snackbarHostState = snackbarHostState,
+        onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() }
+    )
+}
+
+/**
+ * 메인 홈 화면의 마이태그 섹션의 실제 UI를 표시하는 컴포저블
+ * @param uiState UI 상태
+ * @param suggestedTagsUiState 추천 태그 UI 상태
+ * @param snackbarHostState 스낵바 호스트 상태
+ * @param onLoadMoreSuggestedTags 더 불러오기 클릭 시 호출될 콜백
+ */
+@Composable
+fun MainHomeMyTagScreenContent(
+    uiState: MainHomeMyTagUiState,
+    suggestedTagsUiState: SuggestedTagsUiState,
+    snackbarHostState: SnackbarHostState,
+    onLoadMoreSuggestedTags: () -> Unit
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-
             LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -161,9 +165,7 @@ fun MainHomeMyTagScreen(viewModel: MainHomeMyTagViewModel = hiltViewModel()) {
                         suggestedTags = suggestedTagsUiState.tags,
                         canLoadMore = suggestedTagsUiState.canLoadMore,
                         isLoading = uiState.isLoadingSuggestedTags,
-                        onLoadMore = {
-                            viewModel.loadMoreSuggestedTags()
-                        }
+                        onLoadMore = onLoadMoreSuggestedTags
                     )
                 }
             }
@@ -1034,5 +1036,353 @@ fun SuggestedTagShimmerCard(
                 .fillMaxWidth(0.6f)
                 .height(12.dp)
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreenPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreenContent(
+            uiState = MainHomeMyTagUiState(
+                todayTag = MainHomeTagItemUiState(
+                    id = "1",
+                    name = "今日のタグ",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 1000,
+                    description = ""
+                ),
+                trendingTags = listOf(
+                    MainHomeTagItemUiState(
+                        id = "2",
+                        name = "トレンドタグ1",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 800,
+                        description = ""
+                    ),
+                    MainHomeTagItemUiState(
+                        id = "3",
+                        name = "トレンドタグ2",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 600,
+                        description = ""
+                    )
+                ),
+                myTags = listOf(
+                    MainHomeTagItemUiState(
+                        id = "4",
+                        name = "マイタグ1",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 400,
+                        description = ""
+                    ),
+                    MainHomeTagItemUiState(
+                        id = "5",
+                        name = "マイタグ2",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 300,
+                        description = ""
+                    )
+                ),
+                isLoadingTodayAndTrending = false,
+                isLoadingMyTags = false,
+                isLoadingSuggestedTags = false
+            ),
+            suggestedTagsUiState = SuggestedTagsUiState(
+                tags = listOf(
+                    MainHomeTagItemUiState(
+                        id = "6",
+                        name = "おすすめタグ1",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 200,
+                        description = ""
+                    ),
+                    MainHomeTagItemUiState(
+                        id = "7",
+                        name = "おすすめタグ2",
+                        imageUrl = "https://picsum.photos/200/200",
+                        subscriberCount = 150,
+                        description = ""
+                    )
+                ),
+                canLoadMore = true
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onLoadMoreSuggestedTags = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreenLoadingPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreenContent(
+            uiState = MainHomeMyTagUiState(
+                isLoadingTodayAndTrending = true,
+                isLoadingMyTags = true,
+                isLoadingSuggestedTags = true
+            ),
+            suggestedTagsUiState = SuggestedTagsUiState(),
+            snackbarHostState = remember { SnackbarHostState() },
+            onLoadMoreSuggestedTags = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreenEmptyPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreenContent(
+            uiState = MainHomeMyTagUiState(),
+            suggestedTagsUiState = SuggestedTagsUiState(),
+            snackbarHostState = remember { SnackbarHostState() },
+            onLoadMoreSuggestedTags = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_NormalSearchBarPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_NormalSearchBar(
+            onSearchBarClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TodayAndTrendingTags(
+            tags = listOf(
+                MainHomeTagItemUiState(
+                    id = "1",
+                    name = "今日のタグ",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 1000,
+                    description = ""
+                ),
+                MainHomeTagItemUiState(
+                    id = "2",
+                    name = "トレンドタグ1",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 800,
+                    description = ""
+                )
+            ),
+            isLoading = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_TodayAndTrendingTagsLoadingPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TodayAndTrendingTags(
+            tags = emptyList(),
+            isLoading = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_MySelectedTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_MySelectedTags(
+            myTags = listOf(
+                MainHomeTagItemUiState(
+                    id = "1",
+                    name = "マイタグ1",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 400,
+                    description = ""
+                ),
+                MainHomeTagItemUiState(
+                    id = "2",
+                    name = "マイタグ2",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 300,
+                    description = ""
+                )
+            ),
+            isLoading = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_MySelectedTagsLoadingPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_MySelectedTags(
+            myTags = emptyList(),
+            isLoading = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_MySelectedTagsEmptyPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_MySelectedTags(
+            myTags = emptyList(),
+            isLoading = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_PromotionBannerPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_PromotionBanner(
+            imageUrl = "https://picsum.photos/400/100",
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagsPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SuggestedTags(
+            suggestedTags = listOf(
+                MainHomeTagItemUiState(
+                    id = "1",
+                    name = "おすすめタグ1",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 200,
+                    description = ""
+                ),
+                MainHomeTagItemUiState(
+                    id = "2",
+                    name = "おすすめタグ2",
+                    imageUrl = "https://picsum.photos/200/200",
+                    subscriberCount = 150,
+                    description = ""
+                )
+            ),
+            canLoadMore = true,
+            isLoading = false,
+            onLoadMore = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagsLoadingPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SuggestedTags(
+            suggestedTags = emptyList(),
+            canLoadMore = false,
+            isLoading = true,
+            onLoadMore = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagsEmptyPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SuggestedTags(
+            suggestedTags = emptyList(),
+            canLoadMore = false,
+            isLoading = false,
+            onLoadMore = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_TrendingTagCardPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_TrendingTagCard(
+            tag = MainHomeTagItemUiState(
+                id = "1",
+                name = "トレンドタグ",
+                imageUrl = "https://picsum.photos/200/200",
+                subscriberCount = 1000,
+                description = ""
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_MyTagCardPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_MyTagCard(
+            tag = MainHomeTagItemUiState(
+                id = "1",
+                name = "マイタグ",
+                imageUrl = "https://picsum.photos/200/200",
+                subscriberCount = 500,
+                description = ""
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainHomeMyTagScreen_SuggestedTagCardPreview() {
+    TokitokiTheme {
+        MainHomeMyTagScreen_SuggestedTagCard(
+            tag = MainHomeTagItemUiState(
+                id = "1",
+                name = "おすすめタグ",
+                imageUrl = "https://picsum.photos/200/200",
+                subscriberCount = 300,
+                description = ""
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShimmerEffectPreview() {
+    TokitokiTheme {
+        ShimmerEffect(
+            modifier = Modifier
+                .size(100.dp)
+                .background(Color.LightGray)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TrendingTagShimmerCardPreview() {
+    TokitokiTheme {
+        TrendingTagShimmerCard()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MyTagShimmerCardPreview() {
+    TokitokiTheme {
+        MyTagShimmerCard()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SuggestedTagShimmerCardPreview() {
+    TokitokiTheme {
+        SuggestedTagShimmerCard()
     }
 }
