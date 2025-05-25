@@ -1055,7 +1055,8 @@ fun MainHomeMyTagScreenPreview() {
                     name = "今日のタグ",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 1000,
-                    description = ""
+                    description = "",
+                    categoryId = "1"
                 ),
                 trendingTags = listOf(
                     MainHomeTagItemUiState(
@@ -1063,14 +1064,16 @@ fun MainHomeMyTagScreenPreview() {
                         name = "トレンドタグ1",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 800,
-                        description = ""
+                        description = "",
+                        categoryId = "1"
                     ),
                     MainHomeTagItemUiState(
                         id = "3",
                         name = "トレンドタグ2",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 600,
-                        description = ""
+                        description = "",
+                        categoryId = "1"
                     )
                 ),
                 myTags = listOf(
@@ -1079,14 +1082,16 @@ fun MainHomeMyTagScreenPreview() {
                         name = "マイタグ1",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 400,
-                        description = ""
+                        description = "",
+                        categoryId = "2"
                     ),
                     MainHomeTagItemUiState(
                         id = "5",
                         name = "マイタグ2",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 300,
-                        description = ""
+                        description = "",
+                        categoryId = "2"
                     )
                 ),
                 isLoadingTodayAndTrending = false,
@@ -1100,14 +1105,16 @@ fun MainHomeMyTagScreenPreview() {
                         name = "おすすめタグ1",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 200,
-                        description = ""
+                        description = "",
+                        categoryId = "3"
                     ),
                     MainHomeTagItemUiState(
                         id = "7",
                         name = "おすすめタグ2",
                         imageUrl = "https://picsum.photos/200/200",
                         subscriberCount = 150,
-                        description = ""
+                        description = "",
+                        categoryId = "3"
                     )
                 ),
                 canLoadMore = true
@@ -1172,14 +1179,16 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
                     name = "今日のタグ",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 1000,
-                    description = ""
+                    description = "",
+                    categoryId = "1"
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
                     name = "トレンドタグ1",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 800,
-                    description = ""
+                    description = "",
+                    categoryId = "1"
                 )
             ),
             isLoading = false
@@ -1209,14 +1218,16 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
                     name = "マイタグ1",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 400,
-                    description = ""
+                    description = "",
+                    categoryId = "2"
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
                     name = "マイタグ2",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 300,
-                    description = ""
+                    description = "",
+                    categoryId = "2"
                 )
             ),
             isLoading = false
@@ -1268,14 +1279,16 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
                     name = "おすすめタグ1",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 200,
-                    description = ""
+                    description = "",
+                    categoryId = "3"
                 ),
                 MainHomeTagItemUiState(
                     id = "2",
                     name = "おすすめタグ2",
                     imageUrl = "https://picsum.photos/200/200",
                     subscriberCount = 150,
-                    description = ""
+                    description = "",
+                    categoryId = "3"
                 )
             ),
             canLoadMore = true,
@@ -1321,7 +1334,8 @@ fun MainHomeMyTagScreen_TrendingTagCardPreview() {
                 name = "トレンドタグ",
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 1000,
-                description = ""
+                description = "",
+                categoryId = "1"
             )
         )
     }
@@ -1337,7 +1351,8 @@ fun MainHomeMyTagScreen_MyTagCardPreview() {
                 name = "マイタグ",
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 500,
-                description = ""
+                description = "",
+                categoryId = "2"
             )
         )
     }
@@ -1353,7 +1368,8 @@ fun MainHomeMyTagScreen_SuggestedTagCardPreview() {
                 name = "おすすめタグ",
                 imageUrl = "https://picsum.photos/200/200",
                 subscriberCount = 300,
-                description = ""
+                description = "",
+                categoryId = "3"
             )
         )
     }

@@ -8,14 +8,16 @@ data class MainHomeTag(
     val name: String,
     val description: String,
     val imageUrl: String,
-    val subscriberCount: Int
+    val subscriberCount: Int,
+    val categoryId: String
 ) {
     fun toPresentation(): MainHomeTagItemUiState = MainHomeTagItemUiState(
         id = this.id,
         name = this.name,
         description = this.description,
         imageUrl = this.imageUrl,
-        subscriberCount = this.subscriberCount
+        subscriberCount = this.subscriberCount,
+        categoryId = this.categoryId
     )
 
     fun toData(): MainHomeTagData = MainHomeTagData(
@@ -23,6 +25,7 @@ data class MainHomeTag(
         name = this.name,
         description = this.description,
         imageUrl = this.imageUrl,
-        subscriberCount = this.subscriberCount
+        subscriberCount = this.subscriberCount,
+        categoryId = this.categoryId
     )
 }

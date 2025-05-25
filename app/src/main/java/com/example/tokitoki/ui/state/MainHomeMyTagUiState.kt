@@ -18,7 +18,8 @@ data class MainHomeTagItemUiState(
     val name: String,
     val description: String,
     val imageUrl: String,
-    val subscriberCount: Int
+    val subscriberCount: Int,
+    val categoryId: String
 ) {
     fun toDomain(): MainHomeTag {
         return MainHomeTag(
@@ -26,7 +27,8 @@ data class MainHomeTagItemUiState(
             name = this.name,
             description = this.description,
             imageUrl = this.imageUrl,
-            subscriberCount = this.subscriberCount
+            subscriberCount = this.subscriberCount,
+            categoryId = this.categoryId
         )
     }
 }

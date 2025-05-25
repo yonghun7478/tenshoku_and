@@ -20,210 +20,240 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             name = "カフェ巡り",
             description = "お気に入りのカフェを探して、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/1/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "2"  // 食べ物・飲み物
         ),
         MainHomeTagData(
             id = "2",
             name = "旅行好き",
             description = "新しい場所を発見し、素晴らしい思い出を作りましょう。",
             imageUrl = "https://picsum.photos/id/2/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "3",
             name = "料理上手",
             description = "美味しい料理を作って、大切な人と共有しましょう。",
             imageUrl = "https://picsum.photos/id/3/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "2"  // 食べ物・飲み物
         ),
         MainHomeTagData(
             id = "4",
             name = "読書家",
             description = "本の世界に浸り、新しい知識と感動を得ましょう。",
             imageUrl = "https://picsum.photos/id/4/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "5",
             name = "映画好き",
             description = "様々な映画を観て、感動と刺激を受けましょう。",
             imageUrl = "https://picsum.photos/id/5/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "6",
             name = "音楽好き",
             description = "音楽を通じて、心を癒し、活力を得ましょう。",
             imageUrl = "https://picsum.photos/id/6/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "7",
             name = "スポーツ好き",
             description = "体を動かして、健康な生活を送りましょう。",
             imageUrl = "https://picsum.photos/id/7/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "8",
             name = "写真撮影",
             description = "素敵な瞬間を写真に残し、思い出を大切にしましょう。",
             imageUrl = "https://picsum.photos/id/8/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "9",
             name = "アート好き",
             description = "芸術作品に触れ、感性を磨きましょう。",
             imageUrl = "https://picsum.photos/id/9/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "10",
             name = "ガーデニング",
             description = "植物を育て、自然と触れ合いましょう。",
             imageUrl = "https://picsum.photos/id/10/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "11",
             name = "ペット好き",
             description = "かわいいペットと一緒に、幸せな時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/11/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "12",
             name = "ファッション",
             description = "おしゃれを楽しみ、自分らしいスタイルを見つけましょう。",
             imageUrl = "https://picsum.photos/id/12/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "5"  // ファッション・美容
         ),
         MainHomeTagData(
             id = "13",
             name = "ヨガ",
             description = "心と体のバランスを取り、リラックスしましょう。",
             imageUrl = "https://picsum.photos/id/13/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "14",
             name = "お酒好き",
             description = "美味しいお酒を楽しみ、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/14/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "2"  // 食べ物・飲み物
         ),
         MainHomeTagData(
             id = "15",
             name = "ゲーム好き",
             description = "ゲームを通じて、新しい世界を体験しましょう。",
             imageUrl = "https://picsum.photos/id/15/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "16",
             name = "DIY",
             description = "自分で作る喜びを体験しましょう。",
             imageUrl = "https://picsum.photos/id/16/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "1"  // 趣味・スポーツ
         ),
         MainHomeTagData(
             id = "17",
             name = "コーヒー好き",
             description = "美味しいコーヒーで、素敵な時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/17/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "2"  // 食べ物・飲み物
         ),
         MainHomeTagData(
             id = "18",
             name = "スイーツ好き",
             description = "甘いものを通じて、幸せな時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/18/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "2"  // 食べ物・飲み物
         ),
         MainHomeTagData(
             id = "19",
             name = "温泉好き",
             description = "温泉で心身を癒し、リフレッシュしましょう。",
             imageUrl = "https://picsum.photos/id/19/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "20",
             name = "登山",
             description = "自然を感じながら、新しい景色を発見しましょう。",
             imageUrl = "https://picsum.photos/id/20/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "21",
             name = "キャンプ",
             description = "自然の中で、素敵な思い出を作りましょう。",
             imageUrl = "https://picsum.photos/id/21/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "22",
             name = "釣り",
             description = "海や川で、のんびりとした時間を過ごしましょう。",
             imageUrl = "https://picsum.photos/id/22/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "23",
             name = "ゴルフ",
             description = "ゴルフを通じて、新しい出会いを楽しみましょう。",
             imageUrl = "https://picsum.photos/id/23/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "24",
             name = "テニス",
             description = "テニスで体を動かし、爽快感を味わいましょう。",
             imageUrl = "https://picsum.photos/id/24/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "3"  // 旅行・観光
         ),
         MainHomeTagData(
             id = "25",
             name = "ダンス",
             description = "音楽に合わせて、楽しく体を動かしましょう。",
             imageUrl = "https://picsum.photos/id/25/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "26",
             name = "楽器演奏",
             description = "音楽を奏で、心を豊かにしましょう。",
             imageUrl = "https://picsum.photos/id/26/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "27",
             name = "絵画",
             description = "絵を描いて、表現する喜びを感じましょう。",
             imageUrl = "https://picsum.photos/id/27/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "28",
             name = "陶芸",
             description = "土と向き合い、ものづくりの楽しさを体験しましょう。",
             imageUrl = "https://picsum.photos/id/28/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "29",
             name = "茶道",
             description = "日本の伝統文化に触れ、心を落ち着けましょう。",
             imageUrl = "https://picsum.photos/id/29/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         ),
         MainHomeTagData(
             id = "30",
             name = "書道",
             description = "文字を書くことで、心を整えましょう。",
             imageUrl = "https://picsum.photos/id/30/100/100",
-            subscriberCount = (50..300).random()
+            subscriberCount = (50..300).random(),
+            categoryId = "4"  // 音楽・映画
         )
     )
 
@@ -399,15 +429,6 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
     private var selectedTags: MutableList<MainHomeTag> = mutableListOf()
     private var tempSelectedTags: List<MainHomeTag> = listOf()
 
-    // 카테고리별 태그 매핑
-    private val categoryTagMapping = mapOf(
-        "1" to listOf("1", "2", "3", "4", "5", "6"),  // 趣味・スポーツ
-        "2" to listOf("7", "8", "9", "10", "11", "12"),  // 食べ物・飲み物
-        "3" to listOf("13", "14", "15", "16", "17", "18"),  // 旅行・観光
-        "4" to listOf("19", "20", "21", "22", "23", "24"),  // 音楽・映画
-        "5" to listOf("25", "26", "27", "28", "29", "30")   // ファッション・美容
-    )
-
     override suspend fun getTodayTag(): Result<MainHomeTag> {
         delay(500)
         return Result.success(todayTag)
@@ -433,9 +454,7 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             // API 호출을 시뮬레이션하기 위한 딜레이
             delay(1000)
             
-            val tagIds = categoryTagMapping[categoryId] ?: emptyList()
-            val tags = allTags.filter { it.id in tagIds }
-            
+            val tags = allTags.filter { it.categoryId == categoryId }
             Result.success(tags.map { it.toDomain() })
         } catch (e: Exception) {
             Result.failure(e)
