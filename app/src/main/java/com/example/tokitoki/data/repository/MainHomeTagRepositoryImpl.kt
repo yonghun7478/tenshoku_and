@@ -505,11 +505,13 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
         }
     }
 
-    override suspend fun getTagsByType(tagType: TagType): Result<List<MainHomeTag>> {
+    override suspend fun getMyTagsByType(userId: String, tagType: TagType): Result<List<MainHomeTag>> {
         return try {
             delay(500)
-            val filtered = allTags.filter { it.tagType == tagType }
-            Result.success(filtered.map { it.toDomain() })
+            // 현재는 임시로 myTags에서 타입별로 필터링
+            // TODO: 실제 구현에서는 userId를 사용하여 해당 사용자의 마이태그만 필터링해야 함
+            val filtered = myTags.filter { it.tagType == tagType }
+            Result.success(filtered)
         } catch (e: Exception) {
             Result.failure(e)
         }

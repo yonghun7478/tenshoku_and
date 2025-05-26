@@ -116,14 +116,14 @@ fun MyTagListScreenContents(
                     }
                     uiState.error != null -> {
                         Text(
-                            text = uiState.error ?: "알 수 없는 오류",
+                            text = uiState.error ?: "不明なエラー",
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
                     uiState.tagLists[tagType].isNullOrEmpty() -> {
                         Text(
-                            text = "등록중인 마이태그가 없습니다",
+                            text = "登録中のマイタグがありません",
                             modifier = Modifier.align(Alignment.Center),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
@@ -210,9 +210,9 @@ fun MyTagListItem(
 }
 
 private fun TagType.toKoreanString(): String = when (this) {
-    TagType.HOBBY -> "취미"
-    TagType.LIFESTYLE -> "라이프스타일"
-    TagType.VALUE -> "가치관"
+    TagType.HOBBY -> "趣味"
+    TagType.LIFESTYLE -> "ライフスタイル"
+    TagType.VALUE -> "価値観"
 }
 
 @Preview(showBackground = true)
@@ -221,8 +221,8 @@ fun MyTagListItemPreview() {
     MyTagListItem(
         tag = MainHomeTag(
             id = "1",
-            name = "영화감상",
-            description = "영화를 보는 것을 좋아해요",
+            name = "映画鑑賞",
+            description = "映画を見ることが好きです",
             imageUrl = "",
             subscriberCount = 100,
             categoryId = "cat1",
@@ -241,8 +241,8 @@ fun MyTagListScreenContentsPreview() {
                 TagType.HOBBY to listOf(
                     MainHomeTag(
                         id = "1",
-                        name = "영화감상",
-                        description = "영화를 보는 것을 좋아해요",
+                        name = "映画鑑賞",
+                        description = "映画を見ることが好きです",
                         imageUrl = "",
                         subscriberCount = 100,
                         categoryId = "cat1",

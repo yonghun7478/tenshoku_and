@@ -100,10 +100,10 @@ import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetTagCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTagsByCategoryUseCase
 import com.example.tokitoki.domain.usecase.GetTagsByCategoryUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetTagsByTypeUseCase
-import com.example.tokitoki.domain.usecase.GetTagsByTypeUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCase
+import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -404,7 +404,7 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindGetTagsByTypeUseCase(
-        impl: GetTagsByTypeUseCaseImpl
-    ): GetTagsByTypeUseCase
+    abstract fun bindGetMyTagsByTypeUseCase(
+        impl: GetMyTagsByTypeUseCaseImpl
+    ): GetMyTagsByTypeUseCase
 }
