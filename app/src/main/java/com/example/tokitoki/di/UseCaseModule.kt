@@ -104,6 +104,12 @@ import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsByQueryUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetTagDetailUseCase
+import com.example.tokitoki.domain.usecase.GetTagDetailUseCaseImpl
+import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
+import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
+import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCaseImpl
+import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -407,4 +413,22 @@ abstract class UseCaseModule {
     abstract fun bindGetMyTagsByTypeUseCase(
         impl: GetMyTagsByTypeUseCaseImpl
     ): GetMyTagsByTypeUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagDetailUseCase(
+        impl: GetTagDetailUseCaseImpl
+    ): GetTagDetailUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindIsTagSubscribedUseCase(
+        impl: IsTagSubscribedUseCaseImpl
+    ): IsTagSubscribedUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagSubscribersUseCase(
+        impl: GetTagSubscribersUseCaseImpl
+    ): GetTagSubscribersUseCase
 }

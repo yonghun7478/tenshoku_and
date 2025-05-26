@@ -12,4 +12,7 @@ interface UserRepository {
 
     // みてね 전송
     suspend fun sendMiten(userId: String): ResultWrapper<Unit>
+    
+    // 태그 구독자 목록 조회 (항상 lastLoginAt 기준으로 정렬)
+    suspend fun getTagSubscribers(tagId: String, cursor: String?, limit: Int): ResultWrapper<UserList>
 }

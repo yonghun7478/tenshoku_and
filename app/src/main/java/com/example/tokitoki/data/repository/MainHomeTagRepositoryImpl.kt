@@ -516,4 +516,18 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun getTagDetail(tagId: String): Result<MainHomeTag> {
+        return try {
+            delay(500)
+            val tag = allTags.find { it.id == tagId }?.toDomain()
+            if (tag != null) {
+                Result.success(tag)
+            } else {
+                Result.failure(Exception("Tag not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

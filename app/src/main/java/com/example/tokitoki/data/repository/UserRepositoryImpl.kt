@@ -103,4 +103,42 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
             ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
         }
     }
+
+    override suspend fun getTagSubscribers(
+        tagId: String,
+        cursor: String?,
+        limit: Int
+    ): ResultWrapper<UserList> {
+        return try {
+            // API 호출 시뮬레이션
+            kotlinx.coroutines.delay(500)
+
+            // 항상 lastLoginAt 기준으로 정렬
+            val sortedUsers = dummyUsers.sortedByDescending { it.lastLoginAt }
+
+            // cursor가 null이면 처음부터, 아니면 해당 id 이후부터
+            val startIndex = cursor?.let { c ->
+                sortedUsers.indexOfFirst { it.id == c } + 1
+            } ?: 0
+
+            val pagedUsers = sortedUsers.drop(startIndex).take(limit)
+
+            val nextCursor = pagedUsers.lastOrNull()?.id
+            val isLastPage = (startIndex + pagedUsers.size) >= sortedUsers.size
+
+            ResultWrapper.Success(
+                UserList(
+                    users = pagedUsers.map(UserConverter::dataToDomain),
+                    nextCursor = if (isLastPage) null else nextCursor,
+                    isLastPage = isLastPage
+                )
+            )
+        } catch (e: Exception) {
+            ResultWrapper.Error(
+                ResultWrapper.ErrorType.ExceptionError(
+                    e.message ?: "Unknown error"
+                )
+            )
+        }
+    }
 }

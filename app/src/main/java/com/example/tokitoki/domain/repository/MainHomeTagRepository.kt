@@ -13,4 +13,5 @@ interface MainHomeTagRepository {
     suspend fun getTagsByCategory(categoryId: String): Result<List<MainHomeTag>>
     suspend fun getTagsByQuery(query: String): Result<List<MainHomeTag>>
     suspend fun getMyTagsByType(userId: String, tagType: TagType): Result<List<MainHomeTag>>
+    suspend fun getTagDetail(tagId: String): Result<MainHomeTag>
 }
