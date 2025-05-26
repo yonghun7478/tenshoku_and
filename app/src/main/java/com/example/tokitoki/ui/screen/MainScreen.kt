@@ -51,7 +51,8 @@ fun MainScreen(
     onIineSitaHitoClick: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit,
-    onNavigateToTagSearch: () -> Unit
+    onNavigateToTagSearch: () -> Unit,
+    onNavigateToMyTagList: () -> Unit
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -77,6 +78,7 @@ fun MainScreen(
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToUserDetail = onNavigateToUserDetail,
         onNavigateToTagSearch = onNavigateToTagSearch,
+        onNavigateToMyTagList = onNavigateToMyTagList,
         sharedViewModel = sharedViewModel
     )
 }
@@ -91,6 +93,7 @@ fun MainContents(
     onNavigateToSignIn: () -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit,
     onNavigateToTagSearch: () -> Unit,
+    onNavigateToMyTagList: () -> Unit,
     sharedViewModel: SharedPickupViewModel
 ) {
     Scaffold(
@@ -111,6 +114,7 @@ fun MainContents(
                     MainHomeScreen(
                         onNavigateToUserDetail = onNavigateToUserDetail,
                         onNavigateToTagSearch = onNavigateToTagSearch,
+                        onNavigateToMyTagList = onNavigateToMyTagList,
                         sharedViewModel = sharedViewModel
                     )
                 }

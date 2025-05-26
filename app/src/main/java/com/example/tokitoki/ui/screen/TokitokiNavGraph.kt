@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tokitoki.ui.screen.mytaglist.MyTagListScreen
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
@@ -325,7 +326,10 @@ fun TokitokiNavGraph(
                 onNavigateToTagSearch = {
                     navAction.navigateToTagSearch()
                 },
-                sharedViewModel = sharedViewModel
+                sharedViewModel = sharedViewModel,
+                onNavigateToMyTagList = {
+                    navAction.navigateToMyTagList()
+                }
             )
         }
 
@@ -395,6 +399,14 @@ fun TokitokiNavGraph(
             CategoryTagScreen(
                 categoryId = categoryId,
                 categoryName = categoryName,
+                onNavigateUp = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable(TokitokiDestinations.MY_TAG_LIST_ROUTE) {
+            MyTagListScreen(
                 onNavigateUp = {
                     navController.navigateUp()
                 }

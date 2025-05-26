@@ -82,11 +82,13 @@ import com.example.tokitoki.ui.state.SuggestedTagsUiState
  * 메인 홈 화면의 마이태그 섹션을 표시하는 메인 컴포저블
  * @param viewModel 마이태그 관련 데이터와 로직을 관리하는 ViewModel
  * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
+ * @param onNavigateToMyTagList 마이태그 목록 화면으로 이동하는 콜백
  */
 @Composable
 fun MainHomeMyTagScreen(
     viewModel: MainHomeMyTagViewModel = hiltViewModel(),
-    onNavigateToTagSearch: () -> Unit = {}
+    onNavigateToTagSearch: () -> Unit = {},
+    onNavigateToMyTagList: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
@@ -108,7 +110,8 @@ fun MainHomeMyTagScreen(
         suggestedTagsUiState = suggestedTagsUiState,
         snackbarHostState = snackbarHostState,
         onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() },
-        onNavigateToTagSearch = onNavigateToTagSearch
+        onNavigateToTagSearch = onNavigateToTagSearch,
+        onNavigateToMyTagList = onNavigateToMyTagList
     )
 }
 
@@ -119,6 +122,7 @@ fun MainHomeMyTagScreen(
  * @param snackbarHostState 스낵바 호스트 상태
  * @param onLoadMoreSuggestedTags 더 불러오기 클릭 시 호출될 콜백
  * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
+ * @param onNavigateToMyTagList 마이태그 목록 화면으로 이동하는 콜백
  */
 @Composable
 fun MainHomeMyTagScreenContent(
@@ -126,7 +130,8 @@ fun MainHomeMyTagScreenContent(
     suggestedTagsUiState: SuggestedTagsUiState,
     snackbarHostState: SnackbarHostState,
     onLoadMoreSuggestedTags: () -> Unit,
-    onNavigateToTagSearch: () -> Unit
+    onNavigateToTagSearch: () -> Unit,
+    onNavigateToMyTagList: () -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -154,7 +159,11 @@ fun MainHomeMyTagScreenContent(
                 }
                 item {
                     // 내가 선택한 태그
-                    MainHomeMyTagScreen_MySelectedTags(uiState.myTags, uiState.isLoadingMyTags)
+                    MainHomeMyTagScreen_MySelectedTags(
+                        uiState.myTags,
+                        uiState.isLoadingMyTags,
+                        onMoreClick = onNavigateToMyTagList
+                    )
                     Divider()
                 }
 
@@ -679,12 +688,14 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
  * 내가 선택한 태그들을 표시하는 컴포저블
  * @param myTags 선택된 태그 목록
  * @param isLoading 로딩 상태
+ * @param onMoreClick 'もっと見る' 클릭 시 호출될 콜백
  */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_MySelectedTags(
     myTags: List<MainHomeTagItemUiState>,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    onMoreClick: () -> Unit = {}
 ) {
     val itemsPerPage = 4
     val maxPages = 3
@@ -712,7 +723,8 @@ fun MainHomeMyTagScreen_MySelectedTags(
             Text(
                 text = "もっと見る",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = Color.Gray,
+                modifier = Modifier.clickable { onMoreClick() }
             )
         }
 
@@ -1129,7 +1141,8 @@ fun MainHomeMyTagScreenPreview() {
             ),
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
-            onNavigateToTagSearch = {}
+            onNavigateToTagSearch = {},
+            onNavigateToMyTagList = {}
         )
     }
 }
@@ -1147,7 +1160,8 @@ fun MainHomeMyTagScreenLoadingPreview() {
             suggestedTagsUiState = SuggestedTagsUiState(),
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
-            onNavigateToTagSearch = {}
+            onNavigateToTagSearch = {},
+            onNavigateToMyTagList = {}
         )
     }
 }
@@ -1161,7 +1175,8 @@ fun MainHomeMyTagScreenEmptyPreview() {
             suggestedTagsUiState = SuggestedTagsUiState(),
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
-            onNavigateToTagSearch = {}
+            onNavigateToTagSearch = {},
+            onNavigateToMyTagList = {}
         )
     }
 }
@@ -1242,7 +1257,8 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
                     tagType = TagType.LIFESTYLE
                 )
             ),
-            isLoading = false
+            isLoading = false,
+            onMoreClick = {}
         )
     }
 }
@@ -1253,7 +1269,8 @@ fun MainHomeMyTagScreen_MySelectedTagsLoadingPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_MySelectedTags(
             myTags = emptyList(),
-            isLoading = true
+            isLoading = true,
+            onMoreClick = {}
         )
     }
 }
@@ -1264,7 +1281,8 @@ fun MainHomeMyTagScreen_MySelectedTagsEmptyPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_MySelectedTags(
             myTags = emptyList(),
-            isLoading = false
+            isLoading = false,
+            onMoreClick = {}
         )
     }
 }

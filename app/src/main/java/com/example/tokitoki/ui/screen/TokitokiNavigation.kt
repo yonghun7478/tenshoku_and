@@ -34,6 +34,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.IINE_SITA_HITO_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.USER_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_SEARCH_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.CATEGORY_TAG_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.MY_TAG_LIST_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -58,6 +59,7 @@ private object TokitokiScreens {
     const val USER_DETAIL_SCREEN = "UserDetailScreen"
     const val TAG_SEARCH_SCREEN = "tag_search_screen"
     const val CATEGORY_TAG_SCREEN = "category_tag_screen"
+    const val MY_TAG_LIST_SCREEN = "my_tag_list_screen"
 }
 
 object TokitokiArgs {
@@ -96,6 +98,7 @@ object TokitokiDestinations {
     const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
     const val TAG_SEARCH_ROUTE = TAG_SEARCH_SCREEN
     const val CATEGORY_TAG_ROUTE = "$CATEGORY_TAG_SCREEN?$CATEGORY_ID={$CATEGORY_ID}&$CATEGORY_NAME={$CATEGORY_NAME}"
+    const val MY_TAG_LIST_ROUTE = MY_TAG_LIST_SCREEN
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -188,5 +191,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToCategoryTag(categoryId: String, categoryName: String) {
         navController.navigate("$CATEGORY_TAG_SCREEN?$CATEGORY_ID=${categoryId}&$CATEGORY_NAME=${categoryName}")
+    }
+
+    fun navigateToMyTagList() {
+        navController.navigate(TokitokiScreens.MY_TAG_LIST_SCREEN)
     }
 }
