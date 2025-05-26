@@ -38,7 +38,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun TagSearchScreen(
     viewModel: TagSearchViewModel = hiltViewModel(),
     onNavigateToCategory: (String, String) -> Unit = { _, _ -> },
-    onNavigateUp: () -> Unit = {}
+    onNavigateUp: () -> Unit = {},
+    onNavigateToTagDetail: (String) -> Unit = {}
 ) {
     val categories by viewModel.categories.collectAsState()
     val tags by viewModel.tags.collectAsState()
@@ -54,7 +55,7 @@ fun TagSearchScreen(
         searchResults = tags,
         isSearching = searchQuery.isNotBlank(),
         onCategoryClick = { category -> onNavigateToCategory(category.id, category.name) },
-        onTagClick = {},
+        onTagClick = { tag -> onNavigateToTagDetail(tag.id) },
         isLoading = isLoading,
         errorMessage = errorMessage
     )

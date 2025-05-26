@@ -34,7 +34,8 @@ fun CategoryTagScreen(
     categoryId: String,
     categoryName: String,
     viewModel: CategoryTagViewModel = hiltViewModel(),
-    onNavigateUp: () -> Unit = {}
+    onNavigateUp: () -> Unit = {},
+    onNavigateToTagDetail: (String) -> Unit = {}
 ) {
     val tags by viewModel.tags.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -51,7 +52,8 @@ fun CategoryTagScreen(
         onSearchQueryChange = viewModel::onSearchQueryChange,
         tags = tags,
         isLoading = isLoading,
-        errorMessage = errorMessage
+        errorMessage = errorMessage,
+        onNavigateToTagDetail = onNavigateToTagDetail
     )
 }
 
@@ -63,6 +65,7 @@ fun CategoryTagScreenContents(
     tags: List<CategoryTagResultUiState>,
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    onNavigateToTagDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -111,7 +114,7 @@ fun CategoryTagScreenContents(
             else -> {
                 TagSearchResultGrid(
                     tags = tags,
-                    onTagClick = {},
+                    onTagClick = { tag -> onNavigateToTagDetail(tag.id) },
                     modifier = Modifier.weight(1f)
                 )
             }

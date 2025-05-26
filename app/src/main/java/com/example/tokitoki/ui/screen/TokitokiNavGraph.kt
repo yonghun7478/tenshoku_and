@@ -386,6 +386,9 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToCategory = { categoryId, categoryName ->
                     navAction.navigateToCategoryTag(categoryId, categoryName)
+                },
+                onNavigateToTagDetail = { tagId ->
+                    navAction.navigateToTagDetail(tagId)
                 }
             )
         }
@@ -399,13 +402,11 @@ fun TokitokiNavGraph(
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString(TokitokiArgs.CATEGORY_ID) ?: ""
             val categoryName = backStackEntry.arguments?.getString(TokitokiArgs.CATEGORY_NAME) ?: ""
-
             CategoryTagScreen(
                 categoryId = categoryId,
                 categoryName = categoryName,
-                onNavigateUp = {
-                    navController.navigateUp()
-                }
+                onNavigateUp = { navController.navigateUp() },
+                onNavigateToTagDetail = { tagId -> navAction.navigateToTagDetail(tagId) }
             )
         }
 
