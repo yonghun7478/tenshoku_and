@@ -12,6 +12,7 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.USER_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.SCREEN_NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_NAME
+import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_ID
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -35,6 +36,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.USER_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_SEARCH_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.CATEGORY_TAG_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MY_TAG_LIST_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_DETAIL_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -60,6 +62,7 @@ private object TokitokiScreens {
     const val TAG_SEARCH_SCREEN = "tag_search_screen"
     const val CATEGORY_TAG_SCREEN = "category_tag_screen"
     const val MY_TAG_LIST_SCREEN = "my_tag_list_screen"
+    const val TAG_DETAIL_SCREEN = "tag_detail_screen"
 }
 
 object TokitokiArgs {
@@ -73,6 +76,7 @@ object TokitokiArgs {
     const val SCREEN_NAME = "screenName"
     const val CATEGORY_ID = "categoryId"
     const val CATEGORY_NAME = "categoryName"
+    const val TAG_ID = "tagId"
 }
 
 object TokitokiDestinations {
@@ -99,6 +103,7 @@ object TokitokiDestinations {
     const val TAG_SEARCH_ROUTE = TAG_SEARCH_SCREEN
     const val CATEGORY_TAG_ROUTE = "$CATEGORY_TAG_SCREEN?$CATEGORY_ID={$CATEGORY_ID}&$CATEGORY_NAME={$CATEGORY_NAME}"
     const val MY_TAG_LIST_ROUTE = MY_TAG_LIST_SCREEN
+    const val TAG_DETAIL_ROUTE = "$TAG_DETAIL_SCREEN?$TAG_ID={$TAG_ID}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -195,5 +200,9 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToMyTagList() {
         navController.navigate(TokitokiScreens.MY_TAG_LIST_SCREEN)
+    }
+
+    fun navigateToTagDetail(tagId: String) {
+        navController.navigate("$TAG_DETAIL_SCREEN?$TAG_ID=${tagId}")
     }
 }

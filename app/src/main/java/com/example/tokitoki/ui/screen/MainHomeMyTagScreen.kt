@@ -83,12 +83,14 @@ import com.example.tokitoki.ui.state.SuggestedTagsUiState
  * @param viewModel 마이태그 관련 데이터와 로직을 관리하는 ViewModel
  * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
  * @param onNavigateToMyTagList 마이태그 목록 화면으로 이동하는 콜백
+ * @param onNavigateToTagDetail 태그 상세 화면으로 이동하는 콜백
  */
 @Composable
 fun MainHomeMyTagScreen(
     viewModel: MainHomeMyTagViewModel = hiltViewModel(),
     onNavigateToTagSearch: () -> Unit = {},
-    onNavigateToMyTagList: () -> Unit = {}
+    onNavigateToMyTagList: () -> Unit = {},
+    onNavigateToTagDetail: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
@@ -111,7 +113,8 @@ fun MainHomeMyTagScreen(
         snackbarHostState = snackbarHostState,
         onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() },
         onNavigateToTagSearch = onNavigateToTagSearch,
-        onNavigateToMyTagList = onNavigateToMyTagList
+        onNavigateToMyTagList = onNavigateToMyTagList,
+        onNavigateToTagDetail = onNavigateToTagDetail
     )
 }
 
@@ -123,6 +126,7 @@ fun MainHomeMyTagScreen(
  * @param onLoadMoreSuggestedTags 더 불러오기 클릭 시 호출될 콜백
  * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
  * @param onNavigateToMyTagList 마이태그 목록 화면으로 이동하는 콜백
+ * @param onNavigateToTagDetail 태그 상세 화면으로 이동하는 콜백
  */
 @Composable
 fun MainHomeMyTagScreenContent(
@@ -131,7 +135,8 @@ fun MainHomeMyTagScreenContent(
     snackbarHostState: SnackbarHostState,
     onLoadMoreSuggestedTags: () -> Unit,
     onNavigateToTagSearch: () -> Unit,
-    onNavigateToMyTagList: () -> Unit
+    onNavigateToMyTagList: () -> Unit,
+    onNavigateToTagDetail: (String) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -153,7 +158,8 @@ fun MainHomeMyTagScreenContent(
                     // 오늘의 태그 & 트렌딩 태그
                     MainHomeMyTagScreen_TodayAndTrendingTags(
                         listOfNotNull(uiState.todayTag) + uiState.trendingTags,
-                        uiState.isLoadingTodayAndTrending
+                        uiState.isLoadingTodayAndTrending,
+                        onTagClick = onNavigateToTagDetail
                     )
                     Divider()
                 }
@@ -162,7 +168,8 @@ fun MainHomeMyTagScreenContent(
                     MainHomeMyTagScreen_MySelectedTags(
                         uiState.myTags,
                         uiState.isLoadingMyTags,
-                        onMoreClick = onNavigateToMyTagList
+                        onMoreClick = onNavigateToMyTagList,
+                        onTagClick = onNavigateToTagDetail
                     )
                     Divider()
                 }
@@ -181,7 +188,8 @@ fun MainHomeMyTagScreenContent(
                         suggestedTags = suggestedTagsUiState.tags,
                         canLoadMore = suggestedTagsUiState.canLoadMore,
                         isLoading = uiState.isLoadingSuggestedTags,
-                        onLoadMore = onLoadMoreSuggestedTags
+                        onLoadMore = onLoadMoreSuggestedTags,
+                        onTagClick = onNavigateToTagDetail
                     )
                 }
             }
@@ -326,12 +334,14 @@ fun TrendingTagShimmerCard(
  * 오늘의 태그와 트렌딩 태그를 캐러셀 형태로 표시하는 컴포저블
  * @param tags 태그 목록
  * @param isLoading 로딩 상태
+ * @param onTagClick 태그 클릭 시 호출될 콜백
  */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_TodayAndTrendingTags(
     tags: List<MainHomeTagItemUiState>,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    onTagClick: (String) -> Unit = {}
 ) {
     // pageCount를 tags.size로 직접 지정
     val pagerState = rememberPagerState(initialPage = 0) {
@@ -373,7 +383,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
                 ) { page ->
                     val tag = tags[page]
                     MainHomeMyTagScreen_TrendingTagCard(
-                        tag = tag
+                        tag = tag,
+                        onClick = { onTagClick(tag.id) }
                     )
                 }
             } else {
@@ -689,13 +700,15 @@ fun MainHomeMyTagScreen_SuggestedTagCard(
  * @param myTags 선택된 태그 목록
  * @param isLoading 로딩 상태
  * @param onMoreClick 'もっと見る' 클릭 시 호출될 콜백
+ * @param onTagClick 태그 클릭 시 호출될 콜백
  */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_MySelectedTags(
     myTags: List<MainHomeTagItemUiState>,
     isLoading: Boolean = false,
-    onMoreClick: () -> Unit = {}
+    onMoreClick: () -> Unit = {},
+    onTagClick: (String) -> Unit = {}
 ) {
     val itemsPerPage = 4
     val maxPages = 3
@@ -803,6 +816,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
                             ) {
                                 MainHomeMyTagScreen_MyTagCard(
                                     tag = tag,
+                                    onClick = { onTagClick(tag.id) },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(72.dp)
@@ -880,13 +894,15 @@ fun MainHomeMyTagScreen_PromotionBanner(
  * @param canLoadMore 더 불러올 수 있는지 여부
  * @param isLoading 로딩 상태
  * @param onLoadMore 더 불러오기 클릭 시 호출될 콜백
+ * @param onTagClick 태그 클릭 시 호출될 콜백
  */
 @Composable
 fun MainHomeMyTagScreen_SuggestedTags(
     suggestedTags: List<MainHomeTagItemUiState>,
     canLoadMore: Boolean = false,
     isLoading: Boolean = false,
-    onLoadMore: () -> Unit = {}
+    onLoadMore: () -> Unit = {},
+    onTagClick: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -937,7 +953,10 @@ fun MainHomeMyTagScreen_SuggestedTags(
                     }
                 } else {
                     items(items = suggestedTags) { tag ->
-                        MainHomeMyTagScreen_SuggestedTagCard(tag)
+                        MainHomeMyTagScreen_SuggestedTagCard(
+                            tag = tag,
+                            onClick = { onTagClick(tag.id) }
+                        )
                     }
 
                     if (canLoadMore && !isLoading) {
@@ -1142,7 +1161,8 @@ fun MainHomeMyTagScreenPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
-            onNavigateToMyTagList = {}
+            onNavigateToMyTagList = {},
+            onNavigateToTagDetail = {}
         )
     }
 }
@@ -1161,7 +1181,8 @@ fun MainHomeMyTagScreenLoadingPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
-            onNavigateToMyTagList = {}
+            onNavigateToMyTagList = {},
+            onNavigateToTagDetail = {}
         )
     }
 }
@@ -1176,7 +1197,8 @@ fun MainHomeMyTagScreenEmptyPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
-            onNavigateToMyTagList = {}
+            onNavigateToMyTagList = {},
+            onNavigateToTagDetail = {}
         )
     }
 }
@@ -1258,7 +1280,8 @@ fun MainHomeMyTagScreen_MySelectedTagsPreview() {
                 )
             ),
             isLoading = false,
-            onMoreClick = {}
+            onMoreClick = {},
+            onTagClick = {}
         )
     }
 }
@@ -1270,7 +1293,8 @@ fun MainHomeMyTagScreen_MySelectedTagsLoadingPreview() {
         MainHomeMyTagScreen_MySelectedTags(
             myTags = emptyList(),
             isLoading = true,
-            onMoreClick = {}
+            onMoreClick = {},
+            onTagClick = {}
         )
     }
 }
@@ -1282,7 +1306,8 @@ fun MainHomeMyTagScreen_MySelectedTagsEmptyPreview() {
         MainHomeMyTagScreen_MySelectedTags(
             myTags = emptyList(),
             isLoading = false,
-            onMoreClick = {}
+            onMoreClick = {},
+            onTagClick = {}
         )
     }
 }
@@ -1325,7 +1350,8 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
             ),
             canLoadMore = true,
             isLoading = false,
-            onLoadMore = {}
+            onLoadMore = {},
+            onTagClick = {}
         )
     }
 }
@@ -1338,7 +1364,8 @@ fun MainHomeMyTagScreen_SuggestedTagsLoadingPreview() {
             suggestedTags = emptyList(),
             canLoadMore = false,
             isLoading = true,
-            onLoadMore = {}
+            onLoadMore = {},
+            onTagClick = {}
         )
     }
 }
@@ -1351,7 +1378,8 @@ fun MainHomeMyTagScreen_SuggestedTagsEmptyPreview() {
             suggestedTags = emptyList(),
             canLoadMore = false,
             isLoading = false,
-            onLoadMore = {}
+            onLoadMore = {},
+            onTagClick = {}
         )
     }
 }
