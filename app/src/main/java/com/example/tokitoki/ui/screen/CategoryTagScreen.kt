@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,7 +55,8 @@ fun CategoryTagScreen(
         tags = tags,
         isLoading = isLoading,
         errorMessage = errorMessage,
-        onNavigateToTagDetail = onNavigateToTagDetail
+        onNavigateToTagDetail = onNavigateToTagDetail,
+        onNavigateUp = onNavigateUp
     )
 }
 
@@ -66,6 +69,7 @@ fun CategoryTagScreenContents(
     isLoading: Boolean = false,
     errorMessage: String? = null,
     onNavigateToTagDetail: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -73,14 +77,25 @@ fun CategoryTagScreenContents(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Category Name
-        Text(
-            text = categoryName,
-            style = MaterialTheme.typography.titleLarge,
+        // Header with back button and category name
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-        )
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateUp) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+            Text(
+                text = categoryName,
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
 
         // Search Bar
         CategoryTagSearchBar(
