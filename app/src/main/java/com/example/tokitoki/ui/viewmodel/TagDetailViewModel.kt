@@ -7,6 +7,7 @@ import com.example.tokitoki.common.ResultWrapper.ErrorType
 import com.example.tokitoki.domain.usecase.GetTagDetailUseCase
 import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.TagDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class TagDetailViewModel @Inject constructor(
     private val getTagDetailUseCase: GetTagDetailUseCase,
     private val isTagSubscribedUseCase: IsTagSubscribedUseCase,
-    private val getTagSubscribersUseCase: GetTagSubscribersUseCase
+    private val getTagSubscribersUseCase: GetTagSubscribersUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TagDetailUiState())
     val uiState: StateFlow<TagDetailUiState> = _uiState.asStateFlow()
@@ -107,5 +109,10 @@ class TagDetailViewModel @Inject constructor(
                 ResultWrapper.Loading -> TODO()
             }
         }
+    }
+
+    fun addUserIdsToCache() {
+        val userIds = _uiState.value.subscribers.map { it.id }
+        addUserIdsToCacheUseCase("TagDetailScreen", userIds)
     }
 } 

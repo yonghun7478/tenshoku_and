@@ -3,6 +3,7 @@ package com.example.tokitoki.ui.screen.tagdetail
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 fun TagDetailScreen(
     tagId: String,
     onNavigateUp: () -> Unit = {},
+    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     viewModel: TagDetailViewModel = hiltViewModel()
 ) {
@@ -49,6 +51,10 @@ fun TagDetailScreen(
         onLoadMoreSubscribers = { viewModel.loadMoreSubscribers(tagId) },
         onSubscriptionToggle = { /* TODO: ViewModel에 구독/구독해지 이벤트 전달 */ },
         onNavigateUp = onNavigateUp,
+        onNavigateToUserDetail = { userId, screenName ->
+            viewModel.addUserIdsToCache()
+            onNavigateToUserDetail(userId, screenName)
+        },
         modifier = modifier
     )
 }
@@ -59,6 +65,7 @@ fun TagDetailScreenContents(
     onLoadMoreSubscribers: () -> Unit,
     onSubscriptionToggle: () -> Unit,
     onNavigateUp: () -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (uiState.isLoading && uiState.tag == null) {
@@ -179,13 +186,17 @@ fun TagDetailScreenContents(
                     // 구독자 리스트를 LazyVerticalGrid로 변경
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxWidth(), // Grid가 남은 공간을 모두 차지하도록 weight(1f) 추가 가능
-                        contentPadding = PaddingValues(bottom = 16.dp), // 하단 여백 추가
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(uiState.subscribers.size) { index ->
-                            UserSubscriberCard(user = uiState.subscribers[index], modifier = Modifier.fillMaxWidth())
+                            UserSubscriberCard(
+                                user = uiState.subscribers[index],
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { onNavigateToUserDetail(uiState.subscribers[index].id, "TagDetailScreen") }
+                            )
                         }
 
                         // 무한스크롤 트리거 및 로딩 인디케이터
@@ -218,9 +229,13 @@ fun TagDetailScreenContents(
 }
 
 @Composable
-fun UserSubscriberCard(user: User, modifier: Modifier = Modifier) {
+fun UserSubscriberCard(
+    user: User,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = modifier, // 외부에서 fillMaxWidth() 등을 받을 수 있도록 변경
+        modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -276,7 +291,8 @@ fun TagDetailScreenContentsPreview() {
             ),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = {},
-            onNavigateUp = {}
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
         )
     }
 }
@@ -303,7 +319,8 @@ fun TagDetailScreenContentsEmptyPreview() {
             ),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = {},
-            onNavigateUp = {}
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
         )
     }
 }
@@ -316,7 +333,8 @@ fun TagDetailScreenLoadingPreview() {
             uiState = TagDetailUiState(isLoading = true),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = {},
-            onNavigateUp = {}
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
         )
     }
 }
@@ -329,7 +347,8 @@ fun TagDetailScreenErrorPreview() {
             uiState = TagDetailUiState(error = "데이터를 불러오는데 실패했습니다."),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = {},
-            onNavigateUp = {}
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
         )
     }
 } 

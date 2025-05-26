@@ -427,6 +427,9 @@ fun TokitokiNavGraph(
                 tagId = tagId,
                 onNavigateUp = {
                     navController.navigateUp()
+                },
+                onNavigateToUserDetail = { userId, screenName ->
+                    navAction.navigateToUserDetail(userId, screenName)
                 }
             )
         }
