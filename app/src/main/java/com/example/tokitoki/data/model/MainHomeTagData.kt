@@ -3,13 +3,35 @@ package com.example.tokitoki.data.model
 import com.example.tokitoki.domain.model.MainHomeTag
 
 data class MainHomeTagData(
+    val id: String,
     val name: String,
+    val description: String,
     val imageUrl: String,
-    val userCount: Int
-) {
-    fun toDomain(): MainHomeTag = MainHomeTag(
-        name = this.name,
-        imageUrl = this.imageUrl,
-        userCount = this.userCount
+    val subscriberCount: Int,
+    val categoryId: String,
+    val tagType: TagType
+)
+
+fun MainHomeTagData.toDomain(): MainHomeTag {
+    return MainHomeTag(
+        id = id,
+        name = name,
+        description = description,
+        imageUrl = imageUrl,
+        subscriberCount = subscriberCount,
+        categoryId = categoryId,
+        tagType = tagType
+    )
+}
+
+fun MainHomeTag.toData(): MainHomeTagData {
+    return MainHomeTagData(
+        id = id,
+        name = name,
+        description = description,
+        imageUrl = imageUrl,
+        subscriberCount = subscriberCount,
+        categoryId = categoryId,
+        tagType = tagType
     )
 }

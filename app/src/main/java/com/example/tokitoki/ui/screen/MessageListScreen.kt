@@ -1,15 +1,8 @@
 package com.example.tokitoki.ui.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -34,6 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,80 +44,70 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageListScreen(viewModel: MessageListViewModel = hiltViewModel()) {
-    // 7. StateFlow로부터 상태를 수집
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    // 스크롤 상태를 관리하기 위한 LazyListState
     val previousChatsListState = rememberLazyListState()
     val matchingUsersListState = rememberLazyListState()
 
-    // PullToRefresh 상태
     var isRefreshing by remember { mutableStateOf(false) }
 
-    // PullToRefreshBox 래핑
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
             coroutineScope.launch {
-                isRefreshing = true // 리프레시 시작 상태로 설정
-                viewModel.refreshData() // ViewModel의 리프레시 함수 호출
-                isRefreshing = false // 리프레시 완료 상태로 설정
+                isRefreshing = true
+                viewModel.refreshData()
+                isRefreshing = false
             }
         }
     ) {
-        // 8. 화면 전체 구성
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                MessageListTitle(title = "メッセージ") // "메시지" 타이틀
-                Spacer(modifier = Modifier.height(16.dp))
-                MatchingUsersSection(matchingUsers = uiState.matchingUsers, listState = matchingUsersListState) // "매칭" 섹션
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-                PreviousChatsSection(previousChats = uiState.previousChats, listState = previousChatsListState) // "이전 채팅" 섹션
+            if (uiState.isLoading) {
+                LoadingShimmer()
+            } else {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    MessageListTitle(title = "メッセージ")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    MatchingUsersSection(matchingUsers = uiState.matchingUsers, listState = matchingUsersListState)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Divider()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    PreviousChatsSection(previousChats = uiState.previousChats, listState = previousChatsListState)
 
-                // 로딩 및 에러 처리 추가
-                if (uiState.isLoading) {
-                    // 로딩 인디케이터 표시 (예: CircularProgressIndicator)
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Loading...") // 간단한 로딩 메시지
+                    if (uiState.errorMessage != null) {
+                        Text(
+                            text = "Error: ${uiState.errorMessage}",
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
-                }
-
-                if (uiState.errorMessage != null) {
-                    // 에러 메시지 표시
-                    Text(
-                        text = "Error: ${uiState.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
-                    )
                 }
             }
         }
     }
 
-    // MatchingUsersSection의 스크롤 위치를 감지하고, 필요한 경우 추가 데이터를 로드합니다.
     LaunchedEffect(matchingUsersListState) {
         snapshotFlow { matchingUsersListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collectLatest { lastVisibleIndex ->
-                if (lastVisibleIndex != null && lastVisibleIndex > uiState.matchingUsers.size - 3 && !uiState.isLoading) { // 마지막 아이템 3개 전에 로드
+                if (lastVisibleIndex != null && lastVisibleIndex > uiState.matchingUsers.size - 3 && !uiState.isLoading) {
                     viewModel.loadMoreMatchingUsers()
                 }
             }
     }
 
-    // PreviousChatsSection의 스크롤 위치를 감지하고, 필요한 경우 추가 데이터를 로드합니다.
     LaunchedEffect(previousChatsListState) {
         snapshotFlow { previousChatsListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collectLatest { lastVisibleIndex ->
-                if (lastVisibleIndex != null && lastVisibleIndex > uiState.previousChats.size - 3 && !uiState.isLoading) { // 마지막 아이템 3개 전에 로드
+                if (lastVisibleIndex != null && lastVisibleIndex > uiState.previousChats.size - 3 && !uiState.isLoading) {
                     viewModel.loadMorePreviousChats()
                 }
             }
@@ -142,29 +126,25 @@ fun MessageListTitle(title: String) {
 
 // 10. "매칭" 섹션 Composable
 @Composable
-fun MatchingUsersSection(matchingUsers: List<MatchingUser>, listState: LazyListState) { // LazyListState 추가
+fun MatchingUsersSection(matchingUsers: List<MatchingUser>, listState: LazyListState) {
     Column {
         Text(
-            text = "マッチング", // "매칭" 타이틀
+            text = "マッチング",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        if (matchingUsers.isNotEmpty()) {
-            MatchingUserList(users = matchingUsers, listState = listState) // LazyListState 전달
-        } else {
-            Text("No matching users yet.")
-        }
+        MatchingUserList(users = matchingUsers, listState = listState)
     }
 }
 
 // 11. 매칭 유저 리스트 Composable
 @Composable
-fun MatchingUserList(users: List<MatchingUser>, listState: LazyListState) { // LazyListState 추가
-    LazyRow(state = listState) { // LazyRow에 LazyListState 적용
+fun MatchingUserList(users: List<MatchingUser>, listState: LazyListState) {
+    LazyRow(state = listState) {
         items(users) { user ->
             MatchingUserItem(user = user)
-            Spacer(modifier = Modifier.width(8.dp)) // 아이템 간 간격
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
@@ -174,20 +154,20 @@ fun MatchingUserList(users: List<MatchingUser>, listState: LazyListState) { // L
 fun MatchingUserItem(user: MatchingUser) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(80.dp) // 아이템의 너비 고정
+        modifier = Modifier.width(80.dp)
     ) {
         AsyncImage(
             model = user.thumbnail,
             contentDescription = user.name,
             modifier = Modifier
-                .size(60.dp) // 섬네일 크기
-                .clip(CircleShape), // 원형 모양으로 클리핑
+                .size(60.dp)
+                .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
         Text(
             text = user.name,
             style = MaterialTheme.typography.bodySmall,
-            maxLines = 1, // 이름이 길 경우 한 줄로 제한
+            maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
         )
     }
@@ -195,7 +175,7 @@ fun MatchingUserItem(user: MatchingUser) {
 
 // 13. "이전 채팅" 섹션 Composable
 @Composable
-fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListState) {  // LazyListState 추가
+fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListState) {
     Column {
         Text(
             text = "Previous Chats",
@@ -203,21 +183,17 @@ fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListS
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        if (previousChats.isNotEmpty()) {
-            PreviousChatList(chats = previousChats, listState = listState) // LazyListState 전달
-        } else {
-            Text("No previous chats.")
-        }
+        PreviousChatList(chats = previousChats, listState = listState)
     }
 }
 
 // 14. 이전 채팅 리스트 Composable
 @Composable
-fun PreviousChatList(chats: List<PreviousChat>, listState: LazyListState) { // LazyListState 추가
-    LazyColumn(state = listState) { // LazyColumn에 LazyListState 적용
+fun PreviousChatList(chats: List<PreviousChat>, listState: LazyListState) {
+    LazyColumn(state = listState) {
         items(chats) { chat ->
             PreviousChatItem(chat = chat)
-            Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp) // 구분선 추가
+            Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
         }
     }
 }
@@ -241,7 +217,7 @@ fun PreviousChatItem(chat: PreviousChat) {
             contentScale = ContentScale.Crop,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(1f)) { // 남은 공간을 모두 차지하도록 설정
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = chat.nickname,
                 style = MaterialTheme.typography.bodyLarge,
@@ -255,6 +231,137 @@ fun PreviousChatItem(chat: PreviousChat) {
             style = MaterialTheme.typography.bodySmall,
             fontSize = 12.sp
         )
+    }
+}
+
+@Composable
+fun ShimmerEffect(
+    modifier: Modifier = Modifier,
+    content: @Composable (modifier: Modifier) -> Unit
+) {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1200,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer"
+    )
+
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f),
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset.Zero,
+        end = Offset(x = translateAnim.value, y = translateAnim.value)
+    )
+
+    content(
+        modifier = modifier
+            .background(brush)
+    )
+}
+
+@Composable
+fun LoadingShimmer() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        MessageListTitle(title = "メッセージ")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 매칭 유저 섹션 Shimmer
+        Column {
+            Text(
+                text = "マッチング",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow {
+                items(5) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.width(80.dp)
+                    ) {
+                        ShimmerEffect(
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(CircleShape)
+                        ) { shimmerModifier ->
+                            Box(modifier = shimmerModifier)
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ShimmerEffect(
+                            modifier = Modifier
+                                .width(60.dp)
+                                .height(12.dp)
+                        ) { shimmerModifier ->
+                            Box(modifier = shimmerModifier)
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Divider()
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 이전 채팅 섹션 Shimmer
+        Column {
+            Text(
+                text = "Previous Chats",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn {
+                items(10) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        ShimmerEffect(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(CircleShape)
+                        ) { shimmerModifier ->
+                            Box(modifier = shimmerModifier)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerEffect(
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(16.dp)
+                            ) { shimmerModifier ->
+                                Box(modifier = shimmerModifier)
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            ShimmerEffect(
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .height(12.dp)
+                            ) { shimmerModifier ->
+                                Box(modifier = shimmerModifier)
+                            }
+                        }
+                    }
+                    Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+                }
+            }
+        }
     }
 }
 

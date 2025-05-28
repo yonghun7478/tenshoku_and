@@ -5,6 +5,7 @@ import com.example.tokitoki.data.repository.AuthRepositoryImpl
 import com.example.tokitoki.data.repository.DbRepositoryImpl
 import com.example.tokitoki.data.repository.FavoriteUserRepositoryImpl
 import com.example.tokitoki.data.repository.LikeRepositoryImpl
+import com.example.tokitoki.data.repository.MainHomeTagCategoryRepositoryImpl
 import com.example.tokitoki.data.repository.MainHomeTagRepositoryImpl
 import com.example.tokitoki.data.repository.MessageListRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
@@ -18,6 +19,7 @@ import com.example.tokitoki.domain.repository.AuthRepository
 import com.example.tokitoki.domain.repository.DbRepository
 import com.example.tokitoki.domain.repository.FavoriteUserRepository
 import com.example.tokitoki.domain.repository.LikeRepository
+import com.example.tokitoki.domain.repository.MainHomeTagCategoryRepository
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import com.example.tokitoki.domain.repository.MessageListRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
@@ -80,8 +82,14 @@ abstract class TokiTokiRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMainHomeTagRepository(
-        mainHomeTagRepositoryImpl: MainHomeTagRepositoryImpl // 구현체 클래스
-    ): MainHomeTagRepository // 인터페이스
+        mainHomeTagRepositoryImpl: MainHomeTagRepositoryImpl
+    ): MainHomeTagRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMainHomeTagCategoryRepository(
+        mainHomeTagCategoryRepositoryImpl: MainHomeTagCategoryRepositoryImpl
+    ): MainHomeTagCategoryRepository
 
     @Binds
     @Singleton
@@ -94,10 +102,10 @@ abstract class TokiTokiRepositoryModule {
     ): MessageListRepository
 
     @Binds
-    @Singleton // 싱글톤 스코프 지정
+    @Singleton
     abstract fun bindAshiatoRepository(
-        ashiatoRepositoryImpl: AshiatoRepositoryImpl // 실제 구현체 클래스
-    ): AshiatoRepository // 제공할 인터페이스 타입
+        ashiatoRepositoryImpl: AshiatoRepositoryImpl
+    ): AshiatoRepository
 
     @Binds
     @Singleton

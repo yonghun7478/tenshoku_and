@@ -46,11 +46,14 @@ import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     sharedViewModel: SharedPickupViewModel,
-    onAshiatoClick: () -> Unit = {},
-    onFavoriteUsersClick: () -> Unit = {},
-    onIineSitaHitoClick: () -> Unit = {},
-    onNavigateToSignIn: () -> Unit = {},
-    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    onAshiatoClick: () -> Unit,
+    onFavoriteUsersClick: () -> Unit,
+    onIineSitaHitoClick: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit,
+    onNavigateToTagSearch: () -> Unit,
+    onNavigateToMyTagList: () -> Unit,
+    onNavigateToTagDetail: (String) -> Unit
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -75,6 +78,9 @@ fun MainScreen(
         onIineSitaHitoClick = onIineSitaHitoClick,
         onNavigateToSignIn = onNavigateToSignIn,
         onNavigateToUserDetail = onNavigateToUserDetail,
+        onNavigateToTagSearch = onNavigateToTagSearch,
+        onNavigateToMyTagList = onNavigateToMyTagList,
+        onNavigateToTagDetail = onNavigateToTagDetail,
         sharedViewModel = sharedViewModel
     )
 }
@@ -83,11 +89,14 @@ fun MainScreen(
 fun MainContents(
     uiState: MainUiState,
     onEvent: (MainUiEvent) -> Unit,
-    onAshiatoClick: () -> Unit = {},
-    onFavoriteUsersClick: () -> Unit = {},
-    onIineSitaHitoClick: () -> Unit = {},
-    onNavigateToSignIn: () -> Unit = {},
-    onNavigateToUserDetail: (String, String) -> Unit = { _, _ -> },
+    onAshiatoClick: () -> Unit,
+    onFavoriteUsersClick: () -> Unit,
+    onIineSitaHitoClick: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
+    onNavigateToUserDetail: (String, String) -> Unit,
+    onNavigateToTagSearch: () -> Unit,
+    onNavigateToMyTagList: () -> Unit,
+    onNavigateToTagDetail: (String) -> Unit,
     sharedViewModel: SharedPickupViewModel
 ) {
     Scaffold(
@@ -107,6 +116,9 @@ fun MainContents(
                 MainBottomItem.HOME -> {
                     MainHomeScreen(
                         onNavigateToUserDetail = onNavigateToUserDetail,
+                        onNavigateToTagSearch = onNavigateToTagSearch,
+                        onNavigateToMyTagList = onNavigateToMyTagList,
+                        onNavigateToTagDetail = onNavigateToTagDetail,
                         sharedViewModel = sharedViewModel
                     )
                 }

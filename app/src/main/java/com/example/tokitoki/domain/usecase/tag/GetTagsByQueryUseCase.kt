@@ -1,16 +1,17 @@
-package com.example.tokitoki.domain.usecase
+package com.example.tokitoki.domain.usecase.tag
 
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import javax.inject.Inject
 
-interface SearchTagsUseCase{
+interface GetTagsByQueryUseCase {
     suspend operator fun invoke(query: String): Result<List<MainHomeTag>>
 }
-class SearchTagsUseCaseImpl @Inject constructor(
-    private val repository: MainHomeTagRepository
-) : SearchTagsUseCase {
+
+class GetTagsByQueryUseCaseImpl @Inject constructor(
+    private val mainHomeTagRepository: MainHomeTagRepository
+) : GetTagsByQueryUseCase {
     override suspend fun invoke(query: String): Result<List<MainHomeTag>> {
-        return repository.searchTags(query)
+        return mainHomeTagRepository.getTagsByQuery(query)
     }
-}
+} 

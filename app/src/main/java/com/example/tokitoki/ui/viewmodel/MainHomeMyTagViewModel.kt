@@ -2,19 +2,10 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.domain.usecase.AddRecentSearchUseCase
-import com.example.tokitoki.domain.usecase.AddSelectedTagUseCase
-import com.example.tokitoki.domain.usecase.DeleteRecentSearchUseCase
 import com.example.tokitoki.domain.usecase.GetMyMainHomeTagsUseCase
-import com.example.tokitoki.domain.usecase.GetRecentSearchesUseCase
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCase
 import com.example.tokitoki.domain.usecase.GetTodayTagUseCase
 import com.example.tokitoki.domain.usecase.GetTrendingTagsUseCase
-import com.example.tokitoki.domain.usecase.RemoveSelectedTagUseCase
-import com.example.tokitoki.domain.usecase.RestoreTempSelectedTagsUseCase
-import com.example.tokitoki.domain.usecase.SaveTempSelectedTagsUseCase
-import com.example.tokitoki.domain.usecase.SearchTagsUseCase
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
@@ -32,14 +23,6 @@ class MainHomeMyTagViewModel @Inject constructor(
     private val getTrendingTagsUseCase: GetTrendingTagsUseCase,
     private val getMyTagsUseCase: GetMyMainHomeTagsUseCase,
     private val getSuggestedTagsUseCase: GetSuggestedTagsUseCase,
-    private val searchTagsUseCase: SearchTagsUseCase,
-    private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
-    private val addSelectedTagUseCase: AddSelectedTagUseCase,
-    private val removeSelectedTagUseCase: RemoveSelectedTagUseCase,
-    private val saveTempSelectedTagsUseCase: SaveTempSelectedTagsUseCase,
-    private val restoreTempSelectedTagsUseCase: RestoreTempSelectedTagsUseCase,
-    private val addRecentSearchUseCase: AddRecentSearchUseCase, // 추가
-//    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase // 추가
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainHomeMyTagUiState())
@@ -51,129 +34,16 @@ class MainHomeMyTagViewModel @Inject constructor(
 
     init {
         loadTags()
-        loadRecentSearches()
-    }
-
-    fun onTagSearchQueryChanged(query: String) {
-        _uiState.update {
-            it.copy(searchQuery = query)
-        }
-        searchTags(query)
-    }
-
-    // 검색어 초기화 함수
-    fun clearSearchQuery() {
-        _uiState.update {
-            it.copy(searchQuery = "")
-        }
-    }
-
-    fun clearSearchResult() {
-        _uiState.update {
-            it.copy(searchResults = listOf())
-        }
-    }
-
-    // 확장 모드 진입 시 현재 선택된 태그를 임시 저장
-    fun saveSelectedTags() {
-        viewModelScope.launch {
-            saveTempSelectedTagsUseCase(_uiState.value.selectedTags.map { it.toDomain() })
-        }
-    }
-
-    // 돌아가기 시 임시 저장된 태그로 복원
-    fun restoreSelectedTags() {
-        viewModelScope.launch {
-            val result = restoreTempSelectedTagsUseCase()
-            if (result.isSuccess) {
-                _uiState.update {
-                    it.copy(selectedTags = result.getOrThrow().map { tag -> tag.toPresentation() })
-                }
-            } else {
-                // 에러 처리
-            }
-        }
-    }
-
-    // 태그 선택
-    fun onTagSelected(tag: MainHomeTagItemUiState) {
-        viewModelScope.launch {
-            val tagItem = tag.toDomain()
-            val result = addSelectedTagUseCase(tagItem)
-            if (result.isSuccess) {
-                if (!_uiState.value.selectedTags.contains(tag)) {
-                    _uiState.update {
-                        it.copy(selectedTags = it.selectedTags + tag)
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    // 태그 제거
-    fun onTagRemoved(tag: MainHomeTagItemUiState) {
-        viewModelScope.launch {
-            val tagItem = tag.toDomain()
-            val result = removeSelectedTagUseCase(tagItem)
-            if (result.isSuccess) {
-                _uiState.update {
-                    it.copy(selectedTags = it.selectedTags - tag)
-                }
-            }
-        }
-    }
-
-    //검색 usecase
-    fun searchTags(query: String) {
-        viewModelScope.launch {
-            val result = searchTagsUseCase(query)
-            if (result.isSuccess) {
-                _uiState.update {
-                    it.copy(searchResults = result.getOrThrow().map { tag -> tag.toPresentation() })
-                }
-            } else {
-                // 에러 처리
-            }
-        }
-    }
-
-    fun loadRecentSearches() {
-        viewModelScope.launch {
-            val result = getRecentSearchesUseCase()
-            if (result.isSuccess) {
-                _uiState.update {
-                    it.copy(
-                        recentSearches = result.getOrThrow().map { tag -> tag.toPresentation() })
-                }
-            } else {
-                // 에러 처리
-            }
-        }
-    }
-
-
-    //검색 usecase
-    //최근 검색 usecase
-    fun onSearchPerformed() {
-        viewModelScope.launch {
-            val currentSelectedTags =
-                _uiState.value.selectedTags.map { it.toDomain() } // List<MainHomeTagItemUiState> -> List<MainHomeTag>
-            if (currentSelectedTags.isNotEmpty()) {
-                val result = addRecentSearchUseCase(currentSelectedTags) // List<MainHomeTag> 전달
-                if (result.isSuccess.not()) {
-                    // 에러 처리
-                }
-            }
-        }
     }
 
     fun loadTags() {
         viewModelScope.launch {
-            _suggestedTagsUiState.update {
+            // 모든 로딩 상태를 true로 설정
+            _uiState.update {
                 it.copy(
-                    isLoading = true
+                    isLoadingTodayAndTrending = true,
+                    isLoadingMyTags = true,
+                    isLoadingSuggestedTags = true
                 )
             }
 
@@ -187,10 +57,13 @@ class MainHomeMyTagViewModel @Inject constructor(
             ) {
                 _uiState.update {
                     it.copy(
-                        todayTags = todayTagResult.getOrThrow().toPresentation(),
+                        todayTag = todayTagResult.getOrThrow().toPresentation(),
                         trendingTags = trendingTagsResult.getOrThrow()
                             .map { it -> it.toPresentation() },
                         myTags = myTagsResult.getOrThrow().map { it -> it.toPresentation() },
+                        isLoadingTodayAndTrending = false,
+                        isLoadingMyTags = false,
+                        isLoadingSuggestedTags = false
                     )
                 }
 
@@ -198,12 +71,17 @@ class MainHomeMyTagViewModel @Inject constructor(
                     it.copy(
                         tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
                         canLoadMore = true,
-                        isLoading = false,
                     )
                 }
             } else {
                 // 에러 처리 (하나라도 실패하면)
-                // 예: todayTagResult.exceptionOrNull() 등을 사용하여 에러 원인 확인
+                _uiState.update {
+                    it.copy(
+                        isLoadingTodayAndTrending = false,
+                        isLoadingMyTags = false,
+                        isLoadingSuggestedTags = false
+                    )
+                }
             }
         }
     }
@@ -225,6 +103,29 @@ class MainHomeMyTagViewModel @Inject constructor(
             } else {
                 // 에러 처리
             }
+        }
+    }
+
+    // 스낵바 메시지 표시
+    fun showSnackbarMessage(message: String) {
+        _uiState.update {
+            it.copy(snackbarMessage = message)
+        }
+    }
+
+    // 스낵바 메시지 초기화
+    fun clearSnackbarMessage() {
+        _uiState.update {
+            it.copy(snackbarMessage = null)
+        }
+    }
+
+    // 태그 선택 토글
+    fun onTagToggle(tag: MainHomeTagItemUiState, isSelected: Boolean) {
+        if (isSelected) {
+            showSnackbarMessage("タグが登録されました")
+        } else {
+            showSnackbarMessage("タグが解除されました")
         }
     }
 }

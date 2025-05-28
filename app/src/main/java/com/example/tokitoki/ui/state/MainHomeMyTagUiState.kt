@@ -1,28 +1,37 @@
 package com.example.tokitoki.ui.state
 
 import com.example.tokitoki.domain.model.MainHomeTag
+import com.example.tokitoki.data.model.TagType
 
 // UiState
 data class MainHomeMyTagUiState(
-    val selectedTags: List<MainHomeTagItemUiState> = listOf(), // 변경
-    val searchQuery: String = "",
-    val searchResults: List<MainHomeTagItemUiState> = listOf(), // 변경
-    val recentSearches: List<MainHomeTagItemUiState> = listOf(), // 변경
+    val todayTag: MainHomeTagItemUiState? = null,
     val trendingTags: List<MainHomeTagItemUiState> = listOf(),
-    val todayTags: MainHomeTagItemUiState = MainHomeTagItemUiState("", "", 0),
     val myTags: List<MainHomeTagItemUiState> = listOf(),
+    val isLoadingTodayAndTrending: Boolean = false,
+    val isLoadingMyTags: Boolean = false,
+    val isLoadingSuggestedTags: Boolean = false,
+    val snackbarMessage: String? = null
 )
 
-data class MainHomeTagItemUiState( //임시
+data class MainHomeTagItemUiState(
+    val id: String,
     val name: String,
+    val description: String,
     val imageUrl: String,
-    val userCount: Int
+    val subscriberCount: Int,
+    val categoryId: String,
+    val tagType: TagType
 ) {
     fun toDomain(): MainHomeTag {
         return MainHomeTag(
+            id = this.id,
             name = this.name,
+            description = this.description,
             imageUrl = this.imageUrl,
-            userCount = this.userCount
+            subscriberCount = this.subscriberCount,
+            categoryId = this.categoryId,
+            tagType = this.tagType
         )
     }
 }
@@ -30,6 +39,4 @@ data class MainHomeTagItemUiState( //임시
 data class SuggestedTagsUiState(
     val tags: List<MainHomeTagItemUiState> = listOf(),
     val canLoadMore: Boolean = true,
-    val isLoading: Boolean = false
-
 )

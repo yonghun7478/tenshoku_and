@@ -72,4 +72,28 @@ class MyProfileRepositoryImpl @Inject constructor(
     override suspend fun clearUserTags() {
         myTagDao.deleteAllTagsForUser()
     }
+
+    override suspend fun isTagSubscribed(tagId: String): Boolean {
+        // TODO: 실제 구현에서는 DAO를 사용하여 구독 여부를 확인해야 함
+        // 현재는 더미 데이터로 구현 (임의로 true/false 반환)
+        return tagId.toIntOrNull()?.rem(2) == 0
+    }
+
+    override suspend fun subscribeTag(tagId: String): Result<Unit> {
+        return try {
+            // TODO: 실제 구현에서는 API 호출 또는 로컬 DB에 구독 정보 저장
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun unsubscribeTag(tagId: String): Result<Unit> {
+        return try {
+            // TODO: 실제 구현에서는 API 호출 또는 로컬 DB에서 구독 정보 삭제
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
