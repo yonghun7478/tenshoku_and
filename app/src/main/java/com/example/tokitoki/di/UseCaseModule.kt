@@ -110,6 +110,10 @@ import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCaseImpl
 import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCaseImpl
+import com.example.tokitoki.domain.usecase.SubscribeTagUseCase
+import com.example.tokitoki.domain.usecase.SubscribeTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
+import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -431,4 +435,16 @@ abstract class UseCaseModule {
     abstract fun bindGetTagSubscribersUseCase(
         impl: GetTagSubscribersUseCaseImpl
     ): GetTagSubscribersUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSubscribeTagUseCase(
+        impl: SubscribeTagUseCaseImpl
+    ): SubscribeTagUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindUnsubscribeTagUseCase(
+        impl: UnsubscribeTagUseCaseImpl
+    ): UnsubscribeTagUseCase
 }

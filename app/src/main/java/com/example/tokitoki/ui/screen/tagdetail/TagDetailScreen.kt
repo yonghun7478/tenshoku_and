@@ -49,7 +49,7 @@ fun TagDetailScreen(
     TagDetailScreenContents(
         uiState = uiState,
         onLoadMoreSubscribers = { viewModel.loadMoreSubscribers(tagId) },
-        onSubscriptionToggle = { /* TODO: ViewModel에 구독/구독해지 이벤트 전달 */ },
+        onSubscriptionToggle = { viewModel.toggleSubscription(tagId) },
         onNavigateUp = onNavigateUp,
         onNavigateToUserDetail = { userId, screenName ->
             viewModel.addUserIdsToCache()

@@ -8,6 +8,8 @@ import com.example.tokitoki.domain.usecase.GetTagDetailUseCase
 import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
 import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
+import com.example.tokitoki.domain.usecase.SubscribeTagUseCase
+import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
 import com.example.tokitoki.ui.state.TagDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -23,7 +25,9 @@ class TagDetailViewModel @Inject constructor(
     private val getTagDetailUseCase: GetTagDetailUseCase,
     private val isTagSubscribedUseCase: IsTagSubscribedUseCase,
     private val getTagSubscribersUseCase: GetTagSubscribersUseCase,
-    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase,
+    private val subscribeTagUseCase: SubscribeTagUseCase,
+    private val unsubscribeTagUseCase: UnsubscribeTagUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TagDetailUiState())
     val uiState: StateFlow<TagDetailUiState> = _uiState.asStateFlow()
@@ -81,32 +85,63 @@ class TagDetailViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreSubscribers(tagId: String) {
-        val cursor = _uiState.value.nextCursor ?: return
-        if (_uiState.value.isLastPage) return
-        _uiState.update { it.copy(isLoading = true) }
+    fun toggleSubscription(tagId: String) {
         viewModelScope.launch {
-            val result = getTagSubscribersUseCase(tagId, cursor, 20)
-            when (result) {
-                is ResultWrapper.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            subscribers = it.subscribers + result.data.users,
-                            nextCursor = result.data.nextCursor,
-                            isLastPage = result.data.isLastPage,
-                            isLoading = false
-                        )
-                    }
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val result = if (uiState.value.isSubscribed) {
+                    unsubscribeTagUseCase(tagId)
+                } else {
+                    subscribeTagUseCase(tagId)
                 }
-                is ResultWrapper.Error -> {
-                    val errorMsg = when (val error = result.errorType) {
-                        is ErrorType.ServerError -> "서버 오류(${error.httpCode}): ${error.message}"
-                        is ErrorType.ExceptionError -> error.message
+                result.fold(
+                    onSuccess = {
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                isSubscribed = !currentState.isSubscribed,
+                                error = null
+                            )
+                        }
+                    },
+                    onFailure = { exception ->
+                        _uiState.update { it.copy(error = exception.message ?: "구독 상태 변경에 실패했습니다.") }
                     }
-                    _uiState.update { it.copy(error = errorMsg, isLoading = false) }
-                }
+                )
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
 
-                ResultWrapper.Loading -> TODO()
+    fun loadMoreSubscribers(tagId: String) {
+        if (_uiState.value.isLoading || _uiState.value.isLastPage) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val result = getTagSubscribersUseCase(tagId, _uiState.value.nextCursor, 20)
+                when (result) {
+                    is ResultWrapper.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                subscribers = it.subscribers + result.data.users,
+                                nextCursor = result.data.nextCursor,
+                                isLastPage = result.data.isLastPage,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is ResultWrapper.Error -> {
+                        val errorMsg = when (val error = result.errorType) {
+                            is ErrorType.ServerError -> "서버 오류(${error.httpCode}): ${error.message}"
+                            is ErrorType.ExceptionError -> error.message
+                        }
+                        _uiState.update { it.copy(error = errorMsg, isLoading = false) }
+                    }
+                    ResultWrapper.Loading -> TODO()
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.message, isLoading = false) }
             }
         }
     }
