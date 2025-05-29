@@ -7,6 +7,7 @@ import com.example.tokitoki.data.repository.FavoriteUserRepositoryImpl
 import com.example.tokitoki.data.repository.LikeRepositoryImpl
 import com.example.tokitoki.data.repository.MainHomeTagCategoryRepositoryImpl
 import com.example.tokitoki.data.repository.MainHomeTagRepositoryImpl
+import com.example.tokitoki.data.repository.MessageRepositoryImpl
 import com.example.tokitoki.data.repository.MessageListRepositoryImpl
 import com.example.tokitoki.data.repository.MyProfileRepositoryImpl
 import com.example.tokitoki.data.repository.MySelfSentenceRepositoryImpl
@@ -21,6 +22,7 @@ import com.example.tokitoki.domain.repository.FavoriteUserRepository
 import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.domain.repository.MainHomeTagCategoryRepository
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
+import com.example.tokitoki.domain.repository.MessageRepository
 import com.example.tokitoki.domain.repository.MessageListRepository
 import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.MySelfSentenceRepository
@@ -98,6 +100,12 @@ abstract class TokiTokiRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMessageRepository(
+        messageRepositoryImpl: MessageRepositoryImpl
+    ): MessageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMessageListRepository(
         messageRepositoryImpl: MessageListRepositoryImpl
     ): MessageListRepository
 

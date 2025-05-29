@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.ui.screen.mytaglist.MyTagListScreen
 import com.example.tokitoki.ui.screen.tagdetail.TagDetailScreen
+import com.example.tokitoki.ui.screens.message.MessageDetailScreen
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
@@ -430,6 +431,21 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToUserDetail = { userId, screenName ->
                     navAction.navigateToUserDetail(userId, screenName)
+                }
+            )
+        }
+
+        composable(
+            TokitokiDestinations.MESSAGE_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.OTHER_USER_ID) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val otherUserId = backStackEntry.arguments?.getString(TokitokiArgs.OTHER_USER_ID) ?: ""
+            MessageDetailScreen(
+                otherUserId = otherUserId,
+                onNavigateUp = {
+                    navController.navigateUp()
                 }
             )
         }
