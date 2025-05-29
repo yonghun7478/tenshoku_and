@@ -76,7 +76,7 @@ class MessageDetailViewModel @Inject constructor(
                 startReceivingMessages(otherUserId)
 
                 // 채팅 상태 확인
-                checkMessageStatus(otherUserId)
+//                checkMessageStatus(otherUserId)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
             }
@@ -166,14 +166,14 @@ class MessageDetailViewModel @Inject constructor(
         }
     }
 
-    private fun checkMessageStatus(otherUserId: String) {
-        viewModelScope.launch {
-            val result = updateMessageStatusUseCase.getMessageStatus(otherUserId)
-            result.onSuccess { messageStatus ->
-                _uiState.update { it.copy(messageStatus = messageStatus) }
-            }
-        }
-    }
+//    private fun checkMessageStatus(otherUserId: String) {
+//        viewModelScope.launch {
+//            val result = updateMessageStatusUseCase.getMessageStatus(otherUserId)
+//            result.onSuccess { messageStatus ->
+//                _uiState.update { it.copy(messageStatus = messageStatus) }
+//            }
+//        }
+//    }
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }

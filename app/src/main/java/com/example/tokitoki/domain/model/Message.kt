@@ -6,5 +6,6 @@ data class Message(
     val receiverId: String,
     val content: String,
     val timestamp: Long,
-    val isRead: Boolean = false
+    val isRead: Boolean = false,
+    val isFromMe: Boolean
 ) 

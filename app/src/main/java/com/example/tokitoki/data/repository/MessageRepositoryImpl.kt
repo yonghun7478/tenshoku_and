@@ -26,7 +26,8 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
                     receiverId = if (isFromMe) "other_user" else "current_user",
                     content = "더미 메시지 ${index + 1}",
                     timestamp = System.currentTimeMillis() - (index * 1000L),
-                    isRead = true
+                    isRead = true,
+                    isFromMe = isFromMe
                 )
             )
         }
@@ -59,7 +60,8 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
                 receiverId = userId,
                 content = message,
                 timestamp = System.currentTimeMillis(),
-                isRead = false
+                isRead = false,
+                isFromMe = true
             )
             
             dummyMessages.add(0, newMessage) // 새 메시지를 리스트 앞에 추가
@@ -80,7 +82,8 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
                 receiverId = "current_user",
                 content = "새로운 메시지가 도착했습니다! (${System.currentTimeMillis()})",
                 timestamp = System.currentTimeMillis(),
-                isRead = false
+                isRead = false,
+                isFromMe = false
             )
             
             dummyMessages.add(0, newMessage)
