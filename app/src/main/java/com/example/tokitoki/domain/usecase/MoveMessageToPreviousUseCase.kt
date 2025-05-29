@@ -1,6 +1,6 @@
-package com.example.tokitoki.domain.usecase.message
+package com.example.tokitoki.domain.usecase
 
-import com.example.tokitoki.domain.repository.MessageRepository
+import com.example.tokitoki.domain.repository.MessageListRepository
 import javax.inject.Inject
 
 interface MoveMessageToPreviousUseCase {
@@ -8,7 +8,7 @@ interface MoveMessageToPreviousUseCase {
 }
 
 class MoveMessageToPreviousUseCaseImpl @Inject constructor(
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageListRepository
 ) : MoveMessageToPreviousUseCase {
     override suspend fun invoke(userId: String): Result<Unit> {
         return messageRepository.moveMessageToPrevious(userId)

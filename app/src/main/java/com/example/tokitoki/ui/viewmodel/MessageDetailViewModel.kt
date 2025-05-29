@@ -6,7 +6,7 @@ import com.example.tokitoki.domain.model.Message
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.GetUserDetailUseCase
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCase
-import com.example.tokitoki.domain.usecase.message.MoveMessageToPreviousUseCase
+import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
 import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCase
 import com.example.tokitoki.domain.usecase.message.SendMessageUseCase
 import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCase
@@ -14,6 +14,7 @@ import com.example.tokitoki.ui.state.MessageDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
 import javax.inject.Inject
 
 @HiltViewModel

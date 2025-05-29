@@ -18,27 +18,31 @@ import kotlin.random.Random
 class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
     // --- 더미 데이터 생성 ---
-    private val dummyMatchingUsersDatabase = List(30) { index ->
-        val timestamp = System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7) // 최근 1주일 내 랜덤 시간
-        MatchingUserDto(
-            userId = "match_${index + 1}",
-            userName = "Matcher ${index + 1}",
-            profileImageUrl = "https://picsum.photos/seed/${index + 100}/200/200",
-            matchedTimestamp = timestamp
-        )
-    }.sortedByDescending { it.matchedTimestamp } // 최신순 정렬
+    private val dummyMatchingUsersDatabase = mutableListOf<MatchingUserDto>().apply {
+        addAll(List(30) { index ->
+            val timestamp = System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7) // 최근 1주일 내 랜덤 시간
+            MatchingUserDto(
+                userId = "match_${index + 1}",
+                userName = "Matcher ${index + 1}",
+                profileImageUrl = "https://picsum.photos/seed/${index + 100}/200/200",
+                matchedTimestamp = timestamp
+            )
+        }.sortedByDescending { it.matchedTimestamp }) // 최신순 정렬
+    }
 
-    private val dummyPreviousChatsDatabase = List(50) { index ->
-        val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
-        val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
-        PreviousChatDto(
-            messageId = "msg_${index + 1}",
-            partnerNickname = "Chatter ${index + 1}",
-            partnerHometown = listOf("Seoul", "Busan", "Tokyo", "Osaka", "New York")[index % 5],
-            lastMessageTimestamp = timestamp,
-            partnerProfileImageUrl = "https://picsum.photos/seed/${index + 200}/200/200"
-        )
-    }.sortedByDescending { it.lastMessageTimestamp } // 최신순 정렬
+    private val dummyPreviousChatsDatabase = mutableListOf<PreviousChatDto>().apply {
+        addAll(List(50) { index ->
+            val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
+            val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
+            PreviousChatDto(
+                messageId = "msg_${index + 1}",
+                partnerNickname = "Chatter ${index + 1}",
+                partnerHometown = listOf("Seoul", "Busan", "Tokyo", "Osaka", "New York")[index % 5],
+                lastMessageTimestamp = timestamp,
+                partnerProfileImageUrl = "https://picsum.photos/seed/${index + 200}/200/200"
+            )
+        }.sortedByDescending { it.lastMessageTimestamp }) // 최신순 정렬
+    }
     // --- 더미 데이터 끝 ---
 
 
@@ -103,6 +107,36 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             val domainData = pageData.map { it.toDomain() }
             Result.success(CursorResult(data = domainData, nextCursor = nextCursor))
 
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun moveMessageToPrevious(userId: String): Result<Unit> {
+        return try {
+            delay(500) // Simulate network delay
+
+            // 매칭된 유저 목록에서 해당 유저 찾기
+            val matchingUser = dummyMatchingUsersDatabase.find { it.userId == userId }
+                ?: return Result.failure(IllegalArgumentException("User not found in matching list"))
+
+            // 이전 대화 목록에 추가
+            val newPreviousChat = PreviousChatDto(
+                messageId = "msg_${System.currentTimeMillis()}",
+                partnerNickname = matchingUser.userName,
+                partnerHometown = "Unknown", // 실제 구현에서는 유저의 고향 정보를 가져와야 함
+                lastMessageTimestamp = System.currentTimeMillis(),
+                partnerProfileImageUrl = matchingUser.profileImageUrl
+            )
+
+            // 이전 대화 목록에 추가하고 시간순으로 정렬
+            dummyPreviousChatsDatabase.add(newPreviousChat)
+            dummyPreviousChatsDatabase.sortByDescending { it.lastMessageTimestamp }
+
+            // 매칭된 유저 목록에서 제거
+            dummyMatchingUsersDatabase.removeIf { it.userId == userId }
+
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

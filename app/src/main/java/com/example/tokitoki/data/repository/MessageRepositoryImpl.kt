@@ -106,14 +106,4 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             Result.failure(e)
         }
     }
-
-    override suspend fun moveMessageToPrevious(userId: String): Result<Unit> {
-        return try {
-            delay(500) // 네트워크 지연 시뮬레이션
-            // 더미 데이터에서는 단순히 성공을 반환
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 } 

@@ -11,5 +11,4 @@ interface MessageRepository {
     suspend fun receiveMessages(userId: String): Flow<Message>
     suspend fun updateMessageStatus(userId: String, hasMessages: Boolean): Result<Unit>
     suspend fun getMessageStatus(userId: String): Result<MessageStatus>
-    suspend fun moveMessageToPrevious(userId: String): Result<Unit>
 } 

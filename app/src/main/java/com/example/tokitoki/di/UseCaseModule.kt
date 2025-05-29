@@ -116,8 +116,8 @@ import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
 import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCase
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCaseImpl
-import com.example.tokitoki.domain.usecase.message.MoveMessageToPreviousUseCase
-import com.example.tokitoki.domain.usecase.message.MoveMessageToPreviousUseCaseImpl
+import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
+import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.SendMessageUseCase
 import com.example.tokitoki.domain.usecase.message.SendMessageUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCase
