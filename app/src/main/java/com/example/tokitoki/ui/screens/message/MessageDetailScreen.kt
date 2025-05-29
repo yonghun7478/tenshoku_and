@@ -1,9 +1,8 @@
 package com.example.tokitoki.ui.screens.message
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -12,8 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tokitoki.ui.viewmodel.MessageDetailViewModel
-import com.example.tokitoki.domain.model.Message
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,13 +22,16 @@ fun MessageDetailScreen(
     onNavigateUp: () -> Unit,
     viewModel: MessageDetailViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val messages by viewModel.messages.collectAsState()
-    val listState = rememberLazyListState()
+    // Collect state from ViewModel (will be used in later steps)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val messages by viewModel.messages.collectAsStateWithLifecycle()
     
     LaunchedEffect(otherUserId) {
         viewModel.initialize(otherUserId)
     }
+
+    val pagerState = rememberPagerState(pageCount = { 2 }) // 2 pages: Message and User Detail
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -40,127 +43,39 @@ fun MessageDetailScreen(
                     }
                 }
             )
+        },
+        bottomBar = { // Simple indicator for now
+            BottomAppBar {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) } }) { Text("메시지") }
+                    Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) } }) { Text("상세정보") }
+                }
+            }
         }
     ) { paddingValues ->
-        Box(
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // 메시지 목록
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    reverseLayout = true
-                ) {
-//                    items(messages) { message ->
-//                        MessageItem(
-//                            message = message,
-//                            isCurrentUser = message.isFromMe
-//                        )
-//                    }
+        ) { page ->
+            when (page) {
+                0 -> {
+                    // Message Page Placeholder
+                    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("메시지 페이지 (구현 예정)")
+                    }
                 }
-
-                // 메시지 입력 영역
-                MessageInput(
-                    onSendMessage = { message ->
-                        viewModel.sendMessage(otherUserId, message)
-                    },
-                    isSending = uiState.isSending
-                )
-            }
-
-            // 로딩 및 에러 상태 처리
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            uiState.error?.let { error ->
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                ) {
-                    Text(error)
+                1 -> {
+                    // User Detail Page Placeholder
+                    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("유저 상세 정보 페이지 (구현 예정)")
+                    }
                 }
             }
         }
     }
 }
-
-@Composable
-private fun MessageItem(
-    message: Message,
-    isCurrentUser: Boolean
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        contentAlignment = if (isCurrentUser) Alignment.CenterEnd else Alignment.CenterStart
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = if (isCurrentUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-            modifier = Modifier.widthIn(max = 300.dp)
-        ) {
-            Text(
-                text = message.content,
-                modifier = Modifier.padding(12.dp),
-                color = if (isCurrentUser) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
-@Composable
-private fun MessageInput(
-    onSendMessage: (String) -> Unit,
-    isSending: Boolean
-) {
-    var messageText by remember { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextField(
-            value = messageText,
-            onValueChange = { messageText = it },
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("메시지를 입력하세요") },
-            enabled = !isSending
-        )
-        
-        Spacer(modifier = Modifier.width(8.dp))
-        
-        Button(
-            onClick = {
-                if (messageText.isNotBlank()) {
-                    onSendMessage(messageText)
-                    messageText = ""
-                }
-            },
-            enabled = messageText.isNotBlank() && !isSending
-        ) {
-            if (isSending) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("전송")
-            }
-        }
-    }
-} 
