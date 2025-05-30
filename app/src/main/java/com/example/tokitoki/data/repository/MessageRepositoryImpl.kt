@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.UUID
 import javax.inject.Inject
+import java.util.concurrent.CopyOnWriteArrayList
 
 class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     // 더미 데이터를 저장할 리스트
-    private val dummyMessages = mutableListOf<Message>()
+    private val dummyMessages = CopyOnWriteArrayList<Message>()
     private val messageStatuses = mutableMapOf<String, MessageStatus>()
 
     init {
@@ -40,7 +41,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             
             val startIndex = cursor?.toIntOrNull() ?: 0
             val endIndex = minOf(startIndex + limit, dummyMessages.size)
-            val messages = dummyMessages.subList(startIndex, endIndex)
+            val messages = dummyMessages.subList(startIndex, endIndex).toList()
             
             val nextCursor = if (endIndex < dummyMessages.size) endIndex.toString() else null
             

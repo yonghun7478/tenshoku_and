@@ -46,10 +46,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessageListScreen(viewModel: MessageListViewModel = hiltViewModel()) {
+fun MessageListScreen(
+    viewModel: MessageListViewModel = hiltViewModel(),
+    onUserClick: (String) -> Unit,
+    onChatClick: (String) -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -78,11 +83,19 @@ fun MessageListScreen(viewModel: MessageListViewModel = hiltViewModel()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     MessageListTitle(title = "メッセージ")
                     Spacer(modifier = Modifier.height(16.dp))
-                    MatchingUsersSection(matchingUsers = uiState.matchingUsers, listState = matchingUsersListState)
+                    MatchingUsersSection(
+                        matchingUsers = uiState.matchingUsers,
+                        listState = matchingUsersListState,
+                        onUserClick = onUserClick
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider()
                     Spacer(modifier = Modifier.height(16.dp))
-                    PreviousChatsSection(previousChats = uiState.previousChats, listState = previousChatsListState)
+                    PreviousChatsSection(
+                        previousChats = uiState.previousChats,
+                        listState = previousChatsListState,
+                        onChatClick = onChatClick
+                    )
 
                     if (uiState.errorMessage != null) {
                         Text(
@@ -114,7 +127,7 @@ fun MessageListScreen(viewModel: MessageListViewModel = hiltViewModel()) {
     }
 }
 
-// 9. "메시지" 타이틀 Composable
+// 9. "メッセージ" タイトル Composable
 @Composable
 fun MessageListTitle(title: String) {
     Text(
@@ -124,9 +137,13 @@ fun MessageListTitle(title: String) {
     )
 }
 
-// 10. "매칭" 섹션 Composable
+// 10. "マッチング" セクション Composable
 @Composable
-fun MatchingUsersSection(matchingUsers: List<MatchingUser>, listState: LazyListState) {
+fun MatchingUsersSection(
+    matchingUsers: List<MatchingUser>,
+    listState: LazyListState,
+    onUserClick: (String) -> Unit
+) {
     Column {
         Text(
             text = "マッチング",
@@ -134,27 +151,40 @@ fun MatchingUsersSection(matchingUsers: List<MatchingUser>, listState: LazyListS
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        MatchingUserList(users = matchingUsers, listState = listState)
+        MatchingUserList(
+            users = matchingUsers,
+            listState = listState,
+            onUserClick = onUserClick
+        )
     }
 }
 
-// 11. 매칭 유저 리스트 Composable
+// 11. マッチングユーザーリスト Composable
 @Composable
-fun MatchingUserList(users: List<MatchingUser>, listState: LazyListState) {
+fun MatchingUserList(
+    users: List<MatchingUser>,
+    listState: LazyListState,
+    onUserClick: (String) -> Unit
+) {
     LazyRow(state = listState) {
         items(users) { user ->
-            MatchingUserItem(user = user)
+            MatchingUserItem(user = user, onUserClick = onUserClick)
             Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
 
-// 12. 매칭 유저 아이템 Composable
+// 12. マッチングユーザーアイテム Composable
 @Composable
-fun MatchingUserItem(user: MatchingUser) {
+fun MatchingUserItem(
+    user: MatchingUser,
+    onUserClick: (String) -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(80.dp)
+        modifier = Modifier
+            .width(80.dp)
+            .clickable { onUserClick(user.id) }
     ) {
         AsyncImage(
             model = user.thumbnail,
@@ -173,9 +203,13 @@ fun MatchingUserItem(user: MatchingUser) {
     }
 }
 
-// 13. "이전 채팅" 섹션 Composable
+// 13. "以前のチャット" セクション Composable
 @Composable
-fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListState) {
+fun PreviousChatsSection(
+    previousChats: List<PreviousChat>,
+    listState: LazyListState,
+    onChatClick: (String) -> Unit
+) {
     Column {
         Text(
             text = "Previous Chats",
@@ -183,31 +217,42 @@ fun PreviousChatsSection(previousChats: List<PreviousChat>, listState: LazyListS
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        PreviousChatList(chats = previousChats, listState = listState)
+        PreviousChatList(
+            chats = previousChats,
+            listState = listState,
+            onChatClick = onChatClick
+        )
     }
 }
 
-// 14. 이전 채팅 리스트 Composable
+// 14. 以前のチャットリスト Composable
 @Composable
-fun PreviousChatList(chats: List<PreviousChat>, listState: LazyListState) {
+fun PreviousChatList(
+    chats: List<PreviousChat>,
+    listState: LazyListState,
+    onChatClick: (String) -> Unit
+) {
     LazyColumn(state = listState) {
         items(chats) { chat ->
-            PreviousChatItem(chat = chat)
+            PreviousChatItem(chat = chat, onChatClick = onChatClick)
             Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
         }
     }
 }
 
-// 15. 이전 채팅 아이템 Composable
+// 15. 以前のチャットアイテム Composable
 @Composable
-fun PreviousChatItem(chat: PreviousChat) {
+fun PreviousChatItem(
+    chat: PreviousChat,
+    onChatClick: (String) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-
-        ) {
+            .padding(vertical = 8.dp)
+            .clickable { onChatClick(chat.id) },
+    ) {
         AsyncImage(
             model = chat.thumbnail,
             contentDescription = chat.nickname,
@@ -277,7 +322,7 @@ fun LoadingShimmer() {
         MessageListTitle(title = "メッセージ")
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 매칭 유저 섹션 Shimmer
+        // マッチングセクション Shimmer
         Column {
             Text(
                 text = "マッチング",
@@ -316,7 +361,7 @@ fun LoadingShimmer() {
         Divider()
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 이전 채팅 섹션 Shimmer
+        // 以前のチャットセクション Shimmer
         Column {
             Text(
                 text = "Previous Chats",
@@ -365,17 +410,17 @@ fun LoadingShimmer() {
     }
 }
 
-// 16. 프리뷰 Composable
+// 16. プレビュー Composable
 @Preview(showBackground = true)
 @Composable
 fun MessageListScreenPreview() {
-    // 프리뷰에서는 ViewModel 대신 더미 데이터를 직접 사용하여 UI를 테스트합니다.
+    // プレビューではViewModelを使用せずにダミーデータを直接使用してUIをテストします。
     val dummyUiState = MessageListUiState(
         matchingUsers = listOf(
             MatchingUser("1", "Alice", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
             MatchingUser("2", "Bob", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
-            MatchingUser("3", "Charlie", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 추가 데이터
-            MatchingUser("4", "David", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 추가 데이터
+            MatchingUser("3", "Charlie", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 追加データ
+            MatchingUser("4", "David", "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"), // 追加データ
         ),
         previousChats = listOf(
             PreviousChat("4", "David", "Seoul", LocalDate.of(2024, 1, 20), "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg"),
@@ -387,15 +432,25 @@ fun MessageListScreenPreview() {
         errorMessage = null
     )
 
-    //  MessageListScreen(viewModel = MessageListViewModel()) // 실제 ViewModel 사용 대신
+    //  MessageListScreen(viewModel = MessageListViewModel()) // 実際のViewModelを使用する代わりに
     Column {
         MessageListTitle(title = "Messages")
         Spacer(modifier = Modifier.height(16.dp))
-        MatchingUsersSection(matchingUsers = dummyUiState.matchingUsers, listState = rememberLazyListState())
+        MatchingUsersSection(
+            matchingUsers = dummyUiState.matchingUsers,
+            listState = rememberLazyListState(),
+            onUserClick = {}
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Divider()
         Spacer(modifier = Modifier.height(16.dp))
-        PreviousChatsSection(previousChats = dummyUiState.previousChats, listState = rememberLazyListState())
+        PreviousChatsSection(
+            previousChats = dummyUiState.previousChats,
+            listState = rememberLazyListState(),
+            onChatClick = {
+
+            }
+        )
     }
 }
 

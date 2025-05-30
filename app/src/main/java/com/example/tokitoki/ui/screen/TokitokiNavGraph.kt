@@ -331,8 +331,11 @@ fun TokitokiNavGraph(
                 onNavigateToMyTagList = {
                     navAction.navigateToMyTagList()
                 },
-                onNavigateToTagDetail = { tagId ->
-                    navAction.navigateToTagDetail(tagId)
+                onNavigateToTagDetail = {
+                    navAction.navigateToTagDetail(it)
+                },
+                onNavigateToMessageDetail = {
+                    navAction.navigateToMessageDetail(it)
                 },
                 sharedViewModel = sharedViewModel
             )
