@@ -8,7 +8,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +19,17 @@ import com.example.tokitoki.domain.model.Message
 import com.example.tokitoki.ui.viewmodel.MessageDetailViewModel
 import kotlinx.coroutines.launch
 import com.example.tokitoki.ui.state.MessageDetailUiState
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.PaddingValues
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,26 +49,17 @@ fun MessageDetailScreen(
     val pagerState = rememberPagerState(pageCount = { 2 }) // 2 pages: Message and User Detail
     val coroutineScope = rememberCoroutineScope()
 
+    val onNavigateToUserDetailTab: () -> Unit = remember(coroutineScope, pagerState) {
+        { coroutineScope.launch { pagerState.animateScrollToPage(1) } }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(uiState.userProfile?.name ?: "채팅") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
-                    }
-                },
-                actions = { // Modified actions based on screenshot
-                    // Placeholder for thumbnail button
-                    IconButton(onClick = { /* TODO: Handle thumbnail click */ }) {
-                        // Replace with actual user thumbnail later
-                         Text("\uD83D\uDCF7", style = LocalTextStyle.current.copy(fontSize = MaterialTheme.typography.titleLarge.fontSize))
-                    }
-                    // More options menu
-                    IconButton(onClick = { /* TODO: Handle more options click */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "더보기")
-                    }
-                }
+            MessageDetailTopAppBar(
+                userName = uiState.userProfile?.name ?: "채팅",
+                userThumbnailUrl = uiState.userProfile?.thumbnailUrl,
+                onNavigateUp = onNavigateUp,
+                onThumbnailClick = onNavigateToUserDetailTab,
             )
         },
         bottomBar = { // Simple indicator for now
@@ -85,7 +86,8 @@ fun MessageDetailScreen(
                     MessagePageContent(
                         messages = messages,
                         uiState = uiState,
-                        onSendMessage = { message -> viewModel.sendMessage(otherUserId, message) }
+                        onSendMessage = { message -> viewModel.sendMessage(otherUserId, message) },
+                        onProfileAreaClick = onNavigateToUserDetailTab
                     )
                 }
                 1 -> {
@@ -97,48 +99,118 @@ fun MessageDetailScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageDetailTopAppBar(
+    userName: String,
+    userThumbnailUrl: String?,
+    onNavigateUp: () -> Unit,
+    onThumbnailClick: () -> Unit,
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    TopAppBar(
+        title = { Text(userName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        navigationIcon = {
+            IconButton(onClick = onNavigateUp) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
+            }
+        },
+        actions = {
+            IconButton(onClick = onThumbnailClick) {
+                AsyncImage(
+                    model = userThumbnailUrl,
+                    contentDescription = "User Thumbnail",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        },
+        scrollBehavior = scrollBehavior
+    )
+}
+
 @Composable
 private fun MessagePageContent(
     messages: List<Message>,
     uiState: MessageDetailUiState,
-    onSendMessage: (String) -> Unit
+    onSendMessage: (String) -> Unit,
+    onProfileAreaClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .padding(4.dp)
     ) {
-        // Placeholder for Profile Summary Area (Based on screenshot)
-        Box(
+        // Group Profile Summary and Common Topics for centering
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp) // Adjust height as needed
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
         ) {
-            Text("프로필 요약 영역 (구현 예정)")
+            // Placeholder for Profile Summary Area (Based on screenshot)
+            Box(
+                modifier = Modifier
+                    .padding(3.dp)
+                    .clickable { onProfileAreaClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                // 프로필 정보 표시 (썸네일, 이름)
+                uiState.userProfile?.let { userProfile ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) { // 세로 배치, 아이템 중앙 정렬
+                        AsyncImage(
+                            model = userProfile.thumbnailUrl,
+                            contentDescription = userProfile.name,
+                            modifier = Modifier
+                                .size(width = 40.dp, height = 60.dp) // 세로 직사각형 형태
+                                .clip(RoundedCornerShape(8.dp)), // 모서리 둥글게
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.height(4.dp)) // 간격
+                        Text(
+                            text = userProfile.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally) // 텍스트 너비를 내용에 맞추고 중앙 정렬
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp)) // 프로필 영역과 버튼 영역 사이 간격 줄임 (16dp -> 12dp)
+
+            // Placeholder for Common Topics Buttons (Based on screenshot)
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Example buttons, replace with actual logic/data later
+                OutlinedButton(
+                    onClick = { /*TODO*/ },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                ) { Text("#공통점1") }
+                OutlinedButton(
+                    onClick = { /*TODO*/ },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                ) { Text("#공통점2") }
+                OutlinedButton(
+                    onClick = { /*TODO*/ },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                ) { Text("#공통점3") }
+            }
         }
 
-        // Placeholder for Common Topics Buttons (Based on screenshot)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Example buttons, replace with actual logic/data later
-            OutlinedButton(onClick = { /*TODO*/ }) { Text("#공통점1") }
-            OutlinedButton(onClick = { /*TODO*/ }) { Text("#공통점2") }
-            OutlinedButton(onClick = { /*TODO*/ }) { Text("#공통점3") }
-        }
-        
         // Message List
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .weight(1f) // Takes available space
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp),
             reverseLayout = true // Show latest messages at the bottom
         ) {
             items(messages) { message ->
@@ -234,4 +306,38 @@ private fun MessageInput(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MessageDetailTopAppBarPreview() {
+    MessageDetailTopAppBar(
+        userName = "사용자 이름",
+        userThumbnailUrl = "https://img.hankyung.com/photo/202112/BF.28211341.1.jpg",
+        onNavigateUp = {},
+        onThumbnailClick = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MessagePageContentPreview() {
+    val dummyMessages = listOf(
+        Message("1", "other_user", "current_user", "안녕하세요!", 1678886400000L, true, false),
+        Message("2", "current_user", "other_user", "네, 안녕하세요!", 1678886460000L, true, true),
+        Message("3", "other_user", "current_user", "점심 식사 하셨나요?", 1678886520000L, false, false)
+    )
+    val dummyUiState = MessageDetailUiState(
+        isLoading = false,
+        isSending = false,
+        userProfile = null, // 또는 더미 UserProfile 제공
+        error = null
+    )
+
+    MessagePageContent(
+        messages = dummyMessages,
+        uiState = dummyUiState,
+        onSendMessage = {}, // 미리보기에서는 실제 전송 로직 대신 빈 람다 제공
+        onProfileAreaClick = {} // 미리보기에서는 빈 람다 제공
+    )
 }

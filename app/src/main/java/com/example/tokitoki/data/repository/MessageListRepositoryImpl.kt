@@ -22,7 +22,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
         addAll(List(30) { index ->
             val timestamp = System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7) // 최근 1주일 내 랜덤 시간
             MatchingUserDto(
-                userId = "match_${index + 1}",
+                userId = "${index + 1}",
                 userName = "Matcher ${index + 1}",
                 profileImageUrl = "https://picsum.photos/seed/${index + 100}/200/200",
                 matchedTimestamp = timestamp
@@ -35,7 +35,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
             val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
             PreviousChatDto(
-                messageId = "msg_${index + 1}",
+                messageId = "${index + 1}",
                 partnerNickname = "Chatter ${index + 1}",
                 partnerHometown = listOf("Seoul", "Busan", "Tokyo", "Osaka", "New York")[index % 5],
                 lastMessageTimestamp = timestamp,
