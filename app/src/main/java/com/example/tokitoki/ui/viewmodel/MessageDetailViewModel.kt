@@ -112,14 +112,15 @@ class MessageDetailViewModel @Inject constructor(
     fun sendMessage(otherUserId: String, message: String) {
         if (message.isBlank()) return
 
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSending = true) }
+        _uiState.update { it.copy(isSending = true) }
 
+        viewModelScope.launch {
             try {
                 val result = sendMessageUseCase(otherUserId, message)
-                result.onSuccess {
-                    // 메시지 전송 성공 시 상태 업데이트
-                    updateMessageStatusUseCase(otherUserId, true)
+                result.onSuccess { sentMessage ->
+                    _messages.update { currentMessages ->
+                        listOf(sentMessage) + currentMessages
+                    }
                 }.onFailure { error ->
                     _uiState.update { it.copy(error = error.message) }
                 }
@@ -136,7 +137,7 @@ class MessageDetailViewModel @Inject constructor(
             try {
                 receiveMessageUseCase(otherUserId).collect { message ->
                     _messages.update { currentMessages ->
-                        currentMessages + message
+                        listOf(message) + currentMessages
                     }
                 }
             } catch (e: Exception) {

@@ -61,17 +61,6 @@ fun MessageDetailScreen(
                 onNavigateUp = onNavigateUp,
                 onThumbnailClick = onNavigateToUserDetailTab,
             )
-        },
-        bottomBar = { // Simple indicator for now
-            BottomAppBar {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) } }) { Text("메시지") }
-                    Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) } }) { Text("상세정보") }
-                }
-            }
         }
     ) { paddingValues ->
         HorizontalPager(
@@ -140,6 +129,13 @@ private fun MessagePageContent(
     onProfileAreaClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
+
+    // Add LaunchedEffect to scroll to the bottom when messages change
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(0) // Scroll to the first item (bottom in reverseLayout)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -213,7 +209,10 @@ private fun MessagePageContent(
                 .padding(horizontal = 8.dp),
             reverseLayout = true // Show latest messages at the bottom
         ) {
-            items(messages) { message ->
+            items(
+                items = messages,
+                key = { message -> message.id }
+            ) { message ->
                 MessageItem(
                     message = message,
                     isCurrentUser = message.isFromMe // Assuming Message model has isFromMe

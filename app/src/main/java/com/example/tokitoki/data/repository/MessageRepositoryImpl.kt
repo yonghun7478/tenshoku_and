@@ -51,7 +51,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
         }
     }
 
-    override suspend fun sendMessage(userId: String, message: String): Result<Unit> {
+    override suspend fun sendMessage(userId: String, message: String): Result<Message> {
         return try {
             delay(500) // 네트워크 지연 시뮬레이션
             
@@ -66,7 +66,9 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             )
             
             dummyMessages.add(0, newMessage) // 새 메시지를 리스트 앞에 추가
-            Result.success(Unit)
+
+            // 생성된 newMessage 객체를 Result.success()에 담아 반환
+            Result.success(newMessage)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -75,7 +77,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     override suspend fun receiveMessages(userId: String): Flow<Message> = flow {
         // 실시간 메시지 수신 시뮬레이션
         while (true) {
-            delay(5000) // 5초마다 새 메시지 생성
+            delay(10000) // 5초마다 새 메시지 생성
             
             val newMessage = Message(
                 id = UUID.randomUUID().toString(),
