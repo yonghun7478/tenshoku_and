@@ -6,7 +6,7 @@ import com.example.tokitoki.domain.repository.MessageRepository
 import javax.inject.Inject
 
 interface GetMessageHistoryUseCase {
-    suspend operator fun invoke(userId: String, cursor: String?, limit: Int = 20): Result<CursorResult<Message>>
+    suspend operator fun invoke(userId: String, cursor: String?, limit: Int = 10): Result<CursorResult<Message>>
 }
 
 class GetMessageHistoryUseCaseImpl @Inject constructor(

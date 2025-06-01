@@ -15,14 +15,15 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     // 더미 데이터를 저장할 리스트
     private val dummyMessages = CopyOnWriteArrayList<Message>()
     private val messageStatuses = mutableMapOf<String, MessageStatus>()
+    private var messageIdCounter = 0L // 메시지 ID 카운터 추가
 
     init {
         // 초기 더미 데이터 생성
-        repeat(20) { index ->
+        repeat(40) { index ->
             val isFromMe = index % 2 == 0
             dummyMessages.add(
                 Message(
-                    id = UUID.randomUUID().toString(),
+                    id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                     senderId = if (isFromMe) "current_user" else "other_user",
                     receiverId = if (isFromMe) "other_user" else "current_user",
                     content = "더미 메시지 ${index + 1}",
@@ -35,17 +36,33 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     }
 
     override suspend fun getMessageHistory(userId: String, cursor: String?, limit: Int): Result<CursorResult<Message>> {
-        // 실제 구현에서는 서버에서 데이터를 가져오지만, 여기서는 더미 데이터를 반환
         return try {
             delay(1000) // 네트워크 지연 시뮬레이션
-            
-            val startIndex = cursor?.toIntOrNull() ?: 0
+
+            val cursorTimestamp = cursor?.toLongOrNull() ?: Long.MAX_VALUE
+
+            // 커서 타임스탬프보다 엄격히 이전인 메시지부터 찾기
+            val startIndex = dummyMessages.indexOfFirst { it.timestamp < cursorTimestamp }.let {
+                 if (it == -1) dummyMessages.size else it
+            }
+
             val endIndex = minOf(startIndex + limit, dummyMessages.size)
-            val messages = dummyMessages.subList(startIndex, endIndex).toList()
-            
-            val nextCursor = if (endIndex < dummyMessages.size) endIndex.toString() else null
-            
-            Result.success(CursorResult(messages, nextCursor))
+
+            val messagesToFetch = if (startIndex < endIndex) {
+                 dummyMessages.subList(startIndex, endIndex).toList()
+            } else {
+                 emptyList()
+            }
+
+            // 다음 커서 계산
+            val nextCursor = if (messagesToFetch.isNotEmpty() && endIndex < dummyMessages.size) {
+                messagesToFetch.last().timestamp.toString()
+            } else {
+                null // 불필요한 역슬래시 및 개행 제거
+            }
+
+            Result.success(CursorResult(messagesToFetch, nextCursor))
+
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -56,7 +73,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             delay(500) // 네트워크 지연 시뮬레이션
             
             val newMessage = Message(
-                id = UUID.randomUUID().toString(),
+                id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                 senderId = "current_user",
                 receiverId = userId,
                 content = message,
@@ -80,7 +97,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             delay(10000) // 5초마다 새 메시지 생성
             
             val newMessage = Message(
-                id = UUID.randomUUID().toString(),
+                id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                 senderId = userId,
                 receiverId = "current_user",
                 content = "새로운 메시지가 도착했습니다! (${System.currentTimeMillis()})",

@@ -149,9 +149,14 @@ class MessageDetailViewModel @Inject constructor(
     fun loadMoreMessages(otherUserId: String) {
         if (isLoadingMore || currentCursor == null) return
 
-        isLoadingMore = true
-        loadMessageHistory(otherUserId)
-        isLoadingMore = false
+        isLoadingMore = true // Start loading
+        viewModelScope.launch { // Launch a new coroutine for loading
+            try {
+                loadMessageHistory(otherUserId)
+            } finally {
+                isLoadingMore = false // End loading in finally block
+            }
+        }
     }
 
     fun moveToPreviousChats(otherUserId: String) {
@@ -165,18 +170,5 @@ class MessageDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(error = e.message) }
             }
         }
-    }
-
-//    private fun checkMessageStatus(otherUserId: String) {
-//        viewModelScope.launch {
-//            val result = updateMessageStatusUseCase.getMessageStatus(otherUserId)
-//            result.onSuccess { messageStatus ->
-//                _uiState.update { it.copy(messageStatus = messageStatus) }
-//            }
-//        }
-//    }
-
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 } 

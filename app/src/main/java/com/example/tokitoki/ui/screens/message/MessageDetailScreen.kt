@@ -30,6 +30,8 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +78,9 @@ fun MessageDetailScreen(
                         messages = messages,
                         uiState = uiState,
                         onSendMessage = { message -> viewModel.sendMessage(otherUserId, message) },
-                        onProfileAreaClick = onNavigateToUserDetailTab
+                        onProfileAreaClick = onNavigateToUserDetailTab,
+                        otherUserId = otherUserId,
+                        onLoadMore = { userId -> viewModel.loadMoreMessages(userId) }
                     )
                 }
                 1 -> {
@@ -126,7 +130,9 @@ private fun MessagePageContent(
     messages: List<Message>,
     uiState: MessageDetailUiState,
     onSendMessage: (String) -> Unit,
-    onProfileAreaClick: () -> Unit
+    onProfileAreaClick: () -> Unit,
+    otherUserId: String,
+    onLoadMore: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -135,6 +141,22 @@ private fun MessagePageContent(
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(0) // Scroll to the first item (bottom in reverseLayout)
         }
+    }
+
+    // Infinite scrolling: Load more messages when scrolled near the top (older messages)
+    LaunchedEffect(listState, messages.size) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .collect { firstVisibleItemIndex ->
+                // With reverseLayout=true, index 0 is at the bottom.
+                // Older messages are at higher indices.
+                // We want to load more when firstVisibleItemIndex is large,
+                // close to the total number of items (messages.size - 1).
+                // Let's use a threshold, e.g., load when the first visible item is among the last 10 items.
+                val threshold = 10
+                if (firstVisibleItemIndex >= messages.size - 1 - threshold) {
+                    onLoadMore(otherUserId)
+                }
+            }
     }
 
     Column(
@@ -337,6 +359,8 @@ fun MessagePageContentPreview() {
         messages = dummyMessages,
         uiState = dummyUiState,
         onSendMessage = {}, // 미리보기에서는 실제 전송 로직 대신 빈 람다 제공
-        onProfileAreaClick = {} // 미리보기에서는 빈 람다 제공
+        onProfileAreaClick = {}, // 미리보기에서는 빈 람다 제공
+        otherUserId = "",
+        onLoadMore = {} // Add dummy lambda for preview
     )
 }
