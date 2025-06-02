@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import android.util.Log
 import com.example.tokitoki.domain.model.Message
 import com.example.tokitoki.domain.model.MessageStatus
 import com.example.tokitoki.domain.model.CursorResult
@@ -12,6 +13,7 @@ import javax.inject.Inject
 import java.util.concurrent.CopyOnWriteArrayList
 
 class MessageRepositoryImpl @Inject constructor() : MessageRepository {
+    private val TAG = "MessageRepoImpl"
     // 더미 데이터를 저장할 리스트
     private val dummyMessages = CopyOnWriteArrayList<Message>()
     private val messageStatuses = mutableMapOf<String, MessageStatus>()
@@ -23,7 +25,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             val isFromMe = index % 2 == 0
             dummyMessages.add(
                 Message(
-                    id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
+                    id = "msg_" + (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                     senderId = if (isFromMe) "current_user" else "other_user",
                     receiverId = if (isFromMe) "other_user" else "current_user",
                     content = "더미 메시지 ${index + 1}",
@@ -37,6 +39,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
 
     override suspend fun getMessageHistory(userId: String, cursor: String?, limit: Int): Result<CursorResult<Message>> {
         return try {
+            Log.d(TAG, "getMessageHistory - cursor: $cursor")
             delay(1000) // 네트워크 지연 시뮬레이션
 
             val cursorTimestamp = cursor?.toLongOrNull() ?: Long.MAX_VALUE
@@ -47,6 +50,8 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             }
 
             val endIndex = minOf(startIndex + limit, dummyMessages.size)
+
+            Log.d(TAG, "getMessageHistory - startIndex: $startIndex, endIndex: $endIndex")
 
             val messagesToFetch = if (startIndex < endIndex) {
                  dummyMessages.subList(startIndex, endIndex).toList()
@@ -73,7 +78,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
             delay(500) // 네트워크 지연 시뮬레이션
             
             val newMessage = Message(
-                id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
+                id = "msg_" + (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                 senderId = "current_user",
                 receiverId = userId,
                 content = message,
@@ -94,10 +99,10 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     override suspend fun receiveMessages(userId: String): Flow<Message> = flow {
         // 실시간 메시지 수신 시뮬레이션
         while (true) {
-            delay(10000) // 5초마다 새 메시지 생성
+            delay(5000) // 5초마다 새 메시지 생성
             
             val newMessage = Message(
-                id = (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
+                id = "msg_" + (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용
                 senderId = userId,
                 receiverId = "current_user",
                 content = "새로운 메시지가 도착했습니다! (${System.currentTimeMillis()})",

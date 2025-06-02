@@ -30,8 +30,6 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +78,8 @@ fun MessageDetailScreen(
                         onSendMessage = { message -> viewModel.sendMessage(otherUserId, message) },
                         onProfileAreaClick = onNavigateToUserDetailTab,
                         otherUserId = otherUserId,
-                        onLoadMore = { userId -> viewModel.loadMoreMessages(userId) }
+                        onLoadMore = { userId -> viewModel.loadMoreMessages(userId) },
+                        viewModel = viewModel
                     )
                 }
                 1 -> {
@@ -132,27 +131,27 @@ private fun MessagePageContent(
     onSendMessage: (String) -> Unit,
     onProfileAreaClick: () -> Unit,
     otherUserId: String,
-    onLoadMore: (String) -> Unit
+    onLoadMore: (String) -> Unit,
+    viewModel: MessageDetailViewModel = hiltViewModel()
 ) {
     val listState = rememberLazyListState()
+    val shouldScrollToBottom by viewModel.shouldScrollToBottom.collectAsStateWithLifecycle()
 
-    // Add LaunchedEffect to scroll to the bottom when messages change
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(0) // Scroll to the first item (bottom in reverseLayout)
+    // 새 메시지 도착 시 스크롤을 맨 아래로 이동
+    LaunchedEffect(shouldScrollToBottom) {
+        if (shouldScrollToBottom && messages.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+            viewModel.onScrollToBottomHandled()
         }
     }
 
-    // Infinite scrolling: Load more messages when scrolled near the top (older messages)
+    // 무한 스크롤: 오래된 메시지 로드 (리버스 레이아웃)
     LaunchedEffect(listState, messages.size) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .collect { firstVisibleItemIndex ->
-                // With reverseLayout=true, index 0 is at the bottom.
-                // Older messages are at higher indices.
-                // We want to load more when firstVisibleItemIndex is large,
-                // close to the total number of items (messages.size - 1).
-                // Let's use a threshold, e.g., load when the first visible item is among the last 10 items.
-                val threshold = 10
+                // reverseLayout=true일 때, index 0이 맨 아래. 오래된 메시지는 높은 인덱스.
+                // firstVisibleItemIndex가 messages.size - 1 - threshold에 가까울 때 더 로드.
+                val threshold = 15 // 사용자가 요청한 값
                 if (firstVisibleItemIndex >= messages.size - 1 - threshold) {
                     onLoadMore(otherUserId)
                 }
@@ -361,6 +360,7 @@ fun MessagePageContentPreview() {
         onSendMessage = {}, // 미리보기에서는 실제 전송 로직 대신 빈 람다 제공
         onProfileAreaClick = {}, // 미리보기에서는 빈 람다 제공
         otherUserId = "",
-        onLoadMore = {} // Add dummy lambda for preview
+        onLoadMore = {}, // Add dummy lambda for preview
+        viewModel = hiltViewModel()
     )
 }

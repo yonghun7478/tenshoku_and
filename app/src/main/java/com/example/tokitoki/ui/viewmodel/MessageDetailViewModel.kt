@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.Message
@@ -34,7 +35,11 @@ class MessageDetailViewModel @Inject constructor(
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
     private var currentCursor: String? = null
-    private var isLoadingMore = false
+
+    private val TAG = "MessageDetailViewModel"
+
+    private val _shouldScrollToBottom = MutableStateFlow(false)
+    val shouldScrollToBottom: StateFlow<Boolean> = _shouldScrollToBottom.asStateFlow()
 
     fun initialize(otherUserId: String) {
         viewModelScope.launch {
@@ -83,29 +88,27 @@ class MessageDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadMessageHistory(otherUserId: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+    private suspend fun loadMessageHistory(otherUserId: String) {
+        _uiState.update { it.copy(isLoading = true) }
 
-            try {
-                val result = getMessageHistoryUseCase(otherUserId, currentCursor)
-                result.onSuccess { cursorResult ->
-                    _messages.update { currentMessages ->
-                        if (currentCursor == null) {
-                            cursorResult.data
-                        } else {
-                            currentMessages + cursorResult.data
-                        }
+        try {
+            val result = getMessageHistoryUseCase(otherUserId, currentCursor)
+            result.onSuccess { cursorResult ->
+                _messages.update { currentMessages ->
+                    if (currentCursor == null) {
+                        cursorResult.data
+                    } else {
+                        currentMessages + cursorResult.data
                     }
-                    currentCursor = cursorResult.nextCursor
-                }.onFailure { error ->
-                    _uiState.update { it.copy(error = error.message) }
                 }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
+                currentCursor = cursorResult.nextCursor
+            }.onFailure { error ->
+                _uiState.update { it.copy(error = error.message) }
             }
+        } catch (e: Exception) {
+            _uiState.update { it.copy(error = e.message) }
+        } finally {
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -121,6 +124,7 @@ class MessageDetailViewModel @Inject constructor(
                     _messages.update { currentMessages ->
                         listOf(sentMessage) + currentMessages
                     }
+                    _shouldScrollToBottom.value = true
                 }.onFailure { error ->
                     _uiState.update { it.copy(error = error.message) }
                 }
@@ -139,6 +143,7 @@ class MessageDetailViewModel @Inject constructor(
                     _messages.update { currentMessages ->
                         listOf(message) + currentMessages
                     }
+                    _shouldScrollToBottom.value = true
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -147,14 +152,20 @@ class MessageDetailViewModel @Inject constructor(
     }
 
     fun loadMoreMessages(otherUserId: String) {
-        if (isLoadingMore || currentCursor == null) return
+        Log.d(TAG, "loadMoreMessages called. isLoading: ${_uiState.value.isLoading}, currentCursor: $currentCursor")
+        if (_uiState.value.isLoading) {
+            Log.d(TAG, "loadMoreMessages returned early: isLoading is true.")
+            return
+        }
+        if (currentCursor == null) {
+            Log.d(TAG, "loadMoreMessages returned early: currentCursor is null (no more data).")
+            return
+        }
 
-        isLoadingMore = true // Start loading
-        viewModelScope.launch { // Launch a new coroutine for loading
+        viewModelScope.launch {
             try {
                 loadMessageHistory(otherUserId)
             } finally {
-                isLoadingMore = false // End loading in finally block
             }
         }
     }
@@ -170,5 +181,9 @@ class MessageDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(error = e.message) }
             }
         }
+    }
+
+    fun onScrollToBottomHandled() {
+        _shouldScrollToBottom.value = false
     }
 } 
