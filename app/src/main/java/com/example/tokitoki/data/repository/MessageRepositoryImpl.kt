@@ -21,7 +21,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
 
     init {
         // 초기 더미 데이터 생성
-        repeat(40) { index ->
+        repeat(100) { index ->
             val isFromMe = index % 2 == 0
             dummyMessages.add(
                 Message(
@@ -99,7 +99,7 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     override suspend fun receiveMessages(userId: String): Flow<Message> = flow {
         // 실시간 메시지 수신 시뮬레이션
         while (true) {
-            delay(5000) // 5초마다 새 메시지 생성
+            delay(10000) // 5초마다 새 메시지 생성
             
             val newMessage = Message(
                 id = "msg_" + (messageIdCounter++).toString(), // 증가하는 숫자 ID 사용

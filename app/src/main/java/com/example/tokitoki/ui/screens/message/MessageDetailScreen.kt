@@ -84,7 +84,8 @@ fun MessageDetailScreen(
                         onProfileAreaClick = onNavigateToUserDetailTab,
                         otherUserId = otherUserId,
                         onLoadMore = { userId -> viewModel.loadMoreMessages(userId) },
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        source = source
                     )
                 }
                 1 -> {
@@ -137,7 +138,8 @@ private fun MessagePageContent(
     onProfileAreaClick: () -> Unit,
     otherUserId: String,
     onLoadMore: (String) -> Unit,
-    viewModel: MessageDetailViewModel = hiltViewModel()
+    viewModel: MessageDetailViewModel = hiltViewModel(),
+    source: String?
 ) {
     val listState = rememberLazyListState()
     val shouldScrollToBottom by viewModel.shouldScrollToBottom.collectAsStateWithLifecycle()
@@ -156,7 +158,7 @@ private fun MessagePageContent(
             .collect { firstVisibleItemIndex ->
                 // reverseLayout=true일 때, index 0이 맨 아래. 오래된 메시지는 높은 인덱스.
                 // firstVisibleItemIndex가 messages.size - 1 - threshold에 가까울 때 더 로드.
-                val threshold = 15 // 사용자가 요청한 값
+                val threshold = 10 // 사용자가 요청한 값
                 if (firstVisibleItemIndex >= messages.size - 1 - threshold) {
                     onLoadMore(otherUserId)
                 }
@@ -168,61 +170,63 @@ private fun MessagePageContent(
             .padding(4.dp)
     ) {
         // Group Profile Summary and Common Topics for centering
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            // Placeholder for Profile Summary Area (Based on screenshot)
-            Box(
+        if (source != "chat") {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(3.dp)
-                    .clickable { onProfileAreaClick() },
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
             ) {
-                // 프로필 정보 표시 (썸네일, 이름)
-                uiState.userProfile?.let { userProfile ->
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) { // 세로 배치, 아이템 중앙 정렬
-                        AsyncImage(
-                            model = userProfile.thumbnailUrl,
-                            contentDescription = userProfile.name,
-                            modifier = Modifier
-                                .size(width = 40.dp, height = 60.dp) // 세로 직사각형 형태
-                                .clip(RoundedCornerShape(8.dp)), // 모서리 둥글게
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.height(4.dp)) // 간격
-                        Text(
-                            text = userProfile.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally) // 텍스트 너비를 내용에 맞추고 중앙 정렬
-                        )
+                // Placeholder for Profile Summary Area (Based on screenshot)
+                Box(
+                    modifier = Modifier
+                        .padding(3.dp)
+                        .clickable { onProfileAreaClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    // 프로필 정보 표시 (썸네일, 이름)
+                    uiState.userProfile?.let { userProfile ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) { // 세로 배치, 아이템 중앙 정렬
+                            AsyncImage(
+                                model = userProfile.thumbnailUrl,
+                                contentDescription = userProfile.name,
+                                modifier = Modifier
+                                    .size(width = 40.dp, height = 60.dp) // 세로 직사각형 형태
+                                    .clip(RoundedCornerShape(8.dp)), // 모서리 둥글게
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(modifier = Modifier.height(4.dp)) // 간격
+                            Text(
+                                text = userProfile.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally) // 텍스트 너비를 내용에 맞추고 중앙 정렬
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(4.dp)) // 프로필 영역과 버튼 영역 사이 간격 줄임 (16dp -> 12dp)
+                Spacer(modifier = Modifier.height(4.dp)) // 프로필 영역과 버튼 영역 사이 간격 줄임 (16dp -> 12dp)
 
-            // Placeholder for Common Topics Buttons (Based on screenshot)
-            Row(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Example buttons, replace with actual logic/data later
-                OutlinedButton(
-                    onClick = { /*TODO*/ },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                ) { Text("#공통점1") }
-                OutlinedButton(
-                    onClick = { /*TODO*/ },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                ) { Text("#공통점2") }
-                OutlinedButton(
-                    onClick = { /*TODO*/ },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                ) { Text("#공통점3") }
+                // Placeholder for Common Topics Buttons (Based on screenshot)
+                Row(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Example buttons, replace with actual logic/data later
+                    OutlinedButton(
+                        onClick = { /*TODO*/ },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    ) { Text("#공통점1") }
+                    OutlinedButton(
+                        onClick = { /*TODO*/ },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    ) { Text("#공통점2") }
+                    OutlinedButton(
+                        onClick = { /*TODO*/ },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    ) { Text("#공통점3") }
+                }
             }
         }
 
@@ -366,6 +370,7 @@ fun MessagePageContentPreview() {
         onProfileAreaClick = {}, // 미리보기에서는 빈 람다 제공
         otherUserId = "",
         onLoadMore = {}, // Add dummy lambda for preview
-        viewModel = hiltViewModel()
+        viewModel = hiltViewModel(),
+        source = null
     )
 }
