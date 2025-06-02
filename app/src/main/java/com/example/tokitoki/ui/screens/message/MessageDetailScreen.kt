@@ -154,12 +154,17 @@ private fun MessagePageContent(
 
     // 무한 스크롤: 오래된 메시지 로드 (리버스 레이아웃)
     LaunchedEffect(listState, messages.size) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { firstVisibleItemIndex ->
-                // reverseLayout=true일 때, index 0이 맨 아래. 오래된 메시지는 높은 인덱스.
-                // firstVisibleItemIndex가 messages.size - 1 - threshold에 가까울 때 더 로드.
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastVisibleIndexInViewport ->
+                if (lastVisibleIndexInViewport == null) return@collect // null 체크 추가
+
+                Log.d("InfiniteScroll", "lastVisibleIndexInViewport: $lastVisibleIndexInViewport, messages.size: ${messages.size}")
                 val threshold = 10 // 사용자가 요청한 값
-                if (firstVisibleItemIndex >= messages.size - 1 - threshold) {
+                val conditionResult = lastVisibleIndexInViewport >= messages.size - 1 - threshold
+                Log.d("InfiniteScroll", "Condition (lastVisibleIndexInViewport >= messages.size - 1 - threshold): $conditionResult")
+
+                if (conditionResult) {
+                    Log.d("InfiniteScroll", "Calling onLoadMore for userId: $otherUserId")
                     onLoadMore(otherUserId)
                 }
             }
