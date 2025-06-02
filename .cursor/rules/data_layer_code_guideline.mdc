@@ -1,0 +1,92 @@
+---
+description: AI가 데이터 레이어 파일을 생성하거나 수정할 때 참고해야 할 코드 작성 가이드라인입니다. 더미 데이터 처리 예시를 포함합니다.
+globs: 
+alwaysApply: false
+---
+# 데이터 레이어 코드 작성 가이드라인
+
+이 가이드라인은 `data` 레이어에서 코드를 작성할 때 따라야 할 원칙을 정의합니다.
+
+## 주요 원칙:
+
+-   **도메인 레이어 인터페이스 구현**: `data` 레이어는 `domain` 레이어에 정의된 레포지토리 인터페이스를 구현합니다.
+
+-   **데이터 소스 처리**: 로컬 데이터베이스, 원격 API 호출 등 실제 데이터 소스와의 상호작용을 담당합니다.
+
+-   **모델 변환**: 네트워크 또는 로컬 데이터 소스에서 가져온 데이터를 도메인 계층의 모델로 변환하는 역할을 수행합니다.
+
+## 구성 요소:
+
+-   **로컬 데이터 소스 (Local)**: Room 데이터베이스(DAO, Entity), Shared Preferences 등 로컬에 데이터를 저장하고 관리하는 로직을 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/data/local](mdc:app/src/main/java/com/example/tokitoki/data/local)
+    -   `Dao` (Data Access Object): 데이터베이스에 접근하는 메서드를 정의하는 인터페이스입니다.
+    -   `Entity`: Room 데이터베이스 테이블을 나타내는 데이터 클래스입니다.
+    -   `Preferences`: Shared Preferences를 사용하여 간단한 데이터를 저장하고 관리합니다.
+
+-   **모델 (Models)**: 네트워크 응답(DTO) 또는 로컬 데이터베이스에서 사용되는 데이터 구조를 정의합니다. 이 모델들은 도메인 레이어의 모델로 변환되어야 합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/data/model](mdc:app/src/main/java/com/example/tokitoki/data/model)
+    -   명명 규칙: `[모델명]Dto.kt` 또는 `[모델명]Response.kt` (예: `UserDto.kt`, `LoginResponse.kt`)
+
+-   **레포지토리 구현 (Repository Implementations)**: `domain` 레이어의 레포지토리 인터페이스를 실제 데이터 소스와 연결하여 구현합니다. 여기에서 네트워크 호출, 데이터베이스 쿼리, 더미 데이터 생성 등의 로직이 이루어집니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/data/repository](mdc:app/src/main/java/com/example/tokitoki/data/repository)
+    -   명명 규칙: `[엔티티명]RepositoryImpl.kt` (예: `UserRepositoryImpl.kt`, `TagRepositoryImpl.kt`)
+
+-   **유틸리티 (Utilities)**: 데이터 레이어 내에서 사용되는 헬퍼 함수, 데이터 변환 로직, 암호화 등의 유틸리티 코드를 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/data/utils](mdc:app/src/main/java/com/example/tokitoki/data/utils)
+
+## 더미 데이터 처리:
+
+활성 API 서버가 없을 경우, 개발 및 테스트 목적으로 더미 데이터를 사용하여 애플리케이션 기능을 구현합니다. 이는 `data` 레이어의 레포지토리 구현체 내에서 이루어질 수 있습니다.
+
+### 더미 데이터 예시 코드:
+
+```kotlin
+// app/src/main/java/com/example/tokitoki/data/repository/UserRepositoryImpl.kt
+import com.example.tokitoki.domain.model.User
+import com.example.tokitoki.domain.repository.UserRepository
+import kotlinx.coroutines.delay
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class UserRepositoryImpl @Inject constructor(
+    private val isTest: Boolean // IsTestModule에서 제공되는 값
+) : UserRepository {
+
+    private val dummyUsers = listOf(
+        User(id = "1", name = "Alice", email = "alice@example.com"),
+        User(id = "2", name = "Bob", email = "bob@example.com")
+    )
+
+    override suspend fun getUserById(userId: String): User {
+        return if (isTest) {
+            delay(500) // Simulate network delay
+            dummyUsers.firstOrNull { it.id == userId } ?: throw NoSuchElementException("User not found")
+        } else {
+            // 실제 API 호출 로직
+            // retrofitService.getUser(userId)
+            throw NotImplementedError("Real API call not implemented yet")
+        }
+    }
+
+    override suspend fun saveUser(user: User) {
+        if (isTest) {
+            delay(500) // Simulate network delay
+            // 더미 데이터에 저장 로직 (실제로는 변경 불가능한 리스트이므로 예시)
+            println("Dummy save user: $user")
+        } else {
+            // 실제 API 호출 로직
+            // retrofitService.saveUser(user)
+            throw NotImplementedError("Real API call not implemented yet")
+        }
+    }
+}
+
+// app/src/main/java/com/example/tokitoki/di/IsTestModule.kt (이전에 생성된 모듈 활용)
+// ...
+// @Provides
+// @Singleton
+// fun provideIsTest(): Boolean {
+//     return true // 테스트 환경에서는 true로 설정하여 더미 데이터를 사용
+// }
+```

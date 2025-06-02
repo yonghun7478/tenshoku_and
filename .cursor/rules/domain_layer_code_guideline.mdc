@@ -1,0 +1,82 @@
+---
+description: AI가 도메인 레이어 파일을 생성하거나 수정할 때 참고해야 할 코드 작성 가이드라인입니다. 엔티티, 유스케이스, 레포지토리 인터페이스, 컨버터에 대한 예시를 포함합니다.
+globs: 
+alwaysApply: false
+---
+# 도메인 레이어 코드 작성 가이드라인
+
+이 가이드라인은 `domain` 레이어에서 코드를 작성할 때 따라야 할 원칙을 정의합니다.
+
+## 주요 원칙:
+
+-   **프레임워크 독립성**: `domain` 레이어의 코드는 Android, Jetpack Compose, Hilt 등 특정 프레임워크에 의존하지 않아야 합니다. 순수 Kotlin/Java 코드여야 합니다.
+
+-   **핵심 비즈니스 로직**: 애플리케이션의 핵심 비즈니스 규칙과 로직은 이 레이어에 정의되어야 합니다.
+
+-   **엔티티 (Entities)**: 애플리케이션의 핵심 데이터 구조를 나타내며, 어떠한 프레임워크 관련 코드도 포함하지 않아야 합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain/model](mdc:app/src/main/java/com/example/tokitoki/domain/model)
+
+-   **유스케이스 (Use Cases / Interactors)**: 특정 비즈니스 시나리오를 처리하는 단일 책임 클래스입니다. 이들은 레포지토리 인터페이스를 사용하여 데이터를 조작하고 도메인 엔티티를 반환합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain/usecase](mdc:app/src/main/java/com/example/tokitoki/domain/usecase)
+    -   명명 규칙: `[행위]UseCase.kt` (예: `LoginUserUseCase.kt`, `GetUserDetailsUseCase.kt`)
+
+-   **레포지토리 인터페이스 (Repository Interfaces)**: `domain` 레이어는 데이터 소스에 대한 추상화된 인터페이스를 정의합니다. 실제 구현은 `data` 레이어에서 이루어집니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain/repository](mdc:app/src/main/java/com/example/tokitoki/domain/repository)
+    -   명명 규칙: `[엔티티명]Repository.kt` (예: `UserRepository.kt`, `TagRepository.kt`)
+
+-   **컨버터 (Converters)**: 도메인 계층의 모델을 다른 계층의 모델(예: 데이터 계층의 DTO, 프레젠테이션 계층의 UI Model)로 변환하는 로직을 포함합니다. 이는 `domain` 계층이 다른 계층의 구체적인 구현에 의존하지 않도록 돕습니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain/converter](mdc:app/src/main/java/com/example/tokitoki/domain/converter)
+
+-   **유틸리티 (Utilities)**: 도메인 레이어에서만 사용되는 순수 Kotlin 유틸리티 함수 또는 클래스를 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain/util](mdc:app/src/main/java/com/example/tokitoki/domain/util)
+
+## 코드 예시:
+
+```kotlin
+// app/src/main/java/com/example/tokitoki/domain/model/User.kt
+data class User(
+    val id: String,
+    val name: String,
+    val email: String
+)
+
+// app/src/main/java/com/example/tokitoki/domain/repository/UserRepository.kt
+interface UserRepository {
+    suspend fun getUserById(userId: String): User
+    suspend fun saveUser(user: User)
+}
+
+// app/src/main/java/com/example/tokitoki/domain/usecase/GetUserByIdUseCase.kt
+class GetUserByIdUseCase(private val userRepository: UserRepository) {
+    suspend operator fun invoke(userId: String): User {
+        return userRepository.getUserById(userId)
+    }
+}
+
+// app/src/main/java/com/example/tokitoki/domain/converter/UserConverter.kt
+object UserConverter {
+    fun convertToDomain(userEntity: UserEntity): User {
+        return User(
+            id = userEntity.id,
+            name = userEntity.name,
+            email = userEntity.email
+        )
+    }
+
+    fun convertToEntity(user: User): UserEntity {
+        return UserEntity(
+            id = user.id,
+            name = user.name,
+            email = user.email
+        )
+    }
+}
+
+// Data Layer (for example purposes in documentation)
+// app/src/main/java/com/example/tokitoki/data/local/UserEntity.kt
+data class UserEntity(
+    val id: String,
+    val name: String,
+    val email: String
+)
+```

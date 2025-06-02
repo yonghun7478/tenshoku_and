@@ -1,0 +1,118 @@
+---
+description: AI가 Hilt 의존성 주입 관련 코드를 생성하거나 수정할 때 참고해야 할 가이드라인입니다. 모듈 생성, 바인딩 타입, 스코프, 주입 방식에 대한 내용을 포함합니다.
+globs: 
+alwaysApply: false
+---
+# Hilt 의존성 주입 가이드라인
+
+이 가이드라인은 Hilt를 사용하여 의존성을 관리하는 방법을 정의합니다.
+
+## 1. 모듈 생성:
+
+-   **목적**: 의존성 주입에 필요한 객체들을 Hilt에 제공합니다.
+-   **어노테이션**: `@Module`로 클래스를 모듈로 지정하고, `@InstallIn`으로 어떤 Hilt 컴포넌트에 설치될지 지정합니다.
+    -   `SingletonComponent::class`: 애플리케이션 전체 수명 주기 동안 단일 인스턴스를 유지하는 객체를 바인딩할 때 사용합니다.
+    -   `ActivityRetainedComponent::class`, `ViewModelComponent::class` 등 다른 컴포넌트도 필요에 따라 사용합니다.
+-   **유형**: 
+    -   **`object` (객체 선언)**: `@Provides` 메서드만 포함하는 모듈에 사용합니다. (예: `TokiTokiAppModule.kt`, `IsTestModule.kt`)
+    -   **`abstract class` (추상 클래스)**: `@Binds` 메서드(인터페이스 구현체 바인딩)만 포함하는 모듈에 사용합니다. (예: `TokiTokiRepositoryModule.kt`, `UseCaseModule.kt`)
+-   **위치**: [app/src/main/java/com/example/tokitoki/di](mdc:app/src/main/java/com/example/tokitoki/di)
+
+### 코드 예시 (Object Module):
+```kotlin
+// app/src/main/java/com/example/tokitoki/di/IsTestModule.kt
+@Module
+@InstallIn(SingletonComponent::class)
+object IsTestModule {
+
+    @Provides
+    @Singleton
+    fun provideIsTest(): Boolean {
+        return false
+    }
+}
+```
+
+### 코드 예시 (Abstract Class Module):
+```kotlin
+// app/src/main/java/com/example/tokitoki/di/UseCaseModule.kt
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class UseCaseModule {
+    @Binds
+    @Singleton
+    abstract fun bindGetTagCategoriesUseCase(
+        impl: GetTagCategoriesUseCaseImpl
+    ): GetTagCategoriesUseCase
+}
+```
+
+## 2. 바인딩 타입:
+
+-   **`@Provides`**: 
+    -   **사용 시점**: 생성자에 `@Inject` 어노테이션을 붙일 수 없는 클래스(예: 인터페이스, 빌더를 통해 생성되는 객체, 서드파티 라이브러리 객체)를 Hilt에 제공할 때 사용합니다.
+    -   **메서드 이름**: `provide` 접두사를 사용합니다. (예: `provideTokiTokiCoroutineDispatcher`)
+
+-   **`@Binds`**: 
+    -   **사용 시점**: 인터페이스의 구현체를 바인딩할 때 사용합니다. `@Provides`보다 더 효율적입니다.
+    -   **메서드 이름**: `bind` 접두사를 사용합니다. (예: `bindTagRepository`)
+
+### 코드 예시 (`@Provides`):
+```kotlin
+// app/src/main/java/com/example/tokitoki/di/TokiTokiAppModule.kt
+    @Provides
+    @Singleton
+    fun provideTokiTokiCoroutineDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @Singleton
+    fun provideTokiTokiCondDatabase(@ApplicationContext context: Context): TokiTokiCondDatabase {
+        return Room.databaseBuilder(
+            context,
+            TokiTokiCondDatabase::class.java,
+            TokiTokiCondDatabase.DATABASE_NAME
+        ).build()
+    }
+```
+
+### 코드 예시 (`@Binds`):
+```kotlin
+// app/src/main/java/com/example/tokitoki/di/TokiTokiRepositoryModule.kt
+    @Binds
+    @Singleton
+    abstract fun bindTagRepository(
+        tagRepositoryImpl: TagRepositoryImpl
+    ): TagRepository
+```
+
+## 3. 스코프 (Scoping):
+
+-   **`@Singleton`**: 
+    -   **사용 시점**: 애플리케이션 전체 수명 주기 동안 단 하나의 인스턴스만 존재하도록 할 때 사용합니다.
+    -   **위치**: `@Provides` 또는 `@Binds` 메서드 위에 어노테이션을 붙입니다.
+    -   **참고**: `SingletonComponent`에 설치된 모듈에서만 사용해야 합니다.
+
+## 4. 의존성 주입 (Injection):
+
+-   **`@Inject`**: 
+    -   **사용 시점**: 생성자 주입을 통해 클래스에 의존성을 주입할 때 사용합니다.
+    -   **필드 주입**: Android 프레임워크 클래스(Activity, Fragment)에서는 `@AndroidEntryPoint`와 함께 필드 주입을 사용합니다.
+
+### 코드 예시 (`@Inject`):
+```kotlin
+// ViewModel 예시 (constructor injection)
+class MyViewModel @Inject constructor(
+    private val myUseCase: MyUseCase
+) : ViewModel() {
+    // ...
+}
+
+// Activity 예시 (field injection)
+@AndroidEntryPoint
+class MyActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var myViewModel: MyViewModel
+    // ...
+}
+```

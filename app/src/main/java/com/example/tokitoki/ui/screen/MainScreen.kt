@@ -53,7 +53,8 @@ fun MainScreen(
     onNavigateToUserDetail: (String, String) -> Unit,
     onNavigateToTagSearch: () -> Unit,
     onNavigateToMyTagList: () -> Unit,
-    onNavigateToTagDetail: (String) -> Unit
+    onNavigateToTagDetail: (String) -> Unit,
+    onNavigateToMessageDetail: (String, String) -> Unit
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -81,6 +82,7 @@ fun MainScreen(
         onNavigateToTagSearch = onNavigateToTagSearch,
         onNavigateToMyTagList = onNavigateToMyTagList,
         onNavigateToTagDetail = onNavigateToTagDetail,
+        onNavigateToMessageDetail = onNavigateToMessageDetail,
         sharedViewModel = sharedViewModel
     )
 }
@@ -97,6 +99,7 @@ fun MainContents(
     onNavigateToTagSearch: () -> Unit,
     onNavigateToMyTagList: () -> Unit,
     onNavigateToTagDetail: (String) -> Unit,
+    onNavigateToMessageDetail: (String, String) -> Unit,
     sharedViewModel: SharedPickupViewModel
 ) {
     Scaffold(
@@ -128,7 +131,10 @@ fun MainContents(
                 }
 
                 MainBottomItem.MESSAGE -> {
-                    MessageListScreen()
+                    MessageListScreen(
+                        onUserClick = { userId, source -> onNavigateToMessageDetail(userId, source) },
+                        onChatClick = { chatId, source -> onNavigateToMessageDetail(chatId, source) }
+                    )
                 }
 
                 MainBottomItem.MY_PAGE -> {

@@ -114,6 +114,16 @@ import com.example.tokitoki.domain.usecase.SubscribeTagUseCase
 import com.example.tokitoki.domain.usecase.SubscribeTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
 import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCase
+import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCaseImpl
+import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
+import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCaseImpl
+import com.example.tokitoki.domain.usecase.message.SendMessageUseCase
+import com.example.tokitoki.domain.usecase.message.SendMessageUseCaseImpl
+import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCase
+import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCaseImpl
+import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCase
+import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -447,4 +457,34 @@ abstract class UseCaseModule {
     abstract fun bindUnsubscribeTagUseCase(
         impl: UnsubscribeTagUseCaseImpl
     ): UnsubscribeTagUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetMessageHistoryUseCase(
+        impl: GetMessageHistoryUseCaseImpl
+    ): GetMessageHistoryUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindSendMessageUseCase(
+        impl: SendMessageUseCaseImpl
+    ): SendMessageUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindReceiveMessageUseCase(
+        impl: ReceiveMessageUseCaseImpl
+    ): ReceiveMessageUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindMoveMessageToPreviousUseCase(
+        impl: MoveMessageToPreviousUseCaseImpl
+    ): MoveMessageToPreviousUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateMessageStatusUseCase(
+        impl: UpdateMessageStatusUseCaseImpl
+    ): UpdateMessageStatusUseCase
 }

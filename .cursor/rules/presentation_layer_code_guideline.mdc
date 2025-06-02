@@ -1,0 +1,70 @@
+---
+description: AI가 프레젠테이션 레이어 파일을 생성하거나 수정할 때 참고해야 할 코드 작성 가이드라인입니다. Jetpack Compose 화면, ViewModel, UI 상태, NavGraph 통합에 대한 내용을 포함합니다.
+globs: 
+alwaysApply: false
+---
+# 프레젠테이션 레이어 코드 작성 가이드라인
+
+이 가이드라인은 `presentation` 레이어에서 코드를 작성할 때 따라야 할 원칙을 정의합니다.
+
+## 주요 원칙:
+
+-   **UI 및 사용자 상호작용 처리**: `presentation` 레이어는 사용자 인터페이스(UI)를 구성하고 사용자 입력 및 상호작용을 처리하는 데 중점을 둡니다.
+
+-   **도메인 레이어 의존성**: `presentation` 레이어는 `domain` 레이어에만 의존하며, `data` 레이어에는 직접적으로 의존하지 않습니다.
+
+-   **Jetpack Compose 활용**: UI는 전적으로 Jetpack Compose를 사용하여 선언적으로 구축됩니다.
+
+## 구성 요소:
+
+-   **화면 (Screens)**: 개별 UI 화면을 구성하는 Jetpack Compose Composable 함수를 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/screen](mdc:app/src/main/java/com/example/tokitoki/ui/screen) 또는 [app/src/main/java/com/example/tokitoki/ui/screens](mdc:app/src/main/java/com/example/tokitoki/ui/screens)
+    -   명명 규칙: `[화면명]Screen.kt` (예: `SignInScreen.kt`, `MainScreen.kt`)
+    -   **NavGraph 통합**: `TokitokiNavGraph.kt`([app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavGraph.kt](mdc:app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavGraph.kt))에서 각 화면은 `composable` 블록으로 정의되며, `TokitokiNavigationActions`([app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavigation.kt](mdc:app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavigation.kt))를 통해 화면 간 이동을 관리합니다.
+
+-   **ViewModel**: UI 상태를 관리하고 `domain` 레이어의 유스케이스를 호출하여 비즈니스 로직을 수행합니다. ViewModel은 Android 수명 주기를 인식하여 구성 변경 시에도 데이터를 유지합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/viewmodel](mdc:app/src/main/java/com/example/tokitoki/ui/viewmodel)
+    -   명명 규칙: `[화면명]ViewModel.kt` (예: `SignInViewModel.kt`, `MainHomeViewModel.kt`)
+
+-   **상태 (State)**: UI의 현재 상태를 나타내는 데이터 클래스와 UI에서 발생하는 이벤트를 정의합니다. ViewModel에서 이 상태를 관리합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/state](mdc:app/src/main/java/com/example/tokitoki/ui/state)
+    -   명명 규칙: `[화면명]State.kt`, `[화면명]Event.kt` (예: `MainUiState.kt`, `MainUiEvent.kt`)
+
+-   **모델 (Models)**: UI에 표시될 데이터를 정의하는 경량 데이터 클래스입니다. 도메인 모델을 UI에 맞게 변환하여 사용합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/model](mdc:app/src/main/java/com/example/tokitoki/ui/model)
+    -   명명 규칙: `[모델명]Item.kt`, `[모델명]UiModel.kt` (예: `MyTagItem.kt`, `UserUiModel.kt`)
+
+-   **상수 (Constants)**: UI에 특화된 상수 값을 정의합니다 (예: 화면 이름, 테스트 태그).
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/constants](mdc:app/src/main/java/com/example/tokitoki/ui/constants)
+
+-   **컨버터 (Converters)**: 도메인 레이어의 모델을 UI 레이어의 모델로 변환하는 로직을 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/converter](mdc:app/src/main/java/com/example/tokitoki/ui/converter)
+
+-   **테마 (Theme)**: Jetpack Compose 앱의 UI 테마(색상, 타이포그래피, 도형)를 정의합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/theme](mdc:app/src/main/java/com/example/tokitoki/ui/theme)
+
+-   **유틸리티 (Utilities)**: UI 관련 헬퍼 함수, 확장 함수 등 재사용 가능한 유틸리티 코드를 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui/util](mdc:app/src/main/java/com/example/tokitoki/ui/util)
+
+## 코드 예시:
+
+```kotlin
+// app/src/main/java/com/example/tokitoki/ui/screen/ExampleScreen.kt
+@Composable
+fun ExampleScreen(viewModel: ExampleViewModel = hiltViewModel()) {
+    // UI Composable content
+}
+
+// app/src/main/java/com/example/tokitoki/ui/viewmodel/ExampleViewModel.kt
+class ExampleViewModel @Inject constructor(
+    private val exampleUseCase: ExampleUseCase
+) : ViewModel() {
+    // ViewModel logic
+}
+
+// app/src/main/java/com/example/tokitoki/ui/state/ExampleUiState.kt
+data class ExampleUiState(
+    val isLoading: Boolean = false,
+    val data: String = ""
+)
+```
