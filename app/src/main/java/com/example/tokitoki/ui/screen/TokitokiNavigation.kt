@@ -14,6 +14,7 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.OTHER_USER_ID
+import com.example.tokitoki.ui.screen.TokitokiArgs.SOURCE
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_BIRTHDAY_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_GENDER_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.ABOUT_ME_TAG_SCREEN
@@ -81,6 +82,7 @@ object TokitokiArgs {
     const val CATEGORY_NAME = "categoryName"
     const val TAG_ID = "tagId"
     const val OTHER_USER_ID = "otherUserId"
+    const val SOURCE = "source"
 }
 
 object TokitokiDestinations {
@@ -108,7 +110,7 @@ object TokitokiDestinations {
     const val CATEGORY_TAG_ROUTE = "$CATEGORY_TAG_SCREEN?$CATEGORY_ID={$CATEGORY_ID}&$CATEGORY_NAME={$CATEGORY_NAME}"
     const val MY_TAG_LIST_ROUTE = MY_TAG_LIST_SCREEN
     const val TAG_DETAIL_ROUTE = "$TAG_DETAIL_SCREEN?$TAG_ID={$TAG_ID}"
-    const val MESSAGE_DETAIL_ROUTE = "$MESSAGE_DETAIL_SCREEN?$OTHER_USER_ID={$OTHER_USER_ID}"
+    const val MESSAGE_DETAIL_ROUTE = "$MESSAGE_DETAIL_SCREEN?$OTHER_USER_ID={$OTHER_USER_ID}&$SOURCE={$SOURCE}"
 }
 
 class TokitokiNavigationActions(private val navController: NavHostController) {
@@ -211,7 +213,7 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate("$TAG_DETAIL_SCREEN?$TAG_ID=${tagId}")
     }
 
-    fun navigateToMessageDetail(otherUserId: String) {
-        navController.navigate("$MESSAGE_DETAIL_SCREEN?$OTHER_USER_ID=${otherUserId}")
+    fun navigateToMessageDetail(otherUserId: String, source: String?) {
+        navController.navigate("$MESSAGE_DETAIL_SCREEN?$OTHER_USER_ID=${otherUserId}&$SOURCE=${source}")
     }
 }

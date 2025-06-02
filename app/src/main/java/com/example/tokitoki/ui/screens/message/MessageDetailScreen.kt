@@ -30,14 +30,19 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailScreen(
     otherUserId: String,
     onNavigateUp: () -> Unit,
-    viewModel: MessageDetailViewModel = hiltViewModel()
+    viewModel: MessageDetailViewModel = hiltViewModel(),
+    source: String? = null
 ) {
+    LaunchedEffect(source) {
+        Log.d("MessageDetailScreen", "Source: $source")
+    }
     // Collect state from ViewModel
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val messages by viewModel.messages.collectAsStateWithLifecycle()

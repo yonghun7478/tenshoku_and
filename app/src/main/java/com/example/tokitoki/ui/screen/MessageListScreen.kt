@@ -52,8 +52,8 @@ import androidx.compose.foundation.clickable
 @Composable
 fun MessageListScreen(
     viewModel: MessageListViewModel = hiltViewModel(),
-    onUserClick: (String) -> Unit,
-    onChatClick: (String) -> Unit
+    onUserClick: (String, String) -> Unit,
+    onChatClick: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -142,7 +142,7 @@ fun MessageListTitle(title: String) {
 fun MatchingUsersSection(
     matchingUsers: List<MatchingUser>,
     listState: LazyListState,
-    onUserClick: (String) -> Unit
+    onUserClick: (String, String) -> Unit
 ) {
     Column {
         Text(
@@ -164,7 +164,7 @@ fun MatchingUsersSection(
 fun MatchingUserList(
     users: List<MatchingUser>,
     listState: LazyListState,
-    onUserClick: (String) -> Unit
+    onUserClick: (String, String) -> Unit
 ) {
     LazyRow(state = listState) {
         items(users) { user ->
@@ -178,13 +178,13 @@ fun MatchingUserList(
 @Composable
 fun MatchingUserItem(
     user: MatchingUser,
-    onUserClick: (String) -> Unit
+    onUserClick: (String, String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(80.dp)
-            .clickable { onUserClick(user.id) }
+            .clickable { onUserClick(user.id, "matching") }
     ) {
         AsyncImage(
             model = user.thumbnail,
@@ -208,7 +208,7 @@ fun MatchingUserItem(
 fun PreviousChatsSection(
     previousChats: List<PreviousChat>,
     listState: LazyListState,
-    onChatClick: (String) -> Unit
+    onChatClick: (String, String) -> Unit
 ) {
     Column {
         Text(
@@ -230,7 +230,7 @@ fun PreviousChatsSection(
 fun PreviousChatList(
     chats: List<PreviousChat>,
     listState: LazyListState,
-    onChatClick: (String) -> Unit
+    onChatClick: (String, String) -> Unit
 ) {
     LazyColumn(state = listState) {
         items(chats) { chat ->
@@ -244,14 +244,14 @@ fun PreviousChatList(
 @Composable
 fun PreviousChatItem(
     chat: PreviousChat,
-    onChatClick: (String) -> Unit
+    onChatClick: (String, String) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onChatClick(chat.id) },
+            .clickable { onChatClick(chat.id, "chat") },
     ) {
         AsyncImage(
             model = chat.thumbnail,
@@ -439,7 +439,7 @@ fun MessageListScreenPreview() {
         MatchingUsersSection(
             matchingUsers = dummyUiState.matchingUsers,
             listState = rememberLazyListState(),
-            onUserClick = {}
+            onUserClick = { _, _ -> }
         )
         Spacer(modifier = Modifier.height(16.dp))
         Divider()
@@ -447,7 +447,7 @@ fun MessageListScreenPreview() {
         PreviousChatsSection(
             previousChats = dummyUiState.previousChats,
             listState = rememberLazyListState(),
-            onChatClick = {
+            onChatClick = { _, _ ->
 
             }
         )

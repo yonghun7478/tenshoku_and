@@ -334,8 +334,8 @@ fun TokitokiNavGraph(
                 onNavigateToTagDetail = {
                     navAction.navigateToTagDetail(it)
                 },
-                onNavigateToMessageDetail = {
-                    navAction.navigateToMessageDetail(it)
+                onNavigateToMessageDetail = { userId, source ->
+                    navAction.navigateToMessageDetail(userId, source)
                 },
                 sharedViewModel = sharedViewModel
             )
@@ -441,15 +441,18 @@ fun TokitokiNavGraph(
         composable(
             TokitokiDestinations.MESSAGE_DETAIL_ROUTE,
             arguments = listOf(
-                navArgument(TokitokiArgs.OTHER_USER_ID) { type = NavType.StringType }
+                navArgument(TokitokiArgs.OTHER_USER_ID) { type = NavType.StringType },
+                navArgument(TokitokiArgs.SOURCE) { type = NavType.StringType; nullable = true }
             )
         ) { backStackEntry ->
             val otherUserId = backStackEntry.arguments?.getString(TokitokiArgs.OTHER_USER_ID) ?: ""
+            val source = backStackEntry.arguments?.getString(TokitokiArgs.SOURCE)
             MessageDetailScreen(
                 otherUserId = otherUserId,
                 onNavigateUp = {
                     navController.navigateUp()
-                }
+                },
+                source = source
             )
         }
     }
