@@ -112,7 +112,6 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
                     
                     age = user.age,
                     location = locations[userIdInt % locations.size],
-                    myTags = allMyTags.shuffled().take((userIdInt % 3) + 2),
                     introduction = introductions[userIdInt % introductions.size],
                     bloodType = bloodTypes[userIdInt % bloodTypes.size],
                     education = educations[userIdInt % educations.size],

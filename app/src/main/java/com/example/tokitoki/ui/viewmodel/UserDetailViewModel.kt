@@ -13,6 +13,8 @@ import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
 import com.example.tokitoki.domain.usecase.CheckIsUserLikedUseCase
 import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCase
+import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCase
+import com.example.tokitoki.domain.model.MainHomeTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,7 +32,8 @@ class UserDetailViewModel @Inject constructor(
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
     private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
     private val checkIsUserLikedUseCase: CheckIsUserLikedUseCase,
-    private val checkIsUserFavoriteUseCase: CheckIsUserFavoriteUseCase
+    private val checkIsUserFavoriteUseCase: CheckIsUserFavoriteUseCase,
+    private val getUserTagsUseCase: GetUserTagsUseCase
 ) : ViewModel() {
 
     private val _userDetails = MutableStateFlow<List<ResultWrapper<UserDetail>>>(emptyList())
@@ -47,6 +50,9 @@ class UserDetailViewModel @Inject constructor(
 
     private val _toastMessage = MutableStateFlow<String?>(null)
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
+
+    private val _userTags = MutableStateFlow<List<MainHomeTag>>(emptyList())
+    val userTags: StateFlow<List<MainHomeTag>> = _userTags.asStateFlow()
 
     private var cachedUserIds: List<String> = emptyList()
     private val preloadBuffer = 2 // 현재 페이지 기준 앞뒤로 2명씩 프리로드
@@ -74,6 +80,7 @@ class UserDetailViewModel @Inject constructor(
             // 5. 현재 유저의 좋아요/즐겨찾기 상태 로드
             if (selectedIndex != -1 && selectedIndex < cachedUserIds.size) {
                 updateLikeAndFavoriteStatus(cachedUserIds[selectedIndex])
+                updateUserTags(cachedUserIds[selectedIndex])
             }
         }
     }
@@ -87,6 +94,7 @@ class UserDetailViewModel @Inject constructor(
         // 현재 페이지 유저의 좋아요/즐겨찾기 상태 업데이트
         if (newPage >= 0 && newPage < cachedUserIds.size) {
             updateLikeAndFavoriteStatus(cachedUserIds[newPage])
+            updateUserTags(cachedUserIds[newPage])
         }
     }
 
@@ -216,6 +224,20 @@ class UserDetailViewModel @Inject constructor(
                 }
                 is ResultWrapper.Loading -> { /* 로딩 중 UI 처리는 현재 없음 */ }
             }
+        }
+    }
+
+    // 사용자 태그를 업데이트하는 새로운 private 함수
+    private fun updateUserTags(userId: String) {
+        viewModelScope.launch {
+            getUserTagsUseCase(userId)
+                .onSuccess { mainHomeTags ->
+                    _userTags.value = mainHomeTags // mainHomeTags를 직접 할당
+                }
+                .onFailure { throwable ->
+                    _userTags.value = emptyList() // 오류 시 빈 리스트
+                    _toastMessage.value = "태그 로드 실패: ${throwable.localizedMessage}"
+                }
         }
     }
 } 

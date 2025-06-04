@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 import androidx.compose.ui.layout.ContentScale
+import com.example.tokitoki.domain.model.MainHomeTag
 // FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
 // import com.google.accompanist.flowlayout.FlowRow
 
@@ -53,6 +54,7 @@ fun UserDetailScreen(
     val isLiked by viewModel.isLiked.collectAsState() // 기존 isLiked 상태
     val isFavorite by viewModel.isFavorite.collectAsState() // isFavorite 상태
     val toastMessage by viewModel.toastMessage.collectAsState()
+    val userTags by viewModel.userTags.collectAsState() // userTags 상태 관찰 추가
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
@@ -127,6 +129,7 @@ fun UserDetailScreen(
                         is ResultWrapper.Success -> {
                             UserDetailContent(
                                 userDetail = userDetailResult.data,
+                                userTags = userTags, // userTags 파라미터는 이미 List<MainHomeTag> 타입을 따름
                                 modifier = Modifier.fillMaxSize(),
                                 scaffoldTopPadding = paddingValues.calculateTopPadding()
                             )
@@ -216,6 +219,7 @@ fun UserDetailScreen(
 @Composable
 private fun UserDetailContent(
     userDetail: UserDetail,
+    userTags: List<MainHomeTag>, // List<String> -> List<MainHomeTag> 변경
     modifier: Modifier = Modifier,
     scaffoldTopPadding: Dp
 ) {
@@ -242,10 +246,10 @@ private fun UserDetailContent(
 
         item { Spacer(modifier = Modifier.height(24.dp)) }
 
-        if (userDetail.myTags.isNotEmpty()) {
+        if (userTags.isNotEmpty()) { // userDetail.myTags 대신 userTags 사용
             item {
                 SectionTitle(title = "마이 태그")
-                MyTagsSection(tags = userDetail.myTags)
+                MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
             }
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
@@ -316,7 +320,7 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun MyTagsSection(tags: List<String>) {
+private fun MyTagsSection(tags: List<MainHomeTag>) { // List<String> -> List<MainHomeTag> 변경
     if (tags.isEmpty()) return
 
     FlowRow( // Column 대신 FlowRow 사용
@@ -326,9 +330,10 @@ private fun MyTagsSection(tags: List<String>) {
     ) {
         tags.forEach { tag -> // itemsToShow 대신 tags 사용
             MyTagChip(
-                tagText = tag, 
-                // 각 태그 텍스트를 사용하여 고유한 이미지 URL 생성 (테스트용)
-                tagImageUrl = "https://picsum.photos/seed/${tag.hashCode()}/48/48" 
+                tagText = tag.name, // MainHomeTag 객체에서 name 필드를 태그 텍스트로 사용
+                tagImageUrl = tag.imageUrl // MainHomeTag 객체에서 imageUrl 필드를 태그 이미지 URL로 사용
+                                            // 만약 MainHomeTag에 imageUrl 필드가 없다면:
+                                            // tagImageUrl = "https://picsum.photos/seed/${tag.name.hashCode()}/48/48"
             )
         }
     }

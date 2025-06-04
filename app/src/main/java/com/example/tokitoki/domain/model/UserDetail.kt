@@ -9,7 +9,6 @@ data class UserDetail(
     val isMale: Boolean = false,
     val age: Int = 0,
     val location: String = "",
-    val myTags: List<String> = emptyList(),
     val introduction: String = "",
     val bloodType: String = "",
     val education: String = "",
