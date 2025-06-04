@@ -25,8 +25,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
+import androidx.compose.ui.layout.ContentScale
 // FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
 // import com.google.accompanist.flowlayout.FlowRow
 
@@ -76,23 +78,47 @@ fun UserDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("프로필") },
+                title = { /* Text("프로필") */ }, // "프로필" 텍스트 제거
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = onBackClick,
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                            .padding(4.dp) // 패딩 추가
+                    ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "뒤로가기"
+                            contentDescription = "뒤로가기",
+                            tint = Color.White // 흰색으로 변경
                         )
                     }
-                }
-                // actions에 있던 즐겨찾기 버튼 제거
+                },
+                actions = { // 즐겨찾기 버튼을 actions로 이동
+                    IconButton(onClick = { viewModel.toggleFavorite() },
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                            .padding(4.dp) // 패딩 추가
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                            contentDescription = "찜하기",
+                            tint = Color.White // 흰색으로 변경
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent, // 배경 투명화
+                    scrolledContainerColor = Color.Transparent, // 스크롤 시에도 투명 유지
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
-    ) { paddingValues ->
+    ) { paddingValues -> // paddingValues 다시 사용
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                // .padding(paddingValues) // 이 줄 제거
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -103,9 +129,8 @@ fun UserDetailScreen(
                         is ResultWrapper.Success -> {
                             UserDetailContent(
                                 userDetail = userDetailResult.data,
-                                isFavorite = isFavorite, // isFavorite 상태 전달
-                                onFavoriteClick = { viewModel.toggleFavorite() }, // toggleFavorite 콜백 전달
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxSize(),
+                                scaffoldTopPadding = paddingValues.calculateTopPadding()
                             )
                         }
                         is ResultWrapper.Error -> {
@@ -193,21 +218,17 @@ fun UserDetailScreen(
 @Composable
 private fun UserDetailContent(
     userDetail: UserDetail,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scaffoldTopPadding: Dp
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             ThumbnailSection(
                 thumbnailUrl = userDetail.thumbnailUrl,
-                isFavorite = isFavorite,
-                onFavoriteClick = onFavoriteClick
             )
         }
 
@@ -262,8 +283,6 @@ private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
 @Composable
 private fun ThumbnailSection(
     thumbnailUrl: String,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -278,19 +297,6 @@ private fun ThumbnailSection(
             modifier = Modifier.fillMaxSize(),
             contentScale = androidx.compose.ui.layout.ContentScale.Crop // 이미지 채우기 방식
         )
-        IconButton(
-            onClick = onFavoriteClick,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
-        ) {
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                contentDescription = "찜하기",
-                tint = if (isFavorite) MaterialTheme.colorScheme.primary else Color.White
-            )
-        }
     }
 }
 
@@ -300,13 +306,13 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start // 왼쪽 정렬로 변경
     ) {
-        Text(name, style = MaterialTheme.typography.headlineMedium)
+        Text(name, style = MaterialTheme.typography.titleLarge) // 닉네임 스타일 변경
         Spacer(modifier = Modifier.height(4.dp))
-        Row {
-            Text("나이: $age", style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("거주지: $location", style = MaterialTheme.typography.bodyLarge)
-        }
+        Text(
+            text = "${age}세 $location", // 나이와 거주지 한 줄로 표시
+            style = MaterialTheme.typography.bodySmall, // 스타일 변경
+            color = MaterialTheme.colorScheme.onSurfaceVariant // 색상 연하게 변경
+        )
     }
 }
 
@@ -315,45 +321,52 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
 private fun MyTagsSection(tags: List<String>) {
     if (tags.isEmpty()) return
 
-    val maxInitialTags = 4 // 초기에 보여줄 최대 태그 수
-    val itemsToShow = tags.take(maxInitialTags)
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp) // 아이템 간 간격
-        ) {
-            itemsToShow.forEach { tag ->
-                MyTagChip(tag = tag)
-            }
-        }
-
-        if (tags.size > maxInitialTags) {
-            TextButton(
-                onClick = { /* TODO: 새로운 화면으로 이동 로직 추가 */ },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally) // 중앙 정렬
-                    .padding(top = 8.dp)
-            ) {
-                Text("もっと見る (${tags.size - maxInitialTags}개 더보기)")
-            }
+    FlowRow( // Column 대신 FlowRow 사용
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp), // 태그 간 가로 간격
+        verticalArrangement = Arrangement.spacedBy(8.dp) // 태그 간 세로 간격
+    ) {
+        tags.forEach { tag -> // itemsToShow 대신 tags 사용
+            MyTagChip(
+                tagText = tag, 
+                // 각 태그 텍스트를 사용하여 고유한 이미지 URL 생성 (테스트용)
+                tagImageUrl = "https://picsum.photos/seed/${tag.hashCode()}/48/48" 
+            )
         }
     }
 }
 
 @Composable
-private fun MyTagChip(tag: String) {
+private fun MyTagChip(tagText: String, tagImageUrl: String) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        tonalElevation = 2.dp,
-        modifier = Modifier.fillMaxWidth() // 너비를 채우도록 수정
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 1.dp,
     ) {
-        Text(
-            text = tag,
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp) // 패딩 조정
-        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // 왼쪽: AsyncImage로 변경
+            AsyncImage(
+                model = tagImageUrl, // URL 사용
+                contentDescription = "태그 이미지: $tagText",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                contentScale = ContentScale.Crop // 이미지 채우기 방식
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = tagText, // tagText 사용
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+        }
     }
 }
 
