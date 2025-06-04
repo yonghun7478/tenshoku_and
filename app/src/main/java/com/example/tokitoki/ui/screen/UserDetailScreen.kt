@@ -83,7 +83,6 @@ fun UserDetailScreen(
                     IconButton(onClick = onBackClick,
                         modifier = Modifier
                             .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
-                            .padding(4.dp) // 패딩 추가
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
@@ -96,7 +95,6 @@ fun UserDetailScreen(
                     IconButton(onClick = { viewModel.toggleFavorite() },
                         modifier = Modifier
                             .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
-                            .padding(4.dp) // 패딩 추가
                     ) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
