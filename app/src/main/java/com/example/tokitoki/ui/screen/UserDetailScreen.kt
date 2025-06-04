@@ -314,31 +314,48 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
 @Composable
 private fun MyTagsSection(tags: List<String>) {
     if (tags.isEmpty()) return
-//
-//    // FlowRow 사용 (com.google.accompanist:accompanist-flowlayout 의존성 필요)
-//    // 만약 의존성이 없다면 HorizontalLazyRow 등으로 대체 구현 필요
-//    com.google.accompanist.flowlayout.FlowRow(
-//        mainAxisSpacing = 8.dp,
-//        crossAxisSpacing = 8.dp,
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        tags.forEach { tag ->
-//            Surface(
-//                shape = RoundedCornerShape(16.dp),
-//                color = MaterialTheme.colorScheme.secondaryContainer,
-//                onClick = { /* 태그 클릭 시 액션 (필요시) */ },
-//                tonalElevation = 2.dp // 약간의 입체감
-//            ) {
-//                Text(
-//                    text = tag,
-//                    style = MaterialTheme.typography.labelMedium,
-//                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-//                )
-//            }
-//        }
-//    }
+
+    val maxInitialTags = 4 // 초기에 보여줄 최대 태그 수
+    val itemsToShow = tags.take(maxInitialTags)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp) // 아이템 간 간격
+        ) {
+            itemsToShow.forEach { tag ->
+                MyTagChip(tag = tag)
+            }
+        }
+
+        if (tags.size > maxInitialTags) {
+            TextButton(
+                onClick = { /* TODO: 새로운 화면으로 이동 로직 추가 */ },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally) // 중앙 정렬
+                    .padding(top = 8.dp)
+            ) {
+                Text("もっと見る (${tags.size - maxInitialTags}개 더보기)")
+            }
+        }
+    }
 }
 
+@Composable
+private fun MyTagChip(tag: String) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        tonalElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth() // 너비를 채우도록 수정
+    ) {
+        Text(
+            text = tag,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp) // 패딩 조정
+        )
+    }
+}
 
 @Composable
 private fun IntroductionSection(introduction: String) {
