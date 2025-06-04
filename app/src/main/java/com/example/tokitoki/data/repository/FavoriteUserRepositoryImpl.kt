@@ -25,6 +25,9 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
         )
     }.sortedByDescending { it.timestamp } // 최신 timestamp 기준으로 정렬
 
+    // 즐겨찾기 상태를 저장할 Set
+    private val favoriteUserIds: MutableSet<String> = mutableSetOf()
+
     override suspend fun getFavoriteUsers(limit: Int, cursor: Long): List<FavoriteUser> {
         delay(500) // Simulate network delay
         // cursor가 0이면 첫 페이지, 아니면 해당 timestamp 이전의 데이터를 가져옴
@@ -39,6 +42,7 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
         return try {
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
+            favoriteUserIds.add(userId) // 즐겨찾기 성공 시 userId를 세트에 추가
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."))
@@ -49,6 +53,7 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
         return try {
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
+            favoriteUserIds.remove(userId) // 즐겨찾기 제거 성공 시 userId를 세트에서 제거
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."))
@@ -57,8 +62,7 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
 
     override suspend fun isUserFavorite(userId: String): ResultWrapper<Boolean> {
         delay(100) // Simulate network delay
-        // 더미 구현: userId가 "1"이거나 홀수 ID일 경우 true 반환
-        val isFavorite = userId == "1" || (userId.toIntOrNull()?.let { it % 2 != 0 } ?: false)
-        return ResultWrapper.Success(isFavorite)
+        // 더미 구현: favoriteUserIds 세트에 userId가 포함되어 있는지 반환
+        return ResultWrapper.Success(favoriteUserIds.contains(userId))
     }
 }

@@ -143,8 +143,10 @@ class UserDetailViewModel @Inject constructor(
     }
 
     fun toggleLike() {
-        // 이미 좋아요를 누른 상태라면 아무 동작도 하지 않음
-        // if (_isLiked.value) return // 좋아요 상태는 서버에서 관리하므로, 클라이언트에서 중복 방지 로직 제거 가능
+        if (_isLiked.value) {
+            _toastMessage.value = "이미 좋아요를 눌렀습니다."
+            return
+        }
 
         val currentUserDetail = userDetails.value.getOrNull(currentPage.value)?.let {
             if (it is ResultWrapper.Success) it.data else null

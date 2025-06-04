@@ -22,6 +22,8 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +31,11 @@ import androidx.compose.ui.unit.Dp
 import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import com.example.tokitoki.domain.model.MainHomeTag
+import androidx.compose.ui.res.painterResource
+import com.example.tokitoki.R
+
 // FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
 // import com.google.accompanist.flowlayout.FlowRow
 
@@ -96,13 +102,21 @@ fun UserDetailScreen(
                 actions = { // 즐겨찾기 버튼을 actions로 이동
                     IconButton(onClick = { viewModel.toggleFavorite() },
                         modifier = Modifier
-                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
                     ) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                            contentDescription = "찜하기",
-                            tint = Color.White // 흰색으로 변경
-                        )
+                        if (isFavorite) {
+                            Icon(
+                                imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
+                                contentDescription = "찜하기",
+                                tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.outline_star_outline_24),
+                                contentDescription = "찜하기",
+                                tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -130,6 +144,8 @@ fun UserDetailScreen(
                             UserDetailContent(
                                 userDetail = userDetailResult.data,
                                 userTags = userTags, // userTags 파라미터는 이미 List<MainHomeTag> 타입을 따름
+                                isLiked = isLiked, // isLiked 상태 전달
+                                onToggleLike = { viewModel.toggleLike() }, // 좋아요 토글 함수 전달
                                 modifier = Modifier.fillMaxSize(),
                                 scaffoldTopPadding = paddingValues.calculateTopPadding()
                             )
@@ -197,19 +213,7 @@ fun UserDetailScreen(
                     }
                 }
             } else {
-                FloatingActionButton(
-                    onClick = { viewModel.toggleLike() }, // 좋아요 버튼은 isLiked 상태에 따라 아이콘 변경
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp),
-                    containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant // 색상 변경
-                ) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "좋아요",
-                        tint = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary // 색상 변경
-                    )
-                }
+                // 기존 FloatingActionButton 제거
             }
         }
     }
@@ -220,6 +224,8 @@ fun UserDetailScreen(
 private fun UserDetailContent(
     userDetail: UserDetail,
     userTags: List<MainHomeTag>, // List<String> -> List<MainHomeTag> 변경
+    isLiked: Boolean, // isLiked 파라미터 추가
+    onToggleLike: () -> Unit, // onToggleLike 파라미터 추가
     modifier: Modifier = Modifier,
     scaffoldTopPadding: Dp
 ) {
@@ -267,7 +273,29 @@ private fun UserDetailContent(
             ProfileDetailsSection(userDetail = userDetail)
         }
         
-        item { Spacer(modifier = Modifier.height(80.dp)) } 
+        // 기존 Spacer(modifier = Modifier.height(80.dp)) 제거
+
+        // 좋아요 버튼 추가
+        item {
+            Button(
+                onClick = onToggleLike,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Icon(
+                    imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "좋아요",
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("좋아요")
+            }
+        }
     }
 }
 
@@ -275,7 +303,7 @@ private fun UserDetailContent(
 private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleLarge, // 스타일 변경
+        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold), // 스타일 변경 및 fontWeight 명시
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp) // 타이틀 아래 간격
@@ -385,14 +413,31 @@ private fun IntroductionSection(introduction: String) {
 @Composable
 private fun ProfileDetailsSection(userDetail: UserDetail) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+        ProfilePropertyGroupTitle(title = "기본 정보")
         ProfileDetailItem("닉네임", userDetail.name)
         ProfileDetailItem("나이", userDetail.age.toString())
         ProfileDetailItem("성별", if (userDetail.isMale) "남성" else "여성")
         ProfileDetailItem("거주지", userDetail.location)
+
+        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+
+        ProfilePropertyGroupTitle(title = "신체 정보")
         ProfileDetailItem("혈액형", userDetail.bloodType)
+        // TODO: UserDetail에 키(height) 필드가 있다면 추가
+        // ProfileDetailItem("키", userDetail.height.toString() + "cm") 
+        ProfileDetailItem("외견", userDetail.appearance) // 체형에 해당될 수 있음
+
+        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+
+        ProfilePropertyGroupTitle(title = "학력 및 직업")
         ProfileDetailItem("학력", userDetail.education)
         ProfileDetailItem("직종", userDetail.occupation)
-        ProfileDetailItem("외견", userDetail.appearance)
+        // TODO: UserDetail에 연수입(annualIncome) 필드가 있다면 추가
+        // ProfileDetailItem("연수입", userDetail.annualIncome)
+
+        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+
+        ProfilePropertyGroupTitle(title = "가치관")
         ProfileDetailItem("연애관", userDetail.datingPhilosophy)
         ProfileDetailItem("결혼관", userDetail.marriageView)
         if (userDetail.personalityTraits.isNotEmpty()) {
@@ -406,15 +451,27 @@ private fun ProfileDetailsSection(userDetail: UserDetail) {
 }
 
 @Composable
+private fun ProfilePropertyGroupTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 8.dp)
+    )
+}
+
+@Composable
 private fun ProfileDetailItem(label: String, value: String?) {
     if (!value.isNullOrBlank()) {
         Row(modifier = Modifier.padding(vertical = 4.dp)) {
             Text(
                 text = "$label: ",
-                style = MaterialTheme.typography.titleSmall, // 라벨 스타일
+                style = MaterialTheme.typography.bodyMedium, // 레이블 스타일 변경
+                color = MaterialTheme.colorScheme.onSurfaceVariant, // 레이블 색상 변경
                 modifier = Modifier.width(100.dp) // 라벨 너비 고정으로 정렬 효과
             )
-            Text(value, style = MaterialTheme.typography.bodyMedium) // 값 스타일
+            Text(value, style = MaterialTheme.typography.bodyMedium) // 값 스타일 유지
         }
     }
 }
