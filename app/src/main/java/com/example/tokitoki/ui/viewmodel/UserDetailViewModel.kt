@@ -11,6 +11,8 @@ import com.example.tokitoki.domain.usecase.GetUserDetailFromCacheUseCase
 import com.example.tokitoki.domain.usecase.LikeUserUseCase
 import com.example.tokitoki.domain.usecase.AddToFavoritesUseCase
 import com.example.tokitoki.domain.usecase.RemoveFromFavoritesUseCase
+import com.example.tokitoki.domain.usecase.CheckIsUserLikedUseCase
+import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,7 +28,9 @@ class UserDetailViewModel @Inject constructor(
     private val getUserDetailFromCacheUseCase: GetUserDetailFromCacheUseCase,
     private val likeUserUseCase: LikeUserUseCase,
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
-    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
+    private val checkIsUserLikedUseCase: CheckIsUserLikedUseCase,
+    private val checkIsUserFavoriteUseCase: CheckIsUserFavoriteUseCase
 ) : ViewModel() {
 
     private val _userDetails = MutableStateFlow<List<ResultWrapper<UserDetail>>>(emptyList())
@@ -66,6 +70,11 @@ class UserDetailViewModel @Inject constructor(
 
             // 4. 선택된 유저와 주변 유저들의 정보 로드
             loadUserDetails(selectedIndex)
+
+            // 5. 현재 유저의 좋아요/즐겨찾기 상태 로드
+            if (selectedIndex != -1 && selectedIndex < cachedUserIds.size) {
+                updateLikeAndFavoriteStatus(cachedUserIds[selectedIndex])
+            }
         }
     }
 
@@ -74,6 +83,11 @@ class UserDetailViewModel @Inject constructor(
         
         _currentPage.value = newPage
         loadUserDetails(newPage)
+
+        // 현재 페이지 유저의 좋아요/즐겨찾기 상태 업데이트
+        if (newPage >= 0 && newPage < cachedUserIds.size) {
+            updateLikeAndFavoriteStatus(cachedUserIds[newPage])
+        }
     }
 
     private fun loadUserDetails(centerIndex: Int) {
@@ -84,7 +98,7 @@ class UserDetailViewModel @Inject constructor(
 
             // 로드가 필요한 인덱스 목록 생성
             val indicesToLoad = (startIndex..endIndex).filter { index ->
-                _userDetails.value[index] is ResultWrapper.Loading
+                _userDetails.value.getOrNull(index) is ResultWrapper.Loading
             }
 
             if (indicesToLoad.isEmpty()) return@launch
@@ -112,7 +126,9 @@ class UserDetailViewModel @Inject constructor(
             // 결과를 현재 리스트에 반영
             val updatedList = _userDetails.value.toMutableList()
             results.forEach { (index, result) ->
-                updatedList[index] = result
+                if (index < updatedList.size) { // IndexOutOfBounds 방지
+                    updatedList[index] = result
+                }
             }
             _userDetails.value = updatedList
         }
@@ -120,16 +136,17 @@ class UserDetailViewModel @Inject constructor(
 
     fun toggleLike() {
         // 이미 좋아요를 누른 상태라면 아무 동작도 하지 않음
-        if (_isLiked.value) return
+        // if (_isLiked.value) return // 좋아요 상태는 서버에서 관리하므로, 클라이언트에서 중복 방지 로직 제거 가능
 
-        val currentUser = userDetails.value.getOrNull(currentPage.value)?.let {
+        val currentUserDetail = userDetails.value.getOrNull(currentPage.value)?.let {
             if (it is ResultWrapper.Success) it.data else null
         } ?: return
 
         viewModelScope.launch {
-            when (val result = likeUserUseCase(currentUser.id)) {
+            when (val result = likeUserUseCase(currentUserDetail.id)) {
                 is ResultWrapper.Success -> {
-                    _isLiked.value = true
+                    // 성공 시, 좋아요 상태를 다시 확인하여 UI 업데이트
+                    updateLikeAndFavoriteStatus(currentUserDetail.id)
                     _toastMessage.value = "좋아요를 보냈습니다"
                 }
                 is ResultWrapper.Error -> {
@@ -144,21 +161,23 @@ class UserDetailViewModel @Inject constructor(
     }
 
     fun toggleFavorite() {
-        val currentUser = userDetails.value.getOrNull(currentPage.value)?.let {
+        val currentUserDetail = userDetails.value.getOrNull(currentPage.value)?.let {
             if (it is ResultWrapper.Success) it.data else null
         } ?: return
 
         viewModelScope.launch {
             val result = if (_isFavorite.value) {
-                removeFromFavoritesUseCase(currentUser.id)
+                removeFromFavoritesUseCase(currentUserDetail.id)
             } else {
-                addToFavoritesUseCase(currentUser.id)
+                addToFavoritesUseCase(currentUserDetail.id)
             }
 
             when (result) {
                 is ResultWrapper.Success -> {
-                    _isFavorite.value = !_isFavorite.value
-                    _toastMessage.value = if (_isFavorite.value) "즐겨찾기에 추가했습니다" else "즐겨찾기에서 제거했습니다"
+                    // 성공 시, 즐겨찾기 상태를 다시 확인하여 UI 업데이트
+                    updateLikeAndFavoriteStatus(currentUserDetail.id) 
+                    // 토스트 메시지는 isFavorite 상태에 따라 분기 처리 유지 가능
+                    _toastMessage.value = if (!_isFavorite.value) "즐겨찾기에 추가했습니다" else "즐겨찾기에서 제거했습니다" 
                 }
                 is ResultWrapper.Error -> {
                     _toastMessage.value = when (result.errorType) {
@@ -173,5 +192,30 @@ class UserDetailViewModel @Inject constructor(
 
     fun clearToastMessage() {
         _toastMessage.value = null
+    }
+
+    // 좋아요 및 즐겨찾기 상태를 업데이트하는 새로운 private 함수
+    private fun updateLikeAndFavoriteStatus(userId: String) {
+        viewModelScope.launch {
+            // 좋아요 상태 확인
+            when (val likedResult = checkIsUserLikedUseCase(userId)) {
+                is ResultWrapper.Success -> _isLiked.value = likedResult.data
+                is ResultWrapper.Error -> {
+                    _isLiked.value = false // 오류 시 기본값 false
+                     _toastMessage.value = "좋아요 상태 로드 실패: ${likedResult.errorType}" // 필요시 주석 해제
+                }
+                is ResultWrapper.Loading -> { /* 로딩 중 UI 처리는 현재 없음 */ }
+            }
+
+            // 즐겨찾기 상태 확인
+            when (val favoriteResult = checkIsUserFavoriteUseCase(userId)) {
+                is ResultWrapper.Success -> _isFavorite.value = favoriteResult.data
+                is ResultWrapper.Error -> {
+                    _isFavorite.value = false // 오류 시 기본값 false
+                    _toastMessage.value = "즐겨찾기 상태 로드 실패: ${favoriteResult.errorType}" // 필요시 주석 해제
+                }
+                is ResultWrapper.Loading -> { /* 로딩 중 UI 처리는 현재 없음 */ }
+            }
+        }
     }
 } 

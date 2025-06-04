@@ -54,4 +54,11 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."))
         }
     }
+
+    override suspend fun isUserFavorite(userId: String): ResultWrapper<Boolean> {
+        delay(100) // Simulate network delay
+        // 더미 구현: userId가 "1"이거나 홀수 ID일 경우 true 반환
+        val isFavorite = userId == "1" || (userId.toIntOrNull()?.let { it % 2 != 0 } ?: false)
+        return ResultWrapper.Success(isFavorite)
+    }
 }

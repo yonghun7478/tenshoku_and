@@ -10,7 +10,6 @@ object UserDetailConverter {
             name = entity.name,
             birthDay = entity.birthDay,
             isMale = entity.isMale,
-            mySelfSentenceId = entity.mySelfSentenceId,
             email = entity.email,
             thumbnailUrl = entity.thumbnailUrl
         )
@@ -21,7 +20,6 @@ object UserDetailConverter {
             name = domain.name,
             birthDay = domain.birthDay,
             isMale = domain.isMale,
-            mySelfSentenceId = domain.mySelfSentenceId,
             email = domain.email,
             thumbnailUrl = domain.thumbnailUrl
         )

@@ -57,6 +57,13 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         }
     }
 
+    override suspend fun isUserLiked(userId: String): ResultWrapper<Boolean> {
+        delay(100) // Simulate network delay
+        // 더미 구현: userId가 "1"이거나 짝수 ID일 경우 true 반환
+        val isLiked = userId == "1" || (userId.toIntOrNull()?.let { it % 2 == 0 } ?: false)
+        return ResultWrapper.Success(isLiked)
+    }
+
     // 각 탭별 더미 데이터 생성 함수
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {
         val baseId = when (tab) {
