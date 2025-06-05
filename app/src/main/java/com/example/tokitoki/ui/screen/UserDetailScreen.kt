@@ -35,6 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.tokitoki.domain.model.MainHomeTag
 import androidx.compose.ui.res.painterResource
 import com.example.tokitoki.R
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.lazy.LazyListState
 
 // FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
 // import com.google.accompanist.flowlayout.FlowRow
@@ -83,6 +88,14 @@ fun UserDetailScreen(
         }
     }
 
+    val listState = rememberLazyListState() // LazyListState 추가
+    val showFab by remember { // FAB 표시 여부 상태
+        derivedStateOf {
+            // 아이템이 하나 이상 있고, 더 이상 아래로 스크롤할 수 없을 때 FAB를 표시
+            listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -127,12 +140,40 @@ fun UserDetailScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
-        }
+        },
+        floatingActionButton = { // FloatingActionButton을 Button으로 변경
+            AnimatedVisibility(
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp) // 좌우 패딩 추가
+            ) {
+                Button(
+                    onClick = { viewModel.toggleLike() },
+                    modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "좋아요",
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text("좋아요")
+                }
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center // FAB 위치를 중앙 하단으로 변경
     ) { paddingValues -> // paddingValues 다시 사용
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                // .padding(paddingValues) // 이 줄 제거
+                .padding(paddingValues) // 이 줄 다시 추가
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -143,11 +184,9 @@ fun UserDetailScreen(
                         is ResultWrapper.Success -> {
                             UserDetailContent(
                                 userDetail = userDetailResult.data,
-                                userTags = userTags, // userTags 파라미터는 이미 List<MainHomeTag> 타입을 따름
-                                isLiked = isLiked, // isLiked 상태 전달
-                                onToggleLike = { viewModel.toggleLike() }, // 좋아요 토글 함수 전달
+                                userTags = userTags,
                                 modifier = Modifier.fillMaxSize(),
-                                scaffoldTopPadding = paddingValues.calculateTopPadding()
+                                listState = listState
                             )
                         }
                         is ResultWrapper.Error -> {
@@ -223,15 +262,15 @@ fun UserDetailScreen(
 @Composable
 private fun UserDetailContent(
     userDetail: UserDetail,
-    userTags: List<MainHomeTag>, // List<String> -> List<MainHomeTag> 변경
-    isLiked: Boolean, // isLiked 파라미터 추가
-    onToggleLike: () -> Unit, // onToggleLike 파라미터 추가
+    userTags: List<MainHomeTag>,
     modifier: Modifier = Modifier,
-    scaffoldTopPadding: Dp
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize(),
+        state = listState,
+        contentPadding = PaddingValues(bottom = 88.dp), // 하단 패딩 조정 (버튼 높이 + 추가 여유 공간)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
@@ -274,28 +313,6 @@ private fun UserDetailContent(
         }
         
         // 기존 Spacer(modifier = Modifier.height(80.dp)) 제거
-
-        // 좋아요 버튼 추가
-        item {
-            Button(
-                onClick = onToggleLike,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "좋아요",
-                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                )
-                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text("좋아요")
-            }
-        }
     }
 }
 
