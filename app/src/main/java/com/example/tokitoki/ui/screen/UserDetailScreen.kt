@@ -98,73 +98,77 @@ fun UserDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { /* Text("프로필") */ }, // "프로필" 텍스트 제거
-                navigationIcon = {
-                    IconButton(onClick = onBackClick,
-                        modifier = Modifier
-                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "뒤로가기",
-                            tint = Color.White // 흰색으로 변경
-                        )
-                    }
-                },
-                actions = { // 즐겨찾기 버튼을 actions로 이동
-                    IconButton(onClick = { viewModel.toggleFavorite() },
-                        modifier = Modifier
-                            .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
-                    ) {
-                        if (isFavorite) {
+            if (screenName != "MessageListScreen") { // screenName이 "MessageListScreen"이 아닐 때만 TopAppBar 표시
+                TopAppBar(
+                    title = { /* Text("프로필") */ }, // "프로필" 텍스트 제거
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick,
+                            modifier = Modifier
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                        ) {
                             Icon(
-                                imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
-                                contentDescription = "찜하기",
-                                tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.outline_star_outline_24),
-                                contentDescription = "찜하기",
-                                tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "뒤로가기",
+                                tint = Color.White // 흰색으로 변경
                             )
                         }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent, // 배경 투명화
-                    scrolledContainerColor = Color.Transparent, // 스크롤 시에도 투명 유지
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    },
+                    actions = { // 즐겨찾기 버튼을 actions로 이동
+                        IconButton(onClick = { viewModel.toggleFavorite() },
+                            modifier = Modifier
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
+                        ) {
+                            if (isFavorite) {
+                                Icon(
+                                    imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
+                                    contentDescription = "찜하기",
+                                    tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.outline_star_outline_24),
+                                    contentDescription = "찜하기",
+                                    tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent, // 배경 투명화
+                        scrolledContainerColor = Color.Transparent, // 스크롤 시에도 투명 유지
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 )
-            )
+            }
         },
         floatingActionButton = { // FloatingActionButton을 Button으로 변경
-            AnimatedVisibility(
-                visible = showFab,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp) // 좌우 패딩 추가
-            ) {
-                Button(
-                    onClick = { viewModel.toggleLike() },
-                    modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
-                    )
+            if (screenName != "MessageListScreen") { // MessageListScreen이 아닐 때만 좋아요 버튼 표시
+                AnimatedVisibility(
+                    visible = showFab,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp) // 좌우 패딩 추가
                 ) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "좋아요",
-                        modifier = Modifier.size(ButtonDefaults.IconSize)
-                    )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text("좋아요")
+                    Button(
+                        onClick = { viewModel.toggleLike() },
+                        modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(
+                            imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "좋아요",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("좋아요")
+                    }
                 }
             }
         },

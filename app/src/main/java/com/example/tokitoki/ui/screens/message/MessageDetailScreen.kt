@@ -31,6 +31,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
 import android.util.Log
+import com.example.tokitoki.ui.screen.UserDetailScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +91,13 @@ fun MessageDetailScreen(
                 }
                 1 -> {
                     // User Detail Page
-                    UserDetailPageContent()
+                    UserDetailScreen(
+                        selectedUserId = otherUserId,
+                        screenName = "MessageListScreen",
+                        onBackClick = {},
+                        viewModel = hiltViewModel(),
+                        sharedViewModel = hiltViewModel()
+                    )
                 }
             }
         }
@@ -260,14 +267,6 @@ private fun MessagePageContent(
             onSendMessage = onSendMessage,
             isSending = uiState.isSending // Assuming uiState has isSending
         )
-    }
-}
-
-@Composable
-private fun UserDetailPageContent() {
-    // TODO: Implement User Detail Page UI
-    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-        Text("유저 상세 정보 페이지 (구현 예정)")
     }
 }
 

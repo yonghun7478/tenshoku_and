@@ -10,15 +10,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tokitoki.domain.usecase.GetMatchingUsersUseCase
 import com.example.tokitoki.domain.usecase.GetPreviousChatsUseCase
-import com.example.tokitoki.domain.model.MatchingUser
-import com.example.tokitoki.domain.model.PreviousChat
+import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.tokitoki.ui.state.MessageListUiState
 
 @HiltViewModel
 class MessageListViewModel @Inject constructor(
     private val getMatchingUsersUseCase: GetMatchingUsersUseCase,
-    private val getPreviousChatsUseCase: GetPreviousChatsUseCase
+    private val getPreviousChatsUseCase: GetPreviousChatsUseCase,
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MessageListUiState()) // 초기 상태
@@ -157,4 +157,7 @@ class MessageListViewModel @Inject constructor(
         // isPreviousChatLoading = false // finally 블록 제거
     }
 
+    fun addUserIdsToCache(userId: String) {
+        addUserIdsToCacheUseCase("MessageListScreen", listOf(userId))
+    }
 }
