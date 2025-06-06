@@ -18,6 +18,9 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     // 각 탭별 데이터를 저장할 맵 (MutableMap)
     private val allLikes = mutableMapOf<String, MutableList<LikeItem>>() // 키: 탭, 값: LikeItem 리스트
 
+    // 좋아요 상태를 저장할 Set
+    private val likedUserIds: MutableSet<String> = mutableSetOf()
+
     // 초기 데이터 생성 (init 블록)
     init {
         allLikes[LikeTab.RECEIVED.title] = createDummyLikes(LikeTab.RECEIVED.title, 0).toMutableList()
@@ -51,10 +54,17 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         return try {
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
+            likedUserIds.add(userId) // 좋아요 성공 시 userId를 세트에 추가
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "좋아요 추가 중 오류가 발생했습니다."))
         }
+    }
+
+    override suspend fun isUserLiked(userId: String): ResultWrapper<Boolean> {
+        delay(100) // Simulate network delay
+        // 더미 구현: likedUserIds 세트에 userId가 포함되어 있는지 반환
+        return ResultWrapper.Success(likedUserIds.contains(userId))
     }
 
     // 각 탭별 더미 데이터 생성 함수

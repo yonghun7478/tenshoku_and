@@ -7,4 +7,5 @@ interface FavoriteUserRepository {
     suspend fun getFavoriteUsers(limit: Int, cursor: Long): List<FavoriteUser>
     suspend fun addToFavorites(userId: String): ResultWrapper<Unit>
     suspend fun removeFromFavorites(userId: String): ResultWrapper<Unit>
+    suspend fun isUserFavorite(userId: String): ResultWrapper<Boolean>
 }

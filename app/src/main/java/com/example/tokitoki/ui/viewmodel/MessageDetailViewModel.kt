@@ -11,6 +11,7 @@ import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
 import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCase
 import com.example.tokitoki.domain.usecase.message.SendMessageUseCase
 import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCase
+import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCase
 import com.example.tokitoki.ui.state.MessageDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -25,7 +26,8 @@ class MessageDetailViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
     private val receiveMessageUseCase: ReceiveMessageUseCase,
     private val updateMessageStatusUseCase: UpdateMessageStatusUseCase,
-    private val moveMessageToPreviousUseCase: MoveMessageToPreviousUseCase
+    private val moveMessageToPreviousUseCase: MoveMessageToPreviousUseCase,
+    private val getUserTagsUseCase: GetUserTagsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MessageDetailUiState())
@@ -73,6 +75,15 @@ class MessageDetailViewModel @Inject constructor(
 
                     ResultWrapper.Loading -> TODO()
                 }
+
+                // 사용자 태그 로드
+                getUserTagsUseCase(otherUserId)
+                    .onSuccess { tags ->
+                        _uiState.update { it.copy(userTags = tags) }
+                    }
+                    .onFailure { error ->
+                        Log.e(TAG, "Failed to load user tags: ${error.message}")
+                    }
 
                 // 채팅 내역 로드
                 loadMessageHistory(otherUserId)

@@ -6,4 +6,5 @@ import com.example.tokitoki.domain.model.LikeResult
 interface LikeRepository {
     suspend fun getLikes(tab: String, cursor: Long? = null, limit: Int = 20): Result<LikeResult>
     suspend fun likeUser(userId: String): ResultWrapper<Unit>
+    suspend fun isUserLiked(userId: String): ResultWrapper<Boolean>
 }

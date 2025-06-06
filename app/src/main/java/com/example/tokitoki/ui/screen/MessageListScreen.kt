@@ -86,7 +86,10 @@ fun MessageListScreen(
                     MatchingUsersSection(
                         matchingUsers = uiState.matchingUsers,
                         listState = matchingUsersListState,
-                        onUserClick = onUserClick
+                        onUserClick = { id, source ->
+                            viewModel.addUserIdsToCache(id)
+                            onUserClick(id, source)
+                        }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider()
@@ -94,7 +97,10 @@ fun MessageListScreen(
                     PreviousChatsSection(
                         previousChats = uiState.previousChats,
                         listState = previousChatsListState,
-                        onChatClick = onChatClick
+                        onChatClick = { id, source ->
+                            viewModel.addUserIdsToCache(id)
+                            onChatClick(id, source)
+                        }
                     )
 
                     if (uiState.errorMessage != null) {

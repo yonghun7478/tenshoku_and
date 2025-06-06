@@ -31,6 +31,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
 import android.util.Log
+import com.example.tokitoki.ui.screen.UserDetailScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +91,13 @@ fun MessageDetailScreen(
                 }
                 1 -> {
                     // User Detail Page
-                    UserDetailPageContent()
+                    UserDetailScreen(
+                        selectedUserId = otherUserId,
+                        screenName = "MessageListScreen",
+                        onBackClick = {},
+                        viewModel = hiltViewModel(),
+                        sharedViewModel = hiltViewModel()
+                    )
                 }
             }
         }
@@ -218,19 +225,12 @@ private fun MessagePageContent(
                     modifier = Modifier,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Example buttons, replace with actual logic/data later
-                    OutlinedButton(
-                        onClick = { /*TODO*/ },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                    ) { Text("#공통점1") }
-                    OutlinedButton(
-                        onClick = { /*TODO*/ },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                    ) { Text("#공통점2") }
-                    OutlinedButton(
-                        onClick = { /*TODO*/ },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                    ) { Text("#공통점3") }
+                    uiState.userTags.take(3).forEach { tag -> // uiState에서 userTags를 가져와 최대 3개까지만 출력
+                        OutlinedButton(
+                            onClick = { /* TODO: 태그 클릭 시 동작 정의 */ },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                        ) { Text("#${tag.name}") }
+                    }
                 }
             }
         }
@@ -260,14 +260,6 @@ private fun MessagePageContent(
             onSendMessage = onSendMessage,
             isSending = uiState.isSending // Assuming uiState has isSending
         )
-    }
-}
-
-@Composable
-private fun UserDetailPageContent() {
-    // TODO: Implement User Detail Page UI
-    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-        Text("유저 상세 정보 페이지 (구현 예정)")
     }
 }
 

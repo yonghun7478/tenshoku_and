@@ -530,4 +530,11 @@ class MainHomeTagRepositoryImpl @Inject constructor() : MainHomeTagRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun getUserTags(userId: String): Result<List<MainHomeTag>> {
+        // 더미 데이터: 사용자의 모든 태그를 가져오는 로직 (myTags 리스트 사용)
+        // TODO: 실제 API 구현 시 해당 사용자의 태그 목록을 가져오도록 수정 필요
+        delay(200) // API 호출 시뮬레이션을 위한 약간의 딜레이
+        return Result.success(myTags) 
+    }
 }

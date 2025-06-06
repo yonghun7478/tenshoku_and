@@ -124,6 +124,12 @@ import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCase
 import com.example.tokitoki.domain.usecase.message.ReceiveMessageUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCase
 import com.example.tokitoki.domain.usecase.message.UpdateMessageStatusUseCaseImpl
+import com.example.tokitoki.domain.usecase.CheckIsUserLikedUseCase
+import com.example.tokitoki.domain.usecase.CheckIsUserLikedUseCaseImpl
+import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCase
+import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCase
+import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -412,6 +418,18 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
+    abstract fun bindCheckIsUserLikedUseCase(
+        impl: CheckIsUserLikedUseCaseImpl
+    ): CheckIsUserLikedUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindCheckIsUserFavoriteUseCase(
+        impl: CheckIsUserFavoriteUseCaseImpl
+    ): CheckIsUserFavoriteUseCase
+
+    @Binds
+    @Singleton
     abstract fun bindGetTagsByQueryUseCase(
         impl: GetTagsByQueryUseCaseImpl
     ): GetTagsByQueryUseCase
@@ -487,4 +505,10 @@ abstract class UseCaseModule {
     abstract fun bindUpdateMessageStatusUseCase(
         impl: UpdateMessageStatusUseCaseImpl
     ): UpdateMessageStatusUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetUserTagsUseCase(
+        impl: GetUserTagsUseCaseImpl
+    ): GetUserTagsUseCase
 }
