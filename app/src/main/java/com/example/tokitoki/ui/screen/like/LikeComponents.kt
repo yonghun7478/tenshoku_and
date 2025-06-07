@@ -4,18 +4,20 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,9 +36,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.LikeItemUiState
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Color
+import java.util.concurrent.TimeUnit
+import androidx.compose.foundation.clickable
 
 @Composable
-fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
+fun LazyGridState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
     val isAtBottom = remember {
         derivedStateOf {
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
@@ -72,23 +82,29 @@ fun LikeTopBarComponent(
 @Composable
 fun LikeReceivedListComponent(
     likes: List<LikeItemUiState>,
-    listState: LazyListState,
+    listState: LazyGridState,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
         isRefreshing = isRefreshing,
         onRefresh = { onRefresh() }
     ) {
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
-            state = listState
+            state = listState,
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(likes, key = { it.id }) { like ->
                 LikeReceivedItemComponent(
-                    like = like
+                    like = like,
+                    onUserClick = onUserClick
                 )
             }
         }
@@ -101,50 +117,83 @@ fun LikeReceivedListComponent(
     }
 }
 
+// 시간 포맷팅 유틸 함수
+fun formatReceivedTime(receivedTimeMillis: Long): String {
+    val currentTimeMillis = System.currentTimeMillis()
+    val diffMillis = currentTimeMillis - receivedTimeMillis
+
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMillis)
+    val hours = TimeUnit.MILLISECONDS.toHours(diffMillis)
+    val days = TimeUnit.MILLISECONDS.toDays(diffMillis)
+
+    return when {
+        minutes < 60 -> "${minutes}분 전"
+        hours < 24 -> "${hours}시간 전"
+        days < 7 -> "${days}일 전"
+        else -> "${java.time.Instant.ofEpochMilli(receivedTimeMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()}"
+    }
+}
+
 // Note: This was moved from LikeScreen.kt
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LikeReceivedItemComponent(
-    like: LikeItemUiState
+    like: LikeItemUiState,
+    onUserClick: (String) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(4.dp)
+            .clickable { onUserClick(like.id) }
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ThumbUp,
+                    contentDescription = "Received Time",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = formatReceivedTime(like.receivedTime),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
             Image(
                 painter = painterResource(id = R.drawable.profile_sample),
                 contentDescription = "Thumbnail",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
+                    .fillMaxWidth()
+                    .aspectRatio(0.7f)
+                    .clip(RoundedCornerShape(8.dp))
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = like.nickname, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = "${like.age}歳",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = like.introduction,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = { /* TODO: Handle "Like Back" action */ },
-            ) {
-                Text(text = "いいね！する")
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = like.nickname,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "${like.age}歳",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -163,6 +212,7 @@ fun LikeReceivedItemComponentPreview() {
             introduction = "This is a sample introduction.",
             receivedTime = System.currentTimeMillis(),
             isRefreshing = false
-        )
+        ),
+        onUserClick = {}
     )
 } 

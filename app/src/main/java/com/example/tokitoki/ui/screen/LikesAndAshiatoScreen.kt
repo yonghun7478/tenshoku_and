@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -102,13 +103,17 @@ fun LikesAndAshiatoScreen(
             ) { page ->
                 when (page) {
                     LikesAndAshiatoTab.LIKES.ordinal -> {
-                        val likeListState = rememberLazyListState()
+                        val likeListState = rememberLazyGridState()
                         LikeReceivedListComponent(
                             likes = uiState.likeState.receivedLikes,
                             listState = likeListState,
                             isRefreshing = uiState.likeState.receivedLikesIsRefreshing,
                             onRefresh = { viewModel.refresh() },
-                            onLoadMore = { viewModel.loadMore() }
+                            onLoadMore = { viewModel.loadMore() },
+                            onUserClick = { userId ->
+                                viewModel.addLikesUserIdsToCache()
+                                onNavigateToUserProfile(userId, "LikeScreen")
+                            }
                         )
                     }
 
@@ -118,7 +123,7 @@ fun LikesAndAshiatoScreen(
                             onRefresh = { viewModel.refresh() },
                             onLoadMore = { viewModel.loadMore() },
                             onUserClick = { date, userId ->
-                                viewModel.addUserIdsToCache(date)
+                                viewModel.addAshiatoUserIdsToCache(date)
                                 onNavigateToUserProfile(userId, "AshiatoScreen")
                             }
                         )

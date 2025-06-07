@@ -75,7 +75,7 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         val now = System.currentTimeMillis()
 
         return List(PAGE_SIZE) { index ->
-            val id = index  // startIndex 반영
+            val id = index + 1  // startIndex 반영 (0부터 시작하는 index에 1을 더하여 1부터 시작)
             LikeItemData(
                 id = id.toString(),
                 thumbnail = "https://via.placeholder.com/150",

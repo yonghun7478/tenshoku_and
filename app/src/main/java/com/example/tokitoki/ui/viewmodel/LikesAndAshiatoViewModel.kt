@@ -170,7 +170,7 @@ class LikesAndAshiatoViewModel @Inject constructor(
         }
     }
     
-    fun addUserIdsToCache(date: String) {
+    fun addAshiatoUserIdsToCache(date: String) {
         viewModelScope.launch {
             val dailyLog = _uiState.value.ashiatoState.timeline.dailyLogs.find { it.date == date }
             dailyLog?.let { log ->
@@ -178,6 +178,18 @@ class LikesAndAshiatoViewModel @Inject constructor(
                 addUserIdsToCacheUseCase(
                     userIds = userIds,
                     screenName = "AshiatoScreen" // Or a new screen name
+                )
+            }
+        }
+    }
+
+    fun addLikesUserIdsToCache() {
+        viewModelScope.launch {
+            val userIds = _uiState.value.likeState.receivedLikes.map { it.id }
+            if (userIds.isNotEmpty()) {
+                addUserIdsToCacheUseCase(
+                    userIds = userIds,
+                    screenName = "LikeScreen"
                 )
             }
         }
