@@ -10,7 +10,6 @@ import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.ui.state.AshiatoUiState
 import com.example.tokitoki.ui.state.LikeItemUiState
 import com.example.tokitoki.ui.state.LikeScreenUiState
-import com.example.tokitoki.ui.state.LikeTab
 import com.example.tokitoki.ui.state.LikesAndAshiatoTab
 import com.example.tokitoki.ui.state.LikesAndAshiatoUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.repository.LikeRepository
 
 @HiltViewModel
 class LikesAndAshiatoViewModel @Inject constructor(
@@ -75,7 +75,7 @@ class LikesAndAshiatoViewModel @Inject constructor(
 
     private fun loadLikes(isInitialLoad: Boolean, cursor: Long? = null) {
         viewModelScope.launch {
-            getLikesUseCase(LikeTab.RECEIVED.title, cursor)
+            getLikesUseCase(LikeRepository.RECEIVED, cursor)
                 .onSuccess { (newLikes, nextCursor) ->
                     val newLikeUiStates = newLikes.map { it.toUiState() }
                     _uiState.update { currentState ->

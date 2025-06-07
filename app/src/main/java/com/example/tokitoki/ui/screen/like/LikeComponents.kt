@@ -1,9 +1,7 @@
-package com.example.tokitoki.ui.screen
+package com.example.tokitoki.ui.screen.like
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,32 +14,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,43 +32,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.state.LikeItemUiState
-import com.example.tokitoki.ui.state.LikeScreenUiState
-import com.example.tokitoki.ui.state.LikeTab
-import com.example.tokitoki.ui.viewmodel.LikeScreenViewModel
-import kotlinx.coroutines.launch
 
-// Main Screen Composable
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
-    val listState = rememberLazyListState()
-
-    Scaffold(
-        topBar = {
-            LikeTopBarComponent(
-                title = "いいね"
-            )
+fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
+    val isAtBottom = remember {
+        derivedStateOf {
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != null && lastVisibleItem.index == layoutInfo.totalItemsCount - 1
         }
-    ) { paddingValues ->
+    }
 
-        Column(modifier = Modifier.padding(paddingValues)) {
-            // 탭에 따른 리스트 표시
-            LikeReceivedListComponent(
-                likes = uiState.receivedLikes,
-                listState = listState,
-                isRefreshing = uiState.receivedLikesIsRefreshing,
-                onRefresh = { viewModel.refreshLikes() },
-                onLoadMore = { viewModel.loadMoreLikes() }
-            )
+    LaunchedEffect(isAtBottom.value) {
+        if (isAtBottom.value) {
+            onLastItemVisible()
         }
     }
 }
 
-// Top Bar Composable
+// Note: This was moved from LikeScreen.kt
 @Composable
 fun LikeTopBarComponent(
     title: String
@@ -101,7 +67,7 @@ fun LikeTopBarComponent(
     }
 }
 
-// List Composables (for each tab)
+// Note: This was moved from LikeScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikeReceivedListComponent(
@@ -127,38 +93,16 @@ fun LikeReceivedListComponent(
             }
         }
 
-        val isAtBottom = remember {
-            derivedStateOf {
-                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                lastVisibleItem?.index != null && lastVisibleItem.index == listState.layoutInfo.totalItemsCount - 1
-            }
-        }
-
-        LaunchedEffect(isAtBottom.value) {
-            if (isAtBottom.value && likes.isNotEmpty()) {
+        listState.OnLastItemVisible {
+             if (likes.isNotEmpty() && listState.layoutInfo.totalItemsCount > 0) {
                 onLoadMore()
             }
         }
     }
 }
 
-@Composable
-fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
-    val isAtBottom = remember {
-        derivedStateOf {
-            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-            lastVisibleItem?.index != null && lastVisibleItem.index == layoutInfo.totalItemsCount - 1
-        }
-    }
-
-    LaunchedEffect(isAtBottom.value) {
-        if (isAtBottom.value) {
-            onLastItemVisible()
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+// Note: This was moved from LikeScreen.kt
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LikeReceivedItemComponent(
     like: LikeItemUiState
@@ -205,6 +149,7 @@ fun LikeReceivedItemComponent(
     }
 }
 
+
 // Preview (Simplified)
 @Preview(showBackground = true)
 @Composable
@@ -220,11 +165,4 @@ fun LikeReceivedItemComponentPreview() {
             isRefreshing = false
         )
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LikeScreenPreview() {
-    val viewModel: LikeScreenViewModel = hiltViewModel()
-    LikeScreen(viewModel = viewModel)
-}
+} 

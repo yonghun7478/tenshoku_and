@@ -16,9 +16,3 @@ data class LikeItemUiState(
     val receivedTime: Long, // 추가
     val isRefreshing: Boolean = false // 새로고침 상태 추가
 )
-
-// Tab enum
-enum class LikeTab(val title: String) {
-    RECEIVED("いいねされた"),
-    SENT("いいねした"),
-}

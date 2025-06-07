@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tokitoki.ui.screen.like.LikeReceivedListComponent
 import com.example.tokitoki.ui.state.AshiatoUiState
 import com.example.tokitoki.ui.state.LikesAndAshiatoTab
 import com.example.tokitoki.ui.viewmodel.LikesAndAshiatoViewModel
