@@ -70,9 +70,7 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val listStates = remember {
-        mapOf(LikeTab.RECEIVED to LazyListState()).toMutableMap() // LikeTab.RECEIVED에 대해서만 초기화
-    }
+    val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -95,9 +93,10 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
 
         Column(modifier = Modifier.padding(paddingValues)) {
             // 탭에 따른 리스트 표시
-            LikeTabContentComponent(
-                uiState = uiState,
-                listStates = listStates, // listStates를 전달
+            LikeReceivedListComponent(
+                likes = uiState.receivedLikes,
+                listState = listState,
+                isRefreshing = uiState.receivedLikesIsRefreshing,
                 onRefresh = { viewModel.refreshLikes() },
                 onLoadMore = { viewModel.loadMoreLikes() }
             )
@@ -121,37 +120,20 @@ fun LikeTopBarComponent(
     }
 }
 
-// Tab Content Composable (Handles displaying the list for each tab)
-@Composable
-fun LikeTabContentComponent(
-    uiState: LikeScreenUiState,
-    listStates: Map<LikeTab, LazyListState>, // Map으로 받음
-    onRefresh: () -> Unit,
-    onLoadMore: () -> Unit // onLoadMore 파라미터 추가
-) {
-    LikeReceivedListComponent(
-        likes = uiState.receivedLikes,
-        listState = listStates[LikeTab.RECEIVED]!!, // 올바른 LazyListState 사용,
-        isRefreshing = uiState.receivedLikesIsRefreshing,
-        onRefresh = onRefresh,
-        onLoadMore = onLoadMore
-    )
-}
-
 // List Composables (for each tab)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikeReceivedListComponent(
     likes: List<LikeItemUiState>,
     listState: LazyListState,
-    isRefreshing: Boolean, // 추가
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    onLoadMore: () -> Unit // onLoadMore 파라미터 추가
+    onLoadMore: () -> Unit
 ) {
-    PullToRefreshBox( // LazyColumn을 PullToRefreshBox로 감쌉니다.
+    PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
-        isRefreshing = isRefreshing, // ViewModel의 isRefreshing 상태
-        onRefresh = { onRefresh() } // ViewModel의 refreshLikes() 호출
+        isRefreshing = isRefreshing,
+        onRefresh = { onRefresh() }
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -164,7 +146,6 @@ fun LikeReceivedListComponent(
             }
         }
 
-        // LaunchedEffect를 LazyColumn 바깥으로 이동, likes.isNotEmpty() 검사 추가.
         val isAtBottom = remember {
             derivedStateOf {
                 val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
@@ -173,7 +154,7 @@ fun LikeReceivedListComponent(
         }
 
         LaunchedEffect(isAtBottom.value) {
-            if (isAtBottom.value && likes.isNotEmpty()) { // likes.isNotEmpty() 조건 검사
+            if (isAtBottom.value && likes.isNotEmpty()) {
                 onLoadMore()
             }
         }
@@ -183,13 +164,13 @@ fun LikeReceivedListComponent(
 @Composable
 fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
     val isAtBottom = remember {
-        derivedStateOf { // derivedStateOf를 사용하여 최적화
+        derivedStateOf {
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
             lastVisibleItem?.index != null && lastVisibleItem.index == layoutInfo.totalItemsCount - 1
         }
     }
 
-    LaunchedEffect(isAtBottom.value) { // LaunchedEffect를 사용해서 recomposition시에도 감지
+    LaunchedEffect(isAtBottom.value) {
         if (isAtBottom.value) {
             onLastItemVisible()
         }
@@ -201,7 +182,7 @@ fun LazyListState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
 fun LikeReceivedItemComponent(
     like: LikeItemUiState
 ) {
-    ElevatedCard( // Material3 Card
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -211,7 +192,7 @@ fun LikeReceivedItemComponent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.profile_sample), // Replace with actual image loading
+                painter = painterResource(id = R.drawable.profile_sample),
                 contentDescription = "Thumbnail",
                 modifier = Modifier
                     .size(60.dp)
@@ -254,8 +235,8 @@ fun LikeReceivedItemComponentPreview() {
             nickname = "Test User",
             age = 25,
             introduction = "This is a sample introduction.",
-            receivedTime = System.currentTimeMillis(), // 현재 시간 또는 임의의 값
-            isRefreshing = false // 기본값 명시해도 좋음
+            receivedTime = System.currentTimeMillis(),
+            isRefreshing = false
         )
     )
 }

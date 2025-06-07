@@ -6,8 +6,6 @@ data class LikeScreenUiState(
     val showSnackBar: Boolean = false,
     val receivedLikesIsRefreshing: Boolean = false,
     val receivedCursor: Long? = null, // 추가: 받은 좋아요 커서
-    val sentCursor: Long? = null,     // 추가: 보낸 좋아요 커서
-    val matchedCursor: Long? = null    // 추가: 매칭된 좋아요 커서
 )
 
 data class LikeItemUiState(

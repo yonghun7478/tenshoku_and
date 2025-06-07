@@ -33,7 +33,7 @@ class LikeScreenViewModel @Inject constructor(
     private fun loadLikes() {
         viewModelScope.launch {
             // UseCases를 사용하여 데이터 로드
-            handleResult(getLikesUseCase(LikeTab.RECEIVED.title, null), LikeTab.RECEIVED)
+            handleResult(getLikesUseCase(LikeTab.RECEIVED.title, null))
         }
     }
 
@@ -41,7 +41,7 @@ class LikeScreenViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(receivedLikesIsRefreshing = true, receivedLikes = emptyList()) }
             delay(500)
-            handleResult(getLikesUseCase(LikeTab.RECEIVED.title, null), LikeTab.RECEIVED) //데이터를 다시 가져온다.
+            handleResult(getLikesUseCase(LikeTab.RECEIVED.title, null)) //데이터를 다시 가져온다.
         }
     }
 
@@ -49,13 +49,12 @@ class LikeScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val cursor = _uiState.value.receivedCursor
             handleLoadMoreResult(
-                getLikesUseCase(LikeTab.RECEIVED.title, cursor),
-                LikeTab.RECEIVED
+                getLikesUseCase(LikeTab.RECEIVED.title, cursor)
             )
         }
     }
 
-    private fun handleResult(result: Result<LikeResult>, tab: LikeTab) {
+    private fun handleResult(result: Result<LikeResult>) {
         result
             .onSuccess { (newLikes, nextCursor) ->
                 val uiStateList = newLikes.map { it.toUiState() }
@@ -69,13 +68,12 @@ class LikeScreenViewModel @Inject constructor(
             }
             .onFailure { exception ->
                 // 에러 처리 (예: 스낵바 표시, 로그 출력 등)
-                println("Error loading likes for $tab: $exception")
+                println("Error loading likes: $exception")
             }
     }
 
     private fun handleLoadMoreResult(
         result: Result<LikeResult>,
-        tab: LikeTab,
     ) {
         result
             .onSuccess { (newLikes, nextCursor) ->
@@ -90,7 +88,7 @@ class LikeScreenViewModel @Inject constructor(
             }
             .onFailure { exception ->
                 // 에러 처리 (예: 스낵바 표시, 로그 출력 등)
-                println("Error loading more likes for $tab: $exception")
+                println("Error loading more likes: $exception")
             }
     }
 
