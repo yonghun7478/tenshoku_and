@@ -25,7 +25,6 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     init {
         allLikes[LikeTab.RECEIVED.title] = createDummyLikes(LikeTab.RECEIVED.title, 0).toMutableList()
         allLikes[LikeTab.SENT.title] = createDummyLikes(LikeTab.SENT.title, 0).toMutableList()
-        allLikes[LikeTab.MATCHED.title] = createDummyLikes(LikeTab.MATCHED.title, 0).toMutableList()
     }
 
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
@@ -72,7 +71,6 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         val baseId = when (tab) {
             LikeTab.RECEIVED.title -> 0
             LikeTab.SENT.title -> 100
-            LikeTab.MATCHED.title -> 200
             else -> 0
         }
         val now = System.currentTimeMillis()
