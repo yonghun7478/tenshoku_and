@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LikesAndAshiatoScreen(
     viewModel: LikesAndAshiatoViewModel = hiltViewModel(),
-    onNavigateToUserProfile: (userId: String) -> Unit,
+    onNavigateToUserProfile: (String, String) -> Unit,
     onBackClick: () -> Unit,
     showBackButton: Boolean
 ) {
@@ -111,6 +111,7 @@ fun LikesAndAshiatoScreen(
                             onLoadMore = { viewModel.loadMore() }
                         )
                     }
+
                     LikesAndAshiatoTab.ASHIATO.ordinal -> {
                         AshiatoPageContent(
                             uiState = uiState.ashiatoState,
@@ -118,7 +119,7 @@ fun LikesAndAshiatoScreen(
                             onLoadMore = { viewModel.loadMore() },
                             onUserClick = { date, userId ->
                                 viewModel.addUserIdsToCache(date)
-                                onNavigateToUserProfile(userId)
+                                onNavigateToUserProfile(userId, "AshiatoScreen")
                             }
                         )
                     }
@@ -152,6 +153,7 @@ fun AshiatoPageContent(
                     CircularProgressIndicator()
                 }
             }
+
             uiState.error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -160,6 +162,7 @@ fun AshiatoPageContent(
                     Text("오류가 발생했습니다: ${uiState.error.localizedMessage ?: "알 수 없는 오류"}")
                 }
             }
+
             uiState.timeline.dailyLogs.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -168,6 +171,7 @@ fun AshiatoPageContent(
                     Text("아직 받은 足跡(아시아토)가 없어요.")
                 }
             }
+
             else -> {
                 LazyColumn(
                     state = listState,
@@ -199,7 +203,7 @@ fun AshiatoPageContent(
 @Composable
 fun LikesAndAshiatoScreenPreview() {
     LikesAndAshiatoScreen(
-        onNavigateToUserProfile = {},
+        onNavigateToUserProfile = { _, _ -> },
         onBackClick = {},
         showBackButton = true
     )

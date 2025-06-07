@@ -343,8 +343,8 @@ fun TokitokiNavGraph(
 
         composable(TokitokiDestinations.LIKES_AND_ASHIATO_ROUTE) {
             LikesAndAshiatoScreen(
-                onNavigateToUserProfile = {
-                    navAction.navigateToUserDetail(userId = it, screenName = "LikesAndAshiatoScreen")
+                onNavigateToUserProfile = { id, source ->
+                    navAction.navigateToUserDetail(userId = id, screenName = source)
                 },
                 onBackClick = {
                     navController.navigateUp()

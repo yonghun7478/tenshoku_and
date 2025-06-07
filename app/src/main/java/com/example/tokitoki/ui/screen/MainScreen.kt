@@ -128,7 +128,9 @@ fun MainContents(
 
                 MainBottomItem.LIKE -> {
                     LikesAndAshiatoScreen(
-                        onNavigateToUserProfile = {},
+                        onNavigateToUserProfile = { userId, source ->
+                            onNavigateToUserDetail(userId, source)
+                        },
                         onBackClick = { /* Do nothing since it's in MainScreen */ },
                         showBackButton = false
                     )
