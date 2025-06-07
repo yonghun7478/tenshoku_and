@@ -40,6 +40,7 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.CATEGORY_TAG_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MY_TAG_LIST_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MESSAGE_DETAIL_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.LIKES_AND_ASHIATO_SCREEN
 
 private object TokitokiScreens {
     const val SIGN_IN_SCREEN = "signInScreen"
@@ -59,6 +60,7 @@ private object TokitokiScreens {
     const val FAVORITE_TAG_SCREEN = "FavoriteTagScreen"
     const val MAIN_SCREEN = "MainScreen"
     const val ASHIATO_SCREEN = "AshiatoScreen"
+    const val LIKES_AND_ASHIATO_SCREEN = "LikesAndAshiatoScreen"
     const val FAVORITE_USERS_SCREEN = "FavoriteUsersScreen"
     const val IINE_SITA_HITO_SCREEN = "IineSitaHitoScreen"
     const val USER_DETAIL_SCREEN = "UserDetailScreen"
@@ -103,7 +105,7 @@ object TokitokiDestinations {
     const val FAVORITE_TAG_ROUTE = FAVORITE_TAG_SCREEN
     const val FAVORITE_USERS_ROUTE = FAVORITE_USERS_SCREEN
     const val MAIN_ROUTE = MAIN_SCREEN
-    const val ASHIATO_ROUTE = ASHIATO_SCREEN
+    const val LIKES_AND_ASHIATO_ROUTE = LIKES_AND_ASHIATO_SCREEN
     const val IINE_SITA_HITO_ROUTE = IINE_SITA_HITO_SCREEN
     const val USER_DETAIL_ROUTE = "$USER_DETAIL_SCREEN?$USER_ID={$USER_ID}&$SCREEN_NAME={$SCREEN_NAME}"
     const val TAG_SEARCH_ROUTE = TAG_SEARCH_SCREEN
@@ -174,8 +176,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(MAIN_SCREEN)
     }
 
-    fun navigateToAshiato() {
-        navController.navigate(ASHIATO_SCREEN)
+    fun navigateToLikesAndAshiato() {
+        navController.navigate(LIKES_AND_ASHIATO_SCREEN)
     }
 
     fun navigateToFavoriteUsers() {

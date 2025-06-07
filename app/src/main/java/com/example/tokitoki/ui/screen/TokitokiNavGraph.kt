@@ -311,7 +311,7 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.MAIN_ROUTE) {
             MainScreen(
                 onAshiatoClick = {
-                    navAction.navigateToAshiato()
+                    navAction.navigateToLikesAndAshiato()
                 },
                 onFavoriteUsersClick = {
                     navAction.navigateToFavoriteUsers()
@@ -341,14 +341,15 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.ASHIATO_ROUTE) {
-            AshiatoScreen(
+        composable(TokitokiDestinations.LIKES_AND_ASHIATO_ROUTE) {
+            LikesAndAshiatoScreen(
                 onNavigateToUserProfile = {
-                    navAction.navigateToUserDetail(userId = it, screenName = "AshiatoScreen")
+                    navAction.navigateToUserDetail(userId = it, screenName = "LikesAndAshiatoScreen")
                 },
                 onBackClick = {
                     navController.navigateUp()
-                }
+                },
+                showBackButton = true
             )
         }
 

@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 fun LikesAndAshiatoScreen(
     viewModel: LikesAndAshiatoViewModel = hiltViewModel(),
     onNavigateToUserProfile: (userId: String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    showBackButton: Boolean
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val pagerState = rememberPagerState(pageCount = { LikesAndAshiatoTab.entries.size })
@@ -61,11 +62,13 @@ fun LikesAndAshiatoScreen(
             TopAppBar(
                 title = { Text("いいね・足あと") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    if (showBackButton) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
                     }
                 }
             )
@@ -194,6 +197,7 @@ fun AshiatoPageContent(
 fun LikesAndAshiatoScreenPreview() {
     LikesAndAshiatoScreen(
         onNavigateToUserProfile = {},
-        onBackClick = {}
+        onBackClick = {},
+        showBackButton = true
     )
 } 

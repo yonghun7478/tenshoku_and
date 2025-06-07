@@ -127,7 +127,11 @@ fun MainContents(
                 }
 
                 MainBottomItem.LIKE -> {
-                    LikeScreen()
+                    LikesAndAshiatoScreen(
+                        onNavigateToUserProfile = {},
+                        onBackClick = { /* Do nothing since it's in MainScreen */ },
+                        showBackButton = false
+                    )
                 }
 
                 MainBottomItem.MESSAGE -> {
