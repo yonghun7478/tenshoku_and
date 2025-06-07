@@ -31,11 +31,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -67,9 +62,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -77,17 +69,6 @@ fun LikeScreen(viewModel: LikeScreenViewModel = hiltViewModel()) {
             LikeTopBarComponent(
                 title = "いいね"
             )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    snackbarData = data,
-//                    backgroundColor = Color.Gray, // Material 3에서는 containerColor, contentColor로 변경
-//                    contentColor = Color.White
-                    containerColor = MaterialTheme.colorScheme.inverseSurface, // Material3 Color
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface  // Material3 Color
-                )
-            }
         }
     ) { paddingValues ->
 
