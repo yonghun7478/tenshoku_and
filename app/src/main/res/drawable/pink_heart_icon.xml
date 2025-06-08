@@ -7,7 +7,9 @@
     <group
         android:name="animationGroup"
         android:pivotX="512"
-        android:pivotY="512">
+        android:pivotY="512"
+        android:scaleX="0.65"
+        android:scaleY="0.65">
 
         <path
             android:fillColor="#6C1824"
