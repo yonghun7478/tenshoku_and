@@ -49,11 +49,23 @@ fun LikesAndAshiatoScreen(
     viewModel: LikesAndAshiatoViewModel = hiltViewModel(),
     onNavigateToUserProfile: (String, String) -> Unit,
     onBackClick: () -> Unit,
-    showBackButton: Boolean
+    showBackButton: Boolean,
+    initialTab: String? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val pagerState = rememberPagerState(pageCount = { LikesAndAshiatoTab.entries.size })
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(initialTab) {
+        initialTab?.let { tabName ->
+            val initialPageIndex = when (tabName) {
+                LikesAndAshiatoTab.ASHIATO.name -> LikesAndAshiatoTab.ASHIATO.ordinal
+                LikesAndAshiatoTab.LIKES.name -> LikesAndAshiatoTab.LIKES.ordinal
+                else -> pagerState.currentPage
+            }
+            pagerState.scrollToPage(initialPageIndex)
+        }
+    }
 
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {

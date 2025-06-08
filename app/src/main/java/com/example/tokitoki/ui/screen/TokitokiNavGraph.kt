@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tokitoki.ui.screen.mytaglist.MyTagListScreen
 import com.example.tokitoki.ui.screen.tagdetail.TagDetailScreen
 import com.example.tokitoki.ui.screens.message.MessageDetailScreen
+import com.example.tokitoki.ui.state.LikesAndAshiatoTab
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
 @Composable
@@ -311,7 +312,7 @@ fun TokitokiNavGraph(
         composable(TokitokiDestinations.MAIN_ROUTE) {
             MainScreen(
                 onAshiatoClick = {
-                    navAction.navigateToLikesAndAshiato()
+                    navAction.navigateToLikesAndAshiato(initialTab = LikesAndAshiatoTab.ASHIATO.name)
                 },
                 onFavoriteUsersClick = {
                     navAction.navigateToFavoriteUsers()
@@ -341,7 +342,13 @@ fun TokitokiNavGraph(
             )
         }
 
-        composable(TokitokiDestinations.LIKES_AND_ASHIATO_ROUTE) {
+        composable(
+            TokitokiDestinations.LIKES_AND_ASHIATO_ROUTE,
+            arguments = listOf(
+                navArgument(TokitokiArgs.INITIAL_TAB) { type = NavType.StringType; nullable = true }
+            )
+        ) { backStackEntry ->
+            val initialTab = backStackEntry.arguments?.getString(TokitokiArgs.INITIAL_TAB)
             LikesAndAshiatoScreen(
                 onNavigateToUserProfile = { id, source ->
                     navAction.navigateToUserDetail(userId = id, screenName = source)
@@ -349,7 +356,8 @@ fun TokitokiNavGraph(
                 onBackClick = {
                     navController.navigateUp()
                 },
-                showBackButton = true
+                showBackButton = true,
+                initialTab = initialTab
             )
         }
 

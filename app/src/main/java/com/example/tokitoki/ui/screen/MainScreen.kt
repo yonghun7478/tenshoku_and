@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tokitoki.ui.screen.mypage.MyPageScreen
+import com.example.tokitoki.ui.state.LikesAndAshiatoTab
 import com.example.tokitoki.ui.state.MainBottomItem
 import com.example.tokitoki.ui.state.MainUiEvent
 import com.example.tokitoki.ui.state.MainUiState
@@ -132,7 +133,8 @@ fun MainContents(
                             onNavigateToUserDetail(userId, source)
                         },
                         onBackClick = { /* Do nothing since it's in MainScreen */ },
-                        showBackButton = false
+                        showBackButton = false,
+                        initialTab = LikesAndAshiatoTab.LIKES.name
                     )
                 }
 
