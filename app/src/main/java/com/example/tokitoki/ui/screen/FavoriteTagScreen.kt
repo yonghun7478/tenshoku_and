@@ -47,24 +47,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.tokitoki.R
+import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.Category
+import com.example.tokitoki.domain.model.Tag
 import com.example.tokitoki.ui.constants.FavoriteTagAction
 import com.example.tokitoki.ui.model.CategoryItem
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.state.FavoriteTagEvent
 import com.example.tokitoki.ui.state.FavoriteTagUiState
 import com.example.tokitoki.ui.theme.LocalColor
+import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.FavoriteTagViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -76,54 +85,6 @@ fun FavoriteTagScreen(
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState { uiState.categoryList.size }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(top = 20.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    viewModel.onBackBtnClicked()
-                },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                modifier = Modifier.size(25.dp),
-                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
-                tint = LocalColor.current.black,
-                contentDescription = ""
-            )
-            Text(
-                text = "あなたの登録マイタグ",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
-        FavoriteTagPagerTab(
-            modifier = Modifier.padding(top = 20.dp),
-            tabs = uiState.categoryList,
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            onTabSelected = { index ->
-                viewModel.onCategoryTabClicked(index)
-            }
-        )
-
-        FavoriteTagPager(
-            modifier = Modifier.weight(1f),
-            pagerState = pagerState,
-            uiState = uiState,
-        )
-    }
 
     LaunchedEffect(Unit) {
         viewModel.loadTagsByCategory()
@@ -148,6 +109,72 @@ fun FavoriteTagScreen(
                 }
             }
         }
+    }
+
+    FavoriteTagContent(
+        uiState = uiState,
+        pagerState = pagerState,
+        coroutineScope = coroutineScope,
+        onBackBtnClicked = { viewModel.onBackBtnClicked() },
+        onCategoryTabClicked = { index -> viewModel.onCategoryTabClicked(index) }
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FavoriteTagContent(
+    uiState: FavoriteTagUiState,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    onBackBtnClicked: () -> Unit,
+    onCategoryTabClicked: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .padding(top = 20.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onBackBtnClicked()
+                },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(25.dp),
+                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
+                tint = LocalColor.current.black,
+                contentDescription = ""
+            )
+            Text(
+                text = "あなたの登録マイタグ",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+        FavoriteTagPagerTab(
+            modifier = Modifier.padding(top = 20.dp),
+            tabs = uiState.categoryList,
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+            onTabSelected = { index ->
+                onCategoryTabClicked(index)
+            }
+        )
+
+        FavoriteTagPager(
+            modifier = Modifier.weight(1f),
+            pagerState = pagerState,
+            uiState = uiState,
+        )
     }
 }
 
@@ -292,5 +319,55 @@ fun FavoriteTagPager(
 
             }
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+fun FavoriteTagContentPreview() {
+    val mockCategories = listOf(
+        CategoryItem(id = 1, title = "취미"),
+        CategoryItem(id = 2, title = "라이프스타일"),
+        CategoryItem(id = 3, title = "가치관")
+    )
+
+    val mockTagsByCategory = mapOf(
+        "취미" to listOf(
+            TagItem(id = 101, categoryId = 1, title = "요가", url = "https://picsum.photos/id/13/100/100", desc = "몸과 마음을 수련해요.", showBadge = true),
+            TagItem(id = 102, categoryId = 1, title = "독서", url = "https://picsum.photos/id/4/100/100", desc = "새로운 지식을 얻어요."),
+            TagItem(id = 103, categoryId = 1, title = "여행", url = "https://picsum.photos/id/2/100/100", desc = "새로운 곳을 탐험해요."),
+            TagItem(id = 104, categoryId = 1, title = "그림", url = "https://picsum.photos/id/27/100/100", desc = "감성을 표현해요."),
+            TagItem(id = 105, categoryId = 1, title = "스포츠", url = "https://picsum.photos/id/7/100/100", desc = "활동적인 취미"),
+            TagItem(id = 106, categoryId = 1, title = "음악", url = "https://picsum.photos/id/6/100/100", desc = "음악 감상"),
+            TagItem(id = 107, categoryId = 1, title = "영화", url = "https://picsum.photos/id/5/100/100", desc = "영화 감상"),
+        ),
+        "라이프스타일" to listOf(
+            TagItem(id = 201, categoryId = 2, title = "카페투어", url = "https://picsum.photos/id/1/100/100", desc = "예쁜 카페를 찾아다녀요.", showBadge = true),
+            TagItem(id = 202, categoryId = 2, title = "요리", url = "https://picsum.photos/id/3/100/100", desc = "맛있는 요리 만들기"),
+            TagItem(id = 203, categoryId = 2, title = "패션", url = "https://picsum.photos/id/12/100/100", desc = "스타일링"),
+        ),
+        "가치관" to listOf(
+            TagItem(id = 301, categoryId = 3, title = "미니멀리즘", url = "https://picsum.photos/id/25/100/100", desc = "간소한 삶 추구"),
+            TagItem(id = 302, categoryId = 3, title = "환경보호", url = "https://picsum.photos/id/26/100/100", desc = "지구 살리기"),
+        )
+    )
+
+    val uiState = FavoriteTagUiState(
+        categoryList = mockCategories,
+        tagsByCategory = mockTagsByCategory,
+    )
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { uiState.categoryList.size }
+
+    TokitokiTheme {
+        FavoriteTagContent(
+            uiState = uiState,
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+            onBackBtnClicked = { /* 프리뷰에서는 아무것도 하지 않음 */ },
+            onCategoryTabClicked = { index ->
+                coroutineScope.launch { pagerState.scrollToPage(index) }
+            }
+        )
     }
 }
