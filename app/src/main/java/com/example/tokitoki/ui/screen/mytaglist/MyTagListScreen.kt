@@ -38,13 +38,15 @@ import coil.compose.AsyncImage
 fun MyTagListScreen(
     modifier: Modifier = Modifier,
     viewModel: MyTagListViewModel = hiltViewModel(),
-    onNavigateUp: () -> Unit = {}
+    onNavigateUp: () -> Unit = {},
+    onNavigateToTagDetail: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MyTagListScreenContents(
         uiState = uiState,
         onTabSelected = viewModel::onTabSelected,
         onNavigateUp = onNavigateUp,
+        onNavigateToTagDetail = onNavigateToTagDetail,
         modifier = modifier
     )
 }
@@ -55,6 +57,7 @@ fun MyTagListScreenContents(
     uiState: MyTagListUiState,
     onTabSelected: (TagType) -> Unit,
     onNavigateUp: () -> Unit,
+    onNavigateToTagDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(initialPage = uiState.selectedTab.ordinal) { TagType.values().size }
@@ -140,7 +143,7 @@ fun MyTagListScreenContents(
                             items(uiState.tagLists[tagType] ?: emptyList()) { tag ->
                                 MyTagListItem(
                                     tag = tag,
-                                    onClick = { /* TODO: Handle tag click */ }
+                                    onClick = { onNavigateToTagDetail(tag.id) }
                                 )
                             }
                         }
@@ -255,6 +258,7 @@ fun MyTagListScreenContentsPreview() {
         ),
         onTabSelected = {},
         onNavigateUp = {},
+        onNavigateToTagDetail = {},
         modifier = Modifier
     )
 } 
