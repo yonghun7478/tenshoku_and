@@ -6,7 +6,6 @@ import com.example.tokitoki.data.model.LikeItemData
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.domain.model.LikeResult
 import com.example.tokitoki.domain.repository.LikeRepository
-import com.example.tokitoki.ui.state.LikeTab
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlin.random.Random
@@ -23,9 +22,8 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
 
     // 초기 데이터 생성 (init 블록)
     init {
-        allLikes[LikeTab.RECEIVED.title] = createDummyLikes(LikeTab.RECEIVED.title, 0).toMutableList()
-        allLikes[LikeTab.SENT.title] = createDummyLikes(LikeTab.SENT.title, 0).toMutableList()
-        allLikes[LikeTab.MATCHED.title] = createDummyLikes(LikeTab.MATCHED.title, 0).toMutableList()
+        allLikes[LikeRepository.RECEIVED] = createDummyLikes(LikeRepository.RECEIVED, 0).toMutableList()
+        allLikes[LikeRepository.SENT] = createDummyLikes(LikeRepository.SENT, 0).toMutableList()
     }
 
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
@@ -70,15 +68,14 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     // 각 탭별 더미 데이터 생성 함수
     private fun createDummyLikes(tab: String, startIndex: Int): List<LikeItem> {
         val baseId = when (tab) {
-            LikeTab.RECEIVED.title -> 0
-            LikeTab.SENT.title -> 100
-            LikeTab.MATCHED.title -> 200
+            LikeRepository.RECEIVED -> 0
+            LikeRepository.SENT -> 100
             else -> 0
         }
         val now = System.currentTimeMillis()
 
         return List(PAGE_SIZE) { index ->
-            val id = index  // startIndex 반영
+            val id = index + 1  // startIndex 반영 (0부터 시작하는 index에 1을 더하여 1부터 시작)
             LikeItemData(
                 id = id.toString(),
                 thumbnail = "https://via.placeholder.com/150",

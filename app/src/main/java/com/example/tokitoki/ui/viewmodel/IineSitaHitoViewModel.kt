@@ -2,11 +2,10 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
+import com.example.tokitoki.domain.repository.LikeRepository
 import com.example.tokitoki.domain.usecase.GetLikesUseCase
 import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
-import com.example.tokitoki.ui.state.LikeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +34,7 @@ class IineSitaHitoViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val result = getLikesUseCase(LikeTab.SENT.title, null, pageSize)
+                val result = getLikesUseCase(LikeRepository.SENT, null, pageSize)
                 result.getOrNull()?.let { likeResult ->
                     currentCursor = likeResult.nextCursor
                     _uiState.update {
@@ -70,7 +69,7 @@ class IineSitaHitoViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val result = getLikesUseCase(LikeTab.SENT.title, currentCursor, pageSize)
+                val result = getLikesUseCase(LikeRepository.SENT, currentCursor, pageSize)
                 result.getOrNull()?.let { likeResult ->
                     currentCursor = likeResult.nextCursor
                     _uiState.update {
@@ -112,7 +111,7 @@ class IineSitaHitoViewModel @Inject constructor(
             }
             try {
                 currentCursor = null
-                val result = getLikesUseCase(LikeTab.RECEIVED.title, null, pageSize)
+                val result = getLikesUseCase(LikeRepository.SENT, null, pageSize)
                 result.getOrNull()?.let { likeResult ->
                     currentCursor = likeResult.nextCursor
                     _uiState.update {
