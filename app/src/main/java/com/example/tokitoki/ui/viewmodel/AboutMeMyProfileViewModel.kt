@@ -9,7 +9,6 @@ import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
@@ -28,13 +27,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
 
 @HiltViewModel
 class AboutMeMyProfileViewModel
 @Inject constructor(
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val getMyTagUseCase: GetMyTagUseCase,
-    private val getTagByTagIdWithCategoryIdUseCase: GetTagByTagIdWithCategoryIdUseCase,
+    private val getTagsUseCase: GetTagsUseCase,
     private val calculateAgeUseCase: CalculateAgeUseCase,
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
     private val registerMyProfileUseCase: RegisterMyProfileUseCase,
@@ -53,12 +53,9 @@ class AboutMeMyProfileViewModel
         val myProfile = getMyProfileUseCase()
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
         val myTags = getMyTagUseCase()
-        val myTagsMap =
-            myTags.groupBy { it.categoryId }.mapValues { entry -> entry.value.map { it.tagId } }
+        val allTagIds = myTags.map { it.tagId }
 
-        val allTags = myTagsMap.flatMap { (categoryId, tagIds) ->
-            getTagByTagIdWithCategoryIdUseCase(categoryId, tagIds)
-        }
+        val allTags = getTagsUseCase(allTagIds)
 
         val mySelfSentence = getMySelfSentenceUseCase(myProfile.mySelfSentenceId)
 

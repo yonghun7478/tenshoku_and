@@ -1,16 +1,17 @@
 package com.example.tokitoki.ui.converter
 
 import com.example.tokitoki.domain.model.MyTag
-import com.example.tokitoki.domain.model.Tag
+import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.ui.model.TagItem
 
 object TagUiConverter {
-    fun domainToUi(tag: Tag): TagItem {
+    fun domainToUi(tag: MainHomeTag): TagItem {
         return TagItem(
-            id = tag.id,
-            categoryId = tag.categoryId,
-            title = tag.title,
-            url = tag.url
+            id = tag.id.toIntOrNull() ?: 0,
+            categoryId = tag.categoryId.toIntOrNull() ?: 0,
+            title = tag.name,
+            url = tag.imageUrl,
+            desc = tag.description,
         )
     }
 

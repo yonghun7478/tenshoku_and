@@ -3,8 +3,6 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
-import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.converter.CategoryUiConverter
@@ -21,13 +19,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsByTypeUseCase
 
 @HiltViewModel
 class AboutMeTagViewModel
 @Inject constructor(
     private val isTest: Boolean,
-    private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
-    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getTagTypeListUseCase: GetTagTypeListUseCase,
+    private val getTagsByTypeUseCase: GetTagsByTypeUseCase,
     private val setMyTagUseCase: SetMyTagUseCase,
     private val clearMyTagUseCase: ClearMyTagUseCase,
     ) : ViewModel() {
@@ -45,14 +45,17 @@ class AboutMeTagViewModel
     suspend fun init(
         tagIds: List<MyTagItem> = listOf(),
     ) {
-        // Step 1: 도메인 데이터를 가져오기
-        val domainCategories = getCategoriesUseCase()
-        val uiCategories = domainCategories.map { CategoryUiConverter.domainToUi(it) }
+        // Step 1: 도메인 데이터를 가져오기 (TagType)
+        val tagTypes = getTagTypeListUseCase()
+        val uiCategories = tagTypes.map { CategoryUiConverter.tagTypeToUi(it) }
 
         // Step 2: 기본 tagsByCategory 생성
-        val tagsByCategory = domainCategories.associate { category ->
-            category.title to getTagByCategoryIdUseCase(category.id)
+        val tagsByCategory = mutableMapOf<String, List<com.example.tokitoki.ui.model.TagItem>>()
+        tagTypes.forEach { tagType ->
+            val tags = getTagsByTypeUseCase(tagType)
+                .getOrElse { emptyList() }
                 .map { TagUiConverter.domainToUi(it) }
+            tagsByCategory[tagType.value] = tags
         }
 
         // Step 3: tagIds가 비어 있지 않은 경우에만 showBadge 업데이트

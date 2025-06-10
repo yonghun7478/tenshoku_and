@@ -2,10 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.ui.constants.FavoriteTagAction
 import com.example.tokitoki.ui.converter.CategoryUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
@@ -19,12 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsByTypeUseCase
 
 @HiltViewModel
 class FavoriteTagViewModel @Inject constructor(
     private val getMyTagUseCase: GetMyTagUseCase,
-    private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
-    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getTagTypeListUseCase: GetTagTypeListUseCase,
+    private val getTagsByTypeUseCase: GetTagsByTypeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoriteTagUiState())
@@ -35,23 +34,25 @@ class FavoriteTagViewModel @Inject constructor(
 
     suspend fun loadTagsByCategory() {
 
-        val categories = getCategoriesUseCase()
+        val tagTypes = getTagTypeListUseCase()
         val myTags = getMyTagUseCase()
         val tagsByCategory = mutableMapOf<String, List<TagItem>>()
 
-        for (category in categories) {
-            val categoryTags = getTagByCategoryIdUseCase(category.id)
-            val filteredTags = categoryTags.filter { tag ->
-                myTags.any { myTag -> myTag.tagId == tag.id }
+        for (tagType in tagTypes) {
+            val categoryTagsResult = getTagsByTypeUseCase(tagType)
+            val categoryTags = categoryTagsResult.getOrNull() ?: emptyList()
+
+            val filteredTags = categoryTags.filter {
+                myTags.any { myTag -> myTag.tagId.toString() == it.id }
             }
 
-            tagsByCategory[category.title] =
+            tagsByCategory[tagType.value] =
                 filteredTags.map { TagUiConverter.domainToUi(it) }
         }
 
         _uiState.value = _uiState.value.copy(
             tagsByCategory = tagsByCategory,
-            categoryList = categories.map { CategoryUiConverter.domainToUi(it) }
+            categoryList = tagTypes.map { CategoryUiConverter.tagTypeToUi(it) }
         )
 
     }
