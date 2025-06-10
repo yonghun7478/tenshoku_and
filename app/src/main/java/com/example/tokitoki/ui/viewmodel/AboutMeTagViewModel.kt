@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeTagAction
-import com.example.tokitoki.ui.converter.CategoryUiConverter
+import com.example.tokitoki.ui.converter.TagTypeUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.state.AboutMeTagEvent
@@ -47,34 +47,34 @@ class AboutMeTagViewModel
     ) {
         // Step 1: 도메인 데이터를 가져오기 (TagType)
         val tagTypes = getTagTypeListUseCase()
-        val uiCategories = tagTypes.map { CategoryUiConverter.tagTypeToUi(it) }
+        val uiTagTypes = tagTypes.map { TagTypeUiConverter.tagTypeToUi(it) }
 
-        // Step 2: 기본 tagsByCategory 생성
-        val tagsByCategory = mutableMapOf<String, List<com.example.tokitoki.ui.model.TagItem>>()
+        // Step 2: 기본 tagsByTagType 생성
+        val tagsByTagType = mutableMapOf<String, List<com.example.tokitoki.ui.model.TagItem>>()
         tagTypes.forEach { tagType ->
             val tags = getTagsByTypeUseCase(tagType)
                 .getOrElse { emptyList() }
                 .map { TagUiConverter.domainToUi(it) }
-            tagsByCategory[tagType.value] = tags
+            tagsByTagType[tagType.value] = tags
         }
 
         // Step 3: tagIds가 비어 있지 않은 경우에만 showBadge 업데이트
-        val finalTagsByCategory = if (tagIds.isNotEmpty()) {
-            tagsByCategory.mapValues { (_, tags) ->
+        val finalTagsByTagType = if (tagIds.isNotEmpty()) {
+            tagsByTagType.mapValues { (_, tags) ->
                 tags.map { tag ->
                     val isFavorite = tagIds.any { it.tagId == tag.id }
                     tag.copy(showBadge = isFavorite)
                 }
             }
         } else {
-            tagsByCategory
+            tagsByTagType
         }
 
         // Step 4: UI 상태 업데이트
         _uiState.update { currentState ->
             currentState.copy(
-                categoryList = uiCategories,
-                tagsByCategory = finalTagsByCategory,
+                tagTypeList = uiTagTypes,
+                tagsByTagType = finalTagsByTagType,
                 isEditMode = tagIds.isNotEmpty()
             )
         }
@@ -96,33 +96,33 @@ class AboutMeTagViewModel
         }
     }
 
-    fun updateGridItem(categoryTitle: String, index: Int) {
-        val updatedCategoryList =
-            _uiState.value.tagsByCategory[categoryTitle]?.toMutableList() ?: return
+    fun updateGridItem(tagTypeTitle: String, index: Int) {
+        val updatedTagTypeList =
+            _uiState.value.tagsByTagType[tagTypeTitle]?.toMutableList() ?: return
 
-        if (index in updatedCategoryList.indices) {
-            val selectedItem = updatedCategoryList[index].copy(
-                showBadge = !updatedCategoryList[index].showBadge,
+        if (index in updatedTagTypeList.indices) {
+            val selectedItem = updatedTagTypeList[index].copy(
+                showBadge = !updatedTagTypeList[index].showBadge,
             )
 
-            updatedCategoryList[index] = selectedItem
-            val updatedMap = _uiState.value.tagsByCategory.toMutableMap().apply {
-                put(categoryTitle, updatedCategoryList)
+            updatedTagTypeList[index] = selectedItem
+            val updatedMap = _uiState.value.tagsByTagType.toMutableMap().apply {
+                put(tagTypeTitle, updatedTagTypeList)
             }
 
             _uiState.update {
-                it.copy(tagsByCategory = updatedMap)
+                it.copy(tagsByTagType = updatedMap)
             }
         }
     }
 
     suspend fun checkTags(): Boolean {
-        val selectedTags = _uiState.value.tagsByCategory.values.flatten()
+        val selectedTags = _uiState.value.tagsByTagType.values.flatten()
             .filter { it.showBadge }
 
         if (selectedTags.size > 2) {
             // 1. 필터링: showBadge가 true인 태그만 추출
-            val filteredTags = _uiState.value.tagsByCategory
+            val filteredTags = _uiState.value.tagsByTagType
                 .values
                 .flatten()
                 .filter { it.showBadge }

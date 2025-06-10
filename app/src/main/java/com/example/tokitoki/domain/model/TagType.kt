@@ -1,4 +1,4 @@
-package com.example.tokitoki.data.model
+package com.example.tokitoki.domain.model
 
 enum class TagType(val value: String) {
     HOBBY("취미"),

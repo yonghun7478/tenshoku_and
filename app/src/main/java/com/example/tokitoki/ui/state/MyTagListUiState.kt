@@ -1,7 +1,7 @@
 package com.example.tokitoki.ui.state
 
 import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 
 /**
  * 마이태그 리스트 화면의 UI 상태

@@ -53,17 +53,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.tokitoki.R
-import com.example.tokitoki.data.model.TagType
-import com.example.tokitoki.domain.model.Category
-import com.example.tokitoki.domain.model.Tag
 import com.example.tokitoki.ui.constants.FavoriteTagAction
-import com.example.tokitoki.ui.model.CategoryItem
+import com.example.tokitoki.ui.model.TagTypeItem
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.state.FavoriteTagEvent
 import com.example.tokitoki.ui.state.FavoriteTagUiState
@@ -71,9 +67,6 @@ import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.FavoriteTagViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -84,10 +77,10 @@ fun FavoriteTagScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState { uiState.categoryList.size }
+    val pagerState = rememberPagerState { uiState.tagTypeList.size }
 
     LaunchedEffect(Unit) {
-        viewModel.loadTagsByCategory()
+        viewModel.loadTagsByTagType()
 
         viewModel.uiEvent.collect {
             when (it) {
@@ -96,7 +89,7 @@ fun FavoriteTagScreen(
                         FavoriteTagAction.BackBtnClicked -> {
                             onBackClick()
                         }
-                        is FavoriteTagAction.CategoryTabClicked -> {
+                        is FavoriteTagAction.TagTypeTabClicked -> {
                             pagerState.scrollToPage(it.action.index)
                         }
                         FavoriteTagAction.NOTHING -> {
@@ -116,7 +109,7 @@ fun FavoriteTagScreen(
         pagerState = pagerState,
         coroutineScope = coroutineScope,
         onBackBtnClicked = { viewModel.onBackBtnClicked() },
-        onCategoryTabClicked = { index -> viewModel.onCategoryTabClicked(index) }
+        onTagTypeTabClicked = { index -> viewModel.onTagTypeTabClicked(index) }
     )
 }
 
@@ -127,7 +120,7 @@ fun FavoriteTagContent(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     onBackBtnClicked: () -> Unit,
-    onCategoryTabClicked: (Int) -> Unit
+    onTagTypeTabClicked: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -162,11 +155,11 @@ fun FavoriteTagContent(
 
         FavoriteTagPagerTab(
             modifier = Modifier.padding(top = 20.dp),
-            tabs = uiState.categoryList,
+            tabs = uiState.tagTypeList,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
             onTabSelected = { index ->
-                onCategoryTabClicked(index)
+                onTagTypeTabClicked(index)
             }
         )
 
@@ -182,7 +175,7 @@ fun FavoriteTagContent(
 @Composable
 fun FavoriteTagPagerTab(
     modifier: Modifier = Modifier,
-    tabs: List<CategoryItem> = listOf(),
+    tabs: List<TagTypeItem> = listOf(),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     onTabSelected: (Int) -> Unit = {}
@@ -203,7 +196,7 @@ fun FavoriteTagPagerTab(
                     .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                tabs.forEachIndexed { index, categoryItem ->
+                tabs.forEachIndexed { index, tagTypeItem ->
                     Box(
                         modifier = Modifier
                             .height(35.dp)
@@ -219,7 +212,7 @@ fun FavoriteTagPagerTab(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = categoryItem.title,
+                            text = tagTypeItem.title,
                             fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal,
                             color = if (pagerState.currentPage == index) LocalColor.current.blue else Color.LightGray,
                             fontSize = 15.sp
@@ -256,9 +249,8 @@ fun FavoriteTagPager(
         state = pagerState,
         modifier = modifier
     ) { page ->
-        val currentCategoryTitle: String = uiState.categoryList.getOrNull(page)?.title ?: ""
-        val currentTagList: List<TagItem> =
-            uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
+        val currentTagTypeTitle: String = uiState.tagTypeList.getOrNull(page)?.title ?: ""
+        val currentTagList: List<TagItem> = uiState.tagsByTagType[currentTagTypeTitle] ?: emptyList()
 
         val colorStops = arrayOf(
             0.1f to Color.Transparent,
@@ -322,52 +314,79 @@ fun FavoriteTagPager(
     }
 }
 
-@Preview(showBackground = true, widthDp = 360)
+@Preview(showBackground = true)
 @Composable
-fun FavoriteTagContentPreview() {
-    val mockCategories = listOf(
-        CategoryItem(id = 1, title = "취미"),
-        CategoryItem(id = 2, title = "라이프스타일"),
-        CategoryItem(id = 3, title = "가치관")
-    )
-
-    val mockTagsByCategory = mapOf(
-        "취미" to listOf(
-            TagItem(id = 101, categoryId = 1, title = "요가", url = "https://picsum.photos/id/13/100/100", desc = "몸과 마음을 수련해요.", showBadge = true),
-            TagItem(id = 102, categoryId = 1, title = "독서", url = "https://picsum.photos/id/4/100/100", desc = "새로운 지식을 얻어요."),
-            TagItem(id = 103, categoryId = 1, title = "여행", url = "https://picsum.photos/id/2/100/100", desc = "새로운 곳을 탐험해요."),
-            TagItem(id = 104, categoryId = 1, title = "그림", url = "https://picsum.photos/id/27/100/100", desc = "감성을 표현해요."),
-            TagItem(id = 105, categoryId = 1, title = "스포츠", url = "https://picsum.photos/id/7/100/100", desc = "활동적인 취미"),
-            TagItem(id = 106, categoryId = 1, title = "음악", url = "https://picsum.photos/id/6/100/100", desc = "음악 감상"),
-            TagItem(id = 107, categoryId = 1, title = "영화", url = "https://picsum.photos/id/5/100/100", desc = "영화 감상"),
-        ),
-        "라이프스타일" to listOf(
-            TagItem(id = 201, categoryId = 2, title = "카페투어", url = "https://picsum.photos/id/1/100/100", desc = "예쁜 카페를 찾아다녀요.", showBadge = true),
-            TagItem(id = 202, categoryId = 2, title = "요리", url = "https://picsum.photos/id/3/100/100", desc = "맛있는 요리 만들기"),
-            TagItem(id = 203, categoryId = 2, title = "패션", url = "https://picsum.photos/id/12/100/100", desc = "스타일링"),
-        ),
-        "가치관" to listOf(
-            TagItem(id = 301, categoryId = 3, title = "미니멀리즘", url = "https://picsum.photos/id/25/100/100", desc = "간소한 삶 추구"),
-            TagItem(id = 302, categoryId = 3, title = "환경보호", url = "https://picsum.photos/id/26/100/100", desc = "지구 살리기"),
-        )
-    )
-
-    val uiState = FavoriteTagUiState(
-        categoryList = mockCategories,
-        tagsByCategory = mockTagsByCategory,
-    )
-    val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState { uiState.categoryList.size }
-
+fun PreviewFavoriteTagContent() {
     TokitokiTheme {
+        val testTagTypeList = listOf(
+            TagTypeItem(0, "趣味"),
+            TagTypeItem(1, "ライフスタイル"),
+            TagTypeItem(2, "価値観")
+        )
+        val tags = mutableMapOf(
+            "趣味" to listOf(
+                TagItem(
+                    id = 1,
+                    title = "ヨガ",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 1
+                ),
+                TagItem(
+                    id = 2,
+                    title = "Hobby Activity 2",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 1
+                ),
+                TagItem(
+                    id = 3,
+                    title = "Hobby Adventure",
+                    url = "https://example.com/hobby3",
+                    tagTypeId = 1
+                ),
+            ),
+            "ライフスタイル" to listOf(
+                TagItem(
+                    id = 1,
+                    title = "ヨガ",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 2,
+                    showBadge = true
+                ),
+                TagItem(
+                    id = 2,
+                    title = "Hobby Activity 2",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 2,
+                    showBadge = true
+                ),
+            ),
+            "価値観" to listOf(
+                TagItem(
+                    id = 1,
+                    title = "ヨガ",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 3
+                ),
+                TagItem(
+                    id = 2,
+                    title = "Hobby Activity 2",
+                    url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
+                    tagTypeId = 3
+                ),
+            )
+        )
+
+        val uiState = FavoriteTagUiState(
+            tagTypeList = testTagTypeList,
+            tagsByTagType = tags
+        )
+
         FavoriteTagContent(
             uiState = uiState,
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            onBackBtnClicked = { /* 프리뷰에서는 아무것도 하지 않음 */ },
-            onCategoryTabClicked = { index ->
-                coroutineScope.launch { pagerState.scrollToPage(index) }
-            }
+            pagerState = rememberPagerState { uiState.tagTypeList.size },
+            coroutineScope = rememberCoroutineScope(),
+            onBackBtnClicked = {},
+            onTagTypeTabClicked = {}
         )
     }
 }

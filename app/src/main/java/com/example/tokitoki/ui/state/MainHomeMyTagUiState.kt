@@ -1,7 +1,7 @@
 package com.example.tokitoki.ui.state
 
 import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 
 // UiState
 data class MainHomeMyTagUiState(

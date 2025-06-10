@@ -2,7 +2,6 @@ package com.example.tokitoki.domain.model
 
 import com.example.tokitoki.data.model.MainHomeTagData
 import com.example.tokitoki.ui.state.MainHomeTagItemUiState
-import com.example.tokitoki.data.model.TagType
 
 data class MainHomeTag(
     val id: String,

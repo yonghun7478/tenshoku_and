@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.ui.constants.FavoriteTagAction
-import com.example.tokitoki.ui.converter.CategoryUiConverter
+import com.example.tokitoki.ui.converter.TagTypeUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.state.FavoriteTagEvent
@@ -32,34 +32,34 @@ class FavoriteTagViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<FavoriteTagEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun loadTagsByCategory() {
+    suspend fun loadTagsByTagType() {
 
         val tagTypes = getTagTypeListUseCase()
         val myTags = getMyTagUseCase()
-        val tagsByCategory = mutableMapOf<String, List<TagItem>>()
+        val tagsByTagType = mutableMapOf<String, List<TagItem>>()
 
         for (tagType in tagTypes) {
-            val categoryTagsResult = getTagsByTypeUseCase(tagType)
-            val categoryTags = categoryTagsResult.getOrNull() ?: emptyList()
+            val tagTypeTagsResult = getTagsByTypeUseCase(tagType)
+            val tagTypeTags = tagTypeTagsResult.getOrNull() ?: emptyList()
 
-            val filteredTags = categoryTags.filter {
+            val filteredTags = tagTypeTags.filter {
                 myTags.any { myTag -> myTag.tagId.toString() == it.id }
             }
 
-            tagsByCategory[tagType.value] =
+            tagsByTagType[tagType.value] =
                 filteredTags.map { TagUiConverter.domainToUi(it) }
         }
 
         _uiState.value = _uiState.value.copy(
-            tagsByCategory = tagsByCategory,
-            categoryList = tagTypes.map { CategoryUiConverter.tagTypeToUi(it) }
+            tagsByTagType = tagsByTagType,
+            tagTypeList = tagTypes.map { TagTypeUiConverter.tagTypeToUi(it) }
         )
 
     }
 
-    fun onCategoryTabClicked(index: Int) {
+    fun onTagTypeTabClicked(index: Int) {
         viewModelScope.launch {
-            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.CategoryTabClicked(index)))
+            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.TagTypeTabClicked(index)))
         }
     }
 

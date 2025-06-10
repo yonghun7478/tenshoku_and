@@ -1,6 +1,7 @@
 package com.example.tokitoki.data.model
 
 import com.example.tokitoki.domain.model.MainHomeTag
+import com.example.tokitoki.domain.model.TagType
 
 data class MainHomeTagData(
     val id: String,

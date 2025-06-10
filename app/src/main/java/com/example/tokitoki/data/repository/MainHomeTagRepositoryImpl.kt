@@ -3,11 +3,9 @@ package com.example.tokitoki.data.repository
 import com.example.tokitoki.data.model.MainHomeTagData
 import com.example.tokitoki.data.model.MainHomeTagDetailData
 import com.example.tokitoki.data.model.MainHomeTagSubscriberData
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.domain.model.MainHomeTagDetail
-import com.example.tokitoki.domain.model.MainHomeTagSubscriber
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject

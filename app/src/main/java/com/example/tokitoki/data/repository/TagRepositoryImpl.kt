@@ -1,7 +1,7 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.data.model.MainHomeTagData
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.repository.TagRepository

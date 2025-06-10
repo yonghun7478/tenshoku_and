@@ -8,7 +8,7 @@ object TagUiConverter {
     fun domainToUi(tag: MainHomeTag): TagItem {
         return TagItem(
             id = tag.id.toIntOrNull() ?: 0,
-            categoryId = tag.categoryId.toIntOrNull() ?: 0,
+            tagTypeId = tag.categoryId.toIntOrNull() ?: 0,
             title = tag.name,
             url = tag.imageUrl,
             desc = tag.description,
@@ -16,6 +16,6 @@ object TagUiConverter {
     }
 
     fun uiToDomain(tagItem: TagItem): MyTag {
-        return MyTag(tagId = tagItem.id, categoryId = tagItem.categoryId)
+        return MyTag(tagId = tagItem.id, tagTypeId = tagItem.tagTypeId)
     }
 }

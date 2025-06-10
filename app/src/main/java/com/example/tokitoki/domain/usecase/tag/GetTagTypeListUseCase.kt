@@ -1,6 +1,6 @@
 package com.example.tokitoki.domain.usecase.tag
 
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.domain.repository.TagRepository
 import javax.inject.Inject
 

@@ -64,7 +64,7 @@ import coil.request.ImageRequest
 import com.example.tokitoki.R
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.constants.TestTags
-import com.example.tokitoki.ui.model.CategoryItem
+import com.example.tokitoki.ui.model.TagTypeItem
 import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.screen.components.buttons.TkBtn
@@ -92,7 +92,7 @@ fun AboutMeTagScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState {
-        uiState.categoryList.size
+        uiState.tagTypeList.size
     }
 
     AboutMeTagContents(
@@ -132,7 +132,7 @@ fun AboutMeTagScreen(
                         }
 
                         is AboutMeTagAction.ITEM_CLICKED -> {
-                            viewModel.updateGridItem(event.action.category, event.action.index)
+                            viewModel.updateGridItem(event.action.tagType, event.action.index)
                         }
 
                         AboutMeTagAction.EDIT_OK -> {
@@ -183,7 +183,7 @@ fun AboutMeTagContents(
                 modifier = Modifier.padding(top = 30.dp),
                 pagerState = pagerState,
                 coroutineScope = coroutineScope,
-                tabs = uiState.categoryList,
+                tabs = uiState.tagTypeList,
                 aboutMeTagAction = aboutMeTagAction
             )
             AboutMeTagPager(
@@ -258,7 +258,7 @@ fun AboutMeTagTitle(
 @Composable
 fun AboutMeTagPagerTab(
     modifier: Modifier = Modifier,
-    tabs: List<CategoryItem> = listOf(),
+    tabs: List<TagTypeItem> = listOf(),
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
@@ -336,16 +336,14 @@ fun AboutMeTagPager(
         modifier = modifier
     ) { page ->
         // 현재 페이지의 카테고리 이름을 가져옴
-        val currentCategoryTitle: String = uiState.categoryList.getOrNull(page)?.title ?: ""
+        val currentTagTypeTitle: String = uiState.tagTypeList.getOrNull(page)?.title ?: ""
 
-        // 해당 카테고리의 관심사 리스트를 가져옴, 없으면 빈 리스트
         val currentTagList: List<TagItem> =
-            uiState.tagsByCategory[currentCategoryTitle] ?: emptyList()
-
+            uiState.tagsByTagType[currentTagTypeTitle] ?: emptyList()
 
         // 각 카테고리별 페이지 표시
         AboutMeTagPage(
-            categoryTitle = currentCategoryTitle,
+            categoryTitle = currentTagTypeTitle,
             tagList = currentTagList,
             aboutMeTagAction = aboutMeTagAction,
             isTest = isTest
@@ -510,9 +508,9 @@ fun AboutMeTagContentsPreview() {
     val coroutineScope = rememberCoroutineScope()
 
     val testCategotyList = listOf(
-        CategoryItem(0, "趣味"),
-        CategoryItem(1, "ライフスタイル"),
-        CategoryItem(2, "価値観")
+        TagTypeItem(0, "趣味"),
+        TagTypeItem(1, "ライフスタイル"),
+        TagTypeItem(2, "価値観")
     )
 
     val hobbyItem = listOf(
@@ -521,31 +519,31 @@ fun AboutMeTagContentsPreview() {
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 1
+            tagTypeId = 1
         ),
         TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 1
+            tagTypeId = 1
         ),
         TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
-            categoryId = 1
+            tagTypeId = 1
         ),
         TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
-            categoryId = 1
+            tagTypeId = 1
         ),
         TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
-            categoryId = 1
+            tagTypeId = 1
         ),
     )
 
@@ -555,33 +553,33 @@ fun AboutMeTagContentsPreview() {
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 2,
+            tagTypeId = 2,
             showBadge = true
         ),
         TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 2,
+            tagTypeId = 2,
             showBadge = true
         ),
         TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
-            categoryId = 2
+            tagTypeId = 2
         ),
         TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
-            categoryId = 2
+            tagTypeId = 2
         ),
         TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
-            categoryId = 2
+            tagTypeId = 2
         ),
     )
 
@@ -591,31 +589,31 @@ fun AboutMeTagContentsPreview() {
             id = 1,
             title = "ヨガ",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 3
+            tagTypeId = 3
         ),
         TagItem(
             id = 2,
             title = "Hobby Activity 2",
             url = "https://www.dabur.com/Blogs/Doshas/Importance%20and%20Benefits%20of%20Yoga%201020x450.jpg",
-            categoryId = 3
+            tagTypeId = 3
         ),
         TagItem(
             id = 3,
             title = "Hobby Adventure",
             url = "https://example.com/hobby3",
-            categoryId = 3
+            tagTypeId = 3
         ),
         TagItem(
             id = 4,
             title = "Hobby Crafting",
             url = "https://example.com/hobby4",
-            categoryId = 3
+            tagTypeId = 3
         ),
         TagItem(
             id = 5,
             title = "Hobby Gaming",
             url = "https://example.com/hobby5",
-            categoryId = 3
+            tagTypeId = 3
         ),
     )
 
@@ -623,8 +621,8 @@ fun AboutMeTagContentsPreview() {
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
     val uiState = AboutMeTagState(
-        categoryList = testCategotyList,
-        tagsByCategory = tags
+        tagTypeList = testCategotyList,
+        tagsByTagType = tags
     )
 
     val pagerState = rememberPagerState(
