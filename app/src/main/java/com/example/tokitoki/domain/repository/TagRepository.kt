@@ -8,4 +8,5 @@ interface TagRepository {
     suspend fun getTagTypeList(): List<TagType>
     suspend fun getTagsByType(tagType: TagType): Result<List<MainHomeTag>>
     suspend fun getTags(tagIds : List<Int>): List<MainHomeTag>
+    suspend fun getAllTags(): Result<List<MainHomeTag>>
 }

@@ -279,7 +279,7 @@ fun AboutMeTagPagerTab(
                     .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                tabs.forEachIndexed { index, categoryItem ->
+                tabs.forEachIndexed { index, tagTypeItem ->
                     Box(
                         modifier = Modifier
                             .height(35.dp)
@@ -295,7 +295,7 @@ fun AboutMeTagPagerTab(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = categoryItem.title,
+                            text = tagTypeItem.title,
                             fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal,
                             color = if (pagerState.currentPage == index) LocalColor.current.blue else Color.LightGray,
                             fontSize = 15.sp
@@ -343,7 +343,7 @@ fun AboutMeTagPager(
 
         // 각 카테고리별 페이지 표시
         AboutMeTagPage(
-            categoryTitle = currentTagTypeTitle,
+            tagTypeTitle = currentTagTypeTitle,
             tagList = currentTagList,
             aboutMeTagAction = aboutMeTagAction,
             isTest = isTest
@@ -353,7 +353,7 @@ fun AboutMeTagPager(
 
 @Composable
 fun AboutMeTagPage(
-    categoryTitle: String,
+    tagTypeTitle: String,
     tagList: List<TagItem>,
     aboutMeTagAction: (AboutMeTagAction) -> Unit = {},
     isTest: Boolean = false
@@ -371,7 +371,7 @@ fun AboutMeTagPage(
             AboutMeTagGridItem(
                 index = index,
                 title = tag.title,
-                categoryTitle = categoryTitle,
+                tagTypeTitle = tagTypeTitle,
                 url = tag.url,
                 showBadge = tag.showBadge,
                 aboutMeTagAction = aboutMeTagAction,
@@ -384,7 +384,7 @@ fun AboutMeTagPage(
 @Composable
 fun AboutMeTagGridItem(
     modifier: Modifier = Modifier,
-    categoryTitle: String = "",
+    tagTypeTitle: String = "",
     index: Int = 0,
     title: String = "",
     url: String = "",
@@ -445,7 +445,7 @@ fun AboutMeTagGridItem(
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 aboutMeTagAction(
-                    AboutMeTagAction.ITEM_CLICKED(categoryTitle, index)
+                    AboutMeTagAction.ITEM_CLICKED(tagTypeTitle, index)
                 )
             }
     ) {
