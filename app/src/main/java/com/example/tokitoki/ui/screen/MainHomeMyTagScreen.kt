@@ -74,7 +74,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
 

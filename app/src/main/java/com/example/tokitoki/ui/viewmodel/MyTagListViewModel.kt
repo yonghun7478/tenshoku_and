@@ -2,7 +2,7 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCase
 import com.example.tokitoki.ui.state.MyTagListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel

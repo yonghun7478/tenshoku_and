@@ -2,12 +2,9 @@ package com.example.tokitoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
 import com.example.tokitoki.ui.constants.FavoriteTagAction
-import com.example.tokitoki.ui.converter.CategoryUiConverter
+import com.example.tokitoki.ui.converter.TagTypeUiConverter
 import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.TagItem
 import com.example.tokitoki.ui.state.FavoriteTagEvent
@@ -19,12 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsByTypeUseCase
 
 @HiltViewModel
 class FavoriteTagViewModel @Inject constructor(
     private val getMyTagUseCase: GetMyTagUseCase,
-    private val getTagByCategoryIdUseCase: GetTagByCategoryIdUseCase,
-    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getTagTypeListUseCase: GetTagTypeListUseCase,
+    private val getTagsByTypeUseCase: GetTagsByTypeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoriteTagUiState())
@@ -33,32 +32,34 @@ class FavoriteTagViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<FavoriteTagEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun loadTagsByCategory() {
+    suspend fun loadTagsByTagType() {
 
-        val categories = getCategoriesUseCase()
+        val tagTypes = getTagTypeListUseCase()
         val myTags = getMyTagUseCase()
-        val tagsByCategory = mutableMapOf<String, List<TagItem>>()
+        val tagsByTagType = mutableMapOf<String, List<TagItem>>()
 
-        for (category in categories) {
-            val categoryTags = getTagByCategoryIdUseCase(category.id)
-            val filteredTags = categoryTags.filter { tag ->
-                myTags.any { myTag -> myTag.tagId == tag.id }
+        for (tagType in tagTypes) {
+            val tagTypeTagsResult = getTagsByTypeUseCase(tagType)
+            val tagTypeTags = tagTypeTagsResult.getOrNull() ?: emptyList()
+
+            val filteredTags = tagTypeTags.filter {
+                myTags.any { myTag -> myTag.tagId.toString() == it.id }
             }
 
-            tagsByCategory[category.title] =
+            tagsByTagType[tagType.value] =
                 filteredTags.map { TagUiConverter.domainToUi(it) }
         }
 
         _uiState.value = _uiState.value.copy(
-            tagsByCategory = tagsByCategory,
-            categoryList = categories.map { CategoryUiConverter.domainToUi(it) }
+            tagsByTagType = tagsByTagType,
+            tagTypeList = tagTypes.map { TagTypeUiConverter.tagTypeToUi(it) }
         )
 
     }
 
-    fun onCategoryTabClicked(index: Int) {
+    fun onTagTypeTabClicked(index: Int) {
         viewModelScope.launch {
-            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.CategoryTabClicked(index)))
+            _uiEvent.emit(FavoriteTagEvent.ACTION(FavoriteTagAction.TagTypeTabClicked(index)))
         }
     }
 

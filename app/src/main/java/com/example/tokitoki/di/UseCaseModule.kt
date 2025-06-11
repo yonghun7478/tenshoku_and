@@ -12,8 +12,6 @@ import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
 import com.example.tokitoki.domain.usecase.FetchMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetCategoriesUseCase
-import com.example.tokitoki.domain.usecase.GetCategoriesUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetAllMySelfSentenceUseCase
@@ -38,10 +36,6 @@ import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCase
 import com.example.tokitoki.domain.usecase.GetRegistrationTokenUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCase
 import com.example.tokitoki.domain.usecase.GetSuggestedTagsUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCase
-import com.example.tokitoki.domain.usecase.GetTagByCategoryIdUseCaseImpl
-import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
-import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTodayTagUseCase
 import com.example.tokitoki.domain.usecase.GetTodayTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetTokensUseCase
@@ -130,6 +124,12 @@ import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCase
 import com.example.tokitoki.domain.usecase.CheckIsUserFavoriteUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCase
 import com.example.tokitoki.domain.usecase.tag.GetUserTagsUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.GetTagsByTypeUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsByTypeUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
+import com.example.tokitoki.domain.usecase.tag.GetTagsUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -144,12 +144,6 @@ abstract class UseCaseModule {
     abstract fun bindGetTagCategoriesUseCase(
         impl: GetTagCategoriesUseCaseImpl
     ): GetTagCategoriesUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindGetCategoriesUseCase(
-        impl: GetCategoriesUseCaseImpl
-    ): GetCategoriesUseCase
 
     @Binds
     @Singleton
@@ -175,18 +169,6 @@ abstract class UseCaseModule {
     abstract fun bindGetMyTagUseCase(
         impl: GetMyTagUseCaseImpl
     ): GetMyTagUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindGetTagByCategoryIdUseCase(
-        impl: GetTagByCategoryIdUseCaseImpl
-    ): GetTagByCategoryIdUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindGetTagByTagIdUseCase(
-        impl: GetTagByTagIdWithCategoryIdUseCaseImpl
-    ): GetTagByTagIdWithCategoryIdUseCase
 
     @Binds
     @Singleton
@@ -511,4 +493,22 @@ abstract class UseCaseModule {
     abstract fun bindGetUserTagsUseCase(
         impl: GetUserTagsUseCaseImpl
     ): GetUserTagsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagsByTypeUseCase(
+        impl: GetTagsByTypeUseCaseImpl
+    ): GetTagsByTypeUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagTypeListUseCase(
+        impl: GetTagTypeListUseCaseImpl
+    ): GetTagTypeListUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetTagsUseCase(
+        impl: GetTagsUseCaseImpl
+    ): GetTagsUseCase
 }

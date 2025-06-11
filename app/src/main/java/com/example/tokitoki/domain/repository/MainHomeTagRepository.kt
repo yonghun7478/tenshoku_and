@@ -1,9 +1,7 @@
 package com.example.tokitoki.domain.repository
 
-import com.example.tokitoki.data.model.TagType
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.domain.model.MainHomeTag
-import com.example.tokitoki.domain.model.MainHomeTagDetail
-import com.example.tokitoki.domain.model.MainHomeTagSubscriber
 
 interface MainHomeTagRepository {
     suspend fun getTodayTag(): Result<MainHomeTag>
