@@ -507,7 +507,7 @@ fun AboutMeTagGridItem(
 fun AboutMeTagContentsPreview() {
     val coroutineScope = rememberCoroutineScope()
 
-    val testCategotyList = listOf(
+    val testTagTypeList = listOf(
         TagTypeItem(0, "趣味"),
         TagTypeItem(1, "ライフスタイル"),
         TagTypeItem(2, "価値観")
@@ -621,7 +621,7 @@ fun AboutMeTagContentsPreview() {
         mapOf("趣味" to hobbyItem, "ライフスタイル" to lifeStyleItem, "価値観" to kachikanItem)
 
     val uiState = AboutMeTagState(
-        tagTypeList = testCategotyList,
+        tagTypeList = testTagTypeList,
         tagsByTagType = tags
     )
 

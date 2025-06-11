@@ -280,6 +280,96 @@ class TagRepositoryImpl @Inject constructor(
             subscriberCount = (50..300).random(),
             categoryId = "4",  // 音楽・映画
             tagType = TagType.LIFESTYLE
+        ),
+        MainHomeTagData(
+            id = "31",
+            name = "정직",
+            description = "정직한 삶의 가치를 중요하게 생각하는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/31/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",  // 가치관 (새로운 카테고리 ID)
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "32",
+            name = "책임감",
+            description = "자신의 역할과 의무를 다하는 책임감 있는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/32/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "33",
+            name = "도전정신",
+            description = "새로운 것에 도전하고 성장을 추구하는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/33/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "34",
+            name = "성실함",
+            description = "꾸준하고 성실하게 노력하는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/34/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "35",
+            name = "배려심",
+            description = "타인을 존중하고 배려하는 따뜻한 마음을 가진 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/35/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "36",
+            name = "긍정적",
+            description = "어떤 상황에서도 긍정적인 에너지를 잃지 않는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/36/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "37",
+            name = "신뢰",
+            description = "서로에게 신뢰를 기반으로 하는 관계를 중요하게 생각하는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/37/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "38",
+            name = "공정함",
+            description = "모든 일에 공정함을 추구하며 정의로운 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/38/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "39",
+            name = "성장",
+            description = "개인의 성장을 중요하게 생각하고 끊임없이 배우는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/39/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
+        ),
+        MainHomeTagData(
+            id = "40",
+            name = "겸손",
+            description = "항상 겸손한 태도로 배우고 소통하는 사람들과 함께하세요.",
+            imageUrl = "https://picsum.photos/id/40/100/100",
+            subscriberCount = (50..300).random(),
+            categoryId = "6",
+            tagType = TagType.VALUE
         )
     )
 
