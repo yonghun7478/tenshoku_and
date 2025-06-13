@@ -30,7 +30,7 @@ import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 fun TokitokiNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    startDestination: String = TokitokiDestinations.MAIN_ROUTE,
+    startDestination: String = TokitokiDestinations.SPLASH_ROUTE,
     navAction: TokitokiNavigationActions = remember(navController) {
         TokitokiNavigationActions(navController)
     },
@@ -45,6 +45,16 @@ fun TokitokiNavGraph(
         navController = navController,
         startDestination = startDestination,
     ) {
+        composable(TokitokiDestinations.SPLASH_ROUTE) {
+            SplashScreen(
+                onNavigateToMain = {
+                    navAction.navigateToMainAndClearBackStack()
+                },
+                onNavigateToSignIn = {
+                    navAction.navigateToSignInAndClearBackStack()
+                }
+            )
+        }
         composable(TokitokiDestinations.SIGN_IN_ROUTE) {
             SignInScreen(
                 onRegisterWithEmail = {

@@ -40,8 +40,10 @@ import com.example.tokitoki.ui.screen.TokitokiScreens.MY_TAG_LIST_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.TAG_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.MESSAGE_DETAIL_SCREEN
 import com.example.tokitoki.ui.screen.TokitokiScreens.LIKES_AND_ASHIATO_SCREEN
+import com.example.tokitoki.ui.screen.TokitokiScreens.SPLASH_SCREEN
 
 private object TokitokiScreens {
+    const val SPLASH_SCREEN = "splashScreen"
     const val SIGN_IN_SCREEN = "signInScreen"
     const val REGISTER_WITH_EMAIL_SCREEN = "RegisterWithEmailScreen"
     const val EMAIL_VERIFICATION_SCREEN = "EmailVerificationScreen"
@@ -89,6 +91,7 @@ object TokitokiArgs {
 
 object TokitokiDestinations {
     const val SIGN_IN_ROUTE = SIGN_IN_SCREEN
+    const val SPLASH_ROUTE = SPLASH_SCREEN
     const val REGISTER_WITH_EMAIL_ROUTE = REGISTER_WITH_EMAIL_SCREEN
     const val EMAIL_VERIFICATION_ROUTE = EMAIL_VERIFICATION_SCREEN
     const val AGREEMENT_CONFIRMATION_ROUTE = AGREEMENT_CONFIRMATION_SCREEN
@@ -188,13 +191,6 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(IINE_SITA_HITO_SCREEN)
     }
 
-    fun navigateToSignInAndClearBackStack() {
-        navController.navigate(TokitokiScreens.SIGN_IN_SCREEN) {
-            popUpTo(0) { inclusive = true }
-            launchSingleTop = true
-        }
-    }
-
     fun navigateToUserDetail(userId: String, screenName: String) {
         navController.navigate("$USER_DETAIL_SCREEN?$USER_ID=${userId}&$SCREEN_NAME=${screenName}")
     }
@@ -217,5 +213,17 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
 
     fun navigateToMessageDetail(otherUserId: String, source: String?) {
         navController.navigate("$MESSAGE_DETAIL_SCREEN?$OTHER_USER_ID=${otherUserId}&$SOURCE=${source}")
+    }
+
+    fun navigateToSignInAndClearBackStack() {
+        navController.navigate(TokitokiDestinations.SIGN_IN_ROUTE) {
+            popUpTo(TokitokiDestinations.SPLASH_ROUTE) { inclusive = true }
+        }
+    }
+
+    fun navigateToMainAndClearBackStack() {
+        navController.navigate(TokitokiDestinations.MAIN_ROUTE) {
+            popUpTo(TokitokiDestinations.SPLASH_ROUTE) { inclusive = true }
+        }
     }
 }
