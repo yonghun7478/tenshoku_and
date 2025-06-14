@@ -304,6 +304,9 @@ fun TokitokiNavGraph(
                     onMainScreen = {
                         navAction.navigateToMain()
                     },
+                    onNavigateUp = {
+                        navController.navigateUp()
+                    }
                 )
             }
         }

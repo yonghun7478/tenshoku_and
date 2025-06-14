@@ -57,6 +57,7 @@ fun AboutMeMyProfileScreen(
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
     isFromMyPage: Boolean = false,
+    onNavigateUp: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,9 +82,14 @@ fun AboutMeMyProfileScreen(
                     when (event.action) {
                         AboutMeMyProfileAction.SUBMIT -> {
                             val result = viewModel.registerMyProfile()
-
                             if (result) {
-                                onMainScreen()
+                                if (isFromMyPage) {
+                                    // 마이페이지를 통해 접근한 경우, 프로필 저장 성공 시 별도의 화면 이동을 하지 않습니다.
+                                    // 사용자가 이전 화면(마이페이지)으로 돌아갈 수 있도록 합니다.
+                                    onNavigateUp()
+                                } else {
+                                    onMainScreen()
+                                }
                             }
                         }
 
