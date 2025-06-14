@@ -55,7 +55,8 @@ fun MainScreen(
     onNavigateToTagSearch: () -> Unit,
     onNavigateToMyTagList: () -> Unit,
     onNavigateToTagDetail: (String) -> Unit,
-    onNavigateToMessageDetail: (String, String) -> Unit
+    onNavigateToMessageDetail: (String, String) -> Unit,
+    onNavigateToAboutMeMyProfile: (String) -> Unit
 ) {
     // StateFlow를 사용하여 UI 상태를 관찰
     val uiState by viewModel.uiState.collectAsState()
@@ -84,7 +85,8 @@ fun MainScreen(
         onNavigateToMyTagList = onNavigateToMyTagList,
         onNavigateToTagDetail = onNavigateToTagDetail,
         onNavigateToMessageDetail = onNavigateToMessageDetail,
-        sharedViewModel = sharedViewModel
+        sharedViewModel = sharedViewModel,
+        onNavigateToAboutMeMyProfile = onNavigateToAboutMeMyProfile
     )
 }
 
@@ -101,7 +103,8 @@ fun MainContents(
     onNavigateToMyTagList: () -> Unit,
     onNavigateToTagDetail: (String) -> Unit,
     onNavigateToMessageDetail: (String, String) -> Unit,
-    sharedViewModel: SharedPickupViewModel
+    sharedViewModel: SharedPickupViewModel,
+    onNavigateToAboutMeMyProfile: (String) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -151,6 +154,7 @@ fun MainContents(
                         onFavoriteUsersClick = onFavoriteUsersClick,
                         onIineSitaHitoClick = onIineSitaHitoClick,
                         onNavigateToSignIn = onNavigateToSignIn,
+                        onNavigateToAboutMeMyProfile = onNavigateToAboutMeMyProfile
                     )
                 }
             }

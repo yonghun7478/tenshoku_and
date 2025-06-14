@@ -348,6 +348,10 @@ fun TokitokiNavGraph(
                 onNavigateToMessageDetail = { userId, source ->
                     navAction.navigateToMessageDetail(userId, source)
                 },
+                onNavigateToAboutMeMyProfile = {
+                    val uri = Uri.parse(Uri.decode(it))
+                    navAction.navigateToAboutMeMyProfile(uri)
+                },
                 sharedViewModel = sharedViewModel
             )
         }
