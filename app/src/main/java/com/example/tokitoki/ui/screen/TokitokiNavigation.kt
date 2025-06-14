@@ -12,6 +12,7 @@ import com.example.tokitoki.ui.screen.TokitokiArgs.USER_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.SCREEN_NAME
 import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.CATEGORY_NAME
+import com.example.tokitoki.ui.screen.TokitokiArgs.IS_FROM_MY_PAGE
 import com.example.tokitoki.ui.screen.TokitokiArgs.TAG_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.OTHER_USER_ID
 import com.example.tokitoki.ui.screen.TokitokiArgs.SOURCE
@@ -87,6 +88,7 @@ object TokitokiArgs {
     const val OTHER_USER_ID = "otherUserId"
     const val SOURCE = "source"
     const val INITIAL_TAB = "initialTab"
+    const val IS_FROM_MY_PAGE = "isFromMyPage"
 }
 
 object TokitokiDestinations {
@@ -104,7 +106,7 @@ object TokitokiDestinations {
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = "$ABOUT_ME_PHOTO_UPLOAD_SCREEN?$URI={$URI}&$IS_EDIT_MODE={$IS_EDIT_MODE}"
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}&$SELF_SENTENCE_IDS={$SELF_SENTENCE_IDS}"
-    const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}"
+    const val ABOUT_ME_MY_PROFILE_ROUTE = "$ABOUT_ME_MY_PROFILE_SCREEN?$URI={$URI}&$IS_FROM_MY_PAGE={$IS_FROM_MY_PAGE}"
     const val FAVORITE_TAG_ROUTE = FAVORITE_TAG_SCREEN
     const val FAVORITE_USERS_ROUTE = FAVORITE_USERS_SCREEN
     const val MAIN_ROUTE = MAIN_SCREEN
@@ -167,8 +169,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate("$ABOUT_ME_PROF_INPUT_SCREEN?$URI=${Uri.encode(uri.toString())}&$SELF_SENTENCE_IDS=${selfSentenceId}")
     }
 
-    fun navigateToAboutMeMyProfile(uri: Uri) {
-        navController.navigate("$ABOUT_ME_MY_PROFILE_SCREEN?$URI=${Uri.encode(uri.toString())}")
+    fun navigateToAboutMeMyProfile(uri: Uri, isFromMyPage: Boolean = false) {
+        navController.navigate("$ABOUT_ME_MY_PROFILE_SCREEN?$URI=${Uri.encode(uri.toString())}&$IS_FROM_MY_PAGE=${isFromMyPage}")
     }
 
     fun navigateToFavoriteTag() {

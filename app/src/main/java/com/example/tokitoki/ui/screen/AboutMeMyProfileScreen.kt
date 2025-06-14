@@ -56,6 +56,7 @@ fun AboutMeMyProfileScreen(
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
+    isFromMyPage: Boolean = false,
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -63,7 +64,8 @@ fun AboutMeMyProfileScreen(
     AboutMeMyProfileContents(
         uri = uiState.uri,
         myProfileItem = uiState.myProfileItem,
-        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
+        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction,
+        isFromMyPage = isFromMyPage
     )
 
     LaunchedEffect(Unit) {
@@ -124,7 +126,8 @@ fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
     uri: Uri = Uri.EMPTY,
     myProfileItem: MyProfileItem = MyProfileItem(),
-    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column {
         Column(
@@ -161,7 +164,8 @@ fun AboutMeMyProfileContents(
             )
         }
         AboutMeMyProfileBottomMenu(
-            aboutMeMyProfileAction = aboutMeMyProfileAction
+            aboutMeMyProfileAction = aboutMeMyProfileAction,
+            isFromMyPage = isFromMyPage
         )
     }
 }
@@ -598,6 +602,7 @@ fun AboutMeMyProfileProfBaseItem(
 fun AboutMeMyProfileBottomMenu(
     modifier: Modifier = Modifier,
     aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -608,7 +613,7 @@ fun AboutMeMyProfileBottomMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 5.dp),
-            text = "これではじめる",
+            text = if (isFromMyPage) "修正する" else "これではじめる",
             textColor = LocalColor.current.white,
             backgroundColor = LocalColor.current.blue,
             action = aboutMeMyProfileAction,

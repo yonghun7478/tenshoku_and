@@ -256,11 +256,18 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_FROM_MY_PAGE) { 
+                    type = NavType.BoolType
+                    defaultValue = false
+                 }
+            )
         ) { backStackEntry ->
 
             val uriStringFromArg = backStackEntry.arguments?.getString(TokitokiArgs.URI)
             val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
@@ -275,6 +282,7 @@ fun TokitokiNavGraph(
 
                 AboutMeMyProfileScreen(
                     uri = this,
+                    isFromMyPage = isFromMyPage, // Added this line
                     onAboutMeProfInputScreen = {
                         navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                     },
@@ -295,7 +303,7 @@ fun TokitokiNavGraph(
                     },
                     onMainScreen = {
                         navAction.navigateToMain()
-                    }
+                    },
                 )
             }
         }
@@ -350,7 +358,7 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToAboutMeMyProfile = {
                     val uri = Uri.parse(Uri.decode(it))
-                    navAction.navigateToAboutMeMyProfile(uri)
+                    navAction.navigateToAboutMeMyProfile(uri, true)
                 },
                 sharedViewModel = sharedViewModel
             )
