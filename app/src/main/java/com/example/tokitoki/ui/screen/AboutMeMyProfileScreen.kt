@@ -69,7 +69,7 @@ fun AboutMeMyProfileScreen(
         isFromMyPage = isFromMyPage
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uri) {
         viewModel.init(uri)
 
         viewModel.uiEvent.collect { event ->
