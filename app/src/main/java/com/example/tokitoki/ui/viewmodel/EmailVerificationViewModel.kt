@@ -69,7 +69,7 @@ class EmailVerificationViewModel @Inject constructor(
                         name = "더미 사용자",
                         birthDay = "1990-01-01",
                         isMale = true,
-                        mySelfSentenceId = 0,
+                        mySelfSentenceId = 1,
                         thumbnailUrl = ""
                     )
                     setMyProfileUseCase(myProfile = dummyProfile)
