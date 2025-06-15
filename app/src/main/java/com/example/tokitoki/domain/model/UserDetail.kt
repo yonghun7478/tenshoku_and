@@ -18,5 +18,7 @@ data class UserDetail(
     val marriageView: String = "",
     val personalityTraits: List<String> = emptyList(),
     val hobbies: List<String> = emptyList(),
-    val lifestyle: String = ""
+    val lifestyle: String = "",
+    val createdAt: Long = 0,
+    val lastLoginAt: Long = 0
 ) 

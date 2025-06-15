@@ -74,7 +74,9 @@ object DummyData {
             marriageView = marriageViews[userIdInt % marriageViews.size],
             personalityTraits = allPersonalityTraits.shuffled().take((userIdInt % 2) + 2),
             hobbies = allHobbies.shuffled().take((userIdInt % 2) + 2),
-            lifestyle = lifestyles[userIdInt % lifestyles.size]
+            lifestyle = lifestyles[userIdInt % lifestyles.size],
+            createdAt = (1609459200000..1672531199000).random(),
+            lastLoginAt = (1672531200000..1704067199000).random()
         )
     }
 } 
