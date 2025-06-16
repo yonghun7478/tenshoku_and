@@ -2,6 +2,8 @@ package com.example.tokitoki.data.dummy
 
 import com.example.tokitoki.domain.model.UserDetail
 import java.util.Calendar
+import com.example.tokitoki.domain.model.MainHomeTag
+import com.example.tokitoki.domain.model.TagType
 
 object DummyData {
 
@@ -17,17 +19,41 @@ object DummyData {
     )
 
     private val dummyUserDetails: List<UserDetail>
+    private val dummyHomeTags: List<MainHomeTag>
 
     init {
         dummyUserDetails = (1..150).map { id ->
             createUserDetail(id.toString())
         }
+        dummyHomeTags = createHomeTags()
     }
     
     fun getUsers(): List<UserDetail> = dummyUserDetails
     
     fun findUserById(id: String): UserDetail? {
         return dummyUserDetails.find { it.id == id }
+    }
+
+    fun getHomeTags(): List<MainHomeTag> = dummyHomeTags
+
+    private fun createHomeTags(): List<MainHomeTag> {
+        return listOf(
+            MainHomeTag("101", "맛집탐방", "전국의 숨겨진 맛집을 찾아 떠나요!", "https://picsum.photos/id/1/200/200", (50..300).random(), "1", TagType.HOBBY),
+            MainHomeTag("102", "여행에미치다", "아름다운 풍경과 새로운 문화를 경험해요.", "https://picsum.photos/id/2/200/200", (50..300).random(), "2", TagType.HOBBY),
+            MainHomeTag("103", "운동매니아", "함께 땀 흘리며 건강한 삶을 만들어요.", "https://picsum.photos/id/3/200/200", (50..300).random(), "3", TagType.HOBBY),
+            MainHomeTag("104", "개발자", "코드로 세상을 바꾸는 사람들", "https://picsum.photos/id/4/200/200", (50..300).random(), "4", TagType.LIFESTYLE),
+            MainHomeTag("105", "독서클럽", "책을 통해 지혜와 감동을 나눠요.", "https://picsum.photos/id/5/200/200", (50..300).random(), "5", TagType.HOBBY),
+            MainHomeTag("106", "영화광", "주말엔 영화와 함께! 인생 영화 공유해요.", "https://picsum.photos/id/6/200/200", (50..300).random(), "6", TagType.LIFESTYLE),
+            MainHomeTag("107", "음악없인못살아", "나만의 플레이리스트를 공유해보세요.", "https://picsum.photos/id/7/200/200", (50..300).random(), "6", TagType.LIFESTYLE),
+            MainHomeTag("108", "댕댕이그램", "귀여운 강아지 사진 자랑해요.", "https://picsum.photos/id/8/200/200", (50..300).random(), "7", TagType.LIFESTYLE),
+            MainHomeTag("109", "냥집사모임", "고양이의 매력에 빠져보세요.", "https://picsum.photos/id/9/200/200", (50..300).random(), "7", TagType.LIFESTYLE),
+            MainHomeTag("110", "패셔니스타", "오늘의 OOTD! 나만의 스타일을 뽐내요.", "https://picsum.photos/id/10/200/200", (50..300).random(), "8", TagType.LIFESTYLE),
+            MainHomeTag("111", "요리왕", "나만의 비밀 레시피를 공개합니다.", "https://picsum.photos/id/11/200/200", (50..300).random(), "1", TagType.HOBBY),
+            MainHomeTag("112", "캠핑족", "자연 속에서 즐기는 힐링 타임.", "https://picsum.photos/id/12/200/200", (50..300).random(), "2", TagType.HOBBY),
+            MainHomeTag("113", "진지한만남", "가벼운 관계보다는 깊이 있는 인연을 찾아요.", "https://picsum.photos/id/20/200/200", (10..100).random(), "10", TagType.VALUE),
+            MainHomeTag("114", "긍정적인사람", "밝고 긍정적인 에너지를 가진 분 환영해요.", "https://picsum.photos/id/21/200/200", (10..100).random(), "10", TagType.VALUE),
+            MainHomeTag("115", "함께성장", "서로에게 배우고 함께 성장하는 관계를 원해요.", "https://picsum.photos/id/22/200/200", (10..100).random(), "10", TagType.VALUE)
+        )
     }
 
     private fun createUserDetail(userId: String): UserDetail {

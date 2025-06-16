@@ -84,14 +84,38 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 
     override suspend fun getUserDetail(userId: String): ResultWrapper<UserDetail> {
         return try {
-            val user = DummyData.findUserById(userId)
-            if (user != null) {
-                ResultWrapper.Success(user)
+            val userDetail = DummyData.findUserById(userId)
+            if (userDetail != null) {
+                ResultWrapper.Success(userDetail)
             } else {
-                ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError("User not found for ID: $userId"))
+                ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError("User not found"))
             }
         } catch (e: Exception) {
-            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Error fetching user detail for ID: $userId"))
+            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getUsersByIds(
+        userIds: List<String>
+    ): ResultWrapper<List<User>> {
+        return try {
+            val allUsers = DummyData.getUsers()
+            val targetUsers = allUsers.filter { userIds.contains(it.id) }
+
+            // lastLoginAt 기준으로 정렬
+            val sortedUsers = targetUsers.sortedByDescending { it.lastLoginAt }
+
+            ResultWrapper.Success(
+                sortedUsers.map { userDetail ->
+                    User(
+                        id = userDetail.id,
+                        thumbnailUrl = userDetail.thumbnailUrl,
+                        age = userDetail.age,
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
         }
     }
 
@@ -101,41 +125,6 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
-        }
-    }
-
-    override suspend fun getTagSubscribers(
-        tagId: String,
-        cursor: String?,
-        limit: Int
-    ): ResultWrapper<UserList> {
-        return try {
-            kotlinx.coroutines.delay(500)
-
-            val sortedUsers = dummyUsers.sortedByDescending { it.lastLoginAt }
-
-            val startIndex = cursor?.let { c ->
-                sortedUsers.indexOfFirst { it.id == c } + 1
-            } ?: 0
-
-            val pagedUsers = sortedUsers.drop(startIndex).take(limit)
-
-            val nextCursor = pagedUsers.lastOrNull()?.id
-            val isLastPage = (startIndex + pagedUsers.size) >= sortedUsers.size
-
-            ResultWrapper.Success(
-                UserList(
-                    users = pagedUsers.map(UserConverter::dataToDomain),
-                    nextCursor = if (isLastPage) null else nextCursor,
-                    isLastPage = isLastPage
-                )
-            )
-        } catch (e: Exception) {
-            ResultWrapper.Error(
-                ResultWrapper.ErrorType.ExceptionError(
-                    e.message ?: "Unknown error"
-                )
-            )
         }
     }
 }

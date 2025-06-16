@@ -1,7 +1,6 @@
 package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.domain.model.TagType
-import com.example.tokitoki.data.model.toDomain
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
 import com.example.tokitoki.domain.repository.TagRepository
@@ -13,69 +12,46 @@ class MainHomeTagRepositoryImpl @Inject constructor(
 ) : MainHomeTagRepository {
 
     override suspend fun getTodayTag(): Result<MainHomeTag> {
-        delay(500)
-        val allTags = tagRepository.getAllTags().getOrThrow()
-        return Result.success(allTags[0])
+        // TagRepository에서 모든 태그를 가져와 첫 번째 태그를 "오늘의 태그"로 반환합니다.
+        return tagRepository.getAllTags().map { tags ->
+            tags.first()
+        }
     }
 
     override suspend fun getTrendingTags(): Result<List<MainHomeTag>> {
-        delay(700)
-        val allTags = tagRepository.getAllTags().getOrThrow()
-        return Result.success(listOf(
-            allTags[1],
-            allTags[2],
-            allTags[3],
-            allTags[4],
-            allTags[5],
-            allTags[6]
-        ))
+        // TagRepository에서 모든 태그를 가져와 구독자 수 기준으로 정렬하여 상위 10개를 "인기 태그"로 반환합니다.
+        return tagRepository.getAllTags().map { tags ->
+            tags.sortedByDescending { it.subscriberCount }.take(10)
+        }
     }
 
     override suspend fun getMyTags(): Result<List<MainHomeTag>> {
-        delay(300)
-        val allTags = tagRepository.getAllTags().getOrThrow()
-        return Result.success(listOf(
-            allTags[7],
-            allTags[8],
-            allTags[9],
-            allTags[10],
-            allTags[11]
-        ))
+        // TagRepository를 통해 현재 사용자가 구독한 태그 목록을 가져옵니다.
+        return tagRepository.getAllTags().map { allTags ->
+            allTags.filter { tagRepository.isTagSubscribed(it.id) }
+        }
     }
 
     override suspend fun getSuggestedTags(): Result<List<MainHomeTag>> {
-        delay(400)
-        val allTags = tagRepository.getAllTags().getOrThrow()
-        return Result.success(listOf(
-            allTags[12],
-            allTags[13],
-            allTags[14],
-            allTags[15],
-            allTags[16],
-            allTags[17]
-        ))
+        // TagRepository에서 모든 태그를 가져와 그 중 일부를 "추천 태그"로 반환합니다. (현재는 랜덤 10개)
+        return tagRepository.getAllTags().map { tags ->
+            tags.shuffled().take(10)
+        }
     }
 
     override suspend fun getTagsByCategory(categoryId: String): Result<List<MainHomeTag>> {
-        return try {
-            delay(1000)
-            val tags = tagRepository.getAllTags().getOrThrow().filter { it.categoryId == categoryId }
-            Result.success(tags)
-        } catch (e: Exception) {
-            Result.failure(e)
+        // 특정 카테고리의 태그들을 TagRepository에서 가져옵니다. (이 기능은 TagRepository에 추가 필요)
+        // 임시로 전체 태그에서 필터링합니다.
+        return tagRepository.getAllTags().map { tags ->
+            tags.filter { it.categoryId == categoryId }
         }
     }
 
     override suspend fun getTagsByQuery(query: String): Result<List<MainHomeTag>> {
-        return try {
-            delay(500)
-            val filtered = tagRepository.getAllTags().getOrThrow().filter {
-                it.name.contains(query, ignoreCase = true) ||
-                it.description.contains(query, ignoreCase = true)
-            }
-            Result.success(filtered)
-        } catch (e: Exception) {
-            Result.failure(e)
+        // 특정 쿼리로 태그를 검색합니다. (이 기능은 TagRepository에 추가 필요)
+        // 임시로 전체 태그에서 필터링합니다.
+        return tagRepository.getAllTags().map { tags ->
+            tags.filter { it.name.contains(query, ignoreCase = true) }
         }
     }
 
