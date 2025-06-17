@@ -30,6 +30,7 @@ import com.example.tokitoki.domain.model.User
 import com.example.tokitoki.ui.state.TagDetailUiState
 import com.example.tokitoki.ui.viewmodel.TagDetailViewModel
 import androidx.compose.material.icons.filled.ArrowBack
+import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @Composable
 fun TagDetailScreen(
@@ -48,7 +49,11 @@ fun TagDetailScreen(
     TagDetailScreenContents(
         uiState = uiState,
         onLoadMoreSubscribers = { viewModel.loadMoreSubscribers(tagId) },
-        onSubscriptionToggle = { viewModel.toggleSubscription(tagId) },
+        onSubscriptionToggle = { isSubscribed, tagType ->
+            uiState.tag?.let { tag ->
+                viewModel.toggleSubscription(tagId, isSubscribed, tagType)
+            }
+        },
         onNavigateUp = onNavigateUp,
         onNavigateToUserDetail = { userId, screenName ->
             viewModel.addUserIdsToCache()
@@ -62,7 +67,7 @@ fun TagDetailScreen(
 fun TagDetailScreenContents(
     uiState: TagDetailUiState,
     onLoadMoreSubscribers: () -> Unit,
-    onSubscriptionToggle: () -> Unit,
+    onSubscriptionToggle: (Boolean, TagType) -> Unit,
     onNavigateUp: () -> Unit,
     onNavigateToUserDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -149,7 +154,7 @@ fun TagDetailScreenContents(
                 Spacer(Modifier.height(16.dp))
 
                 Button(
-                    onClick = onSubscriptionToggle,
+                    onClick = { onSubscriptionToggle(uiState.isSubscribed, tag.tagType) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
@@ -289,7 +294,7 @@ fun TagDetailScreenContentsPreview() {
                 error = null
             ),
             onLoadMoreSubscribers = {},
-            onSubscriptionToggle = {},
+            onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
             onNavigateToUserDetail = { _, _ -> }
         )
@@ -317,7 +322,7 @@ fun TagDetailScreenContentsEmptyPreview() {
                 error = null
             ),
             onLoadMoreSubscribers = {},
-            onSubscriptionToggle = {},
+            onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
             onNavigateToUserDetail = { _, _ -> }
         )
@@ -331,7 +336,7 @@ fun TagDetailScreenLoadingPreview() {
         TagDetailScreenContents(
             uiState = TagDetailUiState(isLoading = true),
             onLoadMoreSubscribers = {},
-            onSubscriptionToggle = {},
+            onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
             onNavigateToUserDetail = { _, _ -> }
         )
@@ -345,7 +350,58 @@ fun TagDetailScreenErrorPreview() {
         TagDetailScreenContents(
             uiState = TagDetailUiState(error = "데이터를 불러오는데 실패했습니다."),
             onLoadMoreSubscribers = {},
-            onSubscriptionToggle = {},
+            onSubscriptionToggle = { _, _ -> },
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoadingTagDetailScreenPreview() {
+    TokitokiTheme {
+        TagDetailScreenContents(
+            uiState = TagDetailUiState(isLoading = true),
+            onLoadMoreSubscribers = {},
+            onSubscriptionToggle = { _, _ -> },
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ErrorTagDetailScreenPreview() {
+    TokitokiTheme {
+        TagDetailScreenContents(
+            uiState = TagDetailUiState(error = "데이터를 불러오는데 실패했습니다."),
+            onLoadMoreSubscribers = {},
+            onSubscriptionToggle = { _, _ -> },
+            onNavigateUp = {},
+            onNavigateToUserDetail = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NoSubscribersTagDetailScreenPreview() {
+    TokitokiTheme {
+        TagDetailScreenContents(
+            uiState = TagDetailUiState(tag = MainHomeTag(
+                id = "1",
+                name = "독서",
+                description = "책 읽는 것을 좋아하는 사람들의 모임",
+                imageUrl = "https://picsum.photos/200/300?random=1",
+                subscriberCount = 0,
+                categoryId = "101",
+                tagType = TagType.HOBBY,
+                isSubscribed = false
+            )),
+            onLoadMoreSubscribers = {},
+            onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
             onNavigateToUserDetail = { _, _ -> }
         )

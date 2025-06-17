@@ -115,7 +115,7 @@ fun MainHomeMyTagScreen(
         onNavigateToTagSearch = onNavigateToTagSearch,
         onNavigateToMyTagList = onNavigateToMyTagList,
         onNavigateToTagDetail = onNavigateToTagDetail,
-        onTagToggleSubscription = { tagId, isSubscribed -> viewModel.onTagToggleSubscription(tagId, isSubscribed) }
+        onTagToggleSubscription = { tagId, isSubscribed, tagType -> viewModel.onTagToggleSubscription(tagId, isSubscribed, tagType) }
     )
 }
 
@@ -139,7 +139,7 @@ fun MainHomeMyTagScreenContent(
     onNavigateToTagSearch: () -> Unit,
     onNavigateToMyTagList: () -> Unit,
     onNavigateToTagDetail: (String) -> Unit,
-    onTagToggleSubscription: (String, Boolean) -> Unit
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -348,7 +348,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
     tags: List<MainHomeTagItemUiState>,
     isLoading: Boolean = false,
     onTagClick: (String) -> Unit = {},
-    onTagToggleSubscription: (String, Boolean) -> Unit
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     // pageCount를 tags.size로 직접 지정
     val pagerState = rememberPagerState(initialPage = 0) {
@@ -456,7 +456,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
 fun MainHomeMyTagScreen_TrendingTagCard(
     tag: MainHomeTagItemUiState,
     onClick: () -> Unit = {},
-    onTagToggleSubscription: (String, Boolean) -> Unit,
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -538,7 +538,7 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        onTagToggleSubscription(tag.id, tag.isSubscribed)
+                        onTagToggleSubscription(tag.id, tag.isSubscribed, tag.tagType)
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -639,7 +639,7 @@ fun MainHomeMyTagScreen_MyTagCard(
 fun MainHomeMyTagScreen_SuggestedTagCard(
     tag: MainHomeTagItemUiState,
     onClick: () -> Unit = {},
-    onTagToggleSubscription: (String, Boolean) -> Unit,
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -919,7 +919,7 @@ fun MainHomeMyTagScreen_SuggestedTags(
     isLoading: Boolean = false,
     onLoadMore: () -> Unit = {},
     onTagClick: (String) -> Unit = {},
-    onTagToggleSubscription: (String, Boolean) -> Unit
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -1181,7 +1181,7 @@ fun MainHomeMyTagScreenPreview() {
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
             onNavigateToTagDetail = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1202,7 +1202,7 @@ fun MainHomeMyTagScreenLoadingPreview() {
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
             onNavigateToTagDetail = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1219,7 +1219,7 @@ fun MainHomeMyTagScreenEmptyPreview() {
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
             onNavigateToTagDetail = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1260,7 +1260,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
                 )
             ),
             isLoading = false,
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1272,7 +1272,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsLoadingPreview() {
         MainHomeMyTagScreen_TodayAndTrendingTags(
             tags = emptyList(),
             isLoading = true,
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
 
         )
     }
@@ -1376,7 +1376,7 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
             isLoading = false,
             onLoadMore = {},
             onTagClick = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1391,7 +1391,7 @@ fun MainHomeMyTagScreen_SuggestedTagsLoadingPreview() {
             isLoading = true,
             onLoadMore = {},
             onTagClick = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1406,7 +1406,7 @@ fun MainHomeMyTagScreen_SuggestedTagsEmptyPreview() {
             isLoading = false,
             onLoadMore = {},
             onTagClick = {},
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1425,7 +1425,7 @@ fun MainHomeMyTagScreen_TrendingTagCardPreview() {
                 categoryId = "1",
                 tagType = TagType.HOBBY
             ),
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1462,7 +1462,7 @@ fun MainHomeMyTagScreen_SuggestedTagCardPreview() {
                 categoryId = "3",
                 tagType = TagType.VALUE
             ),
-            onTagToggleSubscription = { _, _ -> }
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }

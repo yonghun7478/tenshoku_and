@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.common.ResultWrapper.ErrorType
-import com.example.tokitoki.domain.usecase.GetTagDetailUseCase
-import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
-import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
+import com.example.tokitoki.domain.model.MyTag
+import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
+import com.example.tokitoki.domain.usecase.GetTagDetailUseCase
+import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
+import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
+import com.example.tokitoki.domain.usecase.SetMyTagUseCase
+import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCase
 import com.example.tokitoki.ui.state.TagDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -24,6 +28,8 @@ class TagDetailViewModel @Inject constructor(
     private val isTagSubscribedUseCase: IsTagSubscribedUseCase,
     private val getTagSubscribersUseCase: GetTagSubscribersUseCase,
     private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase,
+    private val setMyTagUseCase: SetMyTagUseCase,
+    private val removeUserTagUseCase: RemoveUserTagUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TagDetailUiState())
     val uiState: StateFlow<TagDetailUiState> = _uiState.asStateFlow()
@@ -41,8 +47,8 @@ class TagDetailViewModel @Inject constructor(
                 val isSubscribed = subscribedDeferred.await()
                 val subscribersResult = subscribersDeferred.await()
 
-                tagResult.onSuccess { tag ->
-                    _uiState.update { it.copy(tag = tag) }
+                tagResult.onSuccess { result ->
+                    _uiState.update { it.copy(tag = result) }
                 }.onFailure { e ->
                     _uiState.update { it.copy(error = e?.message, isLoading = false) }
                     return@launch
@@ -81,31 +87,28 @@ class TagDetailViewModel @Inject constructor(
         }
     }
 
-    fun toggleSubscription(tagId: String) {
+    fun toggleSubscription(tagId: String, isCurrentlySubscribed: Boolean, tagType: TagType) {
         viewModelScope.launch {
-//            _uiState.update { it.copy(isLoading = true) }
-//            try {
-//                val result = if (uiState.value.isSubscribed) {
-//                    unsubscribeTagUseCase(tagId)
-//                } else {
-//                    subscribeTagUseCase(tagId)
-//                }
-//                result.fold(
-//                    onSuccess = {
-//                        _uiState.update { currentState ->
-//                            currentState.copy(
-//                                isSubscribed = !currentState.isSubscribed,
-//                                error = null
-//                            )
-//                        }
-//                    },
-//                    onFailure = { exception ->
-//                        _uiState.update { it.copy(error = exception.message ?: "구독 상태 변경에 실패했습니다.") }
-//                    }
-//                )
-//            } finally {
-//                _uiState.update { it.copy(isLoading = false) }
-//            }
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val result = if (isCurrentlySubscribed) {
+                    removeUserTagUseCase(tagId.toInt())
+                    Result.success(Unit)
+                } else {
+                    setMyTagUseCase(listOf(MyTag(tagId = tagId.toInt(), tagTypeId = tagType.ordinal)))
+                }
+                result.fold(
+                    onSuccess = {
+                        // 구독 상태 변경 후 상세 정보 새로 로드
+                        loadTagDetail(tagId)
+                    },
+                    onFailure = { exception ->
+                        _uiState.update { it.copy(error = exception.message ?: "구독 상태 변경에 실패했습니다.") }
+                    }
+                )
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
