@@ -14,8 +14,9 @@ class MainHomeTagRepositoryImpl @Inject constructor(
     override suspend fun getTodayTag(): Result<MainHomeTag> {
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그 중 첫 번째 태그를 "오늘의 태그"로 반환합니다.
         return tagRepository.getAllTags().map { tags ->
-            val unsubscribedTags = tags.filterNot { tagRepository.isTagSubscribed(it.id) }
-            unsubscribedTags.first().copy(isSubscribed = false)
+            // 모든 태그 중 첫 번째 태그를 가져오고, 해당 태그의 구독 상태를 설정합니다.
+            val todayTag = tags.first()
+            todayTag.copy(isSubscribed = tagRepository.isTagSubscribed(todayTag.id))
         }
     }
 
@@ -23,10 +24,10 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그들 중에서
         // 구독자 수 기준으로 정렬하여 상위 10개를 "인기 태그"로 반환합니다.
         return tagRepository.getAllTags().map { tags ->
-            tags.filterNot { tagRepository.isTagSubscribed(it.id) }
-                .sortedByDescending { it.subscriberCount }
+            // 모든 태그를 가져와 구독자 수 기준으로 정렬하고, 각 태그의 구독 상태를 설정합니다.
+            tags.sortedByDescending { it.subscriberCount }
                 .take(5)
-                .map { it.copy(isSubscribed = false) }
+                .map { it.copy(isSubscribed = tagRepository.isTagSubscribed(it.id)) }
         }
     }
 
@@ -44,10 +45,10 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그들 중에서
         // 그 중 일부를 "추천 태그"로 반환합니다. (현재는 랜덤 10개)
         return tagRepository.getAllTags().map { tags ->
-            tags.filterNot { tagRepository.isTagSubscribed(it.id) } // 구독하지 않은 태그만 필터링
-                .shuffled().take(10).map { tag ->
-                    tag.copy(isSubscribed = false) // 구독하지 않았으므로 isSubscribed는 false
-                }
+            // 모든 태그를 가져와 랜덤 10개를 반환하고 각 태그의 구독 상태를 설정합니다.
+            tags.shuffled().take(10).map { tag ->
+                tag.copy(isSubscribed = tagRepository.isTagSubscribed(tag.id)) // 구독 여부에 따라 isSubscribed 설정
+            }
         }
     }
 
