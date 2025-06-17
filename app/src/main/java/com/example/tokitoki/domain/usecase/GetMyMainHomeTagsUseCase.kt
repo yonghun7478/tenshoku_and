@@ -10,7 +10,6 @@ interface GetMyMainHomeTagsUseCase{
     suspend operator fun invoke(): Result<List<MainHomeTag>>
 }
 class GetMyMainHomeTagsUseCaseImpl @Inject constructor(
-    private val mainHomeTagRepository: MainHomeTagRepository,
     private val myProfileRepository: MyProfileRepository,
     private val tagRepository: TagRepository
 ): GetMyMainHomeTagsUseCase{

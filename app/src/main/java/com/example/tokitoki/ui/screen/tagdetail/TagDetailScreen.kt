@@ -90,7 +90,7 @@ fun TagDetailScreenContents(
         return
     }
 
-    uiState.tag?.let { tag ->
+    uiState.tag?.let { actualTag ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -129,8 +129,8 @@ fun TagDetailScreenContents(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = rememberAsyncImagePainter(model = tag.imageUrl),
-                        contentDescription = tag.name,
+                        painter = rememberAsyncImagePainter(model = actualTag.imageUrl),
+                        contentDescription = actualTag.name,
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape),
@@ -139,13 +139,13 @@ fun TagDetailScreenContents(
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = tag.name,
+                            text = actualTag.name,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "총 ${tag.subscriberCount}명 구독중",
+                            text = "총 ${actualTag.subscriberCount}명 구독중",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -154,7 +154,7 @@ fun TagDetailScreenContents(
                 Spacer(Modifier.height(16.dp))
 
                 Button(
-                    onClick = { onSubscriptionToggle(uiState.isSubscribed, tag.tagType) },
+                    onClick = { onSubscriptionToggle(uiState.isSubscribed, actualTag.tagType) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(

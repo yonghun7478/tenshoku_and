@@ -60,8 +60,8 @@ class MyProfileRepositoryImpl @Inject constructor(
         myTagDao.deleteMyTag(tagId)
     }
 
-    override suspend fun getUserTagsByCategoryId(categoryId: Int): List<MyTag> {
-        return myTagDao.getTagsByCategoryId(categoryId = categoryId)
+    override suspend fun getUserTagsByTagTypeId(tagTypeId: Int): List<MyTag> {
+        return myTagDao.getTagsByTagTypeId(tagTypeId = tagTypeId)
             .map { MyTagConverter.entityToDomain(it) }
     }
 
@@ -74,8 +74,6 @@ class MyProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isTagSubscribed(tagId: String): Boolean {
-        // TODO: 실제 구현에서는 DAO를 사용하여 구독 여부를 확인해야 함
-        // 현재는 더미 데이터로 구현 (임의로 true/false 반환)
-        return tagId.toIntOrNull()?.rem(2) == 0
+        return myTagDao.isTagExists(tagId.toInt())
     }
 }
