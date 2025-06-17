@@ -162,46 +162,6 @@ fun AshiatoUserCard(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop // 이미지 비율 유지하며 채우기
                 )
-
-                // "NEW" 배지 (조건부 표시 - 로직 필요)
-                // 여기서는 예시로 항상 표시
-                Badge(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(4.dp),
-                    containerColor = Color(0xFFFFA500) // 주황색 계열
-                ) {
-                    Text("NEW", fontSize = 10.sp, color = Color.White)
-                }
-
-                // 별 아이콘 (오른쪽 상단)
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "즐겨찾기",
-                    tint = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp)
-                        .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                        .padding(4.dp)
-                        .size(16.dp)
-                )
-
-                // 좋아요 아이콘 (하단 중앙)
-                Icon(
-                    imageVector = Icons.Filled.ThumbUp,
-                    contentDescription = "좋아요",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(all = 6.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                            CircleShape
-                        )
-                        .padding(6.dp)
-                        .size(16.dp)
-                )
             } // Box 끝
 
             // 사용자 정보 텍스트

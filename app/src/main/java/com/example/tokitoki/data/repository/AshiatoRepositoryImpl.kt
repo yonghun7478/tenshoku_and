@@ -1,5 +1,6 @@
 package com.example.tokitoki.data.repository
 
+import com.example.tokitoki.data.dummy.DummyData
 import com.example.tokitoki.data.model.AshiatoData
 import com.example.tokitoki.data.model.AshiatoViewer
 import com.example.tokitoki.data.model.DailyAshiato
@@ -20,10 +21,52 @@ import kotlin.random.Random
 class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
 
     // 날짜 포맷터
-    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE //<y_bin_46>-MM-dd
+    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE // yyyy-MM-dd
 
-    // 전체 더미 데이터를 AshiatoData 객체에 담아 관리
-    private val fullDummyAshiatoData: AshiatoData = generateFullDummyAshiatoData(30)
+    private val CURRENT_USER_ID = "0" // 현재 사용자의 ID를 "0"으로 고정
+    private val viewedPairs: MutableSet<Pair<String, String>> = mutableSetOf() // (조회한 사람 ID, 조회된 프로필 ID)
+
+    // 현재 사용자의 발자국 로그를 저장할 리스트
+    private val currentUserAshiatoLogs: MutableList<DailyAshiato> = mutableListOf()
+
+    init {
+        val users = DummyData.getUsers()
+        val today = LocalDate.now()
+
+        // 지난 30일 동안의 더미 발자국 데이터 생성 (현재 사용자의 프로필을 방문한 경우)
+        for (i in 0 until 30) {
+            val date = today.minusDays(i.toLong())
+            val dateString = date.format(dateFormatter)
+            val viewerCount = Random.nextInt(1, 8) // 하루 방문자 수 (1~7명 랜덤)
+
+            val dailyViewers = mutableListOf<AshiatoViewer>()
+            for (j in 0 until viewerCount) {
+                val randomViewer = users.random()
+                // 방문자가 현재 사용자가 아닌 경우에만 유효한 발자국으로 간주
+                if (randomViewer.id != CURRENT_USER_ID) {
+                    viewedPairs.add(Pair(randomViewer.id, CURRENT_USER_ID)) // (조회한 사람 ID, 조회된 프로필 ID)
+
+                    val hour = Random.nextInt(0, 24)
+                    val minute = Random.nextInt(0, 60)
+                    dailyViewers.add(
+                        AshiatoViewer(
+                            userId = randomViewer.id,
+                            thumbnailUrl = randomViewer.thumbnailUrl,
+                            age = randomViewer.age,
+                            region = randomViewer.location, // UserDetail의 location을 region으로 사용
+                            viewedTime = "%02d:%02d".format(hour, minute)
+                        )
+                    )
+                }
+            }
+            // 해당 날짜에 발자국이 있을 경우에만 로그 추가
+            if (dailyViewers.isNotEmpty()) {
+                dailyViewers.sortByDescending { it.viewedTime } // 시간 내림차순 정렬 (최신순)
+                currentUserAshiatoLogs.add(DailyAshiato(date = dateString, viewers = dailyViewers))
+            }
+        }
+        currentUserAshiatoLogs.sortByDescending { it.date } // 날짜 내림차순 정렬 (최신순)
+    }
 
     /**
      * 아시아토 목록 페이지를 가져오는 함수 구현 (AshiatoData 기반 더미 데이터 사용)
@@ -34,7 +77,7 @@ class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
 
         try {
             val pageSize = limit ?: 7 // 기본 페이지 크기 (예: 7일치 데이터)
-            val allDailyLogs = fullDummyAshiatoData.dailyAshiatoList // 전체 데이터 리스트 접근
+            val allDailyLogs = currentUserAshiatoLogs // 현재 사용자의 발자국 데이터 사용
 
             // 1. 커서를 기준으로 필터링
             val filteredDailyData: List<DailyAshiato> = if (cursor == null) {
@@ -73,44 +116,5 @@ class AshiatoRepositoryImpl @Inject constructor() : AshiatoRepository {
             println("Error fetching Ashiato page: ${e.message}")
             return Result.failure(e)
         }
-    }
-
-    /**
-     * 테스트용 전체 더미 데이터를 생성하는 함수 (AshiatoData 형태 반환)
-     * @param days 생성할 과거 일수
-     * @return AshiatoData 전체 더미 데이터
-     */
-    private fun generateFullDummyAshiatoData(days: Int): AshiatoData {
-        val regions = listOf("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
-        val today = LocalDate.now()
-        val dailyList = mutableListOf<DailyAshiato>()
-
-        for (i in 0 until days) {
-            val date = today.minusDays(i.toLong())
-            val dateString = date.format(dateFormatter)
-            val viewerCount = Random.nextInt(1, 8) // 하루 방문자 수 (1~7명 랜덤)
-            val viewers = mutableListOf<AshiatoViewer>()
-
-            for (j in 0 until viewerCount) {
-                val hour = Random.nextInt(0, 24)
-                val minute = Random.nextInt(0, 60)
-                viewers.add(
-                    AshiatoViewer(
-                        userId = "${(1..150).random()}",
-                        thumbnailUrl = "https://dimg.donga.com/wps/NEWS/IMAGE/2024/10/23/130275989.1.jpg", // Placeholder 이미지
-                        age = Random.nextInt(20, 40),
-                        region = regions.random(),
-                        viewedTime = "%02d:%02d".format(hour, minute)
-                    )
-                )
-            }
-            // 시간 내림차순 정렬 (최신순)
-            viewers.sortByDescending { it.viewedTime }
-            dailyList.add(DailyAshiato(date = dateString, viewers = viewers))
-        }
-        // 날짜 내림차순 정렬 (최신순) - 이미 생성 순서가 최신순이지만 명시적으로 정렬
-        dailyList.sortByDescending { it.date }
-        // 생성된 리스트를 AshiatoData로 감싸서 반환
-        return AshiatoData(dailyAshiatoList = dailyList)
     }
 }
