@@ -10,7 +10,8 @@ data class MainHomeTagData(
     val imageUrl: String,
     val subscriberCount: Int,
     val categoryId: String,
-    val tagType: TagType
+    val tagType: TagType,
+    val isSubscribed: Boolean = false
 )
 
 fun MainHomeTagData.toDomain(): MainHomeTag {
@@ -21,7 +22,8 @@ fun MainHomeTagData.toDomain(): MainHomeTag {
         imageUrl = imageUrl,
         subscriberCount = subscriberCount,
         categoryId = categoryId,
-        tagType = tagType
+        tagType = tagType,
+        isSubscribed = isSubscribed
     )
 }
 
@@ -33,6 +35,7 @@ fun MainHomeTag.toData(): MainHomeTagData {
         imageUrl = imageUrl,
         subscriberCount = subscriberCount,
         categoryId = categoryId,
-        tagType = tagType
+        tagType = tagType,
+        isSubscribed = isSubscribed
     )
 }

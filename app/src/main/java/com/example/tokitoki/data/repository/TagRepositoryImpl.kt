@@ -82,4 +82,37 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
             ResultWrapper.Error(ResultWrapper.ErrorType.ExceptionError(e.message ?: "Unknown error"))
         }
     }
+
+    override suspend fun getUserSubscribedTags(userId: String): Result<List<MainHomeTag>> {
+        return try {
+            // 특정 userId가 구독한 태그 ID들을 subscriptions 셋에서 찾습니다.
+            val subscribedTagIds = subscriptions.filter { it.first == userId }.map { it.second }.toSet()
+
+            // 모든 태그 중에서 해당 ID를 가진 태그들을 필터링합니다.
+            val userSubscribedTags = allHomeTags.filter { subscribedTagIds.contains(it.id) }
+
+            // 필터링된 태그들의 isSubscribed를 true로 설정하여 반환합니다.
+            Result.success(userSubscribedTags.map { it.copy(isSubscribed = true) })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun subscribeTag(tagId: String): Result<Unit> {
+        return try {
+            subscriptions.add(currentUserId to tagId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun unsubscribeTag(tagId: String): Result<Unit> {
+        return try {
+            subscriptions.remove(currentUserId to tagId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
