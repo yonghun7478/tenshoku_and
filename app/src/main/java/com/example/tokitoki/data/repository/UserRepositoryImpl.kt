@@ -26,15 +26,6 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
         "https://cdn.hankooki.com/news/photo/202503/243191_338487_1743185951.jpg",
         "https://img.hankyung.com/photo/202504/03.39959436.1.jpg"
     )
-    private val dummyUsers: List<UserEntity> = (1..150).map { id ->
-        UserEntity(
-            id = id.toString(),
-            thumbnailUrl = thumbnailUrls.random(),
-            age = (18..60).random(),
-            createdAt = (1609459200..1672531199).random().toLong(),
-            lastLoginAt = (1672531200..1704067199).random().toLong()
-        )
-    }
 
     private val allUsers: List<UserDetail> = DummyData.getUsers()
 
