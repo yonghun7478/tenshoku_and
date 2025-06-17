@@ -128,6 +128,8 @@ import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCase
 import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetMyTagsByTagTypeUseCase
+import com.example.tokitoki.domain.usecase.GetMyTagsByTagTypeUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -503,4 +505,10 @@ abstract class UseCaseModule {
     abstract fun bindRemoveUserTagUseCase(
         impl: RemoveUserTagUseCaseImpl
     ): RemoveUserTagUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetMyTagsByTagTypeUseCase(
+        impl: GetMyTagsByTagTypeUseCaseImpl
+    ): GetMyTagsByTagTypeUseCase
 }
