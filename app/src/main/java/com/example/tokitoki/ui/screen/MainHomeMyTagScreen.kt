@@ -77,6 +77,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import android.util.Log
+import kotlinx.coroutines.flow.collectLatest
+
+private const val TAG = "MainHomeMyTagScreen"
 
 /**
  * 메인 홈 화면의 마이태그 섹션을 표시하는 메인 컴포저블
@@ -95,6 +102,16 @@ fun MainHomeMyTagScreen(
     val uiState by viewModel.uiState.collectAsState()
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner) {
+        // 화면이 RESUMED 상태가 될 때마다 태그 목록을 새로고침
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            Log.d(TAG, "Lifecycle RESUMED. Calling refreshMyAndSuggestedTags().")
+            viewModel.refreshMyAndSuggestedTags()
+        }
+    }
 
     // 스낵바 메시지 처리
     LaunchedEffect(uiState.snackbarMessage) {
@@ -1273,7 +1290,6 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsLoadingPreview() {
             tags = emptyList(),
             isLoading = true,
             onTagToggleSubscription = { _, _, _ -> }
-
         )
     }
 }

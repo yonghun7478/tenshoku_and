@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.util.Log
+
+private const val TAG = "MainHomeMyTagViewModel"
 
 @HiltViewModel
 class MainHomeMyTagViewModel @Inject constructor(
@@ -36,13 +39,14 @@ class MainHomeMyTagViewModel @Inject constructor(
     private val _suggestedTagsUiState = MutableStateFlow(SuggestedTagsUiState())
     val suggestedTagsUiState: StateFlow<SuggestedTagsUiState> = _suggestedTagsUiState.asStateFlow()
 
-
     init {
-        loadTags()
+        loadInitialTags()
+        Log.d(TAG, "ViewModel initialized, loadInitialTags() called.")
     }
 
-    fun loadTags() {
+    fun loadInitialTags() {
         viewModelScope.launch {
+            Log.d(TAG, "loadInitialTags() called. Setting loading states to true.")
             // 모든 로딩 상태를 true로 설정
             _uiState.update {
                 it.copy(
@@ -78,6 +82,7 @@ class MainHomeMyTagViewModel @Inject constructor(
                         canLoadMore = true,
                     )
                 }
+                Log.d(TAG, "loadInitialTags() completed successfully. Loading states set to false.")
             } else {
                 // 에러 처리 (하나라도 실패하면)
                 _uiState.update {
@@ -87,12 +92,40 @@ class MainHomeMyTagViewModel @Inject constructor(
                         isLoadingSuggestedTags = false
                     )
                 }
+                Log.e(TAG, "loadInitialTags() failed.")
+            }
+        }
+    }
+
+    fun refreshMyAndSuggestedTags() {
+        viewModelScope.launch {
+            Log.d(TAG, "refreshMyAndSuggestedTags() called. Loading myTags and suggestedTags.")
+            val myTagsResult = getMyTagsUseCase()
+            val suggestedTagsResult = getSuggestedTagsUseCase()
+
+            if (myTagsResult.isSuccess && suggestedTagsResult.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        myTags = myTagsResult.getOrThrow().map { it.toPresentation() },
+                    )
+                }
+                _suggestedTagsUiState.update {
+                    it.copy(
+                        tags = suggestedTagsResult.getOrThrow().map { it.toPresentation() },
+                        canLoadMore = true,
+                    )
+                }
+                Log.d(TAG, "refreshMyAndSuggestedTags() completed successfully.")
+            } else {
+                showSnackbarMessage("タグの更新中にエラーが発生しました。")
+                Log.e(TAG, "refreshMyAndSuggestedTags() failed.")
             }
         }
     }
 
     fun loadMoreSuggestedTags() {
         viewModelScope.launch {
+            Log.d(TAG, "loadMoreSuggestedTags() called.")
             val result = getSuggestedTagsUseCase()
 
             if (result.isSuccess) {
@@ -104,9 +137,13 @@ class MainHomeMyTagViewModel @Inject constructor(
                             canLoadMore = true
                         )
                     }
+                    Log.d(TAG, "loadMoreSuggestedTags() completed successfully. Added ${newTags.size} new tags.")
+                } else {
+                    Log.d(TAG, "loadMoreSuggestedTags() completed, no new tags.")
                 }
             } else {
                 // 에러 처리
+                Log.e(TAG, "loadMoreSuggestedTags() failed.")
             }
         }
     }
@@ -116,6 +153,7 @@ class MainHomeMyTagViewModel @Inject constructor(
         _uiState.update {
             it.copy(snackbarMessage = message)
         }
+        Log.d(TAG, "Snackbar message set: $message")
     }
 
     // 스낵바 메시지 초기화
@@ -123,11 +161,13 @@ class MainHomeMyTagViewModel @Inject constructor(
         _uiState.update {
             it.copy(snackbarMessage = null)
         }
+        Log.d(TAG, "Snackbar message cleared.")
     }
 
     // 태그 선택 토글 (실제 구독 로직을 포함하도록 변경)
     fun onTagToggleSubscription(tagId: String, isCurrentlySubscribed: Boolean, tagType: TagType) {
         viewModelScope.launch {
+            Log.d(TAG, "onTagToggleSubscription() called. tagId: $tagId, isCurrentlySubscribed: $isCurrentlySubscribed")
             val result = if (isCurrentlySubscribed) {
                 // 현재 구독 중이면 구독 취소 (태그 제거)
                 removeUserTagUseCase(tagId.toInt())
@@ -139,11 +179,12 @@ class MainHomeMyTagViewModel @Inject constructor(
 
             result.onSuccess {
                 // 구독/구독 취소 성공 시 UI 상태 업데이트
-                loadTags() // 태그 목록을 다시 로드하여 최신 구독 상태 반영
                 showSnackbarMessage(if (isCurrentlySubscribed) "タグが解除されました" else "タグが登録されました")
+                refreshMyAndSuggestedTags() // UI에서 직접 새로고침하므로, 여기서도 호출해 즉각적인 피드백을 줌
             }.onFailure {
                 // 오류 처리 (예: 스낵바 메시지 표시)
                 showSnackbarMessage("エラーが発生しました: ${it.message ?: "不明なエラー"}")
+                Log.e(TAG, "onTagToggleSubscription() failed: ${it.message}")
             }
         }
     }
