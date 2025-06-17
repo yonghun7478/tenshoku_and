@@ -31,16 +31,6 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMyTags(): Result<List<MainHomeTag>> {
-        // TagRepository를 통해 현재 사용자가 구독한 태그 목록을 가져옵니다.
-        // isSubscribed 플래그를 true로 설정합니다.
-        return tagRepository.getAllTags().map { allTags ->
-            allTags
-                .filter { tagRepository.isTagSubscribed(it.id) }
-                .map { it.copy(isSubscribed = true) }
-        }
-    }
-
     override suspend fun getSuggestedTags(): Result<List<MainHomeTag>> {
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그들 중에서
         // 그 중 일부를 "추천 태그"로 반환합니다. (현재는 랜덤 10개)
