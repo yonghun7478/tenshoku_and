@@ -97,22 +97,4 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
             Result.failure(e)
         }
     }
-
-    override suspend fun subscribeTag(tagId: String): Result<Unit> {
-        return try {
-            subscriptions.add(currentUserId to tagId)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun unsubscribeTag(tagId: String): Result<Unit> {
-        return try {
-            subscriptions.remove(currentUserId to tagId)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }

@@ -104,10 +104,6 @@ import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCaseImpl
 import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCaseImpl
-import com.example.tokitoki.domain.usecase.SubscribeTagUseCase
-import com.example.tokitoki.domain.usecase.SubscribeTagUseCaseImpl
-import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
-import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCase
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCaseImpl
 import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
@@ -130,6 +126,8 @@ import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCase
+import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -448,18 +446,6 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindSubscribeTagUseCase(
-        impl: SubscribeTagUseCaseImpl
-    ): SubscribeTagUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindUnsubscribeTagUseCase(
-        impl: UnsubscribeTagUseCaseImpl
-    ): UnsubscribeTagUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindGetMessageHistoryUseCase(
         impl: GetMessageHistoryUseCaseImpl
     ): GetMessageHistoryUseCase
@@ -511,4 +497,10 @@ abstract class UseCaseModule {
     abstract fun bindGetTagsUseCase(
         impl: GetTagsUseCaseImpl
     ): GetTagsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoveUserTagUseCase(
+        impl: RemoveUserTagUseCaseImpl
+    ): RemoveUserTagUseCase
 }

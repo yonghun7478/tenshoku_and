@@ -22,6 +22,4 @@ interface MyProfileRepository {
     
     // Tag Subscription 관련 메서드
     suspend fun isTagSubscribed(tagId: String): Boolean // 태그 구독 여부 확인
-    suspend fun subscribeTag(tagId: String): Result<Unit> // 태그 구독
-    suspend fun unsubscribeTag(tagId: String): Result<Unit> // 태그 구독 해제
 }

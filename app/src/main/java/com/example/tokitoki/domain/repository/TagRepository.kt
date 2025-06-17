@@ -13,6 +13,4 @@ interface TagRepository {
     fun isTagSubscribed(tagId: String): Boolean
     suspend fun getTagSubscribers(tagId: String, cursor: String?, limit: Int): ResultWrapper<IdList>
     suspend fun getUserSubscribedTags(userId: String): Result<List<MainHomeTag>>
-    suspend fun subscribeTag(tagId: String): Result<Unit>
-    suspend fun unsubscribeTag(tagId: String): Result<Unit>
 }
