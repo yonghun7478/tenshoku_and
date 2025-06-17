@@ -20,13 +20,7 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
     // 2. (사용자 ID, 태그 ID)로 구독 관계만 저장
     private val subscriptions = mutableSetOf<Pair<String, String>>()
 
-    // 현재 로그인한 사용자는 "1"이라고 가정
-    private val currentUserId = "0"
-
     init {
-        // 더미 구독 관계 생성
-        subscriptions.add(currentUserId to "104") // #개발자
-        subscriptions.add(currentUserId to "106") // #영화광
         subscriptions.add("2" to "102")           // #맛집탐방
         subscriptions.add("3" to "104")           // #개발자
     }
@@ -47,10 +41,6 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
 
     override suspend fun getAllTags(): Result<List<MainHomeTag>> {
         return Result.success(allHomeTags)
-    }
-
-    override fun isTagSubscribed(tagId: String): Boolean {
-        return subscriptions.contains(currentUserId to tagId)
     }
 
     override suspend fun getTagSubscribers(

@@ -10,7 +10,6 @@ interface TagRepository {
     suspend fun getTagsByType(tagType: TagType): Result<List<MainHomeTag>>
     suspend fun getTags(tagIds : List<Int>): List<MainHomeTag>
     suspend fun getAllTags(): Result<List<MainHomeTag>>
-    fun isTagSubscribed(tagId: String): Boolean
     suspend fun getTagSubscribers(tagId: String, cursor: String?, limit: Int): ResultWrapper<IdList>
     suspend fun getUserSubscribedTags(userId: String): Result<List<MainHomeTag>>
 }

@@ -3,12 +3,14 @@ package com.example.tokitoki.data.repository
 import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.repository.MainHomeTagRepository
+import com.example.tokitoki.domain.repository.MyProfileRepository
 import com.example.tokitoki.domain.repository.TagRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class MainHomeTagRepositoryImpl @Inject constructor(
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    private val myProfileRepository: MyProfileRepository
 ) : MainHomeTagRepository {
 
     override suspend fun getTodayTag(): Result<MainHomeTag> {
@@ -16,7 +18,7 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         return tagRepository.getAllTags().map { tags ->
             // 모든 태그 중 첫 번째 태그를 가져오고, 해당 태그의 구독 상태를 설정합니다.
             val todayTag = tags.first()
-            todayTag.copy(isSubscribed = tagRepository.isTagSubscribed(todayTag.id))
+            todayTag.copy(isSubscribed = myProfileRepository.isTagSubscribed(todayTag.id))
         }
     }
 
@@ -24,10 +26,10 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그들 중에서
         // 구독자 수 기준으로 정렬하여 상위 10개를 "인기 태그"로 반환합니다.
         return tagRepository.getAllTags().map { tags ->
-            // 모든 태그를 가져와 구독자 수 기준으로 정렬하고, 각 태그의 구독 상태를 설정합니다.
+            // 모든 태그를 가져와 구독자 수 기준으로 정렬하고, 각 태그의 구독 상태를 설정합니다。
             tags.sortedByDescending { it.subscriberCount }
                 .take(5)
-                .map { it.copy(isSubscribed = tagRepository.isTagSubscribed(it.id)) }
+                .map { it.copy(isSubscribed = myProfileRepository.isTagSubscribed(it.id)) }
         }
     }
 
@@ -35,9 +37,9 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         // TagRepository에서 모든 태그를 가져와, 사용자가 아직 구독하지 않은 태그들 중에서
         // 그 중 일부를 "추천 태그"로 반환합니다. (현재는 랜덤 10개)
         return tagRepository.getAllTags().map { tags ->
-            // 모든 태그를 가져와 랜덤 10개를 반환하고 각 태그의 구독 상태를 설정합니다.
+            // 모든 태그를 가져와 랜덤 10개를 반환하고 각 태그의 구독 상태를 설정합니다。
             tags.shuffled().take(10).map { tag ->
-                tag.copy(isSubscribed = tagRepository.isTagSubscribed(tag.id)) // 구독 여부에 따라 isSubscribed 설정
+                tag.copy(isSubscribed = myProfileRepository.isTagSubscribed(tag.id)) // 구독 여부에 따라 isSubscribed 설정
             }
         }
     }
@@ -47,7 +49,7 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         return tagRepository.getAllTags().map { tags ->
             tags.filter { it.categoryId == categoryId }
                 .map { tag ->
-                    tag.copy(isSubscribed = tagRepository.isTagSubscribed(tag.id))
+                    tag.copy(isSubscribed = myProfileRepository.isTagSubscribed(tag.id))
                 }
         }
     }
@@ -57,7 +59,7 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         return tagRepository.getAllTags().map { tags ->
             tags.filter { it.name.contains(query, ignoreCase = true) }
                 .map { tag ->
-                    tag.copy(isSubscribed = tagRepository.isTagSubscribed(tag.id))
+                    tag.copy(isSubscribed = myProfileRepository.isTagSubscribed(tag.id))
                 }
         }
     }
@@ -67,7 +69,7 @@ class MainHomeTagRepositoryImpl @Inject constructor(
         return try {
             delay(500)
             val allTags = tagRepository.getAllTags().getOrThrow()
-            val mySubscribedTags = allTags.filter { tagRepository.isTagSubscribed(it.id) }
+            val mySubscribedTags = allTags.filter { myProfileRepository.isTagSubscribed(it.id) }
             val filtered = mySubscribedTags.filter { it.tagType == tagType }.take(5)
             Result.success(filtered.map { it.copy(isSubscribed = true) })
         } catch (e: Exception) {
@@ -81,7 +83,7 @@ class MainHomeTagRepositoryImpl @Inject constructor(
             delay(500)
             val tag = tagRepository.getAllTags().getOrThrow().find { it.id == tagId }
             if (tag != null) {
-                Result.success(tag.copy(isSubscribed = tagRepository.isTagSubscribed(tag.id)))
+                Result.success(tag.copy(isSubscribed = myProfileRepository.isTagSubscribed(tag.id)))
             } else {
                 Result.failure(Exception("Tag not found"))
             }
