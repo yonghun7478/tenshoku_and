@@ -14,32 +14,34 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlin.random.Random
+import com.example.tokitoki.data.dummy.DummyData
+import com.example.tokitoki.domain.model.UserDetail
 
 class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
     // --- 더미 데이터 생성 ---
     private val dummyMatchingUsersDatabase = mutableListOf<MatchingUserDto>().apply {
-        addAll(List(30) { index ->
+        addAll(DummyData.getUsers().mapIndexed { index, userDetail ->
             val timestamp = System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7) // 최근 1주일 내 랜덤 시간
             MatchingUserDto(
-                userId = "${index + 1}",
-                userName = "Matcher ${index + 1}",
-                profileImageUrl = "https://picsum.photos/seed/${index + 100}/200/200",
+                userId = userDetail.id,
+                userName = userDetail.name,
+                profileImageUrl = userDetail.thumbnailUrl,
                 matchedTimestamp = timestamp
             )
         }.sortedByDescending { it.matchedTimestamp }) // 최신순 정렬
     }
 
     private val dummyPreviousChatsDatabase = mutableListOf<PreviousChatDto>().apply {
-        addAll(List(50) { index ->
+        addAll(DummyData.getUsers().mapIndexed { index, userDetail ->
             val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
             val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
             PreviousChatDto(
-                messageId = "${index + 1}",
-                partnerNickname = "Chatter ${index + 1}",
-                partnerHometown = listOf("Seoul", "Busan", "Tokyo", "Osaka", "New York")[index % 5],
+                messageId = "msg_${userDetail.id}_${timestamp}", // unique message ID
+                partnerNickname = userDetail.name,
+                partnerHometown = userDetail.location,
                 lastMessageTimestamp = timestamp,
-                partnerProfileImageUrl = "https://picsum.photos/seed/${index + 200}/200/200"
+                partnerProfileImageUrl = userDetail.thumbnailUrl
             )
         }.sortedByDescending { it.lastMessageTimestamp }) // 최신순 정렬
     }
