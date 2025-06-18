@@ -96,7 +96,10 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
                 isFromMe = true
             )
             
-            dummyMessages[userId]?.add(0, newMessage) // 해당 유저의 메시지 리스트 앞에 새 메시지 추가
+            // 해당 유저의 메시지 리스트를 가져오거나, 없으면 새로 생성
+            val messageList = dummyMessages.getOrPut(userId) { CopyOnWriteArrayList<Message>() }
+            // 생성된 리스트의 맨 앞에 새 메시지 추가
+            messageList.add(0, newMessage)
 
             // 생성된 newMessage 객체를 Result.success()에 담아 반환
             Result.success(newMessage)

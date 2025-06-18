@@ -43,6 +43,8 @@ class MessageDetailViewModel @Inject constructor(
     private val _shouldScrollToBottom = MutableStateFlow(false)
     val shouldScrollToBottom: StateFlow<Boolean> = _shouldScrollToBottom.asStateFlow()
 
+    private var hasMovedToPreviousChats = false
+
     fun initialize(otherUserId: String) {
         viewModelScope.launch {
             try {
@@ -95,6 +97,8 @@ class MessageDetailViewModel @Inject constructor(
 //                checkMessageStatus(otherUserId)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -136,6 +140,11 @@ class MessageDetailViewModel @Inject constructor(
                         listOf(sentMessage) + currentMessages
                     }
                     _shouldScrollToBottom.value = true
+
+                    if (!hasMovedToPreviousChats) {
+                        moveToPreviousChats(otherUserId)
+                        hasMovedToPreviousChats = true
+                    }
                 }.onFailure { error ->
                     _uiState.update { it.copy(error = error.message) }
                 }
@@ -186,10 +195,10 @@ class MessageDetailViewModel @Inject constructor(
             try {
                 val result = moveMessageToPreviousUseCase(otherUserId)
                 result.onFailure { error ->
-                    _uiState.update { it.copy(error = error.message) }
+                    Log.w(TAG, "Failed to move to previous chats: ${error.message}")
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                Log.e(TAG, "Exception while moving to previous chats", e)
             }
         }
     }

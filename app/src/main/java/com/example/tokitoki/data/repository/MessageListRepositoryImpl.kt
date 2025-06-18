@@ -120,18 +120,21 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             // 매칭된 유저 목록에서 해당 유저 찾기
             val matchingUser = dummyMatchingUsersDatabase.find { it.userId == userId }
                 ?: return Result.failure(IllegalArgumentException("User not found in matching list"))
+            
+            // 전체 더미 데이터에서 사용자 상세 정보 찾기
+            val userDetail = DummyData.findUserById(userId)
 
             // 이전 대화 목록에 추가
             val newPreviousChat = PreviousChatDto(
-                userId = "msg_${System.currentTimeMillis()}",
+                userId = matchingUser.userId, // 기존 임시 ID 생성 로직을 수정하여 실제 userId를 사용
                 partnerNickname = matchingUser.userName,
-                partnerHometown = "Unknown", // 실제 구현에서는 유저의 고향 정보를 가져와야 함
+                partnerHometown = userDetail?.location ?: "지역 정보 없음", // UserDetail에서 실제 지역 정보 가져오기
                 lastMessageTimestamp = System.currentTimeMillis(),
                 partnerProfileImageUrl = matchingUser.profileImageUrl
             )
 
             // 이전 대화 목록에 추가하고 시간순으로 정렬
-            dummyPreviousChatsDatabase.add(newPreviousChat)
+            dummyPreviousChatsDatabase.add(0, newPreviousChat) // 최신이므로 맨 앞에 추가
             dummyPreviousChatsDatabase.sortByDescending { it.lastMessageTimestamp }
 
             // 매칭된 유저 목록에서 제거

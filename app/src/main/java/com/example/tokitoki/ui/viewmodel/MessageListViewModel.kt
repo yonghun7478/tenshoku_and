@@ -71,6 +71,23 @@ class MessageListViewModel @Inject constructor(
         loadInitialData()
     }
 
+    // 화면이 다시 활성화될 때 UI 갱신 (시머 이펙트 없이)
+    fun refreshOnResume() {
+        viewModelScope.launch {
+            // 커서와 리스트를 초기화하고 첫 페이지만 다시 로드
+            nextMatchingCursor = null
+            nextPreviousChatCursor = null
+            // _uiState.update { it.copy(matchingUsers = emptyList(), previousChats = emptyList()) } // 깜빡임의 원인이므로 제거
+
+            // isLoading 상태를 true로 바꾸지 않고 데이터만 다시 로드
+            val matchingResultDeferred = viewModelScope.launch { loadMatchingUsersInternal(null) }
+            val previousChatResultDeferred = viewModelScope.launch { loadPreviousChatsInternal(null) }
+
+            matchingResultDeferred.join()
+            previousChatResultDeferred.join()
+        }
+    }
+
     // 다음 매칭 유저 페이지 로드 (UI에서 호출)
     fun loadMoreMatchingUsers() {
         if (isMatchingLoading || nextMatchingCursor == null) return // 로딩 중이거나 다음 페이지 없으면 리턴
