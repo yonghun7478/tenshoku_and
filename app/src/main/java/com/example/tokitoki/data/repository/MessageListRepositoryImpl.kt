@@ -15,7 +15,6 @@ import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlin.random.Random
 import com.example.tokitoki.data.dummy.DummyData
-import com.example.tokitoki.domain.model.UserDetail
 
 class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
@@ -37,7 +36,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
             val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
             PreviousChatDto(
-                messageId = "msg_${userDetail.id}_${timestamp}", // unique message ID
+                userId = userDetail.id, // unique message ID
                 partnerNickname = userDetail.name,
                 partnerHometown = userDetail.location,
                 lastMessageTimestamp = timestamp,
@@ -91,7 +90,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
                 // 커서의 타임스탬프보다 작거나, 같다면 메시지 ID가 작은 것을 가져옴 (중복 방지 및 정렬 유지)
                  dummyPreviousChatsDatabase.filter {
                     it.lastMessageTimestamp < cursorTimestamp ||
-                    (it.lastMessageTimestamp == cursorTimestamp && it.messageId < cursorMessageId) // ID 비교는 문자열 비교로 가정
+                    (it.lastMessageTimestamp == cursorTimestamp && it.userId < cursorMessageId) // ID 비교는 문자열 비교로 가정
                 }
             } else {
                 dummyPreviousChatsDatabase // 첫 페이지
@@ -101,7 +100,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             val nextCursor = if (pageData.size == limit && filteredData.size > limit) {
                 // 마지막 아이템의 정보로 다음 커서 생성
                 val lastItem = pageData.last()
-                encodePreviousChatCursor(lastItem.messageId, lastItem.lastMessageTimestamp)
+                encodePreviousChatCursor(lastItem.userId, lastItem.lastMessageTimestamp)
             } else {
                 null // 다음 페이지 없음
             }
@@ -124,7 +123,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
             // 이전 대화 목록에 추가
             val newPreviousChat = PreviousChatDto(
-                messageId = "msg_${System.currentTimeMillis()}",
+                userId = "msg_${System.currentTimeMillis()}",
                 partnerNickname = matchingUser.userName,
                 partnerHometown = "Unknown", // 실제 구현에서는 유저의 고향 정보를 가져와야 함
                 lastMessageTimestamp = System.currentTimeMillis(),

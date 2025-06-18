@@ -3,10 +3,9 @@ package com.example.tokitoki.data.model
 import com.example.tokitoki.domain.model.PreviousChat
 import java.time.Instant
 import java.time.ZoneId
-import java.time.LocalDate
 
 data class PreviousChatDto(
-    val messageId: String, // 커서에 사용될 ID
+    val userId: String, // 커서에 사용될 ID
     val partnerNickname: String,
     val partnerHometown: String,
     val lastMessageTimestamp: Long, // LocalDate로 변환될 타임스탬프
@@ -21,7 +20,7 @@ fun PreviousChatDto.toDomain(): PreviousChat {
         .toLocalDate()
 
     return PreviousChat(
-        id = this.messageId,
+        id = this.userId,
         nickname = this.partnerNickname,
         hometown = this.partnerHometown,
         lastMessageDate = date,
