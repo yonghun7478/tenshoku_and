@@ -4,6 +4,7 @@ import com.example.tokitoki.domain.model.UserDetail
 import java.util.Calendar
 import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.domain.model.TagType
+import kotlin.random.Random
 
 object DummyData {
 
@@ -21,10 +22,20 @@ object DummyData {
     private val dummyUserDetails: List<UserDetail>
     private val dummyHomeTags: List<MainHomeTag>
 
+    val usersForMatching: List<UserDetail>
+    val usersWithPreviousChat: List<UserDetail>
+
     init {
-        dummyUserDetails = (1..150).map { id ->
+        val allUsers = (1..150).map { id ->
             createUserDetail(id.toString())
-        }
+        }.shuffled(Random(System.currentTimeMillis())) // 매번 다른 유저 목록을 위해 셔플
+
+        val midPoint = allUsers.size / 2
+        usersWithPreviousChat = allUsers.subList(0, midPoint)
+        usersForMatching = allUsers.subList(midPoint, allUsers.size)
+
+
+        dummyUserDetails = allUsers
         dummyHomeTags = createHomeTags()
     }
     

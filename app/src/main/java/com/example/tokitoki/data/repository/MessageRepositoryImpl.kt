@@ -22,8 +22,8 @@ class MessageRepositoryImpl @Inject constructor() : MessageRepository {
     private var messageIdCounter = 0L // 메시지 ID 카운터 추가
 
     init {
-        // 각 더미 유저에 대해 초기 메시지 데이터 생성
-        DummyData.getUsers().forEach { userDetail ->
+        // '이전 대화가 있는' 더미 유저에 대해서만 초기 메시지 데이터 생성
+        DummyData.usersWithPreviousChat.forEach { userDetail ->
             val messagesForUser = CopyOnWriteArrayList<Message>()
             repeat(20) { index -> // 각 유저마다 20개의 더미 메시지 생성
                 val isFromMe = index % 2 == 0
