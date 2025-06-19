@@ -13,7 +13,8 @@ data class FavoriteUser(
     val hasRoommate: Boolean,
     val siblings: String,
     val bloodType: String,
-    val timestamp: Long // 추가된 timestamp 필드
+    val timestamp: Long,
+    var isSendingMiten: Boolean = false
 )
 
 fun FavoriteUser.toDto(): FavoriteUserDto {

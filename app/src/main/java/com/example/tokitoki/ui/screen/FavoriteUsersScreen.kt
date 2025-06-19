@@ -67,7 +67,6 @@ fun FavoriteUsersScreen(
     onNavigateToUserDetail: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isSendingMiten by viewModel.isSendingMiten.collectAsState()
     val context = LocalContext.current
     
     // 토스트 메시지 처리
@@ -84,8 +83,7 @@ fun FavoriteUsersScreen(
         loadFavoriteUsers = viewModel::loadFavoriteUsers,
         refreshFavoriteUsers = viewModel::refreshFavoriteUsers,
         onBackClick = onBackClick,
-        isSendingMiten = isSendingMiten,
-        onMitenClick = viewModel::sendMiten,
+        onMitenClick = { userId, isCurrentlySending -> viewModel.sendMiten(userId, isCurrentlySending) },
         onUserClick = { userId ->
             viewModel.onUserClick(userId)
             onNavigateToUserDetail(userId, "FavoriteUsersScreen")
@@ -100,8 +98,7 @@ fun FavoriteUsersContents(
     loadFavoriteUsers: () -> Unit,
     onBackClick: () -> Unit,
     refreshFavoriteUsers: () -> Unit,
-    isSendingMiten: Boolean,
-    onMitenClick: (String) -> Unit,
+    onMitenClick: (String, Boolean) -> Unit,
     onUserClick: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -167,8 +164,7 @@ fun FavoriteUsersContents(
                         items(uiState.favoriteUsers) { user ->
                             FavoriteUserItem(
                                 user = user,
-                                isSendingMiten = isSendingMiten,
-                                onMitenClick = { onMitenClick(user.id) },
+                                onMitenClick = onMitenClick,
                                 onUserClick = onUserClick
                             )
                         }
@@ -196,8 +192,7 @@ fun FavoriteUsersContents(
 @Composable
 fun FavoriteUserItem(
     user: FavoriteUser,
-    isSendingMiten: Boolean,
-    onMitenClick: (String) -> Unit,
+    onMitenClick: (String, Boolean) -> Unit,
     onUserClick: (String) -> Unit
 ) {
     Card(
@@ -257,11 +252,11 @@ fun FavoriteUserItem(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { onMitenClick(user.id) },
+                onClick = { onMitenClick(user.id, user.isSendingMiten) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                enabled = !isSendingMiten
+                enabled = !user.isSendingMiten
             ) {
                 Text("みてね！")
             }
@@ -323,8 +318,7 @@ fun FavoriteUsersScreenPreview() {
             loadFavoriteUsers = {},
             onBackClick = {},
             refreshFavoriteUsers = {},
-            isSendingMiten = false,
-            onMitenClick = {},
+            onMitenClick = { _, _ -> },
             onUserClick = {}
         )
     }

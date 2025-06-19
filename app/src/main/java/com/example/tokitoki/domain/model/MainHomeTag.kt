@@ -10,7 +10,8 @@ data class MainHomeTag(
     val imageUrl: String,
     val subscriberCount: Int,
     val categoryId: String,
-    val tagType: TagType
+    val tagType: TagType,
+    val isSubscribed: Boolean = false
 ) {
     fun toPresentation(): MainHomeTagItemUiState = MainHomeTagItemUiState(
         id = this.id,
@@ -19,7 +20,8 @@ data class MainHomeTag(
         imageUrl = this.imageUrl,
         subscriberCount = this.subscriberCount,
         categoryId = this.categoryId,
-        tagType = this.tagType
+        tagType = this.tagType,
+        isSubscribed = this.isSubscribed
     )
 
     fun toData(): MainHomeTagData = MainHomeTagData(
@@ -29,6 +31,7 @@ data class MainHomeTag(
         imageUrl = this.imageUrl,
         subscriberCount = this.subscriberCount,
         categoryId = this.categoryId,
-        tagType = this.tagType
+        tagType = this.tagType,
+        isSubscribed = this.isSubscribed
     )
 }

@@ -44,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import java.util.concurrent.TimeUnit
 import androidx.compose.foundation.clickable
+import coil.compose.AsyncImage
 
 @Composable
 fun LazyGridState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
@@ -101,7 +102,7 @@ fun LikeReceivedListComponent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(likes, key = { it.id }) { like ->
+            items(likes, key = { "${it.id}-${it.receivedTime}" }) { like ->
                 LikeReceivedItemComponent(
                     like = like,
                     onUserClick = onUserClick
@@ -173,8 +174,8 @@ fun LikeReceivedItemComponent(
                     color = Color.Gray
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.profile_sample),
+            AsyncImage(
+                model = like.thumbnail,
                 contentDescription = "Thumbnail",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

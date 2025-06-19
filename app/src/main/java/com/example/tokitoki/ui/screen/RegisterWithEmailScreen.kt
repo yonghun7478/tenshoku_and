@@ -127,6 +127,12 @@ fun RegisterWithEmailContents(
             lineHeight = 30.sp,
             text = stringResource(id = R.string.register_title)
         )
+        Spacer(modifier = modifier.height(5.dp))
+        Text(
+            text = "メイン画面に移動するには、メールアドレスにtrueを入力してください。",
+            fontSize = 12.sp,
+            color = Color.Red
+        )
         Spacer(modifier = modifier.height(20.dp))
         RegisterWithEmailTextField(
             modifier = Modifier

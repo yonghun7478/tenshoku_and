@@ -27,9 +27,6 @@ class FavoriteUsersViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FavoriteUsersUiState())
     val uiState: StateFlow<FavoriteUsersUiState> = _uiState.asStateFlow()
 
-    private val _isSendingMiten = MutableStateFlow(false)
-    val isSendingMiten: StateFlow<Boolean> = _isSendingMiten.asStateFlow()
-
     private var cursor: Long = 0 // 초기 커서 값
     private val limit: Int = 10 // 한 번에 가져올 사용자 수
 
@@ -43,7 +40,7 @@ class FavoriteUsersViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
-            delay(2000)
+            delay(1000)
             val result = getFavoriteUsersUseCase(limit, cursor)
             if (result.isNotEmpty()) {
                 _uiState.value = _uiState.value.copy(
@@ -69,22 +66,60 @@ class FavoriteUsersViewModel @Inject constructor(
         loadFavoriteUsers()
     }
 
-    fun sendMiten(userId: String) {
+    fun sendMiten(userId: String, isCurrentlySending: Boolean) {
         viewModelScope.launch {
-            if (_isSendingMiten.value) return@launch // 이미 전송 중이면 무시
-            
-            _isSendingMiten.value = true
+            if (isCurrentlySending) return@launch // Prevent multiple calls for the same user
+
+            // Mark the specific user as sending
+            _uiState.update { currentState ->
+                val updatedUsers = currentState.favoriteUsers.map { user ->
+                    if (user.id == userId) {
+                        user.copy(isSendingMiten = true)
+                    } else {
+                        user
+                    }
+                }
+                currentState.copy(favoriteUsers = updatedUsers)
+            }
+
             when (val result = sendMitenUseCase(userId)) {
                 is ResultWrapper.Success -> {
-                    _uiState.update { it.copy(toastMessage = "みてねを送信しました") }
+                    _uiState.update { currentState ->
+                        val newUsers = currentState.favoriteUsers.map { user ->
+                            if (user.id == userId) {
+                                user.copy(isSendingMiten = false)
+                            } else {
+                                user
+                            }
+                        }
+                        currentState.copy(toastMessage = "みてねを送信しました", favoriteUsers = newUsers)
+                    }
                 }
                 is ResultWrapper.Error -> {
-                    _uiState.update { it.copy(toastMessage = "送信に失敗しました") }
+                    _uiState.update { currentState ->
+                        val newUsers = currentState.favoriteUsers.map { user ->
+                            if (user.id == userId) {
+                                user.copy(isSendingMiten = false)
+                            } else {
+                                user
+                            }
+                        }
+                        currentState.copy(toastMessage = "送信に失敗しました", favoriteUsers = newUsers)
+                    }
                 }
-
-                ResultWrapper.Loading -> TODO()
+                ResultWrapper.Loading -> {
+                    _uiState.update { currentState ->
+                        val newUsers = currentState.favoriteUsers.map { user ->
+                            if (user.id == userId) {
+                                user.copy(isSendingMiten = false)
+                            } else {
+                                user
+                            }
+                        }
+                        currentState.copy(favoriteUsers = newUsers, toastMessage = "予期せぬ状態: 送信処理中...")
+                    }
+                }
             }
-            _isSendingMiten.value = false
         }
     }
 

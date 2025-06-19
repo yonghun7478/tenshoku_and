@@ -14,32 +14,33 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlin.random.Random
+import com.example.tokitoki.data.dummy.DummyData
 
 class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
 
     // --- 더미 데이터 생성 ---
     private val dummyMatchingUsersDatabase = mutableListOf<MatchingUserDto>().apply {
-        addAll(List(30) { index ->
+        addAll(DummyData.usersForMatching.map { userDetail ->
             val timestamp = System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7) // 최근 1주일 내 랜덤 시간
             MatchingUserDto(
-                userId = "${index + 1}",
-                userName = "Matcher ${index + 1}",
-                profileImageUrl = "https://picsum.photos/seed/${index + 100}/200/200",
+                userId = userDetail.id,
+                userName = userDetail.name,
+                profileImageUrl = userDetail.thumbnailUrl,
                 matchedTimestamp = timestamp
             )
         }.sortedByDescending { it.matchedTimestamp }) // 최신순 정렬
     }
 
     private val dummyPreviousChatsDatabase = mutableListOf<PreviousChatDto>().apply {
-        addAll(List(50) { index ->
+        addAll(DummyData.usersWithPreviousChat.map { userDetail ->
             val date = LocalDate.now().minusDays(Random.nextLong(0, 90)) // 오늘부터 90일 전까지 랜덤 날짜
             val timestamp = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
             PreviousChatDto(
-                messageId = "${index + 1}",
-                partnerNickname = "Chatter ${index + 1}",
-                partnerHometown = listOf("Seoul", "Busan", "Tokyo", "Osaka", "New York")[index % 5],
+                userId = userDetail.id, // unique message ID
+                partnerNickname = userDetail.name,
+                partnerHometown = userDetail.location,
                 lastMessageTimestamp = timestamp,
-                partnerProfileImageUrl = "https://picsum.photos/seed/${index + 200}/200/200"
+                partnerProfileImageUrl = userDetail.thumbnailUrl
             )
         }.sortedByDescending { it.lastMessageTimestamp }) // 최신순 정렬
     }
@@ -89,7 +90,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
                 // 커서의 타임스탬프보다 작거나, 같다면 메시지 ID가 작은 것을 가져옴 (중복 방지 및 정렬 유지)
                  dummyPreviousChatsDatabase.filter {
                     it.lastMessageTimestamp < cursorTimestamp ||
-                    (it.lastMessageTimestamp == cursorTimestamp && it.messageId < cursorMessageId) // ID 비교는 문자열 비교로 가정
+                    (it.lastMessageTimestamp == cursorTimestamp && it.userId < cursorMessageId) // ID 비교는 문자열 비교로 가정
                 }
             } else {
                 dummyPreviousChatsDatabase // 첫 페이지
@@ -99,7 +100,7 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             val nextCursor = if (pageData.size == limit && filteredData.size > limit) {
                 // 마지막 아이템의 정보로 다음 커서 생성
                 val lastItem = pageData.last()
-                encodePreviousChatCursor(lastItem.messageId, lastItem.lastMessageTimestamp)
+                encodePreviousChatCursor(lastItem.userId, lastItem.lastMessageTimestamp)
             } else {
                 null // 다음 페이지 없음
             }
@@ -119,18 +120,21 @@ class MessageListRepositoryImpl @Inject constructor() : MessageListRepository {
             // 매칭된 유저 목록에서 해당 유저 찾기
             val matchingUser = dummyMatchingUsersDatabase.find { it.userId == userId }
                 ?: return Result.failure(IllegalArgumentException("User not found in matching list"))
+            
+            // 전체 더미 데이터에서 사용자 상세 정보 찾기
+            val userDetail = DummyData.findUserById(userId)
 
             // 이전 대화 목록에 추가
             val newPreviousChat = PreviousChatDto(
-                messageId = "msg_${System.currentTimeMillis()}",
+                userId = matchingUser.userId, // 기존 임시 ID 생성 로직을 수정하여 실제 userId를 사용
                 partnerNickname = matchingUser.userName,
-                partnerHometown = "Unknown", // 실제 구현에서는 유저의 고향 정보를 가져와야 함
+                partnerHometown = userDetail?.location ?: "지역 정보 없음", // UserDetail에서 실제 지역 정보 가져오기
                 lastMessageTimestamp = System.currentTimeMillis(),
                 partnerProfileImageUrl = matchingUser.profileImageUrl
             )
 
             // 이전 대화 목록에 추가하고 시간순으로 정렬
-            dummyPreviousChatsDatabase.add(newPreviousChat)
+            dummyPreviousChatsDatabase.add(0, newPreviousChat) // 최신이므로 맨 앞에 추가
             dummyPreviousChatsDatabase.sortByDescending { it.lastMessageTimestamp }
 
             // 매칭된 유저 목록에서 제거

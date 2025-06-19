@@ -37,6 +37,7 @@ fun MyPageScreen(
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit = {},
     onNavigateToSignIn: () -> Unit = {},
+    onNavigateToAboutMeMyProfile: (String) -> Unit = {}
 ) {
     val state = viewModel.myPageState.collectAsState()
 
@@ -53,7 +54,7 @@ fun MyPageScreen(
 
     MyPageScreenContent(
         state = state,
-        onEditProfileClick = viewModel::onEditProfileClick,
+        onEditProfileClick = { imageUrl -> onNavigateToAboutMeMyProfile(imageUrl) },
         onSeenMeClick = onAshiatoClick,
         onFavoriteUsersClick = onFavoriteUsersClick,
         onIineSitaHitoClick = onIineSitaHitoClick,
@@ -64,7 +65,7 @@ fun MyPageScreen(
 @Composable
 fun MyPageScreenContent(
     state: State<MyPageState>,
-    onEditProfileClick: () -> Unit,
+    onEditProfileClick: (String) -> Unit,
     onSeenMeClick: () -> Unit,
     onFavoriteUsersClick: () -> Unit = {},
     onIineSitaHitoClick: () -> Unit,
@@ -119,7 +120,7 @@ fun MyPageProfileSection(
     profileImageUrl: String,
     nickname: String,
     bio: String?,
-    onEditProfileClick: () -> Unit
+    onEditProfileClick: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, // 내부 Column 중앙 정렬
@@ -154,7 +155,7 @@ fun MyPageProfileSection(
 }
 
 @Composable
-fun MyPageProfilePicture(profileImageUrl: String, onEditProfileClick: () -> Unit) {
+fun MyPageProfilePicture(profileImageUrl: String, onEditProfileClick: (String) -> Unit) {
     Box(contentAlignment = Alignment.BottomEnd) {
         // 실제 앱에서는 Coil, Glide 등의 라이브러리를 사용하여 이미지 로딩
         Image(
@@ -166,7 +167,7 @@ fun MyPageProfilePicture(profileImageUrl: String, onEditProfileClick: () -> Unit
             contentScale = ContentScale.Crop,
         )
         IconButton(
-            onClick = onEditProfileClick,
+            onClick = { onEditProfileClick(profileImageUrl) },
             modifier = Modifier
                 .padding(bottom = 8.dp, end = 8.dp) // 여백 증가
                 .size(32.dp) // 크기 증가

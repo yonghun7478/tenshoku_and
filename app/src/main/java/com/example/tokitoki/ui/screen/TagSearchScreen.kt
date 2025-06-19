@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,7 +48,7 @@ fun TagSearchScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-    val selectedCategoryId by viewModel.selectedCategoryId.collectAsState()
+    // val selectedCategoryId by viewModel.selectedCategoryId.collectAsState() // This line seems unused
 
     TagSearchScreenContents(
         searchQuery = searchQuery,
@@ -57,7 +59,8 @@ fun TagSearchScreen(
         onCategoryClick = { category -> onNavigateToCategory(category.id, category.name) },
         onTagClick = { tag -> onNavigateToTagDetail(tag.id) },
         isLoading = isLoading,
-        errorMessage = errorMessage
+        errorMessage = errorMessage,
+        onNavigateUp = onNavigateUp
     )
 }
 
@@ -73,6 +76,7 @@ fun TagSearchScreenContents(
     onTagClick: (TagResultUiState) -> Unit,
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -80,13 +84,26 @@ fun TagSearchScreenContents(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        TagSearchBar(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-        )
+                .padding(horizontal = 8.dp, vertical = 8.dp), // Adjusted padding
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateUp) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Gray
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp)) // Spacer between icon and search bar
+            TagSearchBar(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                modifier = Modifier.weight(1f) // Search bar takes remaining space
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
         when {
             isLoading -> {
@@ -125,7 +142,7 @@ fun TagSearchScreenContents(
 
 // --- Search Bar ---
 @Composable
-fun TagSearchBar(
+fun TagSearchBar( // onNavigateUp parameter removed
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -133,15 +150,15 @@ fun TagSearchBar(
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = Color(0xFFF2F2F2),
-        modifier = modifier
-            .height(48.dp)
+        modifier = modifier // Removed .height(48.dp) to allow Row to control height if needed
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .fillMaxWidth() // Search bar itself will fill width within its weighted space
+                .padding(horizontal = 16.dp, vertical = 12.dp) // Adjusted padding
         ) {
+            // IconButton and Spacer for back arrow removed from here
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
@@ -203,7 +220,7 @@ fun TagCategoryItem(
             .clickable { onClick() }
             .background(Color(0xFFF8F8F8))
             .padding(8.dp)
-            .width(100.dp)
+            .width(100.dp) // Consider making this adaptive or removing fixed width
     ) {
         AsyncImage(
             model = category.imageUrl,
@@ -258,7 +275,7 @@ fun TagResultItem(
             .clickable { onClick() }
             .background(Color(0xFFF8F8F8))
             .padding(8.dp)
-            .width(100.dp)
+            .width(100.dp) // Consider making this adaptive or removing fixed width
     ) {
         AsyncImage(
             model = tag.imageUrl,
@@ -284,9 +301,92 @@ fun TagResultItem(
     }
 }
 
-// --- Preview ---
-@Preview(showBackground = true)
+// --- Preview for TagSearchScreenContents ---
+@Preview(showBackground = true, name = "Contents - Initial State")
 @Composable
-fun TagSearchScreenPreview() {
-    TagSearchScreen()
-} 
+fun TagSearchScreenContentsPreview_Initial() {
+    val sampleCategories = listOf(
+        TagCategoryUiState(id = "1", name = "맛집", imageUrl = ""), // Added tagCount for consistency
+        TagCategoryUiState(id = "2", name = "여행", imageUrl = ""),
+        TagCategoryUiState(id = "3", name = "운동", imageUrl = ""),
+        TagCategoryUiState(id = "4", name = "게임", imageUrl = ""),
+        TagCategoryUiState(id = "5", name = "영화", imageUrl = ""),
+        TagCategoryUiState(id = "6", name = "음악", imageUrl = "")
+    )
+    MaterialTheme {
+        TagSearchScreenContents(
+            searchQuery = "",
+            onSearchQueryChange = {},
+            categories = sampleCategories,
+            searchResults = emptyList(),
+            isSearching = false,
+            onCategoryClick = {},
+            onTagClick = {},
+            isLoading = false,
+            errorMessage = null,
+            onNavigateUp = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Contents - Searching State")
+@Composable
+fun TagSearchScreenContentsPreview_Searching() {
+    val sampleSearchResults = listOf(
+        TagResultUiState(id = "t1", name = "강남역 맛집", imageUrl = "", subscriberCount = 120),
+        TagResultUiState(id = "t2", name = "홍대 맛집", imageUrl = "", subscriberCount = 250),
+        TagResultUiState(id = "t3", name = "부산 맛집", imageUrl = "", subscriberCount = 180)
+    )
+    MaterialTheme {
+        TagSearchScreenContents(
+            searchQuery = "맛집",
+            onSearchQueryChange = {},
+            categories = emptyList(),
+            searchResults = sampleSearchResults,
+            isSearching = true,
+            onCategoryClick = {},
+            onTagClick = {},
+            isLoading = false,
+            errorMessage = null,
+            onNavigateUp = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Contents - Loading State")
+@Composable
+fun TagSearchScreenContentsPreview_Loading() {
+    MaterialTheme {
+        TagSearchScreenContents(
+            searchQuery = "",
+            onSearchQueryChange = {},
+            categories = emptyList(),
+            searchResults = emptyList(),
+            isSearching = false,
+            onCategoryClick = {},
+            onTagClick = {},
+            isLoading = true,
+            errorMessage = null,
+            onNavigateUp = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Contents - Error State")
+@Composable
+fun TagSearchScreenContentsPreview_Error() {
+    MaterialTheme {
+        TagSearchScreenContents(
+            searchQuery = "",
+            onSearchQueryChange = {},
+            categories = emptyList(),
+            searchResults = emptyList(),
+            isSearching = false,
+            onCategoryClick = {},
+            onTagClick = {},
+            isLoading = false,
+            errorMessage = "에러가 발생했습니다. 다시 시도해주세요.",
+            onNavigateUp = {}
+        )
+    }
+}

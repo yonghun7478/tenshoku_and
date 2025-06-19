@@ -1,5 +1,6 @@
 package com.example.tokitoki.domain.usecase
 
+import android.util.Log
 import com.example.tokitoki.data.utils.DatabaseManager
 import com.example.tokitoki.domain.repository.DbRepository
 import javax.inject.Inject
@@ -18,18 +19,34 @@ class UpdateDatabaseUseCaseImpl @Inject constructor(
             val assetDbVersion = dbRepository.getAssetDbVersion()
             val latestDbVersion = getLatestDbVersion()
 
+            Log.d("UpdateDatabaseUseCase", "Current DB Version: $currentDbVersion, Asset DB Version: $assetDbVersion, Latest DB Version: $latestDbVersion")
+
             if (isVersionNewer(latestDbVersion, currentDbVersion)) {
+                Log.d("UpdateDatabaseUseCase", "Newer version detected: $latestDbVersion. Updating database.")
                 dbRepository.setCurrentDbVersion(latestDbVersion)
                 if (latestDbVersion == assetDbVersion) {
                     databaseManager.replaceDatabaseFileWithAssets()
+                    Log.d("UpdateDatabaseUseCase", "Database replaced with asset version.")
                 } else {
                     val serverDbPath = dbRepository.downloadDbFromServer()
                     databaseManager.replaceDatabaseFile(serverDbPath)
+                    Log.d("UpdateDatabaseUseCase", "Database replaced with server version from: $serverDbPath")
                 }
+            } else {
+                Log.d("UpdateDatabaseUseCase", "No newer version found. Database is up to date.")
             }
+
+            // 데이터베이스 업데이트 성공 후, 데이터베이스가 실제로 열리고 App Inspection에 표시되도록 간단한 쿼리를 실행
+            if (dbRepository.isDatabaseEmpty()) {
+                Log.d("UpdateDatabaseUseCase", "Database appears empty, forcing Room initialization with a query.")
+                // isDatabaseEmpty() 내부에서 이미 DAO 접근을 통해 데이터베이스가 열리므로 추가적인 명시적 쿼리 호출은 불필요
+            }
+
+            Log.d("UpdateDatabaseUseCase", "Database update successful.")
             true // 업데이트 성공
         } catch (e: Exception) {
             dbRepository.setCurrentDbVersion("0.0.0")
+            Log.e("UpdateDatabaseUseCase", "Database update failed: ${e.message}", e)
             e.printStackTrace()
             false // 업데이트 실패
         }

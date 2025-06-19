@@ -6,8 +6,6 @@ import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
-import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
-import com.example.tokitoki.domain.usecase.DislikePickupUserUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
 import com.example.tokitoki.domain.usecase.FetchMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
@@ -46,8 +44,6 @@ import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCase
 import com.example.tokitoki.domain.usecase.GetUsersByLoginUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCase
 import com.example.tokitoki.domain.usecase.GetUsersBySignupUseCaseImpl
-import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
-import com.example.tokitoki.domain.usecase.LikePickupUserUseCaseImpl
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.SaveRegistrationTokenUseCase
@@ -104,10 +100,6 @@ import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCase
 import com.example.tokitoki.domain.usecase.GetTagSubscribersUseCaseImpl
 import com.example.tokitoki.domain.usecase.IsTagSubscribedUseCaseImpl
-import com.example.tokitoki.domain.usecase.SubscribeTagUseCase
-import com.example.tokitoki.domain.usecase.SubscribeTagUseCaseImpl
-import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCase
-import com.example.tokitoki.domain.usecase.UnsubscribeTagUseCaseImpl
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCase
 import com.example.tokitoki.domain.usecase.message.GetMessageHistoryUseCaseImpl
 import com.example.tokitoki.domain.usecase.MoveMessageToPreviousUseCase
@@ -130,6 +122,10 @@ import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagTypeListUseCaseImpl
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCaseImpl
+import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCase
+import com.example.tokitoki.domain.usecase.tag.RemoveUserTagUseCaseImpl
+import com.example.tokitoki.domain.usecase.GetMyTagsByTagTypeUseCase
+import com.example.tokitoki.domain.usecase.GetMyTagsByTagTypeUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -265,16 +261,6 @@ abstract class UseCaseModule {
     abstract fun bindFetchPickupUsersUseCase(
         useCaseImpl: FetchPickupUsersUseCaseImpl
     ): FetchPickupUsersUseCase
-
-    @Binds
-    abstract fun bindLikePickupUserUseCase(
-        useCaseImpl: LikePickupUserUseCaseImpl
-    ): LikePickupUserUseCase
-
-    @Binds
-    abstract fun bindDislikePickupUserUseCase(
-        useCaseImpl: DislikePickupUserUseCaseImpl
-    ): DislikePickupUserUseCase
 
     @Binds
     abstract fun bindGetTodayTagUseCase(
@@ -448,18 +434,6 @@ abstract class UseCaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindSubscribeTagUseCase(
-        impl: SubscribeTagUseCaseImpl
-    ): SubscribeTagUseCase
-
-    @Binds
-    @Singleton
-    abstract fun bindUnsubscribeTagUseCase(
-        impl: UnsubscribeTagUseCaseImpl
-    ): UnsubscribeTagUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindGetMessageHistoryUseCase(
         impl: GetMessageHistoryUseCaseImpl
     ): GetMessageHistoryUseCase
@@ -511,4 +485,16 @@ abstract class UseCaseModule {
     abstract fun bindGetTagsUseCase(
         impl: GetTagsUseCaseImpl
     ): GetTagsUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoveUserTagUseCase(
+        impl: RemoveUserTagUseCaseImpl
+    ): RemoveUserTagUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindGetMyTagsByTagTypeUseCase(
+        impl: GetMyTagsByTagTypeUseCaseImpl
+    ): GetMyTagsByTagTypeUseCase
 }

@@ -98,7 +98,8 @@ class AboutMeMyProfileViewModel
 
         if (result is ResultWrapper.Success) {
             setMyProfileUseCase(result.data)
-            (checkEmailRegisteredUseCase(myProfile.email) as ResultWrapper.Success).let { res ->
+
+            (checkEmailRegisteredUseCase("true") as ResultWrapper.Success).let { res ->
                 saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
             }
         }

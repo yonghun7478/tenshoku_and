@@ -3,7 +3,7 @@ package com.example.tokitoki.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.domain.model.TagType
-import com.example.tokitoki.domain.usecase.GetMyTagsByTypeUseCase
+import com.example.tokitoki.domain.usecase.GetMyTagsByTagTypeUseCase
 import com.example.tokitoki.ui.state.MyTagListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
 
 @HiltViewModel
 class MyTagListViewModel @Inject constructor(
-    private val getMyTagsByTypeUseCase: GetMyTagsByTypeUseCase
+    private val getMyTagsByTagTypeUseCase: GetMyTagsByTagTypeUseCase,
+    private val getTagsUseCase: GetTagsUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MyTagListUiState())
     val uiState: StateFlow<MyTagListUiState> = _uiState.asStateFlow()
@@ -37,12 +39,13 @@ class MyTagListViewModel @Inject constructor(
     private fun loadTags(tagType: TagType) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            // TODO: userId를 어떻게 가져올지 결정 필요
-            val userId = "current_user_id" // 임시로 하드코딩
-            val result = getMyTagsByTypeUseCase(userId, tagType)
-            result.onSuccess { tags ->
+            val result = getMyTagsByTagTypeUseCase(tagType)
+            result.onSuccess { myTags ->
+                val myTagIds = myTags.map { it.tagId }
+                val mainHomeTags = getTagsUseCase(myTagIds)
                 val newMap = _uiState.value.tagLists.toMutableMap()
-                newMap[tagType] = tags
+
+                newMap[tagType] = mainHomeTags
                 _uiState.update { it.copy(tagLists = newMap, isLoading = false) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isLoading = false, error = e?.message) }

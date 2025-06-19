@@ -30,7 +30,7 @@ import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 fun TokitokiNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    startDestination: String = TokitokiDestinations.MAIN_ROUTE,
+    startDestination: String = TokitokiDestinations.SPLASH_ROUTE,
     navAction: TokitokiNavigationActions = remember(navController) {
         TokitokiNavigationActions(navController)
     },
@@ -45,6 +45,16 @@ fun TokitokiNavGraph(
         navController = navController,
         startDestination = startDestination,
     ) {
+        composable(TokitokiDestinations.SPLASH_ROUTE) {
+            SplashScreen(
+                onNavigateToMain = {
+                    navAction.navigateToMainAndClearBackStack()
+                },
+                onNavigateToSignIn = {
+                    navAction.navigateToSignInAndClearBackStack()
+                }
+            )
+        }
         composable(TokitokiDestinations.SIGN_IN_ROUTE) {
             SignInScreen(
                 onRegisterWithEmail = {
@@ -246,11 +256,18 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_MY_PROFILE_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.URI) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.URI) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_FROM_MY_PAGE) { 
+                    type = NavType.BoolType
+                    defaultValue = false
+                 }
+            )
         ) { backStackEntry ->
 
             val uriStringFromArg = backStackEntry.arguments?.getString(TokitokiArgs.URI)
             val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
@@ -265,6 +282,7 @@ fun TokitokiNavGraph(
 
                 AboutMeMyProfileScreen(
                     uri = this,
+                    isFromMyPage = isFromMyPage, // Added this line
                     onAboutMeProfInputScreen = {
                         navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                     },
@@ -285,6 +303,9 @@ fun TokitokiNavGraph(
                     },
                     onMainScreen = {
                         navAction.navigateToMain()
+                    },
+                    onNavigateUp = {
+                        navController.navigateUp()
                     }
                 )
             }
@@ -337,6 +358,10 @@ fun TokitokiNavGraph(
                 },
                 onNavigateToMessageDetail = { userId, source ->
                     navAction.navigateToMessageDetail(userId, source)
+                },
+                onNavigateToAboutMeMyProfile = {
+                    val uri = Uri.parse(Uri.decode(it))
+                    navAction.navigateToAboutMeMyProfile(uri, true)
                 },
                 sharedViewModel = sharedViewModel
             )

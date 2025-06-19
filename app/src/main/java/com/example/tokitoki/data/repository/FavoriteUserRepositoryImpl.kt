@@ -2,6 +2,7 @@ package com.example.tokitoki.data.repository
 
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.common.ResultWrapper.ErrorType
+import com.example.tokitoki.data.dummy.DummyData
 import com.example.tokitoki.domain.model.FavoriteUser
 import com.example.tokitoki.domain.repository.FavoriteUserRepository
 import kotlinx.coroutines.delay
@@ -9,32 +10,40 @@ import javax.inject.Inject
 
 class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository {
 
-    private val dummyUsers = (1..30).map {
-        FavoriteUser(
-            id = it.toString(),
-            thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ee/2023_MMA_IVE_Wonyoung_1.jpg",
-            name = "User $it",
-            age = (20..40).random(),
-            location = "Seoul",
-            height = (160..190).random(),
-            job = "Developer",
-            hasRoommate = it % 2 == 0,
-            siblings = "1",
-            bloodType = "A",
-            timestamp = System.currentTimeMillis() - (30 - it) * 1000 // 예시 timestamp
-        )
-    }.sortedByDescending { it.timestamp } // 최신 timestamp 기준으로 정렬
+    private val allUsers: MutableList<FavoriteUser>
+    private val favoriteUserIds: MutableSet<String>
 
-    // 즐겨찾기 상태를 저장할 Set
-    private val favoriteUserIds: MutableSet<String> = mutableSetOf()
+    init {
+        val userDetails = DummyData.getUsers()
+        allUsers = userDetails.map { userDetail ->
+            FavoriteUser(
+                id = userDetail.id,
+                thumbnailUrl = userDetail.thumbnailUrl,
+                name = userDetail.name,
+                age = userDetail.age,
+                location = userDetail.location,
+                height = (160..190).random(),
+                job = userDetail.occupation,
+                hasRoommate = (userDetail.id.toIntOrNull() ?: 0) % 2 == 0,
+                siblings = "1",
+                bloodType = userDetail.bloodType,
+                timestamp = userDetail.lastLoginAt
+            )
+        }.sortedByDescending { it.timestamp }.toMutableList()
+
+        favoriteUserIds = allUsers.take(5).map { it.id }.toMutableSet()
+    }
 
     override suspend fun getFavoriteUsers(limit: Int, cursor: Long): List<FavoriteUser> {
         delay(500) // Simulate network delay
-        // cursor가 0이면 첫 페이지, 아니면 해당 timestamp 이전의 데이터를 가져옴
+        val currentFavoriteUsers = allUsers.filter { user ->
+            favoriteUserIds.contains(user.id)
+        }.sortedByDescending { it.timestamp }
+
         return if (cursor == 0L) {
-            dummyUsers.take(limit)
+            currentFavoriteUsers.take(limit)
         } else {
-            dummyUsers.filter { it.timestamp < cursor }.take(limit)
+            currentFavoriteUsers.filter { it.timestamp < cursor }.take(limit)
         }
     }
 
@@ -43,6 +52,13 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
             favoriteUserIds.add(userId) // 즐겨찾기 성공 시 userId를 세트에 추가
+            allUsers.find { it.id == userId }?.let { user ->
+                val updatedUser = user.copy(timestamp = System.currentTimeMillis())
+                val index = allUsers.indexOf(user)
+                if (index != -1) {
+                    allUsers[index] = updatedUser
+                }
+            }
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."))

@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.usecase.AddUserIdsToCacheUseCase
-import com.example.tokitoki.domain.usecase.DislikePickupUserUseCase
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
-import com.example.tokitoki.domain.usecase.LikePickupUserUseCase
+import com.example.tokitoki.domain.usecase.LikeUserUseCase
 import com.example.tokitoki.ui.converter.PickupUserMapper
 import com.example.tokitoki.ui.screen.CardDirection
 import com.example.tokitoki.ui.state.PickupUserState
@@ -22,9 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PickupUserViewModel @Inject constructor(
     private val fetchPickupUsersUseCase: FetchPickupUsersUseCase,
-    private val likePickupUserUseCase: LikePickupUserUseCase,
-    private val dislikePickupUserUseCase: DislikePickupUserUseCase,
-    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase
+    private val addUserIdsToCacheUseCase: AddUserIdsToCacheUseCase,
+    private val likeUserUseCase: LikeUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PickupUserUiState())
@@ -66,8 +64,21 @@ class PickupUserViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if(_uiState.value.users.isNotEmpty()) {
                 val pickupUserId = _uiState.value.users.first().id
-                likePickupUserUseCase(pickupUserId)
-                removePickupUser(pickupUserId)
+                when (likeUserUseCase.invoke(pickupUserId)) {
+                    is ResultWrapper.Success -> {
+                        removePickupUser(pickupUserId)
+                    }
+                    is ResultWrapper.Error -> {
+                        // 에러 처리: 필요에 따라 사용자에게 메시지 표시 또는 로깅
+                        _uiState.value = _uiState.value.copy(
+                            errorMessage = "좋아요 실패",
+                            state = PickupUserState.COMPLETE
+                        )
+                    }
+                    ResultWrapper.Loading -> {
+                        // 로딩 상태 처리 (현재는 아무것도 하지 않음)
+                    }
+                }
             }
         }
     }
@@ -76,7 +87,6 @@ class PickupUserViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if(_uiState.value.users.isNotEmpty()) {
                 val pickupUserId = _uiState.value.users.first().id
-                dislikePickupUserUseCase(pickupUserId)
                 removePickupUser(pickupUserId)
             }
         }

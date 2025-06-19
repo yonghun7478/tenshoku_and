@@ -3,6 +3,7 @@ package com.example.tokitoki.domain.repository
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.domain.model.UserList
 import com.example.tokitoki.domain.model.UserDetail
+import com.example.tokitoki.domain.model.User
 
 interface UserRepository {
     suspend fun getUsers(cursor: String?, limit: Int, orderBy: String): ResultWrapper<UserList>
@@ -12,7 +13,6 @@ interface UserRepository {
 
     // みてね 전송
     suspend fun sendMiten(userId: String): ResultWrapper<Unit>
-    
-    // 태그 구독자 목록 조회 (항상 lastLoginAt 기준으로 정렬)
-    suspend fun getTagSubscribers(tagId: String, cursor: String?, limit: Int): ResultWrapper<UserList>
+
+    suspend fun getUsersByIds(userIds: List<String>): ResultWrapper<List<User>>
 }

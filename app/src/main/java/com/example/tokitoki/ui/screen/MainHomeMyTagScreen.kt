@@ -77,6 +77,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.ui.state.MainHomeMyTagUiState
 import com.example.tokitoki.ui.state.SuggestedTagsUiState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import android.util.Log
+import kotlinx.coroutines.flow.collectLatest
+
+private const val TAG = "MainHomeMyTagScreen"
 
 /**
  * 메인 홈 화면의 마이태그 섹션을 표시하는 메인 컴포저블
@@ -96,6 +103,16 @@ fun MainHomeMyTagScreen(
     val suggestedTagsUiState by viewModel.suggestedTagsUiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner) {
+        // 화면이 RESUMED 상태가 될 때마다 태그 목록을 새로고침
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            Log.d(TAG, "Lifecycle RESUMED. Calling refreshMyAndSuggestedTags().")
+            viewModel.refreshMyAndSuggestedTags()
+        }
+    }
+
     // 스낵바 메시지 처리
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
@@ -114,7 +131,8 @@ fun MainHomeMyTagScreen(
         onLoadMoreSuggestedTags = { viewModel.loadMoreSuggestedTags() },
         onNavigateToTagSearch = onNavigateToTagSearch,
         onNavigateToMyTagList = onNavigateToMyTagList,
-        onNavigateToTagDetail = onNavigateToTagDetail
+        onNavigateToTagDetail = onNavigateToTagDetail,
+        onTagToggleSubscription = { tagId, isSubscribed, tagType -> viewModel.onTagToggleSubscription(tagId, isSubscribed, tagType) }
     )
 }
 
@@ -127,6 +145,7 @@ fun MainHomeMyTagScreen(
  * @param onNavigateToTagSearch 태그 검색 화면으로 이동하는 콜백
  * @param onNavigateToMyTagList 마이태그 목록 화면으로 이동하는 콜백
  * @param onNavigateToTagDetail 태그 상세 화면으로 이동하는 콜백
+ * @param onTagToggleSubscription 태그 구독/구독 취소 시 호출될 콜백
  */
 @Composable
 fun MainHomeMyTagScreenContent(
@@ -136,7 +155,8 @@ fun MainHomeMyTagScreenContent(
     onLoadMoreSuggestedTags: () -> Unit,
     onNavigateToTagSearch: () -> Unit,
     onNavigateToMyTagList: () -> Unit,
-    onNavigateToTagDetail: (String) -> Unit
+    onNavigateToTagDetail: (String) -> Unit,
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -159,7 +179,8 @@ fun MainHomeMyTagScreenContent(
                     MainHomeMyTagScreen_TodayAndTrendingTags(
                         listOfNotNull(uiState.todayTag) + uiState.trendingTags,
                         uiState.isLoadingTodayAndTrending,
-                        onTagClick = onNavigateToTagDetail
+                        onTagClick = onNavigateToTagDetail,
+                        onTagToggleSubscription = onTagToggleSubscription
                     )
                     Divider()
                 }
@@ -189,7 +210,8 @@ fun MainHomeMyTagScreenContent(
                         canLoadMore = suggestedTagsUiState.canLoadMore,
                         isLoading = uiState.isLoadingSuggestedTags,
                         onLoadMore = onLoadMoreSuggestedTags,
-                        onTagClick = onNavigateToTagDetail
+                        onTagClick = onNavigateToTagDetail,
+                        onTagToggleSubscription = onTagToggleSubscription
                     )
                 }
             }
@@ -335,13 +357,15 @@ fun TrendingTagShimmerCard(
  * @param tags 태그 목록
  * @param isLoading 로딩 상태
  * @param onTagClick 태그 클릭 시 호출될 콜백
+ * @param onTagToggleSubscription 태그 구독/구독 취소 시 호출될 콜백
  */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainHomeMyTagScreen_TodayAndTrendingTags(
     tags: List<MainHomeTagItemUiState>,
     isLoading: Boolean = false,
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     // pageCount를 tags.size로 직접 지정
     val pagerState = rememberPagerState(initialPage = 0) {
@@ -384,7 +408,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
                     val tag = tags[page]
                     MainHomeMyTagScreen_TrendingTagCard(
                         tag = tag,
-                        onClick = { onTagClick(tag.id) }
+                        onClick = { onTagClick(tag.id) },
+                        onTagToggleSubscription = onTagToggleSubscription
                     )
                 }
             } else {
@@ -441,24 +466,23 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
  * 트렌딩 태그 카드를 표시하는 컴포저블
  * @param tag 태그 정보
  * @param onClick 카드 클릭 시 호출될 콜백
+ * @param onTagToggleSubscription 태그 구독/구독 취소 시 호출될 콜백
  * @param modifier 외부에서 전달받은 Modifier
  */
 @Composable
 fun MainHomeMyTagScreen_TrendingTagCard(
     tag: MainHomeTagItemUiState,
     onClick: () -> Unit = {},
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isChecked by remember { mutableStateOf(false) }
-    val viewModel: MainHomeMyTagViewModel = hiltViewModel()
-
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = Color.Transparent,
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
-            .clickable(onClick = onClick)
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
             .border(
                 width = 1.dp,
                 color = Color.Gray.copy(alpha = 0.3f),
@@ -521,27 +545,25 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                     }
                 }
             }
-
-            // 우측 중앙 동그란 버튼
-            Surface(
-                shape = CircleShape,
-                color = if (isChecked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+            
+            // 플러스/체크 아이콘 (우측 하단)
+            Box(
                 modifier = Modifier
-                    .size(32.dp)
-                    .align(Alignment.CenterEnd)
-                    .absoluteOffset(x = (-16).dp)
-                    .clickable { 
-                        isChecked = !isChecked
-                        viewModel.onTagToggle(tag, isChecked)
-                    }
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable {
+                        onTagToggleSubscription(tag.id, tag.isSubscribed, tag.tagType)
+                    },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (isChecked) Icons.Default.Check else Icons.Default.Add,
-                    contentDescription = if (isChecked) "Tag Added" else "Add Tag",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(16.dp)
+                    imageVector = if (tag.isSubscribed) Icons.Default.Check else Icons.Default.Add,
+                    contentDescription = if (tag.isSubscribed) "구독됨" else "구독하기",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
@@ -628,68 +650,78 @@ fun MainHomeMyTagScreen_MyTagCard(
  * 추천 태그 카드를 표시하는 컴포저블
  * @param tag 태그 정보
  * @param onClick 카드 클릭 시 호출될 콜백
+ * @param onTagToggleSubscription 태그 구독/구독 취소 시 호출될 콜백
  */
 @Composable
 fun MainHomeMyTagScreen_SuggestedTagCard(
     tag: MainHomeTagItemUiState,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = Color.Transparent,
-        modifier = Modifier
+        modifier = modifier
             .width(100.dp)
             .wrapContentHeight()
-            .clickable(onClick = onClick)
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
+            .border(
+                width = 1.dp,
+                color = Color.Gray.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // 섬네일 (1:1 비율)
-            AsyncImage(
-                model = tag.imageUrl,
-                contentDescription = "Tag Image",
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .size(84.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                error = painterResource(R.drawable.no_image_icon)
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            // 태그 이름
-            Text(
-                text = tag.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(2.dp))
-            
-            // 구독자 수 (아이콘 + 텍스트)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
+                    .fillMaxSize()
+                    .padding(6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Subscriber Icon",
-                    modifier = Modifier.size(12.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                // 썸네일 (1:1 비율)
+                AsyncImage(
+                    model = tag.imageUrl,
+                    contentDescription = "Tag Image",
+                    modifier = Modifier
+                        .size(84.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(R.drawable.no_image_icon)
                 )
-                Spacer(modifier = Modifier.width(2.dp))
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // 태그 이름
                 Text(
-                    text = "${tag.subscriberCount}人",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = tag.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
+                
+                Spacer(modifier = Modifier.height(2.dp))
+                
+                // 구독자 수 (아이콘 + 텍스트) - 원래대로 되돌림
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Subscriber Icon",
+                        modifier = Modifier.size(12.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = "${tag.subscriberCount}人",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }
@@ -895,14 +927,16 @@ fun MainHomeMyTagScreen_PromotionBanner(
  * @param isLoading 로딩 상태
  * @param onLoadMore 더 불러오기 클릭 시 호출될 콜백
  * @param onTagClick 태그 클릭 시 호출될 콜백
+ * @param onTagToggleSubscription 태그 구독/구독 취소 시 호출될 콜백
  */
 @Composable
 fun MainHomeMyTagScreen_SuggestedTags(
     suggestedTags: List<MainHomeTagItemUiState>,
-    canLoadMore: Boolean = false,
+    canLoadMore: Boolean,
     isLoading: Boolean = false,
     onLoadMore: () -> Unit = {},
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -955,7 +989,8 @@ fun MainHomeMyTagScreen_SuggestedTags(
                     items(items = suggestedTags) { tag ->
                         MainHomeMyTagScreen_SuggestedTagCard(
                             tag = tag,
-                            onClick = { onTagClick(tag.id) }
+                            onClick = { onTagClick(tag.id) },
+                            onTagToggleSubscription = onTagToggleSubscription
                         )
                     }
 
@@ -1162,7 +1197,8 @@ fun MainHomeMyTagScreenPreview() {
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
-            onNavigateToTagDetail = {}
+            onNavigateToTagDetail = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1182,7 +1218,8 @@ fun MainHomeMyTagScreenLoadingPreview() {
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
-            onNavigateToTagDetail = {}
+            onNavigateToTagDetail = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1198,7 +1235,8 @@ fun MainHomeMyTagScreenEmptyPreview() {
             onLoadMoreSuggestedTags = {},
             onNavigateToTagSearch = {},
             onNavigateToMyTagList = {},
-            onNavigateToTagDetail = {}
+            onNavigateToTagDetail = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1238,7 +1276,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsPreview() {
                     tagType = TagType.LIFESTYLE
                 )
             ),
-            isLoading = false
+            isLoading = false,
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1249,7 +1288,8 @@ fun MainHomeMyTagScreen_TodayAndTrendingTagsLoadingPreview() {
     TokitokiTheme {
         MainHomeMyTagScreen_TodayAndTrendingTags(
             tags = emptyList(),
-            isLoading = true
+            isLoading = true,
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1351,7 +1391,8 @@ fun MainHomeMyTagScreen_SuggestedTagsPreview() {
             canLoadMore = true,
             isLoading = false,
             onLoadMore = {},
-            onTagClick = {}
+            onTagClick = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1365,7 +1406,8 @@ fun MainHomeMyTagScreen_SuggestedTagsLoadingPreview() {
             canLoadMore = false,
             isLoading = true,
             onLoadMore = {},
-            onTagClick = {}
+            onTagClick = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1379,7 +1421,8 @@ fun MainHomeMyTagScreen_SuggestedTagsEmptyPreview() {
             canLoadMore = false,
             isLoading = false,
             onLoadMore = {},
-            onTagClick = {}
+            onTagClick = {},
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1397,7 +1440,8 @@ fun MainHomeMyTagScreen_TrendingTagCardPreview() {
                 description = "",
                 categoryId = "1",
                 tagType = TagType.HOBBY
-            )
+            ),
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }
@@ -1433,7 +1477,8 @@ fun MainHomeMyTagScreen_SuggestedTagCardPreview() {
                 description = "",
                 categoryId = "3",
                 tagType = TagType.VALUE
-            )
+            ),
+            onTagToggleSubscription = { _, _, _ -> }
         )
     }
 }

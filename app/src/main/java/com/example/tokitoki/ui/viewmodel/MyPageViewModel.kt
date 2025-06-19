@@ -120,7 +120,6 @@ class MyPageViewModel @Inject constructor(
     }
 
     // --- 이벤트 핸들러 ---
-    fun onEditProfileClick() { println("ViewModel: 프로필 수정 클릭") }
     fun onLogoutClick() {
         viewModelScope.launch {
             clearTokensUseCase()

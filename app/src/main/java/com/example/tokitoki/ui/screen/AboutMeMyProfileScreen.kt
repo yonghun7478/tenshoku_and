@@ -56,6 +56,8 @@ fun AboutMeMyProfileScreen(
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
+    isFromMyPage: Boolean = false,
+    onNavigateUp: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -63,10 +65,11 @@ fun AboutMeMyProfileScreen(
     AboutMeMyProfileContents(
         uri = uiState.uri,
         myProfileItem = uiState.myProfileItem,
-        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
+        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction,
+        isFromMyPage = isFromMyPage
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uri) {
         viewModel.init(uri)
 
         viewModel.uiEvent.collect { event ->
@@ -79,9 +82,14 @@ fun AboutMeMyProfileScreen(
                     when (event.action) {
                         AboutMeMyProfileAction.SUBMIT -> {
                             val result = viewModel.registerMyProfile()
-
                             if (result) {
-                                onMainScreen()
+                                if (isFromMyPage) {
+                                    // 마이페이지를 통해 접근한 경우, 프로필 저장 성공 시 별도의 화면 이동을 하지 않습니다.
+                                    // 사용자가 이전 화면(마이페이지)으로 돌아갈 수 있도록 합니다.
+                                    onNavigateUp()
+                                } else {
+                                    onMainScreen()
+                                }
                             }
                         }
 
@@ -124,7 +132,8 @@ fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
     uri: Uri = Uri.EMPTY,
     myProfileItem: MyProfileItem = MyProfileItem(),
-    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column {
         Column(
@@ -161,7 +170,8 @@ fun AboutMeMyProfileContents(
             )
         }
         AboutMeMyProfileBottomMenu(
-            aboutMeMyProfileAction = aboutMeMyProfileAction
+            aboutMeMyProfileAction = aboutMeMyProfileAction,
+            isFromMyPage = isFromMyPage
         )
     }
 }
@@ -598,6 +608,7 @@ fun AboutMeMyProfileProfBaseItem(
 fun AboutMeMyProfileBottomMenu(
     modifier: Modifier = Modifier,
     aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -608,7 +619,7 @@ fun AboutMeMyProfileBottomMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 5.dp),
-            text = "これではじめる",
+            text = if (isFromMyPage) "修正する" else "これではじめる",
             textColor = LocalColor.current.white,
             backgroundColor = LocalColor.current.blue,
             action = aboutMeMyProfileAction,
