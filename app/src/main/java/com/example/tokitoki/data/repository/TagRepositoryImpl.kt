@@ -21,16 +21,16 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
     private val subscriptions = mutableSetOf<Pair<String, String>>()
 
     init {
-        subscriptions.add("1" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 1)
-        subscriptions.add("4" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 4)
-        subscriptions.add("5" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 5)
-        subscriptions.add("6" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 6)
-        subscriptions.add("7" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 7)
-        subscriptions.add("8" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 8)
-        subscriptions.add("9" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 9)
-        subscriptions.add("10" to "101") // 맛집탐방 태그를 구독한 임의의 유저 (user 10)
-        subscriptions.add("2" to "102") // #맛집탐방
-        subscriptions.add("3" to "104") // #개발자
+        // 기존 구독 데이터를 모두 제거하고 새로운 구독 데이터를 추가합니다.
+        // 각 태그별로 4명 정도의 임의의 사용자를 구독자로 설정합니다.
+        val random = java.util.Random()
+        (101..115).forEach { tagIdInt ->
+            val tagId = tagIdInt.toString()
+            repeat(4) {
+                val userId = (random.nextInt(150) + 1).toString() // 1부터 150 사이의 임의의 유저 ID
+                subscriptions.add(userId to tagId)
+            }
+        }
     }
 
     override suspend fun getTagTypeList(): List<TagType> {
