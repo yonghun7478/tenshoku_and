@@ -156,6 +156,7 @@ fun UserDetailScreen(
                     Button(
                         onClick = { viewModel.toggleLike() },
                         modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
+                        enabled = !isLiked, // isLiked가 true일 때 버튼 비활성화
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
