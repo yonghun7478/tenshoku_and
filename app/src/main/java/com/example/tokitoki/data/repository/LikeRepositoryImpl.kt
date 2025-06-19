@@ -33,7 +33,8 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         val dummySentLikes = mutableListOf<LikeItem>()
 
         // 예시: 100명의 사용자에게 임의로 좋아요를 받거나 보내는 시나리오
-        users.forEach { user ->
+        val initialReceivedTime = System.currentTimeMillis()
+        users.forEachIndexed { index, user ->
             if (user.id != CURRENT_USER_ID) { // 현재 사용자가 아닐 경우에만 좋아요 관계 생성
                 // 현재 사용자가 다른 사용자에게 좋아요를 보냄
                 if (Random.nextBoolean()) {
@@ -41,9 +42,11 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
                     dummySentLikes.add(createLikeItem(user, LikeRepository.SENT))
                 }
                 // 현재 사용자가 다른 사용자로부터 좋아요를 받음
+                // 받은 좋아요는 순서를 고정하기 위해 고정된 시간을 부여합니다.
                 if (Random.nextBoolean()) {
                     likedPairs.add(Pair(user.id, CURRENT_USER_ID))
-                    dummyReceivedLikes.add(createLikeItem(user, LikeRepository.RECEIVED))
+                    val fixedReceivedTime = initialReceivedTime - (index * 10000L) // 인덱스를 기반으로 시간 고정 (예: 10초 간격)
+                    dummyReceivedLikes.add(createLikeItem(user, LikeRepository.RECEIVED, fixedReceivedTime))
                 }
             }
         }
@@ -54,20 +57,8 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     override suspend fun getLikes(tab: String, cursor: Long?, limit: Int): Result<LikeResult> {
         delay(500)
 
-        // 탭에 따라 좋아요 관계 필터링
-        val filteredPairs = when (tab) {
-            LikeRepository.RECEIVED -> likedPairs.filter { it.second == CURRENT_USER_ID } // 받은 좋아요
-            LikeRepository.SENT -> likedPairs.filter { it.first == CURRENT_USER_ID }     // 보낸 좋아요
-            else -> emptyList()
-        }
-
-        // 좋아요 관계에서 상대방 UserDetail 정보를 가져와 LikeItem으로 변환
-        val data = filteredPairs.mapNotNull { pair ->
-            val targetUserId = if (tab == LikeRepository.RECEIVED) pair.first else pair.second
-            DummyData.findUserById(targetUserId)?.let { userDetail ->
-                createLikeItem(userDetail, tab)
-            }
-        }.sortedByDescending { it.receivedTime } // 정렬
+        // 탭에 따라 필터링된 좋아요 데이터를 가져옵니다.
+        val data = allLikes[tab]?.sortedByDescending { it.receivedTime } ?: emptyList()
 
         val startIndex = if (cursor == null) 0 else {
             data.indexOfFirst { it.receivedTime < cursor } // cursor보다 작은 첫번째 index
@@ -103,14 +94,10 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     }
 
     // LikeItem을 생성하는 헬퍼 함수
-    private fun createLikeItem(userDetail: UserDetail, tab: String): LikeItem {
+    private fun createLikeItem(userDetail: UserDetail, tab: String, explicitReceivedTime: Long? = null): LikeItem {
         val now = System.currentTimeMillis()
         // receivedTime은 받은 시각이므로, 좋아요를 받은 경우에만 의미가 있음
-        val receivedTime = if (tab == LikeRepository.RECEIVED) {
-            now - Random.nextLong(0, 3600000) // 0~1시간 내의 랜덤 시간
-        } else {
-            now // 보낸 좋아요는 현재 시각으로 설정
-        }
+        val receivedTime = explicitReceivedTime ?: now
 
         return LikeItemData(
             id = userDetail.id,
