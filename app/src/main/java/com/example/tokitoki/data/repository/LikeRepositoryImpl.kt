@@ -23,6 +23,8 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
     // 좋아요 상태를 저장할 Set (보낸 사람 ID, 받은 사람 ID)
     private val likedPairs: MutableSet<Pair<String, String>> = mutableSetOf()
 
+    private val _users = DummyData.getUsers()
+
     // 초기 데이터 생성 (init 블록)
     init {
         // 더미 사용자 데이터 가져오기
@@ -37,7 +39,7 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
         users.forEachIndexed { index, user ->
             if (user.id != CURRENT_USER_ID) { // 현재 사용자가 아닐 경우에만 좋아요 관계 생성
                 // 현재 사용자가 다른 사용자에게 좋아요를 보냄
-                if (Random.nextBoolean()) {
+                if (dummySentLikes.size < 5 && Random.nextBoolean()) { // 최대 5개까지만 추가
                     likedPairs.add(Pair(CURRENT_USER_ID, user.id))
                     dummySentLikes.add(createLikeItem(user, LikeRepository.SENT))
                 }
@@ -81,6 +83,14 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
             likedPairs.add(Pair(CURRENT_USER_ID, userId)) // 현재 사용자가 userId에게 좋아요를 보냄
+
+            // 좋아요를 보낸 아이템을 allLikes에 추가 (receivedTime을 최신으로)
+            val likedUserDetail = _users.find { it.id == userId }
+            likedUserDetail?.let { user ->
+                val newLikeItem = createLikeItem(user, LikeRepository.SENT, System.currentTimeMillis())
+                allLikes[LikeRepository.SENT]?.add(newLikeItem)
+            }
+
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "좋아요 추가 중 오류가 발생했습니다."))

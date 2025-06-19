@@ -22,12 +22,4 @@ class PickupUserRepositoryImpl @Inject constructor() : PickupUserRepository {
         }
         return ResultWrapper.Success(pickupUsers)
     }
-
-    override suspend fun likePickupUser(pickupUserId: String): ResultWrapper<Unit> {
-        return ResultWrapper.Success(Unit)
-    }
-
-    override suspend fun dislikePickupUser(pickupUserId: String): ResultWrapper<Unit> {
-        return ResultWrapper.Success(Unit)
-    }
 }
