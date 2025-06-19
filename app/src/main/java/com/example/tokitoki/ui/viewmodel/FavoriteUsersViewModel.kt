@@ -40,7 +40,7 @@ class FavoriteUsersViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
-            delay(2000)
+            delay(1000)
             val result = getFavoriteUsersUseCase(limit, cursor)
             if (result.isNotEmpty()) {
                 _uiState.value = _uiState.value.copy(

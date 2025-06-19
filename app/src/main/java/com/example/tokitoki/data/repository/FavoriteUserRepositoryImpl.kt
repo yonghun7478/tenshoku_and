@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository {
 
-    private val allUsers: List<FavoriteUser>
+    private val allUsers: MutableList<FavoriteUser>
     private val favoriteUserIds: MutableSet<String>
 
     init {
@@ -29,18 +29,21 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
                 bloodType = userDetail.bloodType,
                 timestamp = userDetail.lastLoginAt
             )
-        }.sortedByDescending { it.timestamp }
+        }.sortedByDescending { it.timestamp }.toMutableList()
 
         favoriteUserIds = allUsers.take(5).map { it.id }.toMutableSet()
     }
 
     override suspend fun getFavoriteUsers(limit: Int, cursor: Long): List<FavoriteUser> {
         delay(500) // Simulate network delay
-        // cursor가 0이면 첫 페이지, 아니면 해당 timestamp 이전의 데이터를 가져옴
+        val currentFavoriteUsers = allUsers.filter { user ->
+            favoriteUserIds.contains(user.id)
+        }.sortedByDescending { it.timestamp }
+
         return if (cursor == 0L) {
-            allUsers.take(limit)
+            currentFavoriteUsers.take(limit)
         } else {
-            allUsers.filter { it.timestamp < cursor }.take(limit)
+            currentFavoriteUsers.filter { it.timestamp < cursor }.take(limit)
         }
     }
 
@@ -49,6 +52,13 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
             // TODO: 실제 API 호출 구현
             delay(500) // API 호출 시뮬레이션
             favoriteUserIds.add(userId) // 즐겨찾기 성공 시 userId를 세트에 추가
+            allUsers.find { it.id == userId }?.let { user ->
+                val updatedUser = user.copy(timestamp = System.currentTimeMillis())
+                val index = allUsers.indexOf(user)
+                if (index != -1) {
+                    allUsers[index] = updatedUser
+                }
+            }
             ResultWrapper.Success(Unit)
         } catch (e: Exception) {
             ResultWrapper.Error(ErrorType.ExceptionError(e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."))
