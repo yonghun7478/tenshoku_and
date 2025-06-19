@@ -102,7 +102,7 @@ fun DailyAshiatoSection(
         ) {
             items(
                 items = dailyLog.viewers,
-                key = { it.id } // 사용자 ID를 고유 키로 사용
+                key = { "${it.id}-${it.viewedTime}" } // 사용자 ID와 방문 시간을 조합하여 고유 키 생성
             ) { viewer ->
                 AshiatoUserCard(
                     date = dailyLog.date,

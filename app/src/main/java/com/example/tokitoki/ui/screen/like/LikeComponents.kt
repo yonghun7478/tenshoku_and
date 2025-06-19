@@ -102,7 +102,7 @@ fun LikeReceivedListComponent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(likes, key = { it.id }) { like ->
+            items(likes, key = { "${it.id}-${it.receivedTime}" }) { like ->
                 LikeReceivedItemComponent(
                     like = like,
                     onUserClick = onUserClick
