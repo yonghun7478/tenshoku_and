@@ -40,6 +40,7 @@ import com.example.tokitoki.ui.state.LikesAndAshiatoTab
 import com.example.tokitoki.ui.state.MainBottomItem
 import com.example.tokitoki.ui.state.MainUiEvent
 import com.example.tokitoki.ui.state.MainUiState
+import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.viewmodel.MainViewModel
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 
@@ -170,7 +171,7 @@ fun MainBottomNavigation(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF5F5F5)) // 네비게이션 바 배경색
+            .background(color = LocalColor.current.white) // 네비게이션 바 배경색
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
