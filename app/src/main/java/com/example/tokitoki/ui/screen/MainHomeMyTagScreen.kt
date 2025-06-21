@@ -83,6 +83,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import android.util.Log
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.foundation.BorderStroke
+import com.example.tokitoki.ui.theme.LocalColor
 
 private const val TAG = "MainHomeMyTagScreen"
 
@@ -320,7 +321,7 @@ fun TrendingTagShimmerCard(
             .fillMaxWidth()
             .height(100.dp)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = Color.Gray.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -497,11 +498,10 @@ fun MainHomeMyTagScreen_TrendingTagCard(
             .height(100.dp)
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = Color.Gray.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(12.dp)
             ),
-        shadowElevation = 4.dp
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -560,14 +560,14 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                 }
             }
             
-            // 플러스/체크 아이콘 (우측 하단)
+            // 플러스/체크 아이콘 (우측 중앙)
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(16.dp)
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(Color.Gray)
+                    .background(Color.LightGray)
                     .clickable {
                         onTagToggleSubscription(tag.id, tag.isSubscribed, tag.tagType)
                     },
@@ -576,7 +576,7 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                 Icon(
                     imageVector = if (tag.isSubscribed) Icons.Default.Check else Icons.Default.Add,
                     contentDescription = if (tag.isSubscribed) "구독됨" else "구독하기",
-                    tint = Color.White,
+                    tint = if (tag.isSubscribed) LocalColor.current.black else Color.White,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -891,7 +891,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
         ) {
             repeat(pageCount) { iteration ->
                 val color = if (pagerState.currentPage == iteration) {
-                    MaterialTheme.colorScheme.primary
+                    LocalColor.current.blue // MaterialTheme.colorScheme.primary에서 변경
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                 }
