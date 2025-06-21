@@ -378,10 +378,6 @@ fun TokitokiNavGraph(
                 onNavigateToUserProfile = { id, source ->
                     navAction.navigateToUserDetail(userId = id, screenName = source)
                 },
-                onBackClick = {
-                    navController.navigateUp()
-                },
-                showBackButton = true,
                 initialTab = initialTab
             )
         }

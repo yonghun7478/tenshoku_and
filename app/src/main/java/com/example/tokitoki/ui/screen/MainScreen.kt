@@ -136,8 +136,6 @@ fun MainContents(
                         onNavigateToUserProfile = { userId, source ->
                             onNavigateToUserDetail(userId, source)
                         },
-                        onBackClick = { /* Do nothing since it's in MainScreen */ },
-                        showBackButton = false,
                         initialTab = LikesAndAshiatoTab.LIKES.name
                     )
                 }
