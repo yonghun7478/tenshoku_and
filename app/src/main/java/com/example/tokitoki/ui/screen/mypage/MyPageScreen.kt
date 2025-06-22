@@ -83,8 +83,8 @@ fun MyPageScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 30.dp)
-            .background(Color.White), // 배경색을 흰색으로 변경
+            .background(Color.White)
+            .padding(top = 30.dp), // 배경색을 흰색으로 변경
         horizontalAlignment = Alignment.CenterHorizontally // 全体のColumn을中央揃え
     ) {
         MyPageProfileSection(
