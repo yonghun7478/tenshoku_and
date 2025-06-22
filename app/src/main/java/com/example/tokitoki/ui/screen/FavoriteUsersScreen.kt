@@ -33,9 +33,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -133,8 +136,10 @@ fun FavoriteUsersContents(
                             )
                         }
                     },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = LocalColor.current.white)
                 )
-            }
+            },
+            containerColor = LocalColor.current.white
         ) { paddingValues ->
             when {
                 uiState.isLoading && uiState.favoriteUsers.isEmpty() -> {
@@ -200,7 +205,10 @@ fun FavoriteUserItem(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             // 썸네일 영역을 클릭 가능하게 설정
             Box(
                 modifier = Modifier
@@ -218,57 +226,72 @@ fun FavoriteUserItem(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 기본 정보
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Favorite,
-                    contentDescription = "Name Icon"
-                )
-                Text("${user.name}, ${user.age}", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = "Location Icon"
-                )
-                Text(user.location)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 상세 정보 (FlowRow 또는 Column 사용)
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                DetailItem(label = "키", value = "${user.height}cm")
-                DetailItem(label = "직업", value = user.job)
-                DetailItem(label = "동거인", value = if (user.hasRoommate) "있음" else "없음")
-                DetailItem(label = "형제자매", value = user.siblings)
-                DetailItem(label = "혈액형", value = user.bloodType)
-            }
+                Text(
+                    text = user.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${user.age}歳",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = user.location,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
-            Button(
-                onClick = { onMitenClick(user.id, user.isSendingMiten) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                enabled = !user.isSendingMiten
-            ) {
-                Text("みてね！")
+                // 직업과 혈액형을 한 Row에 배치
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "職業: ${user.job}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "血液型: ${user.bloodType}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp)) // 버튼 위 간격은 유지
+
+                Button(
+                    onClick = { onMitenClick(user.id, user.isSendingMiten) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = LocalColor.current.blue),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    enabled = !user.isSendingMiten
+                ) {
+                    Text("みてね！")
+                }
             }
         }
-    }
-}
-
-@Composable
-fun DetailItem(label: String, value: String) {
-    Row {
-        Text("$label: ", fontWeight = FontWeight.Bold)
-        Text(value)
     }
 }
 
@@ -283,10 +306,7 @@ fun FavoriteUsersScreenPreview() {
             name = "User One",
             age = 25,
             location = "Seoul",
-            height = 175,
             job = "Developer",
-            hasRoommate = false,
-            siblings = "1",
             bloodType = "A",
             timestamp = System.currentTimeMillis()
         ),
@@ -296,10 +316,7 @@ fun FavoriteUsersScreenPreview() {
             name = "User Two",
             age = 30,
             location = "Busan",
-            height = 180,
             job = "Designer",
-            hasRoommate = true,
-            siblings = "2",
             bloodType = "B",
             timestamp = System.currentTimeMillis() - 1000
         )
