@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,11 +25,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.tokitoki.domain.model.LikeItem
 import com.example.tokitoki.ui.state.IineSitaHitoUiState
+import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.IineSitaHitoViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun IineSitaHitoScreen(
@@ -68,10 +73,14 @@ fun IineSitaHitoContents(
     ) {
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(LocalColor.current.white)
+            ) {
                 // Header
                 TopAppBar(
-                    title = { Text("あなたから") },
+                    title = { Text("あなたからのいいね") },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(
@@ -81,7 +90,7 @@ fun IineSitaHitoContents(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = LocalColor.current.white
                     )
                 )
 
@@ -157,54 +166,119 @@ private fun LikedUserCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onNavigateToUserDetail(user.id) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalColor.current.white)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "${user.nickname}, ${user.age}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = user.location,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            user.occupation?.let { occupation ->
-                Text(
-                    text = occupation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            Text(
-                text = user.introduction,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
             AsyncImage(
                 model = user.thumbnail,
                 contentDescription = "Profile image of ${user.nickname}",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .padding(top = 8.dp),
+                    .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = user.nickname,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${user.age}歳",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = user.location,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                val hasOccupation = !user.occupation.isNullOrEmpty()
+                val hasPersonalityTrait = !user.personalityTrait.isNullOrEmpty()
+
+                if (hasOccupation || hasPersonalityTrait) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (hasOccupation) {
+                            Text(
+                                text = "職業: ${user.occupation}",
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        if (hasPersonalityTrait) {
+                            Text(
+                                text = "性格: ${user.personalityTrait}",
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+
+                val hasDatingPhilosophy = !user.datingPhilosophy.isNullOrEmpty()
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "ライフスタイル: ${user.lifestyle}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    user.datingPhilosophy?.let { philosophy ->
+                        Text(
+                            text = "恋愛観: $philosophy",
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                user.marriageView?.let { marriage ->
+                    Text(
+                        text = "結婚観: $marriage",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         }
     }
 }
@@ -238,12 +312,12 @@ private fun EmptyState(
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )
         Text(
-            text = "아직 좋아요를 누른 사람이 없습니다",
+            text = "まだ「いいね」した人がいません",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         Text(
-            text = "마음에 드는 사람을 찾아보세요!",
+            text = "気になる人を探してみましょう！",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
@@ -287,7 +361,7 @@ private fun ErrorSnackbar(
             modifier = Modifier.padding(16.dp),
             action = {
                 TextButton(onClick = onDismiss) {
-                    Text("닫기")
+                    Text("閉じる")
                 }
             }
         ) {
@@ -347,7 +421,11 @@ private fun IineSitaHitoContentsWithDataPreview() {
                         introduction = "안녕하세요! 취미는 여행과 요리입니다.",
                         occupation = "디자이너",
                         receivedTime = System.currentTimeMillis(),
-                        likedAt = System.currentTimeMillis()
+                        likedAt = System.currentTimeMillis(),
+                        personalityTrait = "真面目な",
+                        lifestyle = "規則正しい生活を大切にしています。",
+                        datingPhilosophy = "真剣な出会いを求める",
+                        marriageView = "結婚に前向き"
                     ),
                     LikeItem(
                         id = "2",
@@ -358,7 +436,11 @@ private fun IineSitaHitoContentsWithDataPreview() {
                         introduction = "음악을 좋아합니다.",
                         occupation = "회사원",
                         receivedTime = System.currentTimeMillis(),
-                        likedAt = System.currentTimeMillis()
+                        likedAt = System.currentTimeMillis(),
+                        personalityTrait = "活発な",
+                        lifestyle = "自由な魂です！",
+                        datingPhilosophy = "良い友達から始めたい",
+                        marriageView = "まだよく分かりません"
                     )
                 )
             ),

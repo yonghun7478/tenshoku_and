@@ -9,7 +9,11 @@ data class LikeItem(
     val receivedTime: Long,
     val location: String,
     val occupation: String?,
-    val likedAt: Long
+    val likedAt: Long,
+    val personalityTrait: String?,
+    val lifestyle: String,
+    val datingPhilosophy: String?,
+    val marriageView: String?
 )
 
 data class LikeResult(
