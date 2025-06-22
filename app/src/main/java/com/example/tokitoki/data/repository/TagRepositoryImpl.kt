@@ -15,7 +15,7 @@ import javax.inject.Singleton
 class TagRepositoryImpl @Inject constructor() : TagRepository {
 
     // 1. 모든 MainHomeTag 원본 데이터를 DummyData를 통해 생성하고 보관
-    private val allHomeTags: List<MainHomeTag> by lazy { DummyData.getHomeTags() }
+    private var allHomeTags: List<MainHomeTag>
 
     // 2. (사용자 ID, 태그 ID)로 구독 관계만 저장
     private val subscriptions = mutableSetOf<Pair<String, String>>()
@@ -26,10 +26,22 @@ class TagRepositoryImpl @Inject constructor() : TagRepository {
         val random = java.util.Random()
         (101..115).forEach { tagIdInt ->
             val tagId = tagIdInt.toString()
-            repeat(4) {
+            val numberOfSubscribers = random.nextInt(7) + 4 // 4 (inclusive) to 10 (inclusive)
+            repeat(numberOfSubscribers) {
                 val userId = (random.nextInt(150) + 1).toString() // 1부터 150 사이의 임의의 유저 ID
                 subscriptions.add(userId to tagId)
             }
+        }
+
+        // DummyData에서 초기 태그 목록을 가져옵니다.
+        val initialHomeTags = DummyData.getHomeTags()
+
+        // 각 태그별 구독자 수를 계산합니다.
+        val tagSubscriberCounts = subscriptions.groupBy { it.second }.mapValues { it.value.size }
+
+        // initialHomeTags에 subscriberCount를 업데이트합니다.
+        allHomeTags = initialHomeTags.map { tag ->
+            tag.copy(subscriberCount = tagSubscriberCounts[tag.id] ?: 0)
         }
     }
 
