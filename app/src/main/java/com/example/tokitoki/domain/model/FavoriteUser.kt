@@ -4,25 +4,34 @@ import com.example.tokitoki.data.model.FavoriteUserDto
 
 data class FavoriteUser(
     val id: String,
-    val thumbnailUrl: String,
+    val thumbnailUrl: String?,
     val name: String,
     val age: Int,
     val location: String,
-    val job: String,
-    val bloodType: String,
+    val occupation: String?,
+    val bloodType: String?,
     val timestamp: Long,
-    var isSendingMiten: Boolean = false
-)
-
-fun FavoriteUser.toDto(): FavoriteUserDto {
-    return FavoriteUserDto(
-        id = this.id,
-        thumbnail_url = this.thumbnailUrl,
-        name = this.name,
-        age = this.age,
-        location = this.location,
-        job = this.job,
-        blood_type = this.bloodType,
-        timestamp = this.timestamp // 매핑 시 timestamp 처리
-    )
+    val isSendingMiten: Boolean = false,
+    val personalityTrait: String?,
+    val lifestyle: String,
+    val datingPhilosophy: String?,
+    val marriageView: String?
+) {
+    fun toDto(): FavoriteUserDto {
+        return FavoriteUserDto(
+            id = id,
+            thumbnailUrl = thumbnailUrl,
+            name = name,
+            age = age,
+            location = location,
+            occupation = occupation,
+            bloodType = bloodType,
+            timestamp = timestamp,
+            isSendingMiten = isSendingMiten,
+            personalityTrait = personalityTrait,
+            lifestyle = lifestyle,
+            datingPhilosophy = datingPhilosophy,
+            marriageView = marriageView
+        )
+    }
 }

@@ -22,9 +22,13 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
                 name = userDetail.name,
                 age = userDetail.age,
                 location = userDetail.location,
-                job = userDetail.occupation,
+                occupation = userDetail.occupation,
                 bloodType = userDetail.bloodType,
-                timestamp = userDetail.lastLoginAt
+                timestamp = userDetail.lastLoginAt,
+                personalityTrait = userDetail.personalityTraits.firstOrNull(),
+                lifestyle = userDetail.lifestyle,
+                datingPhilosophy = userDetail.datingPhilosophy,
+                marriageView = userDetail.marriageView
             )
         }.sortedByDescending { it.timestamp }.toMutableList()
 

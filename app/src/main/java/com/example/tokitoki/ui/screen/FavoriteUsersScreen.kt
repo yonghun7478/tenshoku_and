@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,15 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +56,8 @@ import com.example.tokitoki.ui.state.FavoriteUsersUiState
 import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import com.example.tokitoki.ui.viewmodel.FavoriteUsersViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -203,7 +200,8 @@ fun FavoriteUserItem(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalColor.current.white)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -226,11 +224,11 @@ fun FavoriteUserItem(
                 )
             }
 
-            Column(
+            Column( // 사용자 정보 감싸는 Column, 패딩과 간격 조정
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp) // 간격 조정
             ) {
                 Text(
                     text = user.name,
@@ -264,7 +262,7 @@ fun FavoriteUserItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "職業: ${user.job}",
+                        text = "職業: ${user.occupation}",
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -277,6 +275,56 @@ fun FavoriteUserItem(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
+                }
+
+                // 성격과 라이프스타일을 한 Row에 배치
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    user.personalityTrait?.let {
+                        Text(
+                            text = "性格: $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Text(
+                        text = "ライフスタイル: ${user.lifestyle}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // 연애관과 결혼관을 한 Row에 배치
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    user.datingPhilosophy?.let {
+                        Text(
+                            text = "恋愛観: $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    user.marriageView?.let {
+                        Text(
+                            text = "結婚観: $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp)) // 버튼 위 간격은 유지
@@ -301,24 +349,34 @@ fun FavoriteUsersScreenPreview() {
     //  샘플 데이터를 사용하여 UI 상태를 만듭니다. 실제 데이터와 유사하게 조정할 수 있습니다.
     val sampleUsers = listOf(
         FavoriteUser(
-            id = "",
-            thumbnailUrl = "https://example.com/user1.jpg", // 실제 이미지 URL 또는 drawable 리소스로 변경
-            name = "User One",
+            id = "1",
+            thumbnailUrl = "https://picsum.photos/id/1/200/200", // 실제 이미지 URL 또는 drawable 리소스로 변경
+            name = "ユーザーA",
             age = 25,
-            location = "Seoul",
-            job = "Developer",
-            bloodType = "A",
-            timestamp = System.currentTimeMillis()
+            location = "東京",
+            occupation = "エンジニア",
+            bloodType = "A型",
+            timestamp = System.currentTimeMillis(),
+            isSendingMiten = false,
+            personalityTrait = "活発な",
+            lifestyle = "規則正しい生活を大切にしています。",
+            datingPhilosophy = "真剣な出会いを求める",
+            marriageView = "結婚に前向き"
         ),
         FavoriteUser(
-            id = "",
-            thumbnailUrl = "https://example.com/user2.jpg",
-            name = "User Two",
+            id = "2",
+            thumbnailUrl = "https://picsum.photos/id/2/200/200",
+            name = "ユーザーB",
             age = 30,
-            location = "Busan",
-            job = "Designer",
-            bloodType = "B",
-            timestamp = System.currentTimeMillis() - 1000
+            location = "大阪",
+            occupation = "デザイナー",
+            bloodType = "B型",
+            timestamp = System.currentTimeMillis() - 1000,
+            isSendingMiten = true,
+            personalityTrait = null,
+            lifestyle = "自由な魂です！",
+            datingPhilosophy = null,
+            marriageView = "良いご縁があれば考えたい"
         )
     )
 
