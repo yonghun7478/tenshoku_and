@@ -120,7 +120,7 @@ fun LikeReceivedListComponent(
     }
 }
 
-// 시간 포맷팅 유틸 함수
+// 時間フォーマット用ユーティリティ関数
 fun formatReceivedTime(receivedTimeMillis: Long): String {
     val currentTimeMillis = System.currentTimeMillis()
     val diffMillis = currentTimeMillis - receivedTimeMillis
@@ -130,9 +130,9 @@ fun formatReceivedTime(receivedTimeMillis: Long): String {
     val days = TimeUnit.MILLISECONDS.toDays(diffMillis)
 
     return when {
-        minutes < 60 -> "${minutes}분 전"
-        hours < 24 -> "${hours}시간 전"
-        days < 7 -> "${days}일 전"
+        minutes < 60 -> "${minutes}分前"
+        hours < 24 -> "${hours}時間前"
+        days < 7 -> "${days}日前"
         else -> "${java.time.Instant.ofEpochMilli(receivedTimeMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()}"
     }
 }
