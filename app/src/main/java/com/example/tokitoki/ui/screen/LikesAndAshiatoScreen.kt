@@ -21,11 +21,13 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -123,13 +125,19 @@ fun LikesAndAshiatoContent(
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         modifier = Modifier.weight(2f),
-                        containerColor = Color.White
+                        containerColor = Color.White,
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     ) {
                         LikesAndAshiatoTab.entries.forEachIndexed { index, tab ->
                             Tab(
                                 selected = index == pagerState.currentPage,
                                 onClick = { onTabClick(index) },
-                                text = { Text(text = tab.title) }
+                                text = { Text(text = tab.title, color = Color.Black) }
                             )
                         }
                     }
