@@ -21,6 +21,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import java.time.LocalDate
+import java.time.Period
 
 // ViewModel
 @HiltViewModel
@@ -81,6 +83,7 @@ class MyPageViewModel @Inject constructor(
                 }
                 // --- 수정된 부분 끝 ---
 
+                val calculatedAge = calculateAge(localProfile.birthDay) // 생년월일로 나이 계산
                 var bioSentence: String? = null
                 // localProfile은 이제 DB값이거나 위에서 생성된 더미값일 수 있음
                 if (localProfile.mySelfSentenceId > 0) {
@@ -102,6 +105,8 @@ class MyPageViewModel @Inject constructor(
                         isLoading = false, // 로딩 완료
                         profileImageUrl = localProfile.thumbnailUrl,
                         nickname = localProfile.name,
+                        birthday = localProfile.birthDay,
+                        age = calculatedAge, // 계산된 나이 추가
                         bio = bioSentence,
                         error = null // 또는 기존 에러 유지
                     )
@@ -116,6 +121,18 @@ class MyPageViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    // 생년월일로부터 만나이를 계산하는 private 함수
+    private fun calculateAge(birthday: String): Int {
+        return try {
+            val birthDate = LocalDate.parse(birthday) // YYYY-MM-DD 형식의 문자열을 LocalDate로 파싱
+            val currentDate = LocalDate.now()
+            Period.between(birthDate, currentDate).years
+        } catch (e: Exception) {
+            println("Error calculating age for birthday '$birthday': ${e.message}")
+            0 // 에러 발생 시 0 또는 적절한 기본값 반환
         }
     }
 
