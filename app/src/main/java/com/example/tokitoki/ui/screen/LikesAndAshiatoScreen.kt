@@ -5,19 +5,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -36,10 +43,11 @@ import com.example.tokitoki.ui.screen.ashiato.InfiniteListHandler
 import com.example.tokitoki.ui.screen.like.LikeReceivedListComponent
 import com.example.tokitoki.ui.state.AshiatoUiState
 import com.example.tokitoki.ui.state.LikesAndAshiatoTab
+import com.example.tokitoki.ui.state.LikesAndAshiatoUiState
 import com.example.tokitoki.ui.viewmodel.LikesAndAshiatoViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LikesAndAshiatoScreen(
     viewModel: LikesAndAshiatoViewModel = hiltViewModel(),
@@ -67,6 +75,38 @@ fun LikesAndAshiatoScreen(
         }
     }
 
+    LikesAndAshiatoContent(
+        uiState = uiState,
+        pagerState = pagerState,
+        onTabClick = { index ->
+            scope.launch {
+                pagerState.animateScrollToPage(index)
+            }
+        },
+        onRefresh = { viewModel.refresh() },
+        onLoadMore = { viewModel.loadMore() },
+        onUserClickFromLikes = { userId ->
+            viewModel.addLikesUserIdsToCache()
+            onNavigateToUserProfile(userId, "LikeScreen")
+        },
+        onUserClickFromAshiato = { date, userId ->
+            viewModel.addAshiatoUserIdsToCache(date)
+            onNavigateToUserProfile(userId, "AshiatoScreen")
+        }
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun LikesAndAshiatoContent(
+    uiState: LikesAndAshiatoUiState,
+    pagerState: PagerState,
+    onTabClick: (Int) -> Unit,
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit,
+    onUserClickFromLikes: (String) -> Unit,
+    onUserClickFromAshiato: (date: String, userId: String) -> Unit
+) {
     Scaffold(
         containerColor = Color.White,
         content = {
@@ -75,18 +115,24 @@ fun LikesAndAshiatoScreen(
                     .fillMaxSize()
                     .padding(it)
             ) {
-                PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
-                    LikesAndAshiatoTab.entries.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = index == pagerState.currentPage,
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                            },
-                            text = { Text(text = tab.title) }
-                        )
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    TabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        modifier = Modifier.weight(2f),
+                        containerColor = Color.White
+                    ) {
+                        LikesAndAshiatoTab.entries.forEachIndexed { index, tab ->
+                            Tab(
+                                selected = index == pagerState.currentPage,
+                                onClick = { onTabClick(index) },
+                                text = { Text(text = tab.title) }
+                            )
+                        }
                     }
+                    Spacer(Modifier.weight(1f))
                 }
 
                 HorizontalPager(
@@ -100,24 +146,18 @@ fun LikesAndAshiatoScreen(
                                 likes = uiState.likeState.receivedLikes,
                                 listState = likeListState,
                                 isRefreshing = uiState.likeState.receivedLikesIsRefreshing,
-                                onRefresh = { viewModel.refresh() },
-                                onLoadMore = { viewModel.loadMore() },
-                                onUserClick = { userId ->
-                                    viewModel.addLikesUserIdsToCache()
-                                    onNavigateToUserProfile(userId, "LikeScreen")
-                                }
+                                onRefresh = onRefresh,
+                                onLoadMore = onLoadMore,
+                                onUserClick = onUserClickFromLikes
                             )
                         }
 
                         LikesAndAshiatoTab.ASHIATO.ordinal -> {
                             AshiatoPageContent(
                                 uiState = uiState.ashiatoState,
-                                onRefresh = { viewModel.refresh() },
-                                onLoadMore = { viewModel.loadMore() },
-                                onUserClick = { date, userId ->
-                                    viewModel.addAshiatoUserIdsToCache(date)
-                                    onNavigateToUserProfile(userId, "AshiatoScreen")
-                                }
+                                onRefresh = onRefresh,
+                                onLoadMore = onLoadMore,
+                                onUserClick = onUserClickFromAshiato
                             )
                         }
                     }
@@ -197,10 +237,18 @@ fun AshiatoPageContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun LikesAndAshiatoScreenPreview() {
-    LikesAndAshiatoScreen(
-        onNavigateToUserProfile = { _, _ -> },
+fun LikesAndAshiatoContentPreview() {
+    val pagerState = rememberPagerState(pageCount = { LikesAndAshiatoTab.entries.size })
+    LikesAndAshiatoContent(
+        uiState = LikesAndAshiatoUiState(),
+        pagerState = pagerState,
+        onTabClick = { },
+        onRefresh = { },
+        onLoadMore = { },
+        onUserClickFromLikes = { },
+        onUserClickFromAshiato = { _, _ -> }
     )
-} 
+}

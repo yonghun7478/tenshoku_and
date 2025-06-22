@@ -2,6 +2,7 @@ package com.example.tokitoki.ui.screen.like
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import java.util.concurrent.TimeUnit
 import androidx.compose.foundation.clickable
 import coil.compose.AsyncImage
+import androidx.compose.material3.CardDefaults
 
 @Composable
 fun LazyGridState.OnLastItemVisible(onLastItemVisible: () -> Unit) {
@@ -146,7 +148,9 @@ fun LikeReceivedItemComponent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp)
-            .clickable { onUserClick(like.id) }
+            .clickable { onUserClick(like.id) },
+        colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
@@ -186,13 +190,13 @@ fun LikeReceivedItemComponent(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = like.nickname,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "${like.age}歳",
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
