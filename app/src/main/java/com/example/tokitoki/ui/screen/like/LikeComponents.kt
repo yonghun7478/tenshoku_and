@@ -150,7 +150,7 @@ fun LikeReceivedItemComponent(
             .padding(4.dp)
             .clickable { onUserClick(like.id) },
         colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.elevatedCardElevation()
     ) {
         Column(
             modifier = Modifier

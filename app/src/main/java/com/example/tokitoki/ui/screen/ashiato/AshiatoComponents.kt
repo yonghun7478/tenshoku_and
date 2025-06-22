@@ -142,7 +142,8 @@ fun AshiatoUserCard(
             .width(150.dp) // 카드 너비 고정 (디자인에 맞게 조절)
             .clickable { onUserClick(date, viewerInfo.id) },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             Box(
@@ -172,13 +173,13 @@ fun AshiatoUserCard(
             ) {
                 Text(
                     text = "${viewerInfo.age}세 ${viewerInfo.region}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1
                 )
                 Text(
                     text = viewerInfo.viewedTime,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray
                 )
             }
