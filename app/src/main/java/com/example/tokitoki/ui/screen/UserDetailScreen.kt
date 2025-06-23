@@ -22,12 +22,8 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
 import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 import androidx.compose.ui.layout.ContentScale
@@ -40,11 +36,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.ui.unit.sp
 
-// FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
-// import com.google.accompanist.flowlayout.FlowRow
-
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserDetailScreen(
     selectedUserId: String,
@@ -96,7 +90,56 @@ fun UserDetailScreen(
         }
     }
 
+    UserDetailContent(
+        userDetails = userDetails,
+        userTags = userTags,
+        currentPage = currentPage,
+        isLiked = isLiked,
+        isFavorite = isFavorite,
+        pagerState = pagerState,
+        listState = listState,
+        showFab = showFab,
+        screenName = screenName,
+        onBackClick = onBackClick,
+        onToggleFavorite = { viewModel.toggleFavorite() },
+        onToggleLike = { viewModel.toggleLike() },
+        onPickupLeftClick = {
+            sharedViewModel.setPickupDirection(PickupDirection.LEFT)
+            onBackClick()
+        },
+        onPickupRightClick = {
+            sharedViewModel.setPickupDirection(PickupDirection.RIGHT)
+            onBackClick()
+        },
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun UserDetailContent(
+    // states
+    userDetails: List<ResultWrapper<UserDetail>>,
+    userTags: List<MainHomeTag>,
+    currentPage: Int,
+    isLiked: Boolean,
+    isFavorite: Boolean,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    listState: LazyListState,
+    showFab: Boolean,
+    screenName: String,
+
+    // event handlers
+    onBackClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onToggleLike: () -> Unit,
+    onPickupLeftClick: () -> Unit,
+    onPickupRightClick: () -> Unit,
+
+    modifier: Modifier = Modifier
+) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             if (screenName != "MessageListScreen") { // screenName이 "MessageListScreen"이 아닐 때만 TopAppBar 표시
                 TopAppBar(
@@ -114,7 +157,7 @@ fun UserDetailScreen(
                         }
                     },
                     actions = { // 즐겨찾기 버튼을 actions로 이동
-                        IconButton(onClick = { viewModel.toggleFavorite() },
+                        IconButton(onClick = onToggleFavorite,
                             modifier = Modifier
                                 .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
                         ) {
@@ -154,7 +197,7 @@ fun UserDetailScreen(
                         .padding(horizontal = 16.dp) // 좌우 패딩 추가
                 ) {
                     Button(
-                        onClick = { viewModel.toggleLike() },
+                        onClick = onToggleLike,
                         modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
                         enabled = !isLiked, // isLiked가 true일 때 버튼 비활성화
                         colors = ButtonDefaults.buttonColors(
@@ -187,7 +230,7 @@ fun UserDetailScreen(
                 if (userDetails.isNotEmpty() && page < userDetails.size) {
                     when (val userDetailResult = userDetails[page]) {
                         is ResultWrapper.Success -> {
-                            UserDetailContent(
+                            UserDetailPage(
                                 userDetail = userDetailResult.data,
                                 userTags = userTags,
                                 modifier = Modifier.fillMaxSize(),
@@ -211,12 +254,12 @@ fun UserDetailScreen(
                 } else if (page >= userDetails.size && userDetails.isNotEmpty()){ // Pager가 아직 업데이트 안된 경우
                     LoadingContent(modifier = Modifier.fillMaxSize()) // 또는 이전 사용자 정보 유지
                 }
-                 else {
-                     ErrorContent( // 좀 더 명확한 오류 메시지
-                         error = ResultWrapper.ErrorType.ExceptionError("프로필 정보를 불러올 수 없습니다. (page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
-                         modifier = Modifier.fillMaxSize()
-                     )
-                 }
+                else {
+                    ErrorContent( // 좀 더 명확한 오류 메시지
+                        error = ResultWrapper.ErrorType.ExceptionError("프로필 정보를 불러올 수 없습니다. (page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             // 하단 버튼 영역 (screenName에 따라 다른 버튼 표시)
@@ -229,10 +272,7 @@ fun UserDetailScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(
-                        onClick = { 
-                            sharedViewModel.setPickupDirection(PickupDirection.LEFT)
-                            onBackClick()
-                        },
+                        onClick = onPickupLeftClick,
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Icon(
@@ -241,12 +281,9 @@ fun UserDetailScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    
+
                     IconButton(
-                        onClick = { 
-                            sharedViewModel.setPickupDirection(PickupDirection.RIGHT)
-                            onBackClick()
-                        },
+                        onClick = onPickupRightClick,
                         modifier = Modifier.padding(end = 16.dp)
                     ) {
                         Icon(
@@ -265,7 +302,7 @@ fun UserDetailScreen(
 
 @OptIn(ExperimentalLayoutApi::class) // FlowRow 사용을 위해 추가
 @Composable
-private fun UserDetailContent(
+private fun UserDetailPage(
     userDetail: UserDetail,
     userTags: List<MainHomeTag>,
     modifier: Modifier = Modifier,
@@ -273,7 +310,8 @@ private fun UserDetailContent(
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceVariant), // 배경색 추가
         state = listState,
         contentPadding = PaddingValues(bottom = 88.dp), // 하단 패딩 조정 (버튼 높이 + 추가 여유 공간)
         horizontalAlignment = Alignment.CenterHorizontally
@@ -284,37 +322,65 @@ private fun UserDetailContent(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item {
-            BasicInfoSection(
-                name = userDetail.name,
-                age = userDetail.age,
-                location = userDetail.location
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(20.dp)
+            ) {
+                BasicInfoSection(
+                    name = userDetail.name,
+                    age = userDetail.age,
+                    location = userDetail.location
+                )
+            }
         }
-
-        item { Spacer(modifier = Modifier.height(24.dp)) }
 
         if (userTags.isNotEmpty()) { // userDetail.myTags 대신 userTags 사용
             item {
-                SectionTitle(title = "마이 태그")
-                MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 7.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(20.dp)
+                ) {
+                    SectionTitle(title = "마이 태그")
+                    MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
+                }
             }
-            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
 
         if (userDetail.introduction.isNotBlank()) {
             item {
-                SectionTitle(title = "자기소개")
-                IntroductionSection(introduction = userDetail.introduction)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 7.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(20.dp)
+                ) {
+                    SectionTitle(title = "자기소개")
+                    IntroductionSection(introduction = userDetail.introduction)
+                }
             }
-            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
 
         item {
-            SectionTitle(title = "프로필 정보")
-            ProfileDetailsSection(userDetail = userDetail)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 7.dp, bottom = 7.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(20.dp)
+            ) {
+                SectionTitle(title = "프로필 정보")
+                ProfileDetailsSection(userDetail = userDetail)
+            }
         }
         
         // 기존 Spacer(modifier = Modifier.height(80.dp)) 제거
@@ -339,9 +405,8 @@ private fun ThumbnailSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f) // 정사각형 비율
-            .clip(RoundedCornerShape(12.dp)) // 모서리 둥글게
-            .background(MaterialTheme.colorScheme.surfaceVariant) // 배경색
+            .aspectRatio(0.7f) // 정사각형 비율
+            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)) // 모서리 둥글게
     ) {
         AsyncImage(
             model = thumbnailUrl,
@@ -358,12 +423,15 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start // 왼쪽 정렬로 변경
     ) {
-        Text(name, style = MaterialTheme.typography.titleLarge) // 닉네임 스타일 변경
+        Text(
+            text = name,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold
+        ) // 닉네임 스타일 변경
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "${age}세 $location", // 나이와 거주지 한 줄로 표시
-            style = MaterialTheme.typography.bodySmall, // 스타일 변경
-            color = MaterialTheme.colorScheme.onSurfaceVariant // 색상 연하게 변경
+            fontSize = 20.sp
         )
     }
 }
@@ -391,34 +459,29 @@ private fun MyTagsSection(tags: List<MainHomeTag>) { // List<String> -> List<Mai
 
 @Composable
 private fun MyTagChip(tagText: String, tagImageUrl: String) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 1.dp,
+    Row(
+        modifier = Modifier
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        // 왼쪽: AsyncImage로 변경
+        AsyncImage(
+            model = tagImageUrl, // URL 사용
+            contentDescription = "태그 이미지: $tagText",
             modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // 왼쪽: AsyncImage로 변경
-            AsyncImage(
-                model = tagImageUrl, // URL 사용
-                contentDescription = "태그 이미지: $tagText",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(6.dp)),
-                contentScale = ContentScale.Crop // 이미지 채우기 방식
+                .size(80.dp)
+                .clip(RoundedCornerShape(10.dp)),
+            contentScale = ContentScale.Crop // 이미지 채우기 방식
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = tagText, // tagText 사용
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
             )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = tagText, // tagText 사용
-                    style = MaterialTheme.typography.titleSmall,
-                )
-            }
         }
     }
 }
@@ -446,7 +509,7 @@ private fun ProfileDetailsSection(userDetail: UserDetail) {
         ProfilePropertyGroupTitle(title = "신체 정보")
         ProfileDetailItem("혈액형", userDetail.bloodType)
         // TODO: UserDetail에 키(height) 필드가 있다면 추가
-        // ProfileDetailItem("키", userDetail.height.toString() + "cm") 
+        // ProfileDetailItem("키", userDetail.height.toString() + "cm")
         ProfileDetailItem("외견", userDetail.appearance) // 체형에 해당될 수 있음
 
         Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
@@ -531,7 +594,7 @@ private fun ErrorContent(
 }
 
 // androidx.compose.foundation.layout.ExperimentalLayoutApi 임포트 추가
-// import androidx.compose.foundation.layout.ExperimentalLayoutApi 
+// import androidx.compose.foundation.layout.ExperimentalLayoutApi
 // 주: 이미 파일 상단에 OptIn으로 추가되어 있다면 별도 import 문은 없어도 될 수 있음.
 // 하지만 명시적으로 추가하는 것이 좋을 수 있음.
 // 실제로는 @OptIn(ExperimentalLayoutApi::class) 어노테이션이 있는 컴포저블 내부에서만 사용 가능.
