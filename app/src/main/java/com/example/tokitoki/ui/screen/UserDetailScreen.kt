@@ -37,6 +37,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.tokitoki.domain.model.TagType
+import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -593,12 +596,200 @@ private fun ErrorContent(
     }
 }
 
+@Preview(showBackground = true, name = "UserDetailContent Preview")
+@Composable
+fun UserDetailContentPreview() {
+    val dummyUserDetail = UserDetail(
+        id = "dummy_user_123",
+        name = "김토키",
+        age = 28,
+        location = "서울",
+        thumbnailUrl = "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
+        introduction = "안녕하세요! 코딩과 여행을 좋아하는 김토키입니다. 같이 맛있는 것도 먹고, 재미있는 이야기도 나누면서 좋은 인연을 만들고 싶어요. 잘 부탁드립니다! :)",
+        isMale = true,
+        bloodType = "A형",
+        education = "대학교 졸업",
+        occupation = "소프트웨어 엔지니어",
+        appearance = "슬림한 체형",
+        datingPhilosophy = "서로에게 긍정적인 영향을 주는 관계",
+        marriageView = "때가 되면 하고 싶어요",
+        personalityTraits = listOf("긍정적", "사교적", "진솔함", "유머러스"),
+        hobbies = listOf("코딩", "넷플릭스 시청", "맛집탐방", "해외여행", "사진찍기"),
+        lifestyle = "주말에는 주로 집에서 쉬거나 친구들을 만나요."
+    )
+
+    val dummyUserTags = listOf(
+        MainHomeTag(id = "tag1", name = "☕️ 카페투어", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 자유로운 해외여행", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag4", name = "🏃‍♂️ 주말엔 등산", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag5", name = "📚 한 달에 책 2권 읽기", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
+    )
+
+    TokitokiTheme {
+        UserDetailContent(
+            userDetails = listOf(ResultWrapper.Success(dummyUserDetail)),
+            userTags = dummyUserTags,
+            currentPage = 0,
+            isLiked = false,
+            isFavorite = false,
+            pagerState = rememberPagerState { 1 },
+            listState = rememberLazyListState(),
+            showFab = false,
+            screenName = "MainHomePickupScreen",
+            onBackClick = {},
+            onToggleFavorite = {},
+            onToggleLike = {},
+            onPickupLeftClick = {},
+            onPickupRightClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "UserDetailContent Preview - No Tags/Intro")
+@Composable
+fun UserDetailContentNoTagsPreview() {
+    val dummyUserDetail = UserDetail(
+        id = "dummy_user_456",
+        name = "박토키",
+        age = 31,
+        location = "부산",
+        thumbnailUrl = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
+        introduction = "",
+        isMale = true,
+        bloodType = "B형",
+        education = "고등학교 졸업",
+        occupation = "프리랜서",
+        appearance = "보통",
+        datingPhilosophy = "자유로운 관계",
+        marriageView = "생각 없음",
+        personalityTraits = listOf("내향적"),
+        hobbies = listOf("음악감상"),
+        lifestyle = "조용히 지내는 편"
+    )
+
+    TokitokiTheme {
+        UserDetailContent(
+            userDetails = listOf(ResultWrapper.Success(dummyUserDetail)),
+            userTags = emptyList(),
+            currentPage = 0,
+            isLiked = false,
+            isFavorite = false,
+            pagerState = rememberPagerState { 1 },
+            listState = rememberLazyListState(),
+            showFab = false,
+            screenName = "MainHomePickupScreen",
+            onBackClick = {},
+            onToggleFavorite = {},
+            onToggleLike = {},
+            onPickupLeftClick = {},
+            onPickupRightClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "SectionTitle Preview")
+@Composable
+fun SectionTitlePreview() {
+    TokitokiTheme {
+        SectionTitle(title = "마이 태그")
+    }
+}
+
+@Preview(showBackground = true, name = "ThumbnailSection Preview")
+@Composable
+fun ThumbnailSectionPreview() {
+    TokitokiTheme {
+        ThumbnailSection(thumbnailUrl = "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80")
+    }
+}
+
+@Preview(showBackground = true, name = "BasicInfoSection Preview")
+@Composable
+fun BasicInfoSectionPreview() {
+    TokitokiTheme {
+        BasicInfoSection(name = "김토키", age = 28, location = "서울")
+    }
+}
+
+@Preview(showBackground = true, name = "MyTagsSection Preview")
+@Composable
+fun MyTagsSectionPreview() {
+    val dummyUserTags = listOf(
+        MainHomeTag(id = "tag1", name = "☕️ 카페투어", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 자유로운 해외여행", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY)
+    )
+    TokitokiTheme {
+        MyTagsSection(tags = dummyUserTags)
+    }
+}
+
+@Preview(showBackground = true, name = "MyTagChip Preview")
+@Composable
+fun MyTagChipPreview() {
+    TokitokiTheme {
+        MyTagChip(
+            tagText = "☕️ 카페투어",
+            tagImageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80"
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "IntroductionSection Preview")
+@Composable
+fun IntroductionSectionPreview() {
+    TokitokiTheme {
+        IntroductionSection(introduction = "안녕하세요! 코딩과 여행을 좋아하는 김토키입니다. 같이 맛있는 것도 먹고, 재미있는 이야기도 나누면서 좋은 인연을 만들고 싶어요. 잘 부탁드립니다! :)")
+    }
+}
+
+@Preview(showBackground = true, name = "ProfileDetailsSection Preview")
+@Composable
+fun ProfileDetailsSectionPreview() {
+    val dummyUserDetail = UserDetail(
+        name = "김토키",
+        age = 28,
+        isMale = true,
+        location = "서울",
+        bloodType = "A형",
+        education = "대학교 졸업",
+        occupation = "소프트웨어 엔지니어",
+        appearance = "슬림한 체형",
+        datingPhilosophy = "서로에게 긍정적인 영향을 주는 관계",
+        marriageView = "때가 되면 하고 싶어요",
+        personalityTraits = listOf("긍정적", "사교적", "진솔함", "유머러스"),
+        hobbies = listOf("코딩", "넷플릭스 시청", "맛집탐방", "해외여행", "사진찍기"),
+        lifestyle = "주말에는 주로 집에서 쉬거나 친구들을 만나요."
+    )
+    TokitokiTheme {
+        ProfileDetailsSection(userDetail = dummyUserDetail)
+    }
+}
+
+@Preview(showBackground = true, name = "ProfilePropertyGroupTitle Preview")
+@Composable
+fun ProfilePropertyGroupTitlePreview() {
+    TokitokiTheme {
+        ProfilePropertyGroupTitle(title = "기본 정보")
+    }
+}
+
+@Preview(showBackground = true, name = "ProfileDetailItem Preview")
+@Composable
+fun ProfileDetailItemPreview() {
+    TokitokiTheme {
+        ProfileDetailItem(label = "닉네임", value = "김토키")
+    }
+}
+
 // androidx.compose.foundation.layout.ExperimentalLayoutApi 임포트 추가
 // import androidx.compose.foundation.layout.ExperimentalLayoutApi
 // 주: 이미 파일 상단에 OptIn으로 추가되어 있다면 별도 import 문은 없어도 될 수 있음.
 // 하지만 명시적으로 추가하는 것이 좋을 수 있음.
 // 실제로는 @OptIn(ExperimentalLayoutApi::class) 어노테이션이 있는 컴포저블 내부에서만 사용 가능.
-// MyTagsSection과 UserDetailContent에 이미 OptIn이 되어있음.
 
 // 주: 이 파일에서 사용되는 모든 컴포저블에서 필요한 경우 @OptIn(ExperimentalLayoutApi::class) 어노테이션을 추가해야 합니다.
 // 이는 해당 컴포저블에서 사용되는 모든 컴포저블에 적용되어야 합니다. 
