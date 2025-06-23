@@ -156,7 +156,7 @@ private fun UserDetailContent(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "뒤로가기",
+                                contentDescription = "戻る",
                                 tint = Color.White // 흰색으로 변경
                             )
                         }
@@ -169,13 +169,13 @@ private fun UserDetailContent(
                             if (isFavorite) {
                                 Icon(
                                     imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
-                                    contentDescription = "찜하기",
+                                    contentDescription = "お気に入り",
                                     tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
                                 )
                             } else {
                                 Icon(
                                     painter = painterResource(id = R.drawable.outline_star_outline_24),
-                                    contentDescription = "찜하기",
+                                    contentDescription = "お気に入り",
                                     tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
                                 )
                             }
@@ -208,17 +208,17 @@ private fun UserDetailContent(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = LocalColor.current.blue,
                             contentColor = Color.White,
-                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            disabledContainerColor = Color(0xFFFFA500), // 오렌지색
+                            disabledContentColor = Color.White
                         )
                     ) {
                         Icon(
                             imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "좋아요",
+                            contentDescription = "いいね",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("좋아요")
+                        Text("いいね")
                     }
                 }
             }
@@ -267,7 +267,7 @@ private fun UserDetailContent(
                 }
                 else {
                     ErrorContent( // 좀 더 명확한 오류 메시지
-                        error = ResultWrapper.ErrorType.ExceptionError("프로필 정보를 불러올 수 없습니다. (page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
+                        error = ResultWrapper.ErrorType.ExceptionError("プロフィール情報を読み込めませんでした。(page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -361,7 +361,7 @@ private fun UserDetailPage(
                         .background(LocalColor.current.white)
                         .padding(20.dp)
                 ) {
-                    SectionTitle(title = "마이 태그")
+                    SectionTitle(title = "マイタグ")
                     MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
                 }
             }
@@ -377,7 +377,7 @@ private fun UserDetailPage(
                         .background(LocalColor.current.white)
                         .padding(20.dp)
                 ) {
-                    SectionTitle(title = "자기소개")
+                    SectionTitle(title = "自己紹介")
                     IntroductionSection(introduction = userDetail.introduction)
                 }
             }
@@ -392,7 +392,7 @@ private fun UserDetailPage(
                     .background(LocalColor.current.white)
                     .padding(20.dp)
             ) {
-                SectionTitle(title = "프로필 정보")
+                SectionTitle(title = "プロフィール情報")
                 ProfileDetailsSection(userDetail = userDetail)
             }
         }
@@ -424,7 +424,7 @@ private fun ThumbnailSection(
     ) {
         AsyncImage(
             model = thumbnailUrl,
-            contentDescription = "프로필 썸네일",
+            contentDescription = "プロフィールサムネイル",
             modifier = Modifier.fillMaxSize(),
             contentScale = androidx.compose.ui.layout.ContentScale.Crop // 이미지 채우기 방식
         )
@@ -444,7 +444,7 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
         ) // 닉네임 스타일 변경
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "${age}세 $location", // 나이와 거주지 한 줄로 표시
+            text = "${age}歳 $location", // 나이와 거주지 한 줄로 표시
             fontSize = 20.sp
         )
     }
@@ -481,7 +481,7 @@ private fun MyTagChip(tagText: String, tagImageUrl: String) {
         // 왼쪽: AsyncImage로 변경
         AsyncImage(
             model = tagImageUrl, // URL 사용
-            contentDescription = "태그 이미지: $tagText",
+            contentDescription = "タグイメージ: $tagText",
             modifier = Modifier
                 .size(80.dp)
                 .clip(RoundedCornerShape(10.dp)),
@@ -512,40 +512,40 @@ private fun IntroductionSection(introduction: String) {
 @Composable
 private fun ProfileDetailsSection(userDetail: UserDetail) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-        ProfilePropertyGroupTitle(title = "기본 정보")
-        ProfileDetailItem("닉네임", userDetail.name)
-        ProfileDetailItem("나이", userDetail.age.toString())
-        ProfileDetailItem("성별", if (userDetail.isMale) "남성" else "여성")
-        ProfileDetailItem("거주지", userDetail.location)
+        ProfilePropertyGroupTitle(title = "基本情報")
+        ProfileDetailItem("ニックネーム", userDetail.name)
+        ProfileDetailItem("年齢", userDetail.age.toString())
+        ProfileDetailItem("性別", if (userDetail.isMale) "男性" else "女性")
+        ProfileDetailItem("居住地", userDetail.location)
 
         Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
 
-        ProfilePropertyGroupTitle(title = "신체 정보")
-        ProfileDetailItem("혈액형", userDetail.bloodType)
-        // TODO: UserDetail에 키(height) 필드가 있다면 추가
+        ProfilePropertyGroupTitle(title = "身体情報")
+        ProfileDetailItem("血液型", userDetail.bloodType)
+        // TODO: UserDetailに키(height)フィールドがあれば追加
         // ProfileDetailItem("키", userDetail.height.toString() + "cm")
-        ProfileDetailItem("외견", userDetail.appearance) // 체형에 해당될 수 있음
+        ProfileDetailItem("外見", userDetail.appearance) // 체형에 해당될 수 있음
 
         Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
 
-        ProfilePropertyGroupTitle(title = "학력 및 직업")
-        ProfileDetailItem("학력", userDetail.education)
-        ProfileDetailItem("직종", userDetail.occupation)
-        // TODO: UserDetail에 연수입(annualIncome) 필드가 있다면 추가
-        // ProfileDetailItem("연수입", userDetail.annualIncome)
+        ProfilePropertyGroupTitle(title = "学歴・職歴")
+        ProfileDetailItem("学歴", userDetail.education)
+        ProfileDetailItem("職種", userDetail.occupation)
+        // TODO: UserDetailに年収(annualIncome)フィールドがあれば追加
+        // ProfileDetailItem("年収", userDetail.annualIncome)
 
         Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
 
-        ProfilePropertyGroupTitle(title = "가치관")
-        ProfileDetailItem("연애관", userDetail.datingPhilosophy)
-        ProfileDetailItem("결혼관", userDetail.marriageView)
+        ProfilePropertyGroupTitle(title = "価値観")
+        ProfileDetailItem("恋愛観", userDetail.datingPhilosophy)
+        ProfileDetailItem("結婚観", userDetail.marriageView)
         if (userDetail.personalityTraits.isNotEmpty()) {
-            ProfileDetailItem("성격", userDetail.personalityTraits.joinToString(", "))
+            ProfileDetailItem("性格", userDetail.personalityTraits.joinToString(", "))
         }
         if (userDetail.hobbies.isNotEmpty()){
-            ProfileDetailItem("취미", userDetail.hobbies.joinToString(", "))
+            ProfileDetailItem("趣味", userDetail.hobbies.joinToString(", "))
         }
-        ProfileDetailItem("생활", userDetail.lifestyle)
+        ProfileDetailItem("ライフスタイル", userDetail.lifestyle)
     }
 }
 
@@ -600,41 +600,41 @@ private fun ErrorContent(
         Text(
             text = when (error) {
                 is ResultWrapper.ErrorType.ExceptionError -> error.message
-                else -> "알 수 없는 오류가 발생했습니다."
+                else -> "不明なエラーが発生しました。"
             },
             color = MaterialTheme.colorScheme.error
         )
     }
 }
 
-@Preview(showBackground = true, name = "UserDetailContent Preview")
+@Preview(showBackground = true, name = "UserDetailContentプレビュー")
 @Composable
 fun UserDetailContentPreview() {
     val dummyUserDetail = UserDetail(
         id = "dummy_user_123",
-        name = "김토키",
+        name = "キム・トキ",
         age = 28,
-        location = "서울",
+        location = "ソウル",
         thumbnailUrl = "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
-        introduction = "안녕하세요! 코딩과 여행을 좋아하는 김토키입니다. 같이 맛있는 것도 먹고, 재미있는 이야기도 나누면서 좋은 인연을 만들고 싶어요. 잘 부탁드립니다! :)",
+        introduction = "こんにちは！コーディングと旅行が好きなキム・トキです。一緒に美味しいものを食べたり、面白い話をしながら良い縁を作りたいです。よろしくお願いします！:)",
         isMale = true,
-        bloodType = "A형",
-        education = "대학교 졸업",
-        occupation = "소프트웨어 엔지니어",
-        appearance = "슬림한 체형",
-        datingPhilosophy = "서로에게 긍정적인 영향을 주는 관계",
-        marriageView = "때가 되면 하고 싶어요",
-        personalityTraits = listOf("긍정적", "사교적", "진솔함", "유머러스"),
-        hobbies = listOf("코딩", "넷플릭스 시청", "맛집탐방", "해외여행", "사진찍기"),
-        lifestyle = "주말에는 주로 집에서 쉬거나 친구들을 만나요."
+        bloodType = "A型",
+        education = "大学卒業",
+        occupation = "ソフトウェアエンジニア",
+        appearance = "スリムな体型",
+        datingPhilosophy = "お互いに良い影響を与える関係",
+        marriageView = "時期が来たらしたいです",
+        personalityTraits = listOf("ポジティブ", "社交的", "率直", "ユーモラス"),
+        hobbies = listOf("コーディング", "Netflix視聴", "グルメ探訪", "海外旅行", "写真撮影"),
+        lifestyle = "週末は主に家で休んだり、友達に会ったりします。"
     )
 
     val dummyUserTags = listOf(
-        MainHomeTag(id = "tag1", name = "☕️ 카페투어", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag2", name = "✈️ 자유로운 해외여행", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag4", name = "🏃‍♂️ 주말엔 등산", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag5", name = "📚 한 달에 책 2권 읽기", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
+        MainHomeTag(id = "tag1", name = "☕️ カフェ巡り", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 自由な海外旅行", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 人生映画探し", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag4", name = "🏃‍♂️ 週末は登山", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag5", name = "📚 月に2冊読書", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
     )
 
     TokitokiTheme {
@@ -646,8 +646,8 @@ fun UserDetailContentPreview() {
             isFavorite = false,
             pagerState = rememberPagerState { 1 },
             listState = rememberLazyListState(),
-            showFab = false,
-            screenName = "MainHomePickupScreen",
+            showFab = true,
+            screenName = "FavoriteUsersScreen",
             onBackClick = {},
             onToggleFavorite = {},
             onToggleLike = {},
@@ -658,26 +658,26 @@ fun UserDetailContentPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "UserDetailContent Preview - No Tags/Intro")
+@Preview(showBackground = true, name = "UserDetailContentプレビュー - タグ/紹介なし")
 @Composable
 fun UserDetailContentNoTagsPreview() {
     val dummyUserDetail = UserDetail(
         id = "dummy_user_456",
-        name = "박토키",
+        name = "パク・トキ",
         age = 31,
-        location = "부산",
+        location = "釜山",
         thumbnailUrl = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
         introduction = "",
         isMale = true,
-        bloodType = "B형",
-        education = "고등학교 졸업",
-        occupation = "프리랜서",
-        appearance = "보통",
-        datingPhilosophy = "자유로운 관계",
-        marriageView = "생각 없음",
-        personalityTraits = listOf("내향적"),
-        hobbies = listOf("음악감상"),
-        lifestyle = "조용히 지내는 편"
+        bloodType = "B型",
+        education = "高校卒業",
+        occupation = "フリーランサー",
+        appearance = "普通",
+        datingPhilosophy = "自由な関係",
+        marriageView = "考えていません",
+        personalityTraits = listOf("内向的"),
+        hobbies = listOf("音楽鑑賞"),
+        lifestyle = "静かに過ごす方"
     )
 
     TokitokiTheme {
@@ -689,8 +689,8 @@ fun UserDetailContentNoTagsPreview() {
             isFavorite = false,
             pagerState = rememberPagerState { 1 },
             listState = rememberLazyListState(),
-            showFab = false,
-            screenName = "MainHomePickupScreen",
+            showFab = true,
+            screenName = "FavoriteUsersScreen",
             onBackClick = {},
             onToggleFavorite = {},
             onToggleLike = {},
@@ -701,15 +701,15 @@ fun UserDetailContentNoTagsPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "SectionTitle Preview")
+@Preview(showBackground = true, name = "SectionTitleプレビュー")
 @Composable
 fun SectionTitlePreview() {
     TokitokiTheme {
-        SectionTitle(title = "마이 태그")
+        SectionTitle(title = "マイタグ")
     }
 }
 
-@Preview(showBackground = true, name = "ThumbnailSection Preview")
+@Preview(showBackground = true, name = "ThumbnailSectionプレビュー")
 @Composable
 fun ThumbnailSectionPreview() {
     TokitokiTheme {
@@ -717,84 +717,82 @@ fun ThumbnailSectionPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "BasicInfoSection Preview")
+@Preview(showBackground = true, name = "BasicInfoSectionプレビュー")
 @Composable
 fun BasicInfoSectionPreview() {
     TokitokiTheme {
-        BasicInfoSection(name = "김토키", age = 28, location = "서울")
+        BasicInfoSection(name = "キム・トキ", age = 28, location = "ソウル")
     }
 }
 
-@Preview(showBackground = true, name = "MyTagsSection Preview")
+@Preview(showBackground = true, name = "MyTagsSectionプレビュー")
 @Composable
 fun MyTagsSectionPreview() {
     val dummyUserTags = listOf(
-        MainHomeTag(id = "tag1", name = "☕️ 카페투어", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag2", name = "✈️ 자유로운 해외여행", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag4", name = "🏃‍♂️ 주말엔 등산", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag5", name = "📚 한 달에 책 2권 읽기", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
+        MainHomeTag(id = "tag1", name = "☕️ カフェ巡り", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 自由な海外旅行", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 人生映画探し", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY)
     )
     TokitokiTheme {
         MyTagsSection(tags = dummyUserTags)
     }
 }
 
-@Preview(showBackground = true, name = "MyTagChip Preview")
+@Preview(showBackground = true, name = "MyTagChipプレビュー")
 @Composable
 fun MyTagChipPreview() {
     TokitokiTheme {
         MyTagChip(
-            tagText = "☕️ 카페투어",
+            tagText = "☕️ カフェ巡り",
             tagImageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80"
         )
     }
 }
 
-@Preview(showBackground = true, name = "IntroductionSection Preview")
+@Preview(showBackground = true, name = "IntroductionSectionプレビュー")
 @Composable
 fun IntroductionSectionPreview() {
     TokitokiTheme {
-        IntroductionSection(introduction = "안녕하세요! 코딩과 여행을 좋아하는 김토키입니다. 같이 맛있는 것도 먹고, 재미있는 이야기도 나누면서 좋은 인연을 만들고 싶어요. 잘 부탁드립니다! :)")
+        IntroductionSection(introduction = "こんにちは！コーディングと旅行が好きなキム・トキです。一緒に美味しいものを食べたり、面白い話をしながら良い縁を作りたいです。よろしくお願いします！:)")
     }
 }
 
-@Preview(showBackground = true, name = "ProfileDetailsSection Preview")
+@Preview(showBackground = true, name = "ProfileDetailsSectionプレビュー")
 @Composable
 fun ProfileDetailsSectionPreview() {
     val dummyUserDetail = UserDetail(
-        name = "김토키",
+        name = "キム・トキ",
         age = 28,
         isMale = true,
-        location = "서울",
-        bloodType = "A형",
-        education = "대학교 졸업",
-        occupation = "소프트웨어 엔지니어",
-        appearance = "슬림한 체형",
-        datingPhilosophy = "서로에게 긍정적인 영향을 주는 관계",
-        marriageView = "때가 되면 하고 싶어요",
-        personalityTraits = listOf("긍정적", "사교적", "진솔함", "유머러스"),
-        hobbies = listOf("코딩", "넷플릭스 시청", "맛집탐방", "해외여행", "사진찍기"),
-        lifestyle = "주말에는 주로 집에서 쉬거나 친구들을 만나요."
+        location = "ソウル",
+        bloodType = "A型",
+        education = "大学卒業",
+        occupation = "ソフトウェアエンジニア",
+        appearance = "スリムな体型",
+        datingPhilosophy = "お互いに良い影響を与える関係",
+        marriageView = "時期が来たらしたいです",
+        personalityTraits = listOf("ポジティブ", "社交的", "率直", "ユーモラス"),
+        hobbies = listOf("コーディング", "Netflix視聴", "グルメ探訪", "海外旅行", "写真撮影"),
+        lifestyle = "週末は主に家で休んだり、友達に会ったりします。"
     )
     TokitokiTheme {
         ProfileDetailsSection(userDetail = dummyUserDetail)
     }
 }
 
-@Preview(showBackground = true, name = "ProfilePropertyGroupTitle Preview")
+@Preview(showBackground = true, name = "ProfilePropertyGroupTitleプレビュー")
 @Composable
 fun ProfilePropertyGroupTitlePreview() {
     TokitokiTheme {
-        ProfilePropertyGroupTitle(title = "기본 정보")
+        ProfilePropertyGroupTitle(title = "基本情報")
     }
 }
 
-@Preview(showBackground = true, name = "ProfileDetailItem Preview")
+@Preview(showBackground = true, name = "ProfileDetailItemプレビュー")
 @Composable
 fun ProfileDetailItemPreview() {
     TokitokiTheme {
-        ProfileDetailItem(label = "닉네임", value = "김토키")
+        ProfileDetailItem(label = "ニックネーム", value = "キム・トキ")
     }
 }
 
