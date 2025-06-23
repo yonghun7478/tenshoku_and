@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.ui.theme.TokitokiTheme
+import androidx.compose.ui.unit.LayoutDirection
+import com.example.tokitoki.ui.theme.LocalColor
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -190,7 +192,7 @@ private fun UserDetailContent(
             }
         },
         floatingActionButton = { // FloatingActionButton을 Button으로 변경
-            if (screenName != "MessageListScreen") { // MessageListScreen이 아닐 때만 좋아요 버튼 표시
+            if (screenName != "MessageListScreen" && screenName != "MainHomePickupScreen") { // "MessageListScreen" 또는 "MainHomePickupScreen"이 아닐 때만 좋아요 버튼 표시
                 AnimatedVisibility(
                     visible = showFab,
                     enter = fadeIn(),
@@ -204,8 +206,10 @@ private fun UserDetailContent(
                         modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
                         enabled = !isLiked, // isLiked가 true일 때 버튼 비활성화
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
+                            containerColor = LocalColor.current.blue,
+                            contentColor = Color.White,
+                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     ) {
                         Icon(
@@ -224,7 +228,11 @@ private fun UserDetailContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // 이 줄 다시 추가
+                .padding(
+                    start = paddingValues.calculateLeftPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateRightPadding(LayoutDirection.Ltr),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -271,28 +279,31 @@ private fun UserDetailContent(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 16.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(
                         onClick = onPickupLeftClick,
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier
+                            .background(Color.White, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "いまいち",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = LocalColor.current.blue
                         )
                     }
 
                     IconButton(
                         onClick = onPickupRightClick,
-                        modifier = Modifier.padding(end = 16.dp)
+                        modifier = Modifier
+                            .background(Color.White, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
                             contentDescription = "いいね",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = LocalColor.current.blue
                         )
                     }
                 }
@@ -314,7 +325,7 @@ private fun UserDetailPage(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant), // 배경색 추가
+            .background(LocalColor.current.lightGray), // 배경색 추가
         state = listState,
         contentPadding = PaddingValues(bottom = 88.dp), // 하단 패딩 조정 (버튼 높이 + 추가 여유 공간)
         horizontalAlignment = Alignment.CenterHorizontally
@@ -329,7 +340,7 @@ private fun UserDetailPage(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(LocalColor.current.white)
                     .padding(20.dp)
             ) {
                 BasicInfoSection(
@@ -347,7 +358,7 @@ private fun UserDetailPage(
                         .fillMaxWidth()
                         .padding(top = 7.dp)
                         .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(LocalColor.current.white)
                         .padding(20.dp)
                 ) {
                     SectionTitle(title = "마이 태그")
@@ -363,7 +374,7 @@ private fun UserDetailPage(
                         .fillMaxWidth()
                         .padding(top = 7.dp)
                         .clip(RoundedCornerShape(30.dp))
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(LocalColor.current.white)
                         .padding(20.dp)
                 ) {
                     SectionTitle(title = "자기소개")
@@ -378,7 +389,7 @@ private fun UserDetailPage(
                     .fillMaxWidth()
                     .padding(top = 7.dp, bottom = 7.dp)
                     .clip(RoundedCornerShape(30.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(LocalColor.current.white)
                     .padding(20.dp)
             ) {
                 SectionTitle(title = "프로필 정보")
@@ -720,7 +731,9 @@ fun MyTagsSectionPreview() {
     val dummyUserTags = listOf(
         MainHomeTag(id = "tag1", name = "☕️ 카페투어", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
         MainHomeTag(id = "tag2", name = "✈️ 자유로운 해외여행", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
-        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY)
+        MainHomeTag(id = "tag3", name = "🎬 인생 영화 찾기", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag4", name = "🏃‍♂️ 주말엔 등산", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag5", name = "📚 한 달에 책 2권 읽기", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
     )
     TokitokiTheme {
         MyTagsSection(tags = dummyUserTags)
