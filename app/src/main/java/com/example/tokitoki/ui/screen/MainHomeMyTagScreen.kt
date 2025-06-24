@@ -453,7 +453,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
                 ) {
                     repeat(tags.size) { iteration ->
                         val color = if (pagerState.currentPage == iteration) {
-                            MaterialTheme.colorScheme.primary
+                            LocalColor.current.blue
                         } else {
                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                         }
