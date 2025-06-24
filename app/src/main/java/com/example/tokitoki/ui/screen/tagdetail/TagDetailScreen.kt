@@ -30,6 +30,7 @@ import com.example.tokitoki.domain.model.User
 import com.example.tokitoki.ui.state.TagDetailUiState
 import com.example.tokitoki.ui.viewmodel.TagDetailViewModel
 import androidx.compose.material.icons.filled.ArrowBack
+import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @Composable
@@ -82,7 +83,7 @@ fun TagDetailScreenContents(
     uiState.error?.let { errorMsg ->
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("오류", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("エラー", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 Text(text = errorMsg, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
             }
@@ -95,7 +96,7 @@ fun TagDetailScreenContents(
             modifier = modifier
                 .fillMaxSize()
         ) {
-            // 헤더 영역
+            // ヘッダーエリア
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,14 +117,14 @@ fun TagDetailScreenContents(
                 }
             }
 
-            // 태그 정보 영역
+            // タグ情報エリア
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                // 상단 태그 정보
-                Spacer(Modifier.height(16.dp)) // 상단 여백
+                // 上部タグ情報
+                Spacer(Modifier.height(16.dp)) // 上部スペース
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -145,7 +146,7 @@ fun TagDetailScreenContents(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "총 ${actualTag.subscriberCount}명 구독중",
+                            text = "登録者数 ${actualTag.subscriberCount}名",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -158,13 +159,13 @@ fun TagDetailScreenContents(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (uiState.isSubscribed) Color(0xFFEEEEEE) else MaterialTheme.colorScheme.primary,
+                        containerColor = if (uiState.isSubscribed) Color(0xFFEEEEEE) else LocalColor.current.blue,
                         contentColor = if (uiState.isSubscribed) Color.DarkGray else MaterialTheme.colorScheme.onPrimary
                     ),
                     border = if (uiState.isSubscribed) BorderStroke(1.dp, Color.LightGray) else null
                 ) {
                     Text(
-                        text = if (uiState.isSubscribed) "구독중" else "구독하기",
+                        text = if (uiState.isSubscribed) "購読中" else "購読する",
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -172,7 +173,7 @@ fun TagDetailScreenContents(
                 Spacer(Modifier.height(24.dp))
 
                 Text(
-                    text = "등록중인 유저",
+                    text = "登録中のユーザー",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -180,14 +181,14 @@ fun TagDetailScreenContents(
 
                 if (uiState.subscribers.isEmpty() && !uiState.isLoading) {
                     Text(
-                        text = "아직 구독자가 없습니다.",
+                        text = "まだ購読者がいません。",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .padding(vertical = 16.dp)
                             .align(Alignment.CenterHorizontally)
                     )
                 } else {
-                    // 구독자 리스트를 LazyVerticalGrid로 변경
+                    // 購読者リストをLazyVerticalGridに変更
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         modifier = Modifier.fillMaxWidth(),
@@ -203,9 +204,9 @@ fun TagDetailScreenContents(
                             )
                         }
 
-                        // 무한스크롤 트리거 및 로딩 인디케이터
+                        // 無限スクロールトリガーおよびローディングインディケータ
                         if (!uiState.isLastPage) {
-                            item(span = { GridItemSpan(maxLineSpan) }) { // 로딩 아이템은 한 줄 전체 차지
+                            item(span = { GridItemSpan(maxLineSpan) }) { // ローディングアイテムは1行全体を占める
                                 if (uiState.isLoading && uiState.subscribers.isNotEmpty()) {
                                     Box(
                                         modifier = Modifier
@@ -216,9 +217,9 @@ fun TagDetailScreenContents(
                                         CircularProgressIndicator(modifier = Modifier.size(32.dp))
                                     }
                                 } else if (!uiState.isLoading) {
-                                    // 마지막 아이템이 화면에 보이면 다음 페이지 로드 (실제로는 스크롤 위치 기반으로 트리거하는 것이 더 정확)
+                                    // 最後のアイテムが画面に表示されると次のページロード (実際にはスクロール位置ベースでトリガーするのがより正確)
                                     LaunchedEffect(uiState.subscribers.size) {
-                                         if (uiState.subscribers.isNotEmpty()) { // 최초 로딩 시 중복 호출 방지
+                                         if (uiState.subscribers.isNotEmpty()) { // 最初のロード時に重複呼び出し防止
                                             onLoadMoreSubscribers()
                                         }
                                     }
@@ -241,7 +242,8 @@ fun UserSubscriberCard(
     Card(
         modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalColor.current.white)
     ) {
         Column {
             Image(
@@ -249,18 +251,18 @@ fun UserSubscriberCard(
                 contentDescription = "User ${user.id}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f) // 이미지 비율 1:1로 유지
+                    .aspectRatio(1f) // 画像比率1:1に維持
                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                 contentScale = ContentScale.Crop
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp), // 상하 패딩만 적용
+                    .padding(vertical = 8.dp), // 上下パディングのみ適用
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${user.age}세",
+                    text = "${user.age}歳",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -272,21 +274,21 @@ fun UserSubscriberCard(
 @Preview(showBackground = true, name = "TagDetailScreen Content Preview")
 @Composable
 fun TagDetailScreenContentsPreview() {
-    MaterialTheme {
+    TokitokiTheme {
         TagDetailScreenContents(
             uiState = TagDetailUiState(
                 isLoading = false,
                 tag = MainHomeTag(
                     id = "1",
                     name = "洋画が好き",
-                    description = "영화를 좋아하는 사람들의 모임",
+                    description = "映画が好きな人たちの集まり",
                     imageUrl = "https://picsum.photos/id/1060/200/200",
                     subscriberCount = 86488,
                     categoryId = "4",
                     tagType = TagType.LIFESTYLE
                 ),
                 isSubscribed = true,
-                subscribers = List(4) { index -> // 미리보기용 데이터 늘리기
+                subscribers = List(4) { index -> // プレビュー用データ増やす
                     User(thumbnailUrl = "https://picsum.photos/id/100${index}/200/200", age = 25 + index, id = "${index + 1}")
                 },
                 nextCursor = "cursor_abc",
@@ -304,14 +306,14 @@ fun TagDetailScreenContentsPreview() {
 @Preview(showBackground = true, name = "TagDetailScreen Content Empty Subscribers")
 @Composable
 fun TagDetailScreenContentsEmptyPreview() {
-    MaterialTheme {
+    TokitokiTheme {
         TagDetailScreenContents(
             uiState = TagDetailUiState(
                 isLoading = false,
                 tag = MainHomeTag(
                     id = "1",
                     name = "洋画が好き",
-                    description = "영화를 좋아하는 사람들의 모임",
+                    description = "映画が好きな人たちの集まり",
                     imageUrl = "https://picsum.photos/id/1060/200/200",
                     subscriberCount = 15,
                     categoryId = "4",
@@ -332,7 +334,7 @@ fun TagDetailScreenContentsEmptyPreview() {
 @Preview(showBackground = true, name = "TagDetailScreen Loading")
 @Composable
 fun TagDetailScreenLoadingPreview() {
-    MaterialTheme {
+    TokitokiTheme {
         TagDetailScreenContents(
             uiState = TagDetailUiState(isLoading = true),
             onLoadMoreSubscribers = {},
@@ -346,9 +348,9 @@ fun TagDetailScreenLoadingPreview() {
 @Preview(showBackground = true, name = "TagDetailScreen Error")
 @Composable
 fun TagDetailScreenErrorPreview() {
-    MaterialTheme {
+    TokitokiTheme {
         TagDetailScreenContents(
-            uiState = TagDetailUiState(error = "데이터를 불러오는데 실패했습니다."),
+            uiState = TagDetailUiState(error = "データの読み込みに失敗しました。"),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
@@ -376,7 +378,7 @@ fun LoadingTagDetailScreenPreview() {
 fun ErrorTagDetailScreenPreview() {
     TokitokiTheme {
         TagDetailScreenContents(
-            uiState = TagDetailUiState(error = "데이터를 불러오는데 실패했습니다."),
+            uiState = TagDetailUiState(error = "データの読み込みに失敗しました。"),
             onLoadMoreSubscribers = {},
             onSubscriptionToggle = { _, _ -> },
             onNavigateUp = {},
@@ -392,8 +394,8 @@ fun NoSubscribersTagDetailScreenPreview() {
         TagDetailScreenContents(
             uiState = TagDetailUiState(tag = MainHomeTag(
                 id = "1",
-                name = "독서",
-                description = "책 읽는 것을 좋아하는 사람들의 모임",
+                name = "読書",
+                description = "本を読むことが好きな人たちの集まり",
                 imageUrl = "https://picsum.photos/200/300?random=1",
                 subscriberCount = 0,
                 categoryId = "101",
