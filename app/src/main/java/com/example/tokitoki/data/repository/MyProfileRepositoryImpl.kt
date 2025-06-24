@@ -33,7 +33,7 @@ class MyProfileRepositoryImpl @Inject constructor(
         val dummyEntity = MyProfileEntity(
             id = 100, // 임의의 ID
             name = "더미 사용자",
-            birthDay = "1995-08-15",
+            birthDay = "19950815",
             isMale = true,
             mySelfSentenceId = 99, // 임의의 자기소개 ID
             email = "dummy@example.com",

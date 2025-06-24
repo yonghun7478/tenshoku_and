@@ -6,8 +6,6 @@ import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCaseImpl
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.ClearMyTagUseCaseImpl
-import com.example.tokitoki.domain.usecase.FetchMyProfileUseCase
-import com.example.tokitoki.domain.usecase.FetchMyProfileUseCaseImpl
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCase
 import com.example.tokitoki.domain.usecase.FetchPickupUsersUseCaseImpl
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
@@ -296,11 +294,6 @@ abstract class UseCaseModule {
     abstract fun bindGetPreviousChatsUseCase(
         useCaseImpl: GetPreviousChatsUseCaseImpl
     ): GetPreviousChatsUseCase
-
-    @Binds
-    abstract fun bindFetchMyProfileUseCase(
-        impl: FetchMyProfileUseCaseImpl
-    ): FetchMyProfileUseCase
 
     @Binds
     abstract fun bindGetAshiatoPageUseCase(
