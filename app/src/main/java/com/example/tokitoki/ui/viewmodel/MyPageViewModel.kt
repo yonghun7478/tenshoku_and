@@ -10,6 +10,7 @@ import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.ClearTokensUseCase
 import com.example.tokitoki.domain.usecase.DeleteUserProfileUseCase
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.ui.state.MyPageDummyData
 import com.example.tokitoki.ui.state.MyPageState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,8 @@ class MyPageViewModel @Inject constructor(
     private val getMyProfileUseCase: GetMyProfileUseCase,     // 기존 Local Get UseCase
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase, // 기존 Sentence Get UseCase
     private val clearTokensUseCase: ClearTokensUseCase, // 추가
-    private val deleteUserProfileUseCase: DeleteUserProfileUseCase // 추가
+    private val deleteUserProfileUseCase: DeleteUserProfileUseCase, // 추가
+    private val clearMyTagUseCase: ClearMyTagUseCase, // 추가
 ) : ViewModel() {
 
     private val _myPageState = MutableStateFlow(MyPageState())
@@ -148,6 +150,7 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             clearTokensUseCase()
             deleteUserProfileUseCase()
+            clearMyTagUseCase()
             _logoutCompleted.emit(Unit)
         }
     }
