@@ -127,12 +127,19 @@ class MyPageViewModel @Inject constructor(
     // 생년월일로부터 만나이를 계산하는 private 함수
     private fun calculateAge(birthday: String): Int {
         return try {
-            val birthDate = LocalDate.parse(birthday) // YYYY-MM-DD 형식의 문자열을 LocalDate로 파싱
+            val birthDate = if (birthday.contains("-")) {
+                LocalDate.parse(birthday) // YYYY-MM-DD 형식
+            } else {
+                LocalDate.parse(birthday, java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) // YYYYMMDD 형식
+            }
             val currentDate = LocalDate.now()
             Period.between(birthDate, currentDate).years
+        } catch (e: java.time.format.DateTimeParseException) {
+            println("Error parsing birthday format '$birthday': ${e.message}")
+            0 // 날짜 파싱 에러 시 0 반환
         } catch (e: Exception) {
             println("Error calculating age for birthday '$birthday': ${e.message}")
-            0 // 에러 발생 시 0 또는 적절한 기본값 반환
+            0 // 다른 에러 발생 시 0 반환
         }
     }
 
