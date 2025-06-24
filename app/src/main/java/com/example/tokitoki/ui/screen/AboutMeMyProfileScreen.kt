@@ -52,7 +52,7 @@ fun AboutMeMyProfileScreen(
     onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
-    onAboutMeTagScreen: (String) -> Unit = {},
+    onAboutMeTagScreen: (String, Boolean) -> Unit = { _, _ -> },
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
@@ -106,7 +106,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {
-                            onAboutMeTagScreen(viewModel.getMyTags())
+                            onAboutMeTagScreen(viewModel.getMyTags(), true)
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {

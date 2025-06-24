@@ -86,6 +86,7 @@ fun AboutMeTagScreen(
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
     onPrevScreen: () -> Unit = {},
+    isFromMyPage: Boolean = false,
     viewModel: AboutMeTagViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -104,7 +105,7 @@ fun AboutMeTagScreen(
     )
 
     LaunchedEffect(true) {
-        viewModel.init(tagIds)
+        viewModel.init(tagIds, isFromMyPage)
 
         viewModel.uiEvent.collect { event ->
             when (event) {

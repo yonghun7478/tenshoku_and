@@ -164,9 +164,10 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_TAG_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType })
+            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType }, navArgument(TokitokiArgs.IS_FROM_MY_PAGE) { type = NavType.BoolType })
         ) { backStackEntry ->
             val tagIdsString = backStackEntry.arguments?.getString(TokitokiArgs.TAG_IDS) ?: ""
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
             val tagIds: List<MyTagItem> = if (tagIdsString.isEmpty()) {
                 listOf()
             } else {
@@ -175,6 +176,7 @@ fun TokitokiNavGraph(
 
             AboutMeTagScreen(
                 tagIds = tagIds,
+                isFromMyPage = isFromMyPage,
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },
@@ -292,8 +294,8 @@ fun TokitokiNavGraph(
                     onAboutMeBirthDayScreen = {
                         navAction.navigateToAboutMeBirthday(it)
                     },
-                    onAboutMeTagScreen = {
-                        navAction.navigateToAboutMeTag(it)
+                    onAboutMeTagScreen = { tags, isFromMyPage ->
+                        navAction.navigateToAboutMeTag(tags, isFromMyPage)
                     },
                     onAboutMePhotoUploadScreen = {
                         navAction.navigateToAboutMePhotoUpload(it, true)
