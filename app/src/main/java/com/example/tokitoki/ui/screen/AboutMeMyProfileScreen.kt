@@ -53,6 +53,7 @@ fun AboutMeMyProfileScreen(
     birthday: String? = null,
     name: String? = null,
     selfSentenceId: Int? = null,
+    tagIds: ArrayList<MyTagItem>? = null,
     onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
@@ -73,7 +74,7 @@ fun AboutMeMyProfileScreen(
     )
 
     LaunchedEffect(uri) {
-        viewModel.init(uri, birthday, name, selfSentenceId)
+        viewModel.init(uri, birthday, name, selfSentenceId, tagIds)
 
         viewModel.uiEvent.collect { event ->
             when (event) {

@@ -130,14 +130,12 @@ class AboutMeTagViewModel
 
             val domainMyTags = filteredTags.map { TagUiConverter.uiToDomain(it) }
 
-            clearMyTagUseCase()
-            val result = setMyTagUseCase(domainMyTags)
-
-            if (result.isSuccess) {
-                return true
-            } else {
-                return false
+            if(!uiState.value.isEditMode) {
+                clearMyTagUseCase()
+                setMyTagUseCase(domainMyTags)
             }
+
+            return true
         }
 
         return false

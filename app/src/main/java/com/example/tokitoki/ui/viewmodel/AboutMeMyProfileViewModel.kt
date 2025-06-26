@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.model.MyTag
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
+import com.example.tokitoki.ui.model.MyTagItem
 
 @HiltViewModel
 class AboutMeMyProfileViewModel
@@ -53,7 +55,8 @@ class AboutMeMyProfileViewModel
         uri: Uri = Uri.EMPTY,
         birthday: String? = null,
         name: String? = null,
-        selfSentenceId: Int? = null
+        selfSentenceId: Int? = null,
+        tagIds: ArrayList<MyTagItem>? = null
     ) {
         var myProfile = getMyProfileUseCase()
         myProfile = myProfile.copy(
@@ -62,7 +65,8 @@ class AboutMeMyProfileViewModel
             mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId,
         )
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
-        val myTags = getMyTagUseCase()
+
+        val myTags = tagIds?.map { MyTag(it.tagId, it.categoryId) } ?: getMyTagUseCase()
         val allTagIds = myTags.map { it.tagId }
 
         val allTags = getTagsUseCase(allTagIds)

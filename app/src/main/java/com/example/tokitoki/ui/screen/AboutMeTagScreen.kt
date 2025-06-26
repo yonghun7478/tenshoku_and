@@ -62,8 +62,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.tokitoki.R
+import com.example.tokitoki.domain.model.MainHomeTag
 import com.example.tokitoki.ui.constants.AboutMeTagAction
 import com.example.tokitoki.ui.constants.TestTags
+import com.example.tokitoki.ui.converter.TagUiConverter
 import com.example.tokitoki.ui.model.TagTypeItem
 import com.example.tokitoki.ui.model.MyTagItem
 import com.example.tokitoki.ui.model.TagItem
@@ -85,7 +87,7 @@ fun AboutMeTagScreen(
     tagIds: List<MyTagItem> = listOf(),
     onAboutMeSecondScreen: () -> Unit = {},
     onAboutMeThirdScreen: () -> Unit = {},
-    onPrevScreen: () -> Unit = {},
+    onPrevScreen: (ArrayList<MyTagItem>) -> Unit = {},
     isFromMyPage: Boolean = false,
     viewModel: AboutMeTagViewModel = hiltViewModel()
 ) {
@@ -138,7 +140,13 @@ fun AboutMeTagScreen(
 
                         AboutMeTagAction.EDIT_OK -> {
                             if (viewModel.checkTags()) {
-                                onPrevScreen()
+                                val filteredTags = uiState.tagsByTagType
+                                    .values
+                                    .flatten()
+                                    .filter { it.showBadge }
+
+                                val result = filteredTags.map { MyTagItem(it.id, it.tagTypeId, it.title, it.url) }
+                                onPrevScreen(ArrayList(result))
                             } else {
                                 viewModel.updateShowDialogState(true)
                             }
