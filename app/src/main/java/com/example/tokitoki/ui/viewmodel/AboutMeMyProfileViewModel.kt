@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.model.MyTag
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
@@ -13,6 +14,7 @@ import com.example.tokitoki.domain.usecase.GetMyTagUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
 import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
@@ -43,13 +45,18 @@ class AboutMeMyProfileViewModel
     private val fileManager: FileManager,
     private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
     private val saveTokensUseCase: SaveTokensUseCase,
-    private val setMyProfileUseCase: SetMyProfileUseCase
-) : ViewModel() {
+    private val setMyProfileUseCase: SetMyProfileUseCase,
+    private val setMyTagUseCase: SetMyTagUseCase,
+
+    ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
 
     private val _uiEvent = MutableSharedFlow<AboutMeMyProfileEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
+
+    var buffer:MyProfile? = null
+    var tagBuffer:ArrayList<MyTagItem>? = null
 
     suspend fun init(
         uri: Uri = Uri.EMPTY,
@@ -64,6 +71,10 @@ class AboutMeMyProfileViewModel
             name = name ?: myProfile.name,
             mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId,
         )
+
+        buffer = myProfile
+        tagBuffer = tagIds
+
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
 
         val myTags = tagIds?.map { MyTag(it.tagId, it.categoryId) } ?: getMyTagUseCase()
@@ -121,4 +132,9 @@ class AboutMeMyProfileViewModel
         return result is ResultWrapper.Success
     }
 
+    suspend fun saveMyProfile() {
+        setMyProfileUseCase(buffer?:MyProfile())
+        val tags = tagBuffer?.map { MyTag(it.tagId, it.categoryId) } ?: getMyTagUseCase()
+        setMyTagUseCase(tags)
+    }
 }
