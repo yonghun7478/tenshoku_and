@@ -49,8 +49,12 @@ class AboutMeMyProfileViewModel
     private val _uiEvent = MutableSharedFlow<AboutMeMyProfileEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun init(uri: Uri = Uri.EMPTY) {
-        val myProfile = getMyProfileUseCase()
+    suspend fun init(
+        uri: Uri = Uri.EMPTY,
+        birthday: String? = null
+    ) {
+        var myProfile = getMyProfileUseCase()
+        myProfile = myProfile.copy(birthDay = birthday ?: myProfile.birthDay)
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
         val myTags = getMyTagUseCase()
         val allTagIds = myTags.map { it.tagId }

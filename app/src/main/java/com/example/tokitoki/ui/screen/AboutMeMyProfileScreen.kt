@@ -49,6 +49,8 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 @Composable
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
+    isFromMyPage: Boolean = false,
+    birthday: String? = null,
     onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
@@ -56,7 +58,6 @@ fun AboutMeMyProfileScreen(
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
-    isFromMyPage: Boolean = false,
     onNavigateUp: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -70,7 +71,7 @@ fun AboutMeMyProfileScreen(
     )
 
     LaunchedEffect(uri) {
-        viewModel.init(uri)
+        viewModel.init(uri, birthday)
 
         viewModel.uiEvent.collect { event ->
             when (event) {

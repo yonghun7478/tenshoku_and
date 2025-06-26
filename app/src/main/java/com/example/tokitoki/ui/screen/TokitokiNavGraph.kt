@@ -114,13 +114,21 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_FROM_MY_PAGE) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
         ) { backStackEntry ->
 
             val birthDay = backStackEntry.arguments?.getString(TokitokiArgs.BIRTHDAY) ?: ""
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
             AboutMeBirthdayScreen(
                 birthDay = birthDay,
+                isFromMyPage = isFromMyPage,
                 onAboutMeGenderScreen = {
                     navController.navigateUp()
                 },
@@ -128,6 +136,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeName()
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.BIRTHDAY, it)
                     navController.navigateUp()
                 }
             )
@@ -271,6 +280,8 @@ fun TokitokiNavGraph(
             val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
             val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
+            val birthday:String? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.BIRTHDAY)
+
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
 
@@ -285,6 +296,7 @@ fun TokitokiNavGraph(
                 AboutMeMyProfileScreen(
                     uri = this,
                     isFromMyPage = isFromMyPage, // Added this line
+                    birthday = birthday,
                     onAboutMeProfInputScreen = {
                         navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                     },
@@ -292,7 +304,7 @@ fun TokitokiNavGraph(
                         navAction.navigateToAboutMeName(it)
                     },
                     onAboutMeBirthDayScreen = {
-                        navAction.navigateToAboutMeBirthday(it)
+                        navAction.navigateToAboutMeBirthday(it, true)
                     },
                     onAboutMeTagScreen = { tags, isFromMyPage ->
                         navAction.navigateToAboutMeTag(tags, isFromMyPage)
