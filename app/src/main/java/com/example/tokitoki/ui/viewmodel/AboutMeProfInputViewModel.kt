@@ -51,7 +51,8 @@ class AboutMeProfInputViewModel
 
     suspend fun saveMySelfSentence(sentenceId: Int) {
         val curProfile = getMyProfileUseCase()
-        setMyProfileUseCase(curProfile.copy(mySelfSentenceId = sentenceId))
+        if(!_uiState.value.isEditMode)
+            setMyProfileUseCase(curProfile.copy(mySelfSentenceId = sentenceId))
     }
 
     fun aboutMeProfInputAction(action: AboutMeProfInputAction) {

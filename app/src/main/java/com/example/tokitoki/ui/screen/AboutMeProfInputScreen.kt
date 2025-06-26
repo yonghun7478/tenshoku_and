@@ -45,7 +45,7 @@ fun AboutMeProfInputScreen(
     selfSentenceId: Int,
     onAboutMePhotoUploadScreen: () -> Unit = {},
     onAboutMeMyProfileScreen: () -> Unit = {},
-    onPrevScreen: () -> Unit = {},
+    onPrevScreen: (Int) -> Unit = {},
     viewModel: AboutMeProfInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,7 +81,7 @@ fun AboutMeProfInputScreen(
 
                         AboutMeProfInputAction.EDIT_OK -> {
                             viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].id)
-                            onPrevScreen()
+                            onPrevScreen(uiState.offset)
                         }
 
                         else -> {}

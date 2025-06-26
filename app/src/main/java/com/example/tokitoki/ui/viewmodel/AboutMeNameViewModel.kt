@@ -46,7 +46,8 @@ class AboutMeNameViewModel @Inject constructor(
     suspend fun checkName(): Boolean {
         if (_uiState.value.name.isNotEmpty()) {
             val profile = getMyProfileUseCase()
-            setMyProfileUseCase(profile.copy(name = _uiState.value.name))
+            if(!_uiState.value.isEditMode)
+                setMyProfileUseCase(profile.copy(name = _uiState.value.name))
 
             return true
         }

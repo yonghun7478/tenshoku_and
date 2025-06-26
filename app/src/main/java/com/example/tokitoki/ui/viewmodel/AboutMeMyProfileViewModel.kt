@@ -51,10 +51,16 @@ class AboutMeMyProfileViewModel
 
     suspend fun init(
         uri: Uri = Uri.EMPTY,
-        birthday: String? = null
+        birthday: String? = null,
+        name: String? = null,
+        selfSentenceId: Int? = null
     ) {
         var myProfile = getMyProfileUseCase()
-        myProfile = myProfile.copy(birthDay = birthday ?: myProfile.birthDay)
+        myProfile = myProfile.copy(
+            birthDay = birthday ?: myProfile.birthDay,
+            name = name ?: myProfile.name,
+            mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId,
+        )
         val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
         val myTags = getMyTagUseCase()
         val allTagIds = myTags.map { it.tagId }

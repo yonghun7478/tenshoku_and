@@ -158,6 +158,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeSecond()
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.NAME, it)
                     navController.navigateUp()
                 }
             )
@@ -260,6 +261,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeMyProfile(uri)
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.SELF_SENTENCE_IDS, it)
                     navController.navigateUp()
                 }
             )
@@ -281,6 +283,8 @@ fun TokitokiNavGraph(
             val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
             val birthday:String? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.BIRTHDAY)
+            val name:String? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.NAME)
+            val selfSentenceId:Int? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.SELF_SENTENCE_IDS)
 
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
@@ -297,6 +301,8 @@ fun TokitokiNavGraph(
                     uri = this,
                     isFromMyPage = isFromMyPage, // Added this line
                     birthday = birthday,
+                    name = name,
+                    selfSentenceId = selfSentenceId,
                     onAboutMeProfInputScreen = {
                         navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                     },
