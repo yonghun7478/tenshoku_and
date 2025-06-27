@@ -8,6 +8,7 @@ import com.example.tokitoki.domain.model.MyProfile
 import com.example.tokitoki.domain.model.MyTag
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
@@ -47,6 +48,8 @@ class AboutMeMyProfileViewModel
     private val saveTokensUseCase: SaveTokensUseCase,
     private val setMyProfileUseCase: SetMyProfileUseCase,
     private val setMyTagUseCase: SetMyTagUseCase,
+    private val clearMyTagUseCase: ClearMyTagUseCase,
+
 
     ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
@@ -134,7 +137,10 @@ class AboutMeMyProfileViewModel
 
     suspend fun saveMyProfile() {
         setMyProfileUseCase(buffer?:MyProfile())
-        val tags = tagBuffer?.map { MyTag(it.tagId, it.categoryId) } ?: getMyTagUseCase()
-        setMyTagUseCase(tags)
+        tagBuffer?.let {
+            clearMyTagUseCase()
+            val tags = it.map { MyTag(it.tagId, it.categoryId) }
+            setMyTagUseCase(tags)
+        }
     }
 }
