@@ -1,6 +1,7 @@
 package com.example.tokitoki.ui.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
@@ -68,11 +69,14 @@ class AboutMeMyProfileViewModel
         selfSentenceId: Int? = null,
         tagIds: ArrayList<MyTagItem>? = null
     ) {
-        var myProfile = getMyProfileUseCase()
+        Log.d("AboutMeMyProfileViewModel", "init uri: $uri $birthday $name $selfSentenceId $tagIds")
+
+        var myProfile = getMyProfileUseCase() // Fetches the base profile
         myProfile = myProfile.copy(
-            birthDay = birthday ?: myProfile.birthDay,
-            name = name ?: myProfile.name,
-            mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId,
+            birthDay = birthday ?: myProfile.birthDay, // Uses 'birthday' parameter if not null, else uses 'myProfile.birthDay' (from getMyProfileUseCase)
+            name = name ?: myProfile.name,             // Uses 'name' parameter if not null, else uses 'myProfile.name'
+            mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId, // Uses 'selfSentenceId' parameter if not null, else uses 'myProfile.mySelfSentenceId'
+            thumbnailUrl = uri.toString()
         )
 
         buffer = myProfile
@@ -93,7 +97,7 @@ class AboutMeMyProfileViewModel
         _uiState.update { currentState ->
             currentState.copy(
                 myProfileItem = myProfileItem,
-                uri = uri
+                uri = Uri.parse(Uri.decode(myProfile.thumbnailUrl))
             )
         }
     }
