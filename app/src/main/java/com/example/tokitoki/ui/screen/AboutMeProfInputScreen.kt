@@ -81,7 +81,7 @@ fun AboutMeProfInputScreen(
 
                         AboutMeProfInputAction.EDIT_OK -> {
                             viewModel.saveMySelfSentence(uiState.myselfSentenceList[pagerState.currentPage].id)
-                            onPrevScreen(uiState.offset)
+                            onPrevScreen(uiState.myselfSentenceList[pagerState.currentPage].id)
                         }
 
                         else -> {}
