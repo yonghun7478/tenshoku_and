@@ -61,10 +61,10 @@ fun UserDetailScreen(
 
     val userDetails by viewModel.userDetails.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val isLiked by viewModel.isLiked.collectAsState() // 기존 isLiked 상태
-    val isFavorite by viewModel.isFavorite.collectAsState() // isFavorite 상태
+    val isLiked by viewModel.isLiked.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
     val toastMessage by viewModel.toastMessage.collectAsState()
-    val userTags by viewModel.userTags.collectAsState() // userTags 상태 관찰 추가
+    val userTags by viewModel.userTags.collectAsState()
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
@@ -76,22 +76,14 @@ fun UserDetailScreen(
     val pagerState = rememberPagerState { userDetails.size }
 
     LaunchedEffect(currentPage) {
-        if (currentPage < pagerState.pageCount) { // 안정성 추가
+        if (currentPage < pagerState.pageCount) {
             pagerState.scrollToPage(currentPage)
         }
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != currentPage) { // 불필요한 호출 방지
+        if (pagerState.currentPage != currentPage) {
              viewModel.onPageChanged(pagerState.currentPage)
-        }
-    }
-
-    val listState = rememberLazyListState() // LazyListState 추가
-    val showFab by remember { // FAB 표시 여부 상태
-        derivedStateOf {
-            // 아이템이 하나 이상 있고, 더 이상 아래로 스크롤할 수 없을 때 FAB를 표시
-            listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward
         }
     }
 
@@ -102,8 +94,6 @@ fun UserDetailScreen(
         isLiked = isLiked,
         isFavorite = isFavorite,
         pagerState = pagerState,
-        listState = listState,
-        showFab = showFab,
         screenName = screenName,
         onBackClick = onBackClick,
         onToggleFavorite = { viewModel.toggleFavorite() },
@@ -123,67 +113,63 @@ fun UserDetailScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun UserDetailContent(
-    // states
     userDetails: List<ResultWrapper<UserDetail>>,
     userTags: List<MainHomeTag>,
     currentPage: Int,
     isLiked: Boolean,
     isFavorite: Boolean,
     pagerState: androidx.compose.foundation.pager.PagerState,
-    listState: LazyListState,
-    showFab: Boolean,
     screenName: String,
-
-    // event handlers
     onBackClick: () -> Unit,
     onToggleFavorite: () -> Unit,
     onToggleLike: () -> Unit,
     onPickupLeftClick: () -> Unit,
     onPickupRightClick: () -> Unit,
-
     modifier: Modifier = Modifier
 ) {
+    var showFab by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (screenName != "MessageListScreen") { // screenName이 "MessageListScreen"이 아닐 때만 TopAppBar 표시
+            if (screenName != "MessageListScreen") {
                 TopAppBar(
-                    title = { /* Text("프로필") */ }, // "프로필" 텍스트 제거
+                    title = { },
                     navigationIcon = {
                         IconButton(onClick = onBackClick,
                             modifier = Modifier
-                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "戻る",
-                                tint = Color.White // 흰색으로 변경
+                                tint = Color.White
                             )
                         }
                     },
-                    actions = { // 즐겨찾기 버튼을 actions로 이동
+                    actions = {
                         IconButton(onClick = onToggleFavorite,
                             modifier = Modifier
-                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
                         ) {
                             if (isFavorite) {
                                 Icon(
-                                    imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
+                                    imageVector = Icons.Default.Star,
                                     contentDescription = "お気に入り",
-                                    tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
+                                    tint = Color.White
                                 )
                             } else {
                                 Icon(
                                     painter = painterResource(id = R.drawable.outline_star_outline_24),
                                     contentDescription = "お気に入り",
-                                    tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
+                                    tint = Color.White
                                 )
                             }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent, // 배경 투명화
-                        scrolledContainerColor = Color.Transparent, // 스크롤 시에도 투명 유지
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         actionIconContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -191,24 +177,24 @@ private fun UserDetailContent(
                 )
             }
         },
-        floatingActionButton = { // FloatingActionButton을 Button으로 변경
-            if (screenName != "MessageListScreen" && screenName != "MainHomePickupScreen") { // "MessageListScreen" 또는 "MainHomePickupScreen"이 아닐 때만 좋아요 버튼 표시
+        floatingActionButton = {
+            if (screenName != "MessageListScreen" && screenName != "MainHomePickupScreen") {
                 AnimatedVisibility(
                     visible = showFab,
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp) // 좌우 패딩 추가
+                        .padding(horizontal = 16.dp)
                 ) {
                     Button(
                         onClick = onToggleLike,
-                        modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
-                        enabled = !isLiked, // isLiked가 true일 때 버튼 비활성화
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLiked,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = LocalColor.current.blue,
                             contentColor = Color.White,
-                            disabledContainerColor = Color(0xFFFFA500), // 오렌지색
+                            disabledContainerColor = Color(0xFFFFA500),
                             disabledContentColor = Color.White
                         )
                     ) {
@@ -223,8 +209,8 @@ private fun UserDetailContent(
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center // FAB 위치를 중앙 하단으로 변경
-    ) { paddingValues -> // paddingValues 다시 사용
+        floatingActionButtonPosition = FabPosition.Center
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -245,7 +231,11 @@ private fun UserDetailContent(
                                 userDetail = userDetailResult.data,
                                 userTags = userTags,
                                 modifier = Modifier.fillMaxSize(),
-                                listState = listState
+                                onShowFabChange = { isVisible ->
+                                    if (pagerState.currentPage == page) {
+                                        showFab = isVisible
+                                    }
+                                }
                             )
                         }
                         is ResultWrapper.Error -> {
@@ -260,20 +250,19 @@ private fun UserDetailContent(
                             )
                         }
                     }
-                } else if (userDetails.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) { // 초기 로딩 조건 명확화
+                } else if (userDetails.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) {
                     LoadingContent(modifier = Modifier.fillMaxSize())
-                } else if (page >= userDetails.size && userDetails.isNotEmpty()){ // Pager가 아직 업데이트 안된 경우
-                    LoadingContent(modifier = Modifier.fillMaxSize()) // 또는 이전 사용자 정보 유지
+                } else if (page >= userDetails.size && userDetails.isNotEmpty()){
+                    LoadingContent(modifier = Modifier.fillMaxSize())
                 }
                 else {
-                    ErrorContent( // 좀 더 명확한 오류 메시지
+                    ErrorContent(
                         error = ResultWrapper.ErrorType.ExceptionError("プロフィール情報を読み込めませんでした。(page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
 
-            // 하단 버튼 영역 (screenName에 따라 다른 버튼 표시)
             if (screenName == "MainHomePickupScreen") {
                 Row(
                     modifier = Modifier
@@ -307,27 +296,37 @@ private fun UserDetailContent(
                         )
                     }
                 }
-            } else {
-                // 기존 FloatingActionButton 제거
             }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class) // FlowRow 사용을 위해 추가
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun UserDetailPage(
     userDetail: UserDetail,
     userTags: List<MainHomeTag>,
     modifier: Modifier = Modifier,
-    listState: LazyListState
+    onShowFabChange: (Boolean) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    val showFab by remember {
+        derivedStateOf {
+            listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward
+        }
+    }
+
+    LaunchedEffect(showFab) {
+        onShowFabChange(showFab)
+    }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(LocalColor.current.lightGray), // 배경색 추가
+            .background(LocalColor.current.lightGray),
         state = listState,
-        contentPadding = PaddingValues(bottom = 88.dp), // 하단 패딩 조정 (버튼 높이 + 추가 여유 공간)
+        contentPadding = PaddingValues(bottom = 88.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
@@ -351,7 +350,7 @@ private fun UserDetailPage(
             }
         }
 
-        if (userTags.isNotEmpty()) { // userDetail.myTags 대신 userTags 사용
+        if (userTags.isNotEmpty()) {
             item {
                 Column(
                     modifier = Modifier
@@ -362,7 +361,7 @@ private fun UserDetailPage(
                         .padding(20.dp)
                 ) {
                     SectionTitle(title = "マイタグ")
-                    MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
+                    MyTagsSection(tags = userTags)
                 }
             }
         }
@@ -396,8 +395,6 @@ private fun UserDetailPage(
                 ProfileDetailsSection(userDetail = userDetail)
             }
         }
-        
-        // 기존 Spacer(modifier = Modifier.height(80.dp)) 제거
     }
 }
 
@@ -405,10 +402,10 @@ private fun UserDetailPage(
 private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold), // 스타일 변경 및 fontWeight 명시
+        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp) // 타이틀 아래 간격
+            .padding(bottom = 8.dp)
     )
 }
 
@@ -419,14 +416,14 @@ private fun ThumbnailSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(0.7f) // 정사각형 비율
-            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)) // 모서리 둥글게
+            .aspectRatio(0.7f)
+            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
     ) {
         AsyncImage(
             model = thumbnailUrl,
             contentDescription = "プロフィールサムネイル",
             modifier = Modifier.fillMaxSize(),
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop // 이미지 채우기 방식
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop
         )
     }
 }
@@ -435,16 +432,16 @@ private fun ThumbnailSection(
 private fun BasicInfoSection(name: String, age: Int, location: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start // 왼쪽 정렬로 변경
+        horizontalAlignment = Alignment.Start
     ) {
         Text(
             text = name,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold
-        ) // 닉네임 스타일 변경
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "${age}歳 $location", // 나이와 거주지 한 줄로 표시
+            text = "${age}歳 $location",
             fontSize = 20.sp
         )
     }
@@ -452,20 +449,18 @@ private fun BasicInfoSection(name: String, age: Int, location: String) {
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun MyTagsSection(tags: List<MainHomeTag>) { // List<String> -> List<MainHomeTag> 변경
+private fun MyTagsSection(tags: List<MainHomeTag>) {
     if (tags.isEmpty()) return
 
-    FlowRow( // Column 대신 FlowRow 사용
+    FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp), // 태그 간 가로 간격
-        verticalArrangement = Arrangement.spacedBy(8.dp) // 태그 간 세로 간격
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        tags.forEach { tag -> // itemsToShow 대신 tags 사용
+        tags.forEach { tag ->
             MyTagChip(
-                tagText = tag.name, // MainHomeTag 객체에서 name 필드를 태그 텍스트로 사용
-                tagImageUrl = tag.imageUrl // MainHomeTag 객체에서 imageUrl 필드를 태그 이미지 URL로 사용
-                                            // 만약 MainHomeTag에 imageUrl 필드가 없다면:
-                                            // tagImageUrl = "https://picsum.photos/seed/${tag.name.hashCode()}/48/48"
+                tagText = tag.name,
+                tagImageUrl = tag.imageUrl
             )
         }
     }
@@ -478,21 +473,20 @@ private fun MyTagChip(tagText: String, tagImageUrl: String) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // 왼쪽: AsyncImage로 변경
         AsyncImage(
-            model = tagImageUrl, // URL 사용
+            model = tagImageUrl,
             contentDescription = "タグイメージ: $tagText",
             modifier = Modifier
                 .size(80.dp)
                 .clip(RoundedCornerShape(10.dp)),
-            contentScale = ContentScale.Crop // 이미지 채우기 방식
+            contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.width(10.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = tagText, // tagText 사용
+                text = tagText,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -518,23 +512,19 @@ private fun ProfileDetailsSection(userDetail: UserDetail) {
         ProfileDetailItem("性別", if (userDetail.isMale) "男性" else "女性")
         ProfileDetailItem("居住地", userDetail.location)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
         ProfilePropertyGroupTitle(title = "身体情報")
         ProfileDetailItem("血液型", userDetail.bloodType)
-        // TODO: UserDetailに키(height)フィールドがあれば追加
-        // ProfileDetailItem("키", userDetail.height.toString() + "cm")
-        ProfileDetailItem("外見", userDetail.appearance) // 체형에 해당될 수 있음
+        ProfileDetailItem("外見", userDetail.appearance)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
         ProfilePropertyGroupTitle(title = "学歴・職歴")
         ProfileDetailItem("学歴", userDetail.education)
         ProfileDetailItem("職種", userDetail.occupation)
-        // TODO: UserDetailに年収(annualIncome)フィールドがあれば追加
-        // ProfileDetailItem("年収", userDetail.annualIncome)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
         ProfilePropertyGroupTitle(title = "価値観")
         ProfileDetailItem("恋愛観", userDetail.datingPhilosophy)
@@ -566,16 +556,15 @@ private fun ProfileDetailItem(label: String, value: String?) {
         Row(modifier = Modifier.padding(vertical = 4.dp)) {
             Text(
                 text = "$label: ",
-                style = MaterialTheme.typography.bodyMedium, // 레이블 스타일 변경
-                color = MaterialTheme.colorScheme.onSurfaceVariant, // 레이블 색상 변경
-                modifier = Modifier.width(100.dp) // 라벨 너비 고정으로 정렬 효과
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.width(100.dp)
             )
-            Text(value, style = MaterialTheme.typography.bodyMedium) // 값 스타일 유지
+            Text(value, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
-// 기존 LoadingContent, ErrorContent 함수 (변경 없음)
 @Composable
 private fun LoadingContent(
     modifier: Modifier = Modifier
@@ -645,8 +634,6 @@ fun UserDetailContentPreview() {
             isLiked = false,
             isFavorite = false,
             pagerState = rememberPagerState { 1 },
-            listState = rememberLazyListState(),
-            showFab = true,
             screenName = "FavoriteUsersScreen",
             onBackClick = {},
             onToggleFavorite = {},
@@ -688,8 +675,6 @@ fun UserDetailContentNoTagsPreview() {
             isLiked = false,
             isFavorite = false,
             pagerState = rememberPagerState { 1 },
-            listState = rememberLazyListState(),
-            showFab = true,
             screenName = "FavoriteUsersScreen",
             onBackClick = {},
             onToggleFavorite = {},
@@ -794,13 +779,4 @@ fun ProfileDetailItemPreview() {
     TokitokiTheme {
         ProfileDetailItem(label = "ニックネーム", value = "キム・トキ")
     }
-}
-
-// androidx.compose.foundation.layout.ExperimentalLayoutApi 임포트 추가
-// import androidx.compose.foundation.layout.ExperimentalLayoutApi
-// 주: 이미 파일 상단에 OptIn으로 추가되어 있다면 별도 import 문은 없어도 될 수 있음.
-// 하지만 명시적으로 추가하는 것이 좋을 수 있음.
-// 실제로는 @OptIn(ExperimentalLayoutApi::class) 어노테이션이 있는 컴포저블 내부에서만 사용 가능.
-
-// 주: 이 파일에서 사용되는 모든 컴포저블에서 필요한 경우 @OptIn(ExperimentalLayoutApi::class) 어노테이션을 추가해야 합니다.
-// 이는 해당 컴포저블에서 사용되는 모든 컴포저블에 적용되어야 합니다. 
+} 
