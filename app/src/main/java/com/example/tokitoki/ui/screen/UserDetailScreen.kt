@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.tokitoki.domain.model.UserDetail
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.ui.viewmodel.UserDetailViewModel
 import androidx.compose.foundation.shape.CircleShape
@@ -35,7 +34,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tokitoki.domain.model.TagType
@@ -46,6 +44,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.example.tokitoki.domain.model.UserDetail
+import com.example.tokitoki.ui.state.UserDetailUiState
 import kotlin.math.abs
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -59,17 +59,14 @@ fun UserDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    
+
     LaunchedEffect(selectedUserId, screenName) {
         viewModel.initialize(selectedUserId, screenName)
     }
 
-    val userDetails by viewModel.userDetails.collectAsState()
+    val uiStates by viewModel.uiState.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val isLiked by viewModel.isLiked.collectAsState()
-    val isFavorite by viewModel.isFavorite.collectAsState()
     val toastMessage by viewModel.toastMessage.collectAsState()
-    val userTags by viewModel.userTags.collectAsState()
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
@@ -78,26 +75,24 @@ fun UserDetailScreen(
         }
     }
 
-    val pagerState = rememberPagerState { userDetails.size }
+    val pagerState = rememberPagerState { uiStates.size }
 
     LaunchedEffect(currentPage) {
-        if (currentPage < pagerState.pageCount) {
+        if (currentPage < pagerState.pageCount && currentPage != pagerState.currentPage) {
             pagerState.scrollToPage(currentPage)
         }
     }
 
     LaunchedEffect(pagerState.currentPage) {
+        // 유저가 스와이프해서 페이지를 변경했을 때만 호출
         if (pagerState.currentPage != currentPage) {
-             viewModel.onPageChanged(pagerState.currentPage)
+            viewModel.onPageChanged(pagerState.currentPage)
         }
     }
 
     UserDetailContent(
-        userDetails = userDetails,
-        userTags = userTags,
+        uiStates = uiStates,
         currentPage = currentPage,
-        isLiked = isLiked,
-        isFavorite = isFavorite,
         pagerState = pagerState,
         screenName = screenName,
         onBackClick = onBackClick,
@@ -118,11 +113,8 @@ fun UserDetailScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun UserDetailContent(
-    userDetails: List<ResultWrapper<UserDetail>>,
-    userTags: List<MainHomeTag>,
+    uiStates: List<ResultWrapper<UserDetailUiState>>,
     currentPage: Int,
-    isLiked: Boolean,
-    isFavorite: Boolean,
     pagerState: androidx.compose.foundation.pager.PagerState,
     screenName: String,
     onBackClick: () -> Unit,
@@ -137,13 +129,19 @@ private fun UserDetailContent(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (source == NestedScrollSource.Drag && abs(available.x) > abs(available.y)) {
-                    return Offset(x = 0f, y = available.y)
+                // 수직 스크롤일 때는 HorizontalPager가 스크롤 이벤트를 가로채지 않도록 함
+                if (source == NestedScrollSource.Drag && abs(available.y) > abs(available.x)) {
+                    return Offset.Zero
                 }
                 return Offset.Zero
             }
         }
     }
+
+    val currentUiStateResult = uiStates.getOrNull(currentPage)
+    val currentUiState = (currentUiStateResult as? ResultWrapper.Success)?.data
+    val isFavorite = currentUiState?.isFavorite ?: false
+    val isLiked = currentUiState?.isLiked ?: false
 
     Scaffold(
         modifier = modifier,
@@ -220,7 +218,7 @@ private fun UserDetailContent(
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("いいね")
+                        Text(if(isLiked) "いいね済み" else "いいね")
                     }
                 }
             }
@@ -241,12 +239,11 @@ private fun UserDetailContent(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                if (userDetails.isNotEmpty() && page < userDetails.size) {
-                    when (val userDetailResult = userDetails[page]) {
+                if (uiStates.isNotEmpty() && page < uiStates.size) {
+                    when (val uiStateResult = uiStates[page]) {
                         is ResultWrapper.Success -> {
                             UserDetailPage(
-                                userDetail = userDetailResult.data,
-                                userTags = userTags,
+                                uiState = uiStateResult.data,
                                 modifier = Modifier.fillMaxSize(),
                                 onShowFabChange = { isVisible ->
                                     if (pagerState.currentPage == page) {
@@ -257,7 +254,7 @@ private fun UserDetailContent(
                         }
                         is ResultWrapper.Error -> {
                             ErrorContent(
-                                error = userDetailResult.errorType,
+                                error = uiStateResult.errorType,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -267,14 +264,14 @@ private fun UserDetailContent(
                             )
                         }
                     }
-                } else if (userDetails.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) {
+                } else if (uiStates.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) {
                     LoadingContent(modifier = Modifier.fillMaxSize())
-                } else if (page >= userDetails.size && userDetails.isNotEmpty()){
+                } else if (page >= uiStates.size && uiStates.isNotEmpty()){
                     LoadingContent(modifier = Modifier.fillMaxSize())
                 }
                 else {
                     ErrorContent(
-                        error = ResultWrapper.ErrorType.ExceptionError("プロフィール情報を読み込めませんでした。(page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
+                        error = ResultWrapper.ErrorType.ExceptionError("プロフィール情報を読み込めませんでした。(page:$page, currentPage:$currentPage, details size:${uiStates.size}, pageCount:${pagerState.pageCount})"),
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -321,8 +318,7 @@ private fun UserDetailContent(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun UserDetailPage(
-    userDetail: UserDetail,
-    userTags: List<MainHomeTag>,
+    uiState: UserDetailUiState,
     modifier: Modifier = Modifier,
     onShowFabChange: (Boolean) -> Unit
 ) {
@@ -348,7 +344,7 @@ private fun UserDetailPage(
     ) {
         item {
             ThumbnailSection(
-                thumbnailUrl = userDetail.thumbnailUrl,
+                thumbnailUrl = uiState.userDetail.thumbnailUrl,
             )
         }
 
@@ -360,14 +356,14 @@ private fun UserDetailPage(
                     .padding(20.dp)
             ) {
                 BasicInfoSection(
-                    name = userDetail.name,
-                    age = userDetail.age,
-                    location = userDetail.location
+                    name = uiState.userDetail.name,
+                    age = uiState.userDetail.age,
+                    location = uiState.userDetail.location
                 )
             }
         }
 
-        if (userTags.isNotEmpty()) {
+        if (uiState.userTags.isNotEmpty()) {
             item {
                 Column(
                     modifier = Modifier
@@ -378,12 +374,12 @@ private fun UserDetailPage(
                         .padding(20.dp)
                 ) {
                     SectionTitle(title = "マイタグ")
-                    MyTagsSection(tags = userTags)
+                    MyTagsSection(tags = uiState.userTags)
                 }
             }
         }
 
-        if (userDetail.introduction.isNotBlank()) {
+        if (uiState.userDetail.introduction.isNotBlank()) {
             item {
                 Column(
                     modifier = Modifier
@@ -394,7 +390,7 @@ private fun UserDetailPage(
                         .padding(20.dp)
                 ) {
                     SectionTitle(title = "自己紹介")
-                    IntroductionSection(introduction = userDetail.introduction)
+                    IntroductionSection(introduction = uiState.userDetail.introduction)
                 }
             }
         }
@@ -409,7 +405,7 @@ private fun UserDetailPage(
                     .padding(20.dp)
             ) {
                 SectionTitle(title = "プロフィール情報")
-                ProfileDetailsSection(userDetail = userDetail)
+                ProfileDetailsSection(userDetail = uiState.userDetail)
             }
         }
     }
@@ -643,13 +639,17 @@ fun UserDetailContentPreview() {
         MainHomeTag(id = "tag5", name = "📚 月に2冊読書", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
     )
 
+    val dummyUiState = UserDetailUiState(
+        userDetail = dummyUserDetail,
+        userTags = dummyUserTags,
+        isLiked = false,
+        isFavorite = false
+    )
+
     TokitokiTheme {
         UserDetailContent(
-            userDetails = listOf(ResultWrapper.Success(dummyUserDetail)),
-            userTags = dummyUserTags,
+            uiStates = listOf(ResultWrapper.Success(dummyUiState)),
             currentPage = 0,
-            isLiked = false,
-            isFavorite = false,
             pagerState = rememberPagerState { 1 },
             screenName = "FavoriteUsersScreen",
             onBackClick = {},
@@ -684,13 +684,15 @@ fun UserDetailContentNoTagsPreview() {
         lifestyle = "静かに過ごす方"
     )
 
+    val dummyUiState = UserDetailUiState(
+        userDetail = dummyUserDetail,
+        userTags = emptyList()
+    )
+
     TokitokiTheme {
         UserDetailContent(
-            userDetails = listOf(ResultWrapper.Success(dummyUserDetail)),
-            userTags = emptyList(),
+            uiStates = listOf(ResultWrapper.Success(dummyUiState)),
             currentPage = 0,
-            isLiked = false,
-            isFavorite = false,
             pagerState = rememberPagerState { 1 },
             screenName = "FavoriteUsersScreen",
             onBackClick = {},
