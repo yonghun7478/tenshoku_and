@@ -42,6 +42,11 @@ import com.example.tokitoki.domain.model.TagType
 import com.example.tokitoki.ui.theme.TokitokiTheme
 import androidx.compose.ui.unit.LayoutDirection
 import com.example.tokitoki.ui.theme.LocalColor
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import kotlin.math.abs
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -128,6 +133,17 @@ private fun UserDetailContent(
     modifier: Modifier = Modifier
 ) {
     var showFab by remember { mutableStateOf(false) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (source == NestedScrollSource.Drag && abs(available.x) > abs(available.y)) {
+                    return Offset(x = 0f, y = available.y)
+                }
+                return Offset.Zero
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -219,6 +235,7 @@ private fun UserDetailContent(
                     end = paddingValues.calculateRightPadding(LayoutDirection.Ltr),
                     bottom = paddingValues.calculateBottomPadding()
                 )
+                .nestedScroll(nestedScrollConnection)
         ) {
             HorizontalPager(
                 state = pagerState,
