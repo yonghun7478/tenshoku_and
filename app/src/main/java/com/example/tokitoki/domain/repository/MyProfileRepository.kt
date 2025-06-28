@@ -16,7 +16,7 @@ interface MyProfileRepository {
     // User Tags 관련 메서드
     suspend fun addUserTag(tag: MyTag): Boolean // 태그 추가
     suspend fun removeUserTag(tagId: Int) // 특정 태그 삭제
-    suspend fun getUserTagsByTagTypeId(categoryId: Int): List<MyTag> // 모든 태그 ID 가져오기
+    suspend fun getUserTagsByTagTypeId(tagTypeId: Int): List<MyTag> // 모든 태그 ID 가져오기
     suspend fun getUserTags(): List<MyTag>
     suspend fun clearUserTags() // 모든 태그 삭제
     

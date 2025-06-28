@@ -140,10 +140,12 @@ class AboutMeMyProfileViewModel
     }
 
     suspend fun saveMyProfile() {
-        setMyProfileUseCase(buffer?:MyProfile())
-        tagBuffer?.let {
+        setMyProfileUseCase(buffer ?: MyProfile())
+        tagBuffer?.let { tagItems ->
             clearMyTagUseCase()
-            val tags = it.map { MyTag(it.tagId, it.categoryId) }
+            val tagIds = tagItems.map { it.tagId }
+            val myTags = getTagsUseCase(tagIds) 
+             val tags = myTags.map { MyTag(it.id.toInt(), it.tagType.ordinal) }
             setMyTagUseCase(tags)
         }
     }
