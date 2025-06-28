@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 
 @HiltViewModel
 class UserDetailViewModel @Inject constructor(
@@ -58,7 +59,7 @@ class UserDetailViewModel @Inject constructor(
     private val preloadBuffer = 2 // 현재 페이지 기준 앞뒤로 2명씩 프리로드
 
     fun initialize(selectedUserId: String, screenName: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             // 1. 캐시된 유저 ID 목록 가져오기
             cachedUserIds = getCachedUserIdsUseCase(screenName)
             
@@ -99,7 +100,7 @@ class UserDetailViewModel @Inject constructor(
     }
 
     private fun loadUserDetails(centerIndex: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             // 현재 페이지 기준 앞뒤로 preloadBuffer만큼의 유저 정보 로드
             val startIndex = (centerIndex - preloadBuffer).coerceAtLeast(0)
             val endIndex = (centerIndex + preloadBuffer).coerceAtMost(cachedUserIds.size - 1)
@@ -152,7 +153,7 @@ class UserDetailViewModel @Inject constructor(
             if (it is ResultWrapper.Success) it.data else null
         } ?: return
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = likeUserUseCase(currentUserDetail.id)) {
                 is ResultWrapper.Success -> {
                     // 성공 시, 좋아요 상태를 다시 확인하여 UI 업데이트
@@ -175,7 +176,7 @@ class UserDetailViewModel @Inject constructor(
             if (it is ResultWrapper.Success) it.data else null
         } ?: return
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = if (_isFavorite.value) {
                 removeFromFavoritesUseCase(currentUserDetail.id)
             } else {
@@ -206,7 +207,7 @@ class UserDetailViewModel @Inject constructor(
 
     // 좋아요 및 즐겨찾기 상태를 업데이트하는 새로운 private 함수
     private fun updateLikeAndFavoriteStatus(userId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             // 좋아요 상태 확인
             when (val likedResult = checkIsUserLikedUseCase(userId)) {
                 is ResultWrapper.Success -> _isLiked.value = likedResult.data
@@ -231,7 +232,7 @@ class UserDetailViewModel @Inject constructor(
 
     // 사용자 태그를 업데이트하는 새로운 private 함수
     private fun updateUserTags(userId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getUserTagsUseCase(userId)
                 .onSuccess { mainHomeTags ->
                     _userTags.value = mainHomeTags // mainHomeTags를 직접 할당
