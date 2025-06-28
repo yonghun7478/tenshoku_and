@@ -46,7 +46,7 @@ class UserDetailViewModel @Inject constructor(
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
 
     private var cachedUserIds: List<String> = emptyList()
-    private val preloadBuffer = 2
+    private val preloadBuffer = 4
 
     fun initialize(selectedUserId: String, screenName: String) {
         viewModelScope.launch(Dispatchers.IO) {
