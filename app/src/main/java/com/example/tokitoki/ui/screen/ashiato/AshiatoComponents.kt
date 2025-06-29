@@ -53,7 +53,7 @@ import java.time.format.DateTimeFormatter
 import com.example.tokitoki.domain.model.AshiatoTimeline
 
 /**
- * 아시아토 화면 상단의 정보 배너 Composable
+ * 足あと画面上部の情報バナー Composable
  */
 @Composable
 fun AshiatoInfoBanner() {
@@ -72,7 +72,7 @@ fun AshiatoInfoBanner() {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "足あと(아시아토)는, 당신의 프로필을 본 상대가 표시됩니다.",
+            text = "足あととは、あなたのプロフィールを見た相手が表示されます。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -80,7 +80,7 @@ fun AshiatoInfoBanner() {
 }
 
 /**
- * 특정 날짜의 아시아토 섹션 Composable (날짜 헤더 + 사용자 목록)
+ * 特定の日の足あとセクション Composable (日付ヘッダー + ユーザーリスト)
  */
 @Composable
 fun DailyAshiatoSection(
@@ -88,7 +88,7 @@ fun DailyAshiatoSection(
     onUserClick: (date: String, userId: String) -> Unit
 ) {
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-        // 날짜 헤더
+        // 日付フォーマット変換 (例: "10/21 (金)")
         Text(
             text = formatDateString(dailyLog.date), // 날짜 형식 변환 (예: "10/21 (金)")
             style = MaterialTheme.typography.titleMedium,
@@ -142,7 +142,8 @@ fun AshiatoUserCard(
             .width(150.dp) // 카드 너비 고정 (디자인에 맞게 조절)
             .clickable { onUserClick(date, viewerInfo.id) },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             Box(
@@ -172,13 +173,13 @@ fun AshiatoUserCard(
             ) {
                 Text(
                     text = "${viewerInfo.age}세 ${viewerInfo.region}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1
                 )
                 Text(
                     text = viewerInfo.viewedTime,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = Color.Gray
                 )
             }

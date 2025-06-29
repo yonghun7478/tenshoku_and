@@ -1,5 +1,6 @@
 package com.example.tokitoki.ui.screen.mytaglist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -31,6 +32,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import com.example.tokitoki.ui.theme.LocalColor
+import com.example.tokitoki.ui.theme.TokitokiTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,14 +91,15 @@ fun MyTagListScreenContents(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = LocalColor.current.white,
                 titleContentColor = MaterialTheme.colorScheme.onSurface
             )
         )
 
         TabRow(
             selectedTabIndex = uiState.selectedTab.ordinal,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = LocalColor.current.white
         ) {
             TagType.values().forEachIndexed { index, tagType ->
                 Tab(
@@ -111,7 +115,11 @@ fun MyTagListScreenContents(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             val tagType = TagType.values()[page]
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(LocalColor.current.white)
+            ) {
                 when {
                     uiState.isLoading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -220,44 +228,48 @@ private fun TagType.toKoreanString(): String = when (this) {
 @Preview(showBackground = true)
 @Composable
 fun MyTagListItemPreview() {
-    MyTagListItem(
-        tag = MainHomeTag(
-            id = "1",
-            name = "映画鑑賞",
-            description = "映画を見ることが好きです",
-            imageUrl = "",
-            subscriberCount = 100,
-            categoryId = "cat1",
-            tagType = TagType.HOBBY
+    TokitokiTheme {
+        MyTagListItem(
+            tag = MainHomeTag(
+                id = "1",
+                name = "映画鑑賞",
+                description = "映画を見ることが好きです",
+                imageUrl = "",
+                subscriberCount = 100,
+                categoryId = "cat1",
+                tagType = TagType.HOBBY
+            )
         )
-    )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MyTagListScreenContentsPreview() {
-    MyTagListScreenContents(
-        uiState = MyTagListUiState(
-            selectedTab = TagType.HOBBY,
-            tagLists = mapOf(
-                TagType.HOBBY to listOf(
-                    MainHomeTag(
-                        id = "1",
-                        name = "映画鑑賞",
-                        description = "映画を見ることが好きです",
-                        imageUrl = "",
-                        subscriberCount = 100,
-                        categoryId = "cat1",
-                        tagType = TagType.HOBBY
+    TokitokiTheme {
+        MyTagListScreenContents(
+            uiState = MyTagListUiState(
+                selectedTab = TagType.HOBBY,
+                tagLists = mapOf(
+                    TagType.HOBBY to listOf(
+                        MainHomeTag(
+                            id = "1",
+                            name = "映画鑑賞",
+                            description = "映画を見ることが好きです",
+                            imageUrl = "",
+                            subscriberCount = 100,
+                            categoryId = "cat1",
+                            tagType = TagType.HOBBY
+                        )
                     )
-                )
+                ),
+                isLoading = false,
+                error = null
             ),
-            isLoading = false,
-            error = null
-        ),
-        onTabSelected = {},
-        onNavigateUp = {},
-        onNavigateToTagDetail = {},
-        modifier = Modifier
-    )
+            onTabSelected = {},
+            onNavigateUp = {},
+            onNavigateToTagDetail = {},
+            modifier = Modifier
+        )
+    }
 } 

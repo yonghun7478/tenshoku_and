@@ -29,9 +29,12 @@ class AboutMeBirthdayViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AboutMeBirthdayEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    fun init(birthDay: String) {
+    var isFromMyPage = false
+
+    fun init(birthDay: String, isFromMyPage: Boolean) {
         _uiState.value =
             AboutMeBirthdayState(birthday = birthDay, isEditMode = birthDay.isNotEmpty())
+        this.isFromMyPage = isFromMyPage
     }
 
     fun onBirthdayChanged(birthday: String) {
@@ -47,7 +50,9 @@ class AboutMeBirthdayViewModel @Inject constructor(
     suspend fun checkBirthday(): Boolean {
         if (_uiState.value.birthday.length == 8) {
             val profile = getMyProfileUseCase()
-            setMyProfileUseCase(profile.copy(birthDay = _uiState.value.birthday))
+            if (!isFromMyPage) {
+                setMyProfileUseCase(profile.copy(birthDay = _uiState.value.birthday))
+            }
             return true
         }
         return false

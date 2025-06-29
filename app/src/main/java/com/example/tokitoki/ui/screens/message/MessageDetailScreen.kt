@@ -32,6 +32,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
 import android.util.Log
 import com.example.tokitoki.ui.screen.UserDetailScreen
+import com.example.tokitoki.ui.theme.LocalColor
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.Send
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +59,7 @@ fun MessageDetailScreen(
 
     val pagerState = rememberPagerState(pageCount = { 2 }) // 2 pages: Message and User Detail
     val coroutineScope = rememberCoroutineScope()
-
+ 
     val onNavigateToUserDetailTab: () -> Unit = remember(coroutineScope, pagerState) {
         { coroutineScope.launch { pagerState.animateScrollToPage(1) } }
     }
@@ -67,7 +72,8 @@ fun MessageDetailScreen(
                 onNavigateUp = onNavigateUp,
                 onThumbnailClick = onNavigateToUserDetailTab,
             )
-        }
+        },
+        containerColor = LocalColor.current.white
     ) { paddingValues ->
         HorizontalPager(
             state = pagerState,
@@ -121,6 +127,7 @@ fun MessageDetailTopAppBar(
                 Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
             }
         },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = LocalColor.current.white),
         actions = {
             IconButton(onClick = onThumbnailClick) {
                 AsyncImage(
@@ -277,7 +284,7 @@ private fun MessageItem(
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            color = if (isCurrentUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+            color = if (isCurrentUser) LocalColor.current.blue else MaterialTheme.colorScheme.surface,
             modifier = Modifier.widthIn(max = 300.dp)
         ) {
             Text(
@@ -291,6 +298,7 @@ private fun MessageItem(
 
 // Re-add MessageInput composable
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun MessageInput(
     onSendMessage: (String) -> Unit,
     isSending: Boolean
@@ -300,20 +308,36 @@ private fun MessageInput(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
             value = messageText,
             onValueChange = { messageText = it },
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("메시지를 입력하세요") },
-            enabled = !isSending
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            placeholder = { Text("メッセージを入力してください", style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)) },
+            enabled = !isSending,
+            textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFFF0F0F0),
+                unfocusedContainerColor = Color(0xFFF0F0F0),
+                disabledContainerColor = Color(0xFFF0F0F0),
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                disabledTextColor = Color.Black,
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            shape = CircleShape
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Button(
+        IconButton(
             onClick = {
                 if (messageText.isNotBlank()) {
                     onSendMessage(messageText)
@@ -328,7 +352,7 @@ private fun MessageInput(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("전송")
+                Icon(Icons.Default.Send, contentDescription = "메시지 전송")
             }
         }
     }

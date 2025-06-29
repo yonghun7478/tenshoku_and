@@ -118,7 +118,11 @@ class LikeRepositoryImpl @Inject constructor() : LikeRepository {
             receivedTime = receivedTime,
             location = userDetail.location,
             occupation = userDetail.occupation,
-            likedAt = now // 좋아요를 누른 시각
+            likedAt = now, // 좋아요를 누른 시각
+            personalityTrait = userDetail.personalityTraits.firstOrNull(), // List에서 단일 String으로 변경
+            lifestyle = userDetail.lifestyle,
+            datingPhilosophy = userDetail.datingPhilosophy,
+            marriageView = userDetail.marriageView
         ).toDomain()
     }
 }

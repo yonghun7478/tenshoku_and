@@ -102,11 +102,16 @@ class MainHomeMyTagViewModel @Inject constructor(
             Log.d(TAG, "refreshMyAndSuggestedTags() called. Loading myTags and suggestedTags.")
             val myTagsResult = getMyTagsUseCase()
             val suggestedTagsResult = getSuggestedTagsUseCase()
+            val todayTagResult = getTodayTagUseCase()
+            val trendingTagsResult = getTrendingTagsUseCase()
 
-            if (myTagsResult.isSuccess && suggestedTagsResult.isSuccess) {
+            if (myTagsResult.isSuccess && suggestedTagsResult.isSuccess &&
+                todayTagResult.isSuccess && trendingTagsResult.isSuccess) {
                 _uiState.update {
                     it.copy(
                         myTags = myTagsResult.getOrThrow().map { it.toPresentation() },
+                        todayTag = todayTagResult.getOrThrow().toPresentation(),
+                        trendingTags = trendingTagsResult.getOrThrow().map { it.toPresentation() }
                     )
                 }
                 _suggestedTagsUiState.update {

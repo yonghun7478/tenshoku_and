@@ -1,7 +1,7 @@
 package com.example.tokitoki.domain.model
 
 enum class TagType(val value: String) {
-    HOBBY("취미"),
-    LIFESTYLE("라이프스타일"),
-    VALUE("가치관")
+    HOBBY("趣味"),
+    LIFESTYLE("ライフスタイル"),
+    VALUE("価値観")
 } 

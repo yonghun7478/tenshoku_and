@@ -49,14 +49,18 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 @Composable
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
+    isFromMyPage: Boolean = false,
+    birthday: String? = null,
+    name: String? = null,
+    selfSentenceId: Int? = null,
+    tagIds: ArrayList<MyTagItem>? = null,
     onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
-    onAboutMeTagScreen: (String) -> Unit = {},
+    onAboutMeTagScreen: (String, Boolean) -> Unit = { _, _ -> },
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
-    isFromMyPage: Boolean = false,
     onNavigateUp: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
@@ -70,7 +74,7 @@ fun AboutMeMyProfileScreen(
     )
 
     LaunchedEffect(uri) {
-        viewModel.init(uri)
+        viewModel.init(uri, birthday, name, selfSentenceId, tagIds)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -86,6 +90,7 @@ fun AboutMeMyProfileScreen(
                                 if (isFromMyPage) {
                                     // 마이페이지를 통해 접근한 경우, 프로필 저장 성공 시 별도의 화면 이동을 하지 않습니다.
                                     // 사용자가 이전 화면(마이페이지)으로 돌아갈 수 있도록 합니다.
+                                    viewModel.saveMyProfile()
                                     onNavigateUp()
                                 } else {
                                     onMainScreen()
@@ -106,7 +111,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {
-                            onAboutMeTagScreen(viewModel.getMyTags())
+                            onAboutMeTagScreen(viewModel.getMyTags(), true)
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {

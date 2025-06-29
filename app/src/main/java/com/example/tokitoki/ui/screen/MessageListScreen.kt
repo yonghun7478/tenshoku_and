@@ -92,7 +92,7 @@ fun MessageListScreen(
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = Color.White
         ) {
             if (uiState.isLoading) {
                 LoadingShimmer()
@@ -122,7 +122,7 @@ fun MessageListScreen(
 
                     if (uiState.errorMessage != null) {
                         Text(
-                            text = "Error: ${uiState.errorMessage}",
+                            text = "エラーが発生しました: ${uiState.errorMessage}",
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -235,7 +235,7 @@ fun PreviousChatsSection(
 ) {
     Column {
         Text(
-            text = "Previous Chats",
+            text = "以前のチャット",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -387,7 +387,7 @@ fun LoadingShimmer() {
         // 以前のチャットセクション Shimmer
         Column {
             Text(
-                text = "Previous Chats",
+                text = "以前のチャット",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -457,7 +457,7 @@ fun MessageListScreenPreview() {
 
     //  MessageListScreen(viewModel = MessageListViewModel()) // 実際のViewModelを使用する代わりに
     Column {
-        MessageListTitle(title = "Messages")
+        MessageListTitle(title = "メッセージ")
         Spacer(modifier = Modifier.height(16.dp))
         MatchingUsersSection(
             matchingUsers = dummyUiState.matchingUsers,

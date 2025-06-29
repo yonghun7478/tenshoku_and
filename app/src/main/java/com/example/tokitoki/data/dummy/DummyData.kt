@@ -20,6 +20,21 @@ object DummyData {
         "https://img.hankyung.com/photo/202504/03.39959436.1.jpg"
     )
 
+    private val japaneseLastNames = listOf(
+        "佐藤", "鈴木", "高橋", "田中", "渡辺", "伊藤", "山本", "中村", "小林", "加藤",
+        "吉田", "山田", "佐々木", "山口", "松本", "井上", "木村", "林", "斎藤", "清水"
+    )
+
+    private val japaneseMaleFirstNames = listOf(
+        "ひろし", "たけし", "まこと", "あきら", "けんじ", "まもる", "はる", "だいき", "かいと", "そら",
+        "ゆうと", "りく", "はやと", "こうき", "れん", "そうた", "はると", "ゆうき", "しょうた", "けい"
+    )
+
+    private val japaneseFemaleFirstNames = listOf(
+        "ゆい", "あおい", "ひな", "さくら", "りこ", "めい", "えま", "あかり", "はな", "ゆうな",
+        "みう", "ここな", "ひまり", "りん", "うた", "ももか", "いちか", "つむぎ", "あやか", "さき"
+    )
+
     private val dummyUserDetails: List<UserDetail>
     private val dummyHomeTags: List<MainHomeTag>
 
@@ -132,12 +147,16 @@ object DummyData {
         val age = (18..60).random()
         val birthYear = currentYear - age
         val userIdInt = userId.toIntOrNull() ?: 1
+        val isMale = false
+
+        val lastName = japaneseLastNames.random()
+        val firstName = japaneseFemaleFirstNames.random()
 
         return UserDetail(
             id = userId,
-            name = "User${userId}",
+            name = "$lastName $firstName",
             birthDay = "$birthYear-${String.format("%02d", (userIdInt % 12) + 1)}-${String.format("%02d", (userIdInt % 28) + 1)}",
-            isMale = userIdInt % 2 == 0,
+            isMale = isMale,
             email = "user${userId}@example.com",
             thumbnailUrl = thumbnailUrls.random(),
             age = age,

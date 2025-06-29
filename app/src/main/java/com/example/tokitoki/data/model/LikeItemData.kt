@@ -11,7 +11,11 @@ data class LikeItemData(
     val receivedTime: Long,
     val location: String,
     val occupation: String?,
-    val likedAt: Long
+    val likedAt: Long,
+    val personalityTrait: String?,
+    val lifestyle: String,
+    val datingPhilosophy: String?,
+    val marriageView: String?
 ) {
     // 도메인 모델로 변환
     fun toDomain(): LikeItem = LikeItem(
@@ -23,6 +27,10 @@ data class LikeItemData(
         receivedTime = receivedTime,
         location = location,
         occupation = occupation,
-        likedAt = likedAt
+        likedAt = likedAt,
+        personalityTrait = personalityTrait,
+        lifestyle = lifestyle,
+        datingPhilosophy = datingPhilosophy,
+        marriageView = marriageView
     )
 }

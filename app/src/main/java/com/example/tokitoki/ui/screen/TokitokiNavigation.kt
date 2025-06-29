@@ -99,10 +99,10 @@ object TokitokiDestinations {
     const val AGREEMENT_CONFIRMATION_ROUTE = AGREEMENT_CONFIRMATION_SCREEN
     const val ABOUT_ME_ROUTE = ABOUT_ME_SCREEN
     const val ABOUT_ME_GENDER_ROUTE = ABOUT_ME_GENDER_SCREEN
-    const val ABOUT_ME_BIRTHDAY_ROUTE = "$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY={$BIRTHDAY}"
+    const val ABOUT_ME_BIRTHDAY_ROUTE = "$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY={$BIRTHDAY}&${IS_FROM_MY_PAGE}={${IS_FROM_MY_PAGE}}"
     const val ABOUT_ME_NAME_ROUTE = "$ABOUT_ME_NAME_SCREEN?$NAME={$NAME}"
     const val ABOUT_ME_SECOND_ROUTE = ABOUT_ME_SECOND_SCREEN
-    const val ABOUT_ME_TAG_ROUTE = "$ABOUT_ME_TAG_SCREEN?$TAG_IDS={$TAG_IDS}"
+    const val ABOUT_ME_TAG_ROUTE = "$ABOUT_ME_TAG_SCREEN?$TAG_IDS={$TAG_IDS}&$IS_FROM_MY_PAGE={${IS_FROM_MY_PAGE}}"
     const val ABOUT_ME_THIRD_ROUTE = ABOUT_ME_THIRD_SCREEN
     const val ABOUT_ME_PHOTO_UPLOAD_ROUTE = "$ABOUT_ME_PHOTO_UPLOAD_SCREEN?$URI={$URI}&$IS_EDIT_MODE={$IS_EDIT_MODE}"
     const val ABOUT_ME_PROF_INPUT_ROUTE = "$ABOUT_ME_PROF_INPUT_SCREEN?$URI={$URI}&$SELF_SENTENCE_IDS={$SELF_SENTENCE_IDS}"
@@ -141,8 +141,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_GENDER_SCREEN)
     }
 
-    fun navigateToAboutMeBirthday(birthday: String = "") {
-        navController.navigate("$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY=${birthday}")
+    fun navigateToAboutMeBirthday(birthday: String = "", isFromMyPage: Boolean = false) {
+        navController.navigate("$ABOUT_ME_BIRTHDAY_SCREEN?$BIRTHDAY=${birthday}&${IS_FROM_MY_PAGE}=${isFromMyPage}")
     }
 
     fun navigateToAboutMeName(name: String = "") {
@@ -153,8 +153,8 @@ class TokitokiNavigationActions(private val navController: NavHostController) {
         navController.navigate(ABOUT_ME_SECOND_SCREEN)
     }
 
-    fun navigateToAboutMeTag(args: String = "") {
-        navController.navigate("$ABOUT_ME_TAG_SCREEN?$TAG_IDS=${args}")
+    fun navigateToAboutMeTag(args: String = "", isFromMyPage: Boolean = false) {
+        navController.navigate("$ABOUT_ME_TAG_SCREEN?$TAG_IDS=${args}&$IS_FROM_MY_PAGE=${isFromMyPage}")
     }
 
     fun navigateToAboutMeThird() {

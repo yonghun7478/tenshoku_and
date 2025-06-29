@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.tokitoki.domain.model.UserDetail
 import com.example.tokitoki.common.ResultWrapper
 import com.example.tokitoki.ui.viewmodel.UserDetailViewModel
 import androidx.compose.foundation.shape.CircleShape
@@ -22,12 +21,8 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
 import com.example.tokitoki.ui.viewmodel.PickupDirection
 import com.example.tokitoki.ui.viewmodel.SharedPickupViewModel
 import androidx.compose.ui.layout.ContentScale
@@ -39,12 +34,21 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.tokitoki.domain.model.TagType
+import com.example.tokitoki.ui.theme.TokitokiTheme
+import androidx.compose.ui.unit.LayoutDirection
+import com.example.tokitoki.ui.theme.LocalColor
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.example.tokitoki.domain.model.UserDetail
+import com.example.tokitoki.ui.state.UserDetailUiState
+import kotlin.math.abs
 
-// FlowRow를 위해 추가 (만약 accompanist 라이브러리가 없다면, 이 import는 오류를 발생시킬 수 있습니다.)
-// import com.google.accompanist.flowlayout.FlowRow
-
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserDetailScreen(
     selectedUserId: String,
@@ -55,17 +59,14 @@ fun UserDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    
+
     LaunchedEffect(selectedUserId, screenName) {
         viewModel.initialize(selectedUserId, screenName)
     }
 
-    val userDetails by viewModel.userDetails.collectAsState()
+    val uiStates by viewModel.uiState.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val isLiked by viewModel.isLiked.collectAsState() // 기존 isLiked 상태
-    val isFavorite by viewModel.isFavorite.collectAsState() // isFavorite 상태
     val toastMessage by viewModel.toastMessage.collectAsState()
-    val userTags by viewModel.userTags.collectAsState() // userTags 상태 관찰 추가
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
@@ -74,68 +75,115 @@ fun UserDetailScreen(
         }
     }
 
-    val pagerState = rememberPagerState { userDetails.size }
+    val pagerState = rememberPagerState { uiStates.size }
 
     LaunchedEffect(currentPage) {
-        if (currentPage < pagerState.pageCount) { // 안정성 추가
+        if (currentPage < pagerState.pageCount && currentPage != pagerState.currentPage) {
             pagerState.scrollToPage(currentPage)
         }
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != currentPage) { // 불필요한 호출 방지
-             viewModel.onPageChanged(pagerState.currentPage)
+        // 유저가 스와이프해서 페이지를 변경했을 때만 호출
+        if (pagerState.currentPage != currentPage) {
+            viewModel.onPageChanged(pagerState.currentPage)
         }
     }
 
-    val listState = rememberLazyListState() // LazyListState 추가
-    val showFab by remember { // FAB 표시 여부 상태
-        derivedStateOf {
-            // 아이템이 하나 이상 있고, 더 이상 아래로 스크롤할 수 없을 때 FAB를 표시
-            listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward
+    UserDetailContent(
+        uiStates = uiStates,
+        currentPage = currentPage,
+        pagerState = pagerState,
+        screenName = screenName,
+        onBackClick = onBackClick,
+        onToggleFavorite = { viewModel.toggleFavorite() },
+        onToggleLike = { viewModel.toggleLike() },
+        onPickupLeftClick = {
+            sharedViewModel.setPickupDirection(PickupDirection.LEFT)
+            onBackClick()
+        },
+        onPickupRightClick = {
+            sharedViewModel.setPickupDirection(PickupDirection.RIGHT)
+            onBackClick()
+        },
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun UserDetailContent(
+    uiStates: List<ResultWrapper<UserDetailUiState>>,
+    currentPage: Int,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    screenName: String,
+    onBackClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onToggleLike: () -> Unit,
+    onPickupLeftClick: () -> Unit,
+    onPickupRightClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showFab by remember { mutableStateOf(false) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // 수직 스크롤일 때는 HorizontalPager가 스크롤 이벤트를 가로채지 않도록 함
+                if (source == NestedScrollSource.Drag && abs(available.y) > abs(available.x)) {
+                    return Offset.Zero
+                }
+                return Offset.Zero
+            }
         }
     }
+
+    val currentUiStateResult = uiStates.getOrNull(currentPage)
+    val currentUiState = (currentUiStateResult as? ResultWrapper.Success)?.data
+    val isFavorite = currentUiState?.isFavorite ?: false
+    val isLiked = currentUiState?.isLiked ?: false
 
     Scaffold(
+        modifier = modifier,
         topBar = {
-            if (screenName != "MessageListScreen") { // screenName이 "MessageListScreen"이 아닐 때만 TopAppBar 표시
+            if (screenName != "MessageListScreen") {
                 TopAppBar(
-                    title = { /* Text("프로필") */ }, // "프로필" 텍스트 제거
+                    title = { },
                     navigationIcon = {
                         IconButton(onClick = onBackClick,
                             modifier = Modifier
-                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 추가
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "뒤로가기",
-                                tint = Color.White // 흰색으로 변경
+                                contentDescription = "戻る",
+                                tint = Color.White
                             )
                         }
                     },
-                    actions = { // 즐겨찾기 버튼을 actions로 이동
-                        IconButton(onClick = { viewModel.toggleFavorite() },
+                    actions = {
+                        IconButton(onClick = onToggleFavorite,
                             modifier = Modifier
-                                .background(Color.Black.copy(alpha = 0.3f), CircleShape) // 반투명 배경 항상 유지
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
                         ) {
                             if (isFavorite) {
                                 Icon(
-                                    imageVector = Icons.Default.Star, // 사용자의 마지막 수동 변경 사항 반영
-                                    contentDescription = "찜하기",
-                                    tint = Color.White // 사용자의 마지막 수동 변경 사항 반영
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "お気に入り",
+                                    tint = Color.White
                                 )
                             } else {
                                 Icon(
                                     painter = painterResource(id = R.drawable.outline_star_outline_24),
-                                    contentDescription = "찜하기",
-                                    tint = Color.White // 활성 상태와 동일하게 흰색으로 유지
+                                    contentDescription = "お気に入り",
+                                    tint = Color.White
                                 )
                             }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent, // 배경 투명화
-                        scrolledContainerColor = Color.Transparent, // 스크롤 시에도 투명 유지
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         actionIconContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -143,60 +191,70 @@ fun UserDetailScreen(
                 )
             }
         },
-        floatingActionButton = { // FloatingActionButton을 Button으로 변경
-            if (screenName != "MessageListScreen") { // MessageListScreen이 아닐 때만 좋아요 버튼 표시
+        floatingActionButton = {
+            if (screenName != "MessageListScreen" && screenName != "MainHomePickupScreen") {
                 AnimatedVisibility(
                     visible = showFab,
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp) // 좌우 패딩 추가
+                        .padding(horizontal = 16.dp)
                 ) {
                     Button(
-                        onClick = { viewModel.toggleLike() },
-                        modifier = Modifier.fillMaxWidth(), // 버튼 너비 꽉 채우기
-                        enabled = !isLiked, // isLiked가 true일 때 버튼 비활성화
+                        onClick = onToggleLike,
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLiked,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = if (isLiked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
+                            containerColor = LocalColor.current.blue,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color(0xFFFFA500),
+                            disabledContentColor = Color.White
                         )
                     ) {
                         Icon(
                             imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "좋아요",
+                            contentDescription = "いいね",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("좋아요")
+                        Text(if(isLiked) "いいね済み" else "いいね")
                     }
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center // FAB 위치를 중앙 하단으로 변경
-    ) { paddingValues -> // paddingValues 다시 사용
+        floatingActionButtonPosition = FabPosition.Center
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // 이 줄 다시 추가
+                .padding(
+                    start = paddingValues.calculateLeftPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateRightPadding(LayoutDirection.Ltr),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
+                .nestedScroll(nestedScrollConnection)
         ) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                if (userDetails.isNotEmpty() && page < userDetails.size) {
-                    when (val userDetailResult = userDetails[page]) {
+                if (uiStates.isNotEmpty() && page < uiStates.size) {
+                    when (val uiStateResult = uiStates[page]) {
                         is ResultWrapper.Success -> {
-                            UserDetailContent(
-                                userDetail = userDetailResult.data,
-                                userTags = userTags,
+                            UserDetailPage(
+                                uiState = uiStateResult.data,
                                 modifier = Modifier.fillMaxSize(),
-                                listState = listState
+                                onShowFabChange = { isVisible ->
+                                    if (pagerState.currentPage == page) {
+                                        showFab = isVisible
+                                    }
+                                }
                             )
                         }
                         is ResultWrapper.Error -> {
                             ErrorContent(
-                                error = userDetailResult.errorType,
+                                error = uiStateResult.errorType,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -206,118 +264,150 @@ fun UserDetailScreen(
                             )
                         }
                     }
-                } else if (userDetails.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) { // 초기 로딩 조건 명확화
+                } else if (uiStates.isEmpty() && pagerState.pageCount == 0 && currentPage == 0) {
                     LoadingContent(modifier = Modifier.fillMaxSize())
-                } else if (page >= userDetails.size && userDetails.isNotEmpty()){ // Pager가 아직 업데이트 안된 경우
-                    LoadingContent(modifier = Modifier.fillMaxSize()) // 또는 이전 사용자 정보 유지
+                } else if (page >= uiStates.size && uiStates.isNotEmpty()){
+                    LoadingContent(modifier = Modifier.fillMaxSize())
                 }
-                 else {
-                     ErrorContent( // 좀 더 명확한 오류 메시지
-                         error = ResultWrapper.ErrorType.ExceptionError("프로필 정보를 불러올 수 없습니다. (page:$page, currentPage:$currentPage, details size:${userDetails.size}, pageCount:${pagerState.pageCount})"),
-                         modifier = Modifier.fillMaxSize()
-                     )
-                 }
+                else {
+                    ErrorContent(
+                        error = ResultWrapper.ErrorType.ExceptionError("プロフィール情報を読み込めませんでした。(page:$page, currentPage:$currentPage, details size:${uiStates.size}, pageCount:${pagerState.pageCount})"),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
-            // 하단 버튼 영역 (screenName에 따라 다른 버튼 표시)
             if (screenName == "MainHomePickupScreen") {
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 16.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(
-                        onClick = { 
-                            sharedViewModel.setPickupDirection(PickupDirection.LEFT)
-                            onBackClick()
-                        },
-                        modifier = Modifier.padding(start = 16.dp)
+                        onClick = onPickupLeftClick,
+                        modifier = Modifier
+                            .background(Color.White, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "いまいち",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = LocalColor.current.blue
                         )
                     }
-                    
+
                     IconButton(
-                        onClick = { 
-                            sharedViewModel.setPickupDirection(PickupDirection.RIGHT)
-                            onBackClick()
-                        },
-                        modifier = Modifier.padding(end = 16.dp)
+                        onClick = onPickupRightClick,
+                        modifier = Modifier
+                            .background(Color.White, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
                             contentDescription = "いいね",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = LocalColor.current.blue
                         )
                     }
                 }
-            } else {
-                // 기존 FloatingActionButton 제거
             }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class) // FlowRow 사용을 위해 추가
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun UserDetailContent(
-    userDetail: UserDetail,
-    userTags: List<MainHomeTag>,
+private fun UserDetailPage(
+    uiState: UserDetailUiState,
     modifier: Modifier = Modifier,
-    listState: LazyListState
+    onShowFabChange: (Boolean) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    val showFab by remember {
+        derivedStateOf {
+            listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward
+        }
+    }
+
+    LaunchedEffect(showFab) {
+        onShowFabChange(showFab)
+    }
+
     LazyColumn(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(LocalColor.current.lightGray),
         state = listState,
-        contentPadding = PaddingValues(bottom = 88.dp), // 하단 패딩 조정 (버튼 높이 + 추가 여유 공간)
+        contentPadding = PaddingValues(bottom = 88.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             ThumbnailSection(
-                thumbnailUrl = userDetail.thumbnailUrl,
+                thumbnailUrl = uiState.userDetail.thumbnailUrl,
             )
         }
 
-        item { Spacer(modifier = Modifier.height(24.dp)) }
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LocalColor.current.white)
+                    .padding(20.dp)
+            ) {
+                BasicInfoSection(
+                    name = uiState.userDetail.name,
+                    age = uiState.userDetail.age,
+                    location = uiState.userDetail.location
+                )
+            }
+        }
+
+        if (uiState.userTags.isNotEmpty()) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 7.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(LocalColor.current.white)
+                        .padding(20.dp)
+                ) {
+                    SectionTitle(title = "マイタグ")
+                    MyTagsSection(tags = uiState.userTags)
+                }
+            }
+        }
+
+        if (uiState.userDetail.introduction.isNotBlank()) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 7.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(LocalColor.current.white)
+                        .padding(20.dp)
+                ) {
+                    SectionTitle(title = "自己紹介")
+                    IntroductionSection(introduction = uiState.userDetail.introduction)
+                }
+            }
+        }
 
         item {
-            BasicInfoSection(
-                name = userDetail.name,
-                age = userDetail.age,
-                location = userDetail.location
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-
-        if (userTags.isNotEmpty()) { // userDetail.myTags 대신 userTags 사용
-            item {
-                SectionTitle(title = "마이 태그")
-                MyTagsSection(tags = userTags) // userDetail.myTags 대신 userTags 사용
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 7.dp, bottom = 7.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(LocalColor.current.white)
+                    .padding(20.dp)
+            ) {
+                SectionTitle(title = "プロフィール情報")
+                ProfileDetailsSection(userDetail = uiState.userDetail)
             }
-            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
-
-        if (userDetail.introduction.isNotBlank()) {
-            item {
-                SectionTitle(title = "자기소개")
-                IntroductionSection(introduction = userDetail.introduction)
-            }
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-        }
-
-        item {
-            SectionTitle(title = "프로필 정보")
-            ProfileDetailsSection(userDetail = userDetail)
-        }
-        
-        // 기존 Spacer(modifier = Modifier.height(80.dp)) 제거
     }
 }
 
@@ -325,10 +415,10 @@ private fun UserDetailContent(
 private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold), // 스타일 변경 및 fontWeight 명시
+        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp) // 타이틀 아래 간격
+            .padding(bottom = 8.dp)
     )
 }
 
@@ -339,15 +429,14 @@ private fun ThumbnailSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f) // 정사각형 비율
-            .clip(RoundedCornerShape(12.dp)) // 모서리 둥글게
-            .background(MaterialTheme.colorScheme.surfaceVariant) // 배경색
+            .aspectRatio(0.7f)
+            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
     ) {
         AsyncImage(
             model = thumbnailUrl,
-            contentDescription = "프로필 썸네일",
+            contentDescription = "プロフィールサムネイル",
             modifier = Modifier.fillMaxSize(),
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop // 이미지 채우기 방식
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop
         )
     }
 }
@@ -356,34 +445,35 @@ private fun ThumbnailSection(
 private fun BasicInfoSection(name: String, age: Int, location: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start // 왼쪽 정렬로 변경
+        horizontalAlignment = Alignment.Start
     ) {
-        Text(name, style = MaterialTheme.typography.titleLarge) // 닉네임 스타일 변경
+        Text(
+            text = name,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "${age}세 $location", // 나이와 거주지 한 줄로 표시
-            style = MaterialTheme.typography.bodySmall, // 스타일 변경
-            color = MaterialTheme.colorScheme.onSurfaceVariant // 색상 연하게 변경
+            text = "${age}歳 $location",
+            fontSize = 20.sp
         )
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun MyTagsSection(tags: List<MainHomeTag>) { // List<String> -> List<MainHomeTag> 변경
+private fun MyTagsSection(tags: List<MainHomeTag>) {
     if (tags.isEmpty()) return
 
-    FlowRow( // Column 대신 FlowRow 사용
+    FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp), // 태그 간 가로 간격
-        verticalArrangement = Arrangement.spacedBy(8.dp) // 태그 간 세로 간격
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        tags.forEach { tag -> // itemsToShow 대신 tags 사용
+        tags.forEach { tag ->
             MyTagChip(
-                tagText = tag.name, // MainHomeTag 객체에서 name 필드를 태그 텍스트로 사용
-                tagImageUrl = tag.imageUrl // MainHomeTag 객체에서 imageUrl 필드를 태그 이미지 URL로 사용
-                                            // 만약 MainHomeTag에 imageUrl 필드가 없다면:
-                                            // tagImageUrl = "https://picsum.photos/seed/${tag.name.hashCode()}/48/48"
+                tagText = tag.name,
+                tagImageUrl = tag.imageUrl
             )
         }
     }
@@ -391,34 +481,28 @@ private fun MyTagsSection(tags: List<MainHomeTag>) { // List<String> -> List<Mai
 
 @Composable
 private fun MyTagChip(tagText: String, tagImageUrl: String) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 1.dp,
+    Row(
+        modifier = Modifier
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        AsyncImage(
+            model = tagImageUrl,
+            contentDescription = "タグイメージ: $tagText",
             modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // 왼쪽: AsyncImage로 변경
-            AsyncImage(
-                model = tagImageUrl, // URL 사용
-                contentDescription = "태그 이미지: $tagText",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(6.dp)),
-                contentScale = ContentScale.Crop // 이미지 채우기 방식
+                .size(80.dp)
+                .clip(RoundedCornerShape(10.dp)),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = tagText,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
             )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = tagText, // tagText 사용
-                    style = MaterialTheme.typography.titleSmall,
-                )
-            }
         }
     }
 }
@@ -435,40 +519,36 @@ private fun IntroductionSection(introduction: String) {
 @Composable
 private fun ProfileDetailsSection(userDetail: UserDetail) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-        ProfilePropertyGroupTitle(title = "기본 정보")
-        ProfileDetailItem("닉네임", userDetail.name)
-        ProfileDetailItem("나이", userDetail.age.toString())
-        ProfileDetailItem("성별", if (userDetail.isMale) "남성" else "여성")
-        ProfileDetailItem("거주지", userDetail.location)
+        ProfilePropertyGroupTitle(title = "基本情報")
+        ProfileDetailItem("ニックネーム", userDetail.name)
+        ProfileDetailItem("年齢", userDetail.age.toString())
+        ProfileDetailItem("性別", if (userDetail.isMale) "男性" else "女性")
+        ProfileDetailItem("居住地", userDetail.location)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
-        ProfilePropertyGroupTitle(title = "신체 정보")
-        ProfileDetailItem("혈액형", userDetail.bloodType)
-        // TODO: UserDetail에 키(height) 필드가 있다면 추가
-        // ProfileDetailItem("키", userDetail.height.toString() + "cm") 
-        ProfileDetailItem("외견", userDetail.appearance) // 체형에 해당될 수 있음
+        ProfilePropertyGroupTitle(title = "身体情報")
+        ProfileDetailItem("血液型", userDetail.bloodType)
+        ProfileDetailItem("外見", userDetail.appearance)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
-        ProfilePropertyGroupTitle(title = "학력 및 직업")
-        ProfileDetailItem("학력", userDetail.education)
-        ProfileDetailItem("직종", userDetail.occupation)
-        // TODO: UserDetail에 연수입(annualIncome) 필드가 있다면 추가
-        // ProfileDetailItem("연수입", userDetail.annualIncome)
+        ProfilePropertyGroupTitle(title = "学歴・職歴")
+        ProfileDetailItem("学歴", userDetail.education)
+        ProfileDetailItem("職種", userDetail.occupation)
 
-        Spacer(modifier = Modifier.height(16.dp)) // 그룹 간 간격
+        Spacer(modifier = Modifier.height(16.dp))
 
-        ProfilePropertyGroupTitle(title = "가치관")
-        ProfileDetailItem("연애관", userDetail.datingPhilosophy)
-        ProfileDetailItem("결혼관", userDetail.marriageView)
+        ProfilePropertyGroupTitle(title = "価値観")
+        ProfileDetailItem("恋愛観", userDetail.datingPhilosophy)
+        ProfileDetailItem("結婚観", userDetail.marriageView)
         if (userDetail.personalityTraits.isNotEmpty()) {
-            ProfileDetailItem("성격", userDetail.personalityTraits.joinToString(", "))
+            ProfileDetailItem("性格", userDetail.personalityTraits.joinToString(", "))
         }
         if (userDetail.hobbies.isNotEmpty()){
-            ProfileDetailItem("취미", userDetail.hobbies.joinToString(", "))
+            ProfileDetailItem("趣味", userDetail.hobbies.joinToString(", "))
         }
-        ProfileDetailItem("생활", userDetail.lifestyle)
+        ProfileDetailItem("ライフスタイル", userDetail.lifestyle)
     }
 }
 
@@ -489,16 +569,15 @@ private fun ProfileDetailItem(label: String, value: String?) {
         Row(modifier = Modifier.padding(vertical = 4.dp)) {
             Text(
                 text = "$label: ",
-                style = MaterialTheme.typography.bodyMedium, // 레이블 스타일 변경
-                color = MaterialTheme.colorScheme.onSurfaceVariant, // 레이블 색상 변경
-                modifier = Modifier.width(100.dp) // 라벨 너비 고정으로 정렬 효과
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.width(100.dp)
             )
-            Text(value, style = MaterialTheme.typography.bodyMedium) // 값 스타일 유지
+            Text(value, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
-// 기존 LoadingContent, ErrorContent 함수 (변경 없음)
 @Composable
 private fun LoadingContent(
     modifier: Modifier = Modifier
@@ -523,19 +602,200 @@ private fun ErrorContent(
         Text(
             text = when (error) {
                 is ResultWrapper.ErrorType.ExceptionError -> error.message
-                else -> "알 수 없는 오류가 발생했습니다."
+                else -> "不明なエラーが発生しました。"
             },
             color = MaterialTheme.colorScheme.error
         )
     }
 }
 
-// androidx.compose.foundation.layout.ExperimentalLayoutApi 임포트 추가
-// import androidx.compose.foundation.layout.ExperimentalLayoutApi 
-// 주: 이미 파일 상단에 OptIn으로 추가되어 있다면 별도 import 문은 없어도 될 수 있음.
-// 하지만 명시적으로 추가하는 것이 좋을 수 있음.
-// 실제로는 @OptIn(ExperimentalLayoutApi::class) 어노테이션이 있는 컴포저블 내부에서만 사용 가능.
-// MyTagsSection과 UserDetailContent에 이미 OptIn이 되어있음.
+@Preview(showBackground = true, name = "UserDetailContentプレビュー")
+@Composable
+fun UserDetailContentPreview() {
+    val dummyUserDetail = UserDetail(
+        id = "dummy_user_123",
+        name = "キム・トキ",
+        age = 28,
+        location = "ソウル",
+        thumbnailUrl = "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
+        introduction = "こんにちは！コーディングと旅行が好きなキム・トキです。一緒に美味しいものを食べたり、面白い話をしながら良い縁を作りたいです。よろしくお願いします！:)",
+        isMale = true,
+        bloodType = "A型",
+        education = "大学卒業",
+        occupation = "ソフトウェアエンジニア",
+        appearance = "スリムな体型",
+        datingPhilosophy = "お互いに良い影響を与える関係",
+        marriageView = "時期が来たらしたいです",
+        personalityTraits = listOf("ポジティブ", "社交的", "率直", "ユーモラス"),
+        hobbies = listOf("コーディング", "Netflix視聴", "グルメ探訪", "海外旅行", "写真撮影"),
+        lifestyle = "週末は主に家で休んだり、友達に会ったりします。"
+    )
 
-// 주: 이 파일에서 사용되는 모든 컴포저블에서 필요한 경우 @OptIn(ExperimentalLayoutApi::class) 어노테이션을 추가해야 합니다.
-// 이는 해당 컴포저블에서 사용되는 모든 컴포저블에 적용되어야 합니다. 
+    val dummyUserTags = listOf(
+        MainHomeTag(id = "tag1", name = "☕️ カフェ巡り", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 自由な海外旅行", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 人生映画探し", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag4", name = "🏃‍♂️ 週末は登山", description = "", imageUrl = "https://images.unsplash.com/photo-1458442310124-352161d4224d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 40, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag5", name = "📚 月に2冊読書", description = "", imageUrl = "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 50, categoryId = "c1", tagType = TagType.HOBBY)
+    )
+
+    val dummyUiState = UserDetailUiState(
+        userDetail = dummyUserDetail,
+        userTags = dummyUserTags,
+        isLiked = false,
+        isFavorite = false
+    )
+
+    TokitokiTheme {
+        UserDetailContent(
+            uiStates = listOf(ResultWrapper.Success(dummyUiState)),
+            currentPage = 0,
+            pagerState = rememberPagerState { 1 },
+            screenName = "FavoriteUsersScreen",
+            onBackClick = {},
+            onToggleFavorite = {},
+            onToggleLike = {},
+            onPickupLeftClick = {},
+            onPickupRightClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "UserDetailContentプレビュー - タグ/紹介なし")
+@Composable
+fun UserDetailContentNoTagsPreview() {
+    val dummyUserDetail = UserDetail(
+        id = "dummy_user_456",
+        name = "パク・トキ",
+        age = 31,
+        location = "釜山",
+        thumbnailUrl = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80",
+        introduction = "",
+        isMale = true,
+        bloodType = "B型",
+        education = "高校卒業",
+        occupation = "フリーランサー",
+        appearance = "普通",
+        datingPhilosophy = "自由な関係",
+        marriageView = "考えていません",
+        personalityTraits = listOf("内向的"),
+        hobbies = listOf("音楽鑑賞"),
+        lifestyle = "静かに過ごす方"
+    )
+
+    val dummyUiState = UserDetailUiState(
+        userDetail = dummyUserDetail,
+        userTags = emptyList()
+    )
+
+    TokitokiTheme {
+        UserDetailContent(
+            uiStates = listOf(ResultWrapper.Success(dummyUiState)),
+            currentPage = 0,
+            pagerState = rememberPagerState { 1 },
+            screenName = "FavoriteUsersScreen",
+            onBackClick = {},
+            onToggleFavorite = {},
+            onToggleLike = {},
+            onPickupLeftClick = {},
+            onPickupRightClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "SectionTitleプレビュー")
+@Composable
+fun SectionTitlePreview() {
+    TokitokiTheme {
+        SectionTitle(title = "マイタグ")
+    }
+}
+
+@Preview(showBackground = true, name = "ThumbnailSectionプレビュー")
+@Composable
+fun ThumbnailSectionPreview() {
+    TokitokiTheme {
+        ThumbnailSection(thumbnailUrl = "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80")
+    }
+}
+
+@Preview(showBackground = true, name = "BasicInfoSectionプレビュー")
+@Composable
+fun BasicInfoSectionPreview() {
+    TokitokiTheme {
+        BasicInfoSection(name = "キム・トキ", age = 28, location = "ソウル")
+    }
+}
+
+@Preview(showBackground = true, name = "MyTagsSectionプレビュー")
+@Composable
+fun MyTagsSectionPreview() {
+    val dummyUserTags = listOf(
+        MainHomeTag(id = "tag1", name = "☕️ カフェ巡り", description = "", imageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 10, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag2", name = "✈️ 自由な海外旅行", description = "", imageUrl = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 20, categoryId = "c1", tagType = TagType.HOBBY),
+        MainHomeTag(id = "tag3", name = "🎬 人生映画探し", description = "", imageUrl = "https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80", subscriberCount = 30, categoryId = "c1", tagType = TagType.HOBBY)
+    )
+    TokitokiTheme {
+        MyTagsSection(tags = dummyUserTags)
+    }
+}
+
+@Preview(showBackground = true, name = "MyTagChipプレビュー")
+@Composable
+fun MyTagChipPreview() {
+    TokitokiTheme {
+        MyTagChip(
+            tagText = "☕️ カフェ巡り",
+            tagImageUrl = "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1941&q=80"
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "IntroductionSectionプレビュー")
+@Composable
+fun IntroductionSectionPreview() {
+    TokitokiTheme {
+        IntroductionSection(introduction = "こんにちは！コーディングと旅行が好きなキム・トキです。一緒に美味しいものを食べたり、面白い話をしながら良い縁を作りたいです。よろしくお願いします！:)")
+    }
+}
+
+@Preview(showBackground = true, name = "ProfileDetailsSectionプレビュー")
+@Composable
+fun ProfileDetailsSectionPreview() {
+    val dummyUserDetail = UserDetail(
+        name = "キム・トキ",
+        age = 28,
+        isMale = true,
+        location = "ソウル",
+        bloodType = "A型",
+        education = "大学卒業",
+        occupation = "ソフトウェアエンジニア",
+        appearance = "スリムな体型",
+        datingPhilosophy = "お互いに良い影響を与える関係",
+        marriageView = "時期が来たらしたいです",
+        personalityTraits = listOf("ポジティブ", "社交的", "率直", "ユーモラス"),
+        hobbies = listOf("コーディング", "Netflix視聴", "グルメ探訪", "海外旅行", "写真撮影"),
+        lifestyle = "週末は主に家で休んだり、友達に会ったりします。"
+    )
+    TokitokiTheme {
+        ProfileDetailsSection(userDetail = dummyUserDetail)
+    }
+}
+
+@Preview(showBackground = true, name = "ProfilePropertyGroupTitleプレビュー")
+@Composable
+fun ProfilePropertyGroupTitlePreview() {
+    TokitokiTheme {
+        ProfilePropertyGroupTitle(title = "基本情報")
+    }
+}
+
+@Preview(showBackground = true, name = "ProfileDetailItemプレビュー")
+@Composable
+fun ProfileDetailItemPreview() {
+    TokitokiTheme {
+        ProfileDetailItem(label = "ニックネーム", value = "キム・トキ")
+    }
+} 

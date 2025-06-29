@@ -22,12 +22,13 @@ class FavoriteUserRepositoryImpl @Inject constructor() : FavoriteUserRepository 
                 name = userDetail.name,
                 age = userDetail.age,
                 location = userDetail.location,
-                height = (160..190).random(),
-                job = userDetail.occupation,
-                hasRoommate = (userDetail.id.toIntOrNull() ?: 0) % 2 == 0,
-                siblings = "1",
+                occupation = userDetail.occupation,
                 bloodType = userDetail.bloodType,
-                timestamp = userDetail.lastLoginAt
+                timestamp = userDetail.lastLoginAt,
+                personalityTrait = userDetail.personalityTraits.firstOrNull(),
+                lifestyle = userDetail.lifestyle,
+                datingPhilosophy = userDetail.datingPhilosophy,
+                marriageView = userDetail.marriageView
             )
         }.sortedByDescending { it.timestamp }.toMutableList()
 

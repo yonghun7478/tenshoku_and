@@ -70,6 +70,7 @@ import com.example.tokitoki.ui.state.MainHomeSearchUiEvent
 import com.example.tokitoki.ui.state.MainHomeSearchUiStateData
 import com.example.tokitoki.ui.state.OrderType
 import com.example.tokitoki.ui.state.currentData
+import com.example.tokitoki.ui.theme.LocalColor
 import com.example.tokitoki.ui.viewmodel.MainHomeSearchViewModel
 
 @Composable
@@ -186,7 +187,11 @@ fun MainHomeSearchContents(
         isRefreshing = data.isRefreshing,
         onRefresh = { onEvent(MainHomeSearchUiEvent.OnRefreshing) }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = LocalColor.current.white)
+        ) {
             // 데이터 표시 그리드
             MainHomeSearchGrid(
                 data = data,

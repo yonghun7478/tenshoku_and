@@ -114,13 +114,21 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_BIRTHDAY_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(TokitokiArgs.BIRTHDAY) { type = NavType.StringType },
+                navArgument(TokitokiArgs.IS_FROM_MY_PAGE) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
         ) { backStackEntry ->
 
             val birthDay = backStackEntry.arguments?.getString(TokitokiArgs.BIRTHDAY) ?: ""
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
             AboutMeBirthdayScreen(
                 birthDay = birthDay,
+                isFromMyPage = isFromMyPage,
                 onAboutMeGenderScreen = {
                     navController.navigateUp()
                 },
@@ -128,6 +136,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeName()
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.BIRTHDAY, it)
                     navController.navigateUp()
                 }
             )
@@ -149,6 +158,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeSecond()
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.NAME, it)
                     navController.navigateUp()
                 }
             )
@@ -164,9 +174,10 @@ fun TokitokiNavGraph(
 
         composable(
             TokitokiDestinations.ABOUT_ME_TAG_ROUTE,
-            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType })
+            arguments = listOf(navArgument(TokitokiArgs.TAG_IDS) { type = NavType.StringType }, navArgument(TokitokiArgs.IS_FROM_MY_PAGE) { type = NavType.BoolType })
         ) { backStackEntry ->
             val tagIdsString = backStackEntry.arguments?.getString(TokitokiArgs.TAG_IDS) ?: ""
+            val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
             val tagIds: List<MyTagItem> = if (tagIdsString.isEmpty()) {
                 listOf()
             } else {
@@ -175,6 +186,7 @@ fun TokitokiNavGraph(
 
             AboutMeTagScreen(
                 tagIds = tagIds,
+                isFromMyPage = isFromMyPage,
                 onAboutMeSecondScreen = {
                     navController.navigateUp()
                 },
@@ -182,6 +194,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeThird()
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.TAG_IDS, it)
                     navController.navigateUp()
                 }
             )
@@ -249,6 +262,7 @@ fun TokitokiNavGraph(
                     navAction.navigateToAboutMeMyProfile(uri)
                 },
                 onPrevScreen = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(TokitokiArgs.SELF_SENTENCE_IDS, it)
                     navController.navigateUp()
                 }
             )
@@ -269,6 +283,11 @@ fun TokitokiNavGraph(
             val uriFromArg = Uri.parse(Uri.decode(uriStringFromArg))
             val isFromMyPage = backStackEntry.arguments?.getBoolean(TokitokiArgs.IS_FROM_MY_PAGE) ?: false
 
+            val birthday:String? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.BIRTHDAY)
+            val name:String? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.NAME)
+            val selfSentenceId:Int? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.SELF_SENTENCE_IDS)
+            val tagIds:ArrayList<MyTagItem>? = navController.currentBackStackEntry?.savedStateHandle?.get(TokitokiArgs.TAG_IDS)
+
             val isFromEditMode: Boolean = navController
                 .currentBackStackEntry?.savedStateHandle?.get("isFromEdit") ?: false
 
@@ -283,6 +302,10 @@ fun TokitokiNavGraph(
                 AboutMeMyProfileScreen(
                     uri = this,
                     isFromMyPage = isFromMyPage, // Added this line
+                    birthday = birthday,
+                    name = name,
+                    tagIds = tagIds,
+                    selfSentenceId = selfSentenceId,
                     onAboutMeProfInputScreen = {
                         navAction.navigateToAboutMeProfInput(selfSentenceId = it)
                     },
@@ -290,10 +313,10 @@ fun TokitokiNavGraph(
                         navAction.navigateToAboutMeName(it)
                     },
                     onAboutMeBirthDayScreen = {
-                        navAction.navigateToAboutMeBirthday(it)
+                        navAction.navigateToAboutMeBirthday(it, true)
                     },
-                    onAboutMeTagScreen = {
-                        navAction.navigateToAboutMeTag(it)
+                    onAboutMeTagScreen = { tags, isFromMyPage ->
+                        navAction.navigateToAboutMeTag(tags, isFromMyPage)
                     },
                     onAboutMePhotoUploadScreen = {
                         navAction.navigateToAboutMePhotoUpload(it, true)
@@ -378,10 +401,6 @@ fun TokitokiNavGraph(
                 onNavigateToUserProfile = { id, source ->
                     navAction.navigateToUserDetail(userId = id, screenName = source)
                 },
-                onBackClick = {
-                    navController.navigateUp()
-                },
-                showBackButton = true,
                 initialTab = initialTab
             )
         }

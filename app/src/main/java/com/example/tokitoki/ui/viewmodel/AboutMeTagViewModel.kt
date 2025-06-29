@@ -44,6 +44,7 @@ class AboutMeTagViewModel
 
     suspend fun init(
         tagIds: List<MyTagItem> = listOf(),
+        isFromMyPage: Boolean = false,
     ) {
         // Step 1: 도메인 데이터를 가져오기 (TagType)
         val tagTypes = getTagTypeListUseCase()
@@ -75,7 +76,7 @@ class AboutMeTagViewModel
             currentState.copy(
                 tagTypeList = uiTagTypes,
                 tagsByTagType = finalTagsByTagType,
-                isEditMode = tagIds.isNotEmpty()
+                isEditMode = isFromMyPage || tagIds.isNotEmpty()
             )
         }
     }
@@ -129,14 +130,12 @@ class AboutMeTagViewModel
 
             val domainMyTags = filteredTags.map { TagUiConverter.uiToDomain(it) }
 
-            clearMyTagUseCase()
-            val result = setMyTagUseCase(domainMyTags)
-
-            if (result.isSuccess) {
-                return true
-            } else {
-                return false
+            if(!uiState.value.isEditMode) {
+                clearMyTagUseCase()
+                setMyTagUseCase(domainMyTags)
             }
+
+            return true
         }
 
         return false

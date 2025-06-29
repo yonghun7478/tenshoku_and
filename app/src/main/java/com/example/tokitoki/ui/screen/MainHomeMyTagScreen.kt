@@ -82,6 +82,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import android.util.Log
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.foundation.BorderStroke
+import com.example.tokitoki.ui.theme.LocalColor
 
 private const val TAG = "MainHomeMyTagScreen"
 
@@ -159,7 +161,8 @@ fun MainHomeMyTagScreenContent(
     onTagToggleSubscription: (String, Boolean, TagType) -> Unit
 ) {
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.White
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
@@ -171,7 +174,6 @@ fun MainHomeMyTagScreenContent(
                     MainHomeMyTagScreen_NormalSearchBar(
                         onSearchBarClicked = onNavigateToTagSearch,
                     )
-                    Divider()
                 }
 
                 item {
@@ -182,7 +184,6 @@ fun MainHomeMyTagScreenContent(
                         onTagClick = onNavigateToTagDetail,
                         onTagToggleSubscription = onTagToggleSubscription
                     )
-                    Divider()
                 }
                 item {
                     // 내가 선택한 태그
@@ -192,7 +193,6 @@ fun MainHomeMyTagScreenContent(
                         onMoreClick = onNavigateToMyTagList,
                         onTagClick = onNavigateToTagDetail
                     )
-                    Divider()
                 }
 
                 item {
@@ -201,7 +201,6 @@ fun MainHomeMyTagScreenContent(
                         imageUrl = "https://picsum.photos/400/100",
                         onClick = { /* TODO: Handle banner click */ }
                     )
-                    Divider()
                 }
                 item {
                     // 새로운 태그 추천
@@ -229,26 +228,41 @@ fun MainHomeMyTagScreen_NormalSearchBar(
     onSearchBarClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .clickable { onSearchBarClicked() }
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = "Search Icon",
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(10.dp),
+            border = BorderStroke(1.dp, Color.LightGray),
+            color = Color.White,
+            shadowElevation = 4.dp,
+            onClick = onSearchBarClicked
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
 
-        Text(
-            text = "興味があるマイタグを検索",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
-        )
+                Text(
+                    text = "興味があるマイタグを検索",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
+        }
     }
 }
 
@@ -307,7 +321,7 @@ fun TrendingTagShimmerCard(
             .fillMaxWidth()
             .height(100.dp)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = Color.Gray.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -439,7 +453,7 @@ fun MainHomeMyTagScreen_TodayAndTrendingTags(
                 ) {
                     repeat(tags.size) { iteration ->
                         val color = if (pagerState.currentPage == iteration) {
-                            MaterialTheme.colorScheme.primary
+                            LocalColor.current.blue
                         } else {
                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                         }
@@ -484,10 +498,10 @@ fun MainHomeMyTagScreen_TrendingTagCard(
             .height(100.dp)
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = Color.Gray.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(12.dp)
-            )
+            ),
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -546,14 +560,14 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                 }
             }
             
-            // 플러스/체크 아이콘 (우측 하단)
+            // 플러스/체크 아이콘 (우측 중앙)
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp)
+                    .align(Alignment.CenterEnd)
+                    .padding(16.dp)
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(Color.LightGray)
                     .clickable {
                         onTagToggleSubscription(tag.id, tag.isSubscribed, tag.tagType)
                     },
@@ -562,7 +576,7 @@ fun MainHomeMyTagScreen_TrendingTagCard(
                 Icon(
                     imageVector = if (tag.isSubscribed) Icons.Default.Check else Icons.Default.Add,
                     contentDescription = if (tag.isSubscribed) "구독됨" else "구독하기",
-                    tint = Color.White,
+                    tint = if (tag.isSubscribed) LocalColor.current.black else Color.White,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -877,7 +891,7 @@ fun MainHomeMyTagScreen_MySelectedTags(
         ) {
             repeat(pageCount) { iteration ->
                 val color = if (pagerState.currentPage == iteration) {
-                    MaterialTheme.colorScheme.primary
+                    LocalColor.current.blue // MaterialTheme.colorScheme.primary에서 변경
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                 }

@@ -66,8 +66,8 @@ class EmailVerificationViewModel @Inject constructor(
                 return if (isRegistered.data.isRegistered) {
                     saveTokensUseCase(isRegistered.data.accessToken, isRegistered.data.refreshToken)
                     val dummyProfile = profile.copy(
-                        name = "더미 사용자",
-                        birthDay = "1990-01-01",
+                        name = "dummy users",
+                        birthDay = "19900101",
                         isMale = true,
                         mySelfSentenceId = 1,
                         thumbnailUrl = ""
