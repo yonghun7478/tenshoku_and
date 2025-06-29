@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 클린 아키텍처 기반 만남 애플리케이션
+
+이 프로젝트는 클린 아키텍처 원칙에 따라 구축된 만남 애플리케이션으로, 코틀린, 의존성 주입을 위한 Hilt, 그리고 UI를 위한 Jetpack Compose를 활용합니다.
+
+## 주요 기능 및 구조:
+
+-   **클린 아키텍처 레이어**: 코드베이스는 관심사의 분리와 유지보수성을 보장하기 위해 `data`, `domain`, `presentation` 레이어로 구성되어 있습니다.
+    -   **`domain`**: 프레임워크에 독립적인 비즈니스 로직과 엔티티를 포함합니다. 여기에는 유스케이스, 레포지토리 인터페이스, 모델이 포함됩니다.
+    -   **`data`**: `domain` 레이어에 정의된 레포지토리 인터페이스를 구현합니다. 이 레이어는 로컬 저장소 및 원격 API 호출을 포함한 데이터 소스를 처리합니다.
+    -   **`presentation`**: UI (Jetpack Compose), ViewModel로 구성되며 사용자 상호작용을 처리합니다. `domain` 레이어에 의존합니다.
+
+-   **의존성 주입**: Hilt는 애플리케이션 전체의 의존성을 관리하는 데 사용되어 느슨하게 결합된 아키텍처를 보장합니다.
+
+-   **UI 프레임워크**: 사용자 인터페이스는 Jetpack Compose를 사용하여 전적으로 구축되었습니다.
+
+-   **더미 데이터 처리**: **중요 사항**: 활성 API 서버가 없으므로, 애플리케이션은 현재 개발 및 테스트 목적으로 더미 데이터를 사용합니다. 이는 UI에 표시되는 데이터가 백엔드에서 가져오는 것이 아니라 로컬에서 생성된다는 의미입니다. API 서버가 사용 가능해지면 `data` 레이어는 실제 데이터를 가져오도록 업데이트될 것입니다.
+
+## 상세 가이드라인:
+
+-   **프로젝트 구조**: 프로젝트의 전체적인 디렉토리 구조와 각 레이어의 역할에 대한 자세한 설명은 다음 문서를 참조하세요: [project_structure.mdc](mdc:project_structure.mdc)
+
+-   **도메인 레이어 코드 작성**: `domain` 레이어에서 코드를 작성하기 위한 가이드라인은 다음 문서를 참조하세요: [domain_layer_code_guideline.mdc](mdc:domain_layer_code_guideline.mdc)
+
+-   **프레젠테이션 레이어 코드 작성**: `presentation` 레이어에서 코드를 작성하기 위한 가이드라인은 다음 문서를 참조하세요: [presentation_layer_code_guideline.mdc](mdc:presentation_layer_code_guideline.mdc)
+
+-   **Hilt 의존성 주입**: Hilt를 사용하여 의존성을 관리하는 방법에 대한 가이드라인은 다음 문서를 참조하세요: [hilt_guideline.mdc](mdc:hilt_guideline.mdc)

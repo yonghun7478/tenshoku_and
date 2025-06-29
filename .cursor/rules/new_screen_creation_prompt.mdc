@@ -1,0 +1,157 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 신규 화면 생성 가이드 프롬프트
+
+이 프롬프트는 새로운 화면을 애플리케이션에 추가하는 데 필요한 단계를 안내합니다. AI가 제안하는 이름과 구조를 바탕으로 진행되며, 제안된 내용을 검토하고 필요에 따라 수정하여 사용하세요. **특히 Domain 및 Data Layer에서는 AI가 먼저 코드베이스를 검색하여 재사용 가능한 코드를 찾도록 요청하고, 그 결과를 바탕으로 진행하는 것을 적극 권장합니다.** 각 질문에 답변하면서 필요한 작업을 계획하고 실행해 주세요.
+
+## 1. 기본 정보
+
+*   **화면 이름**: 생성하려는 화면의 이름은 무엇인가요? (예: `UserProfile`, `Settings`, `ItemDetail`)
+    *   *AI는 이 이름을 기반으로 다른 컴포넌트들의 이름을 제안합니다.*
+*   **화면 목적**: 이 화면의 주요 기능이나 목적은 무엇인가요? (예: 사용자 프로필 정보 표시, 앱 설정 변경, 특정 아이템 상세 정보 제공)
+    *   *AI는 이 목적을 달성하기 위한 함수 및 데이터 구조를 제안합니다.*
+*   **네비게이션 (시작점)**: 이 화면으로 이동하는 기존 화면이 있나요? 있다면 어떤 화면인가요? (예: `HomeScreen`의 사용자 아이콘 클릭 시)
+*   **네비게이션 (목적지)**: 이 화면에서 다른 화면으로 이동하는 경우가 있나요? 있다면 어떤 화면인가요? (예: `UserProfileScreen`에서 '친구 목록 보기' 버튼 클릭 시 `FriendListScreen`으로 이동)
+
+## 2. Presentation Layer (`app/src/main/java/com/example/tokitoki/ui`)
+
+### 2.1. 화면 (Screen - Composable)
+
+*   **AI 제안 파일명**: `[화면이름]Screen.kt` (예: 이전 답변이 `UserProfile`이었다면 `UserProfileScreen.kt`). 이 이름이 적절한가요?
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/screen/` 또는 `app/src/main/java/com/example/tokitoki/ui/screens/`
+*   **주요 UI 요소**: 화면에 표시될 주요 UI 요소들은 무엇인가요? (예: 사용자 이름 표시용 Text, 프로필 이미지용 Image, 정보 수정 버튼)
+*   **AI 제안 Content 함수**: 주요 UI 요소(`[위에서 답변한 UI 요소들]`)를 표시하고 `[화면 목적]`을 달성하기 위한 핵심 Composable 함수의 이름으로 `[화면이름]Content` (예: `UserProfileContent`)를 제안합니다. 괜찮으신가요? 아니면 다른 이름을 제안하시겠어요?
+*   **커스텀 UI 컴포넌트**: 재사용 가능한 커스텀 UI 컴포넌트가 필요한가요? (예: 프로필 정보 카드) 그렇다면 어떤 컴포넌트인가요?
+
+### 2.2. ViewModel
+
+*   **AI 제안 파일명**: `[화면이름]ViewModel.kt` (예: `UserProfileViewModel.kt`). 이 이름이 적절한가요?
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/viewmodel/`
+*   **데이터 관리**: ViewModel에서 어떤 데이터를 가져오거나 관리해야 하나요? (예: 사용자 정보 객체, 아이템 목록 리스트, 설정 값)
+    *   *AI는 이 데이터를 기반으로 UseCase 및 Repository 함수를 제안합니다.*
+*   **AI 제안 ViewModel 함수**: `[화면 목적]`과 관리해야 할 데이터(`[위에서 답변한 데이터]`)를 고려할 때, 다음과 같은 함수들이 필요할 수 있습니다:
+    *   `fun load[데이터이름]()` (예: `fun loadUserProfileData()`)
+    *   `fun on[주요사용자액션]()` (예: `fun onEditButtonClicked()`)
+    *   이 외에 어떤 함수들이 필요할까요? 또는 기존 ViewModel의 함수를 활용할 수 있는 부분이 있나요?
+
+### 2.3. UI 상태 (State) 및 이벤트 (Event) - 선택 사항
+
+*   **상태 클래스 필요성**: 화면의 UI 상태(로딩 상태, 데이터, 오류 메시지 등)를 명시적으로 관리하기 위한 별도의 데이터 클래스가 필요할까요? (AI 추천: 화면이 복잡하거나 비동기 작업이 많다면 사용 고려)
+    *   필요하다면, AI 제안 파일명: `[화면이름]State.kt` (예: `UserProfileState.kt`)
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/state/`
+    *   어떤 필드들이 포함될까요? (AI 제안 예: `isLoading: Boolean = false`, `data: [관리할 데이터 타입]? = null`, `error: String? = null`)
+*   **이벤트 클래스 필요성**: UI에서 발생하는 이벤트를 ViewModel로 전달하기 위한 별도의 클래스/sealed interface가 필요할까요?
+    *   필요하다면, AI 제안 파일명: `[화면이름]Event.kt` (예: `UserProfileEvent.kt`)
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/state/`
+
+### 2.4. 네비게이션 (Navigation)
+
+*   **참고 파일**:
+    *   `TokitokiNavGraph.kt` ([app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavGraph.kt](mdc:app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavGraph.kt))
+    *   `TokitokiNavigation.kt` ([app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavigation.kt](mdc:app/src/main/java/com/example/tokitoki/ui/screen/TokitokiNavigation.kt))
+    *   **`MainScreen.kt` (또는 `MainScreen`의 네비게이션을 정의하는 주요 파일, 예: `app/src/main/java/com/example/tokitoki/ui/screen/main/MainScreen.kt`). `MainScreen`의 정확한 경로와 파일명을 확인해주세요.**
+    *   **`MainScreen` 내부 네비게이션 관련 파일 (예: `MainBottomNavigation.kt`, `MainNavHost.kt`, `MainTab.kt` 등, 해당 파일들이 있다면 경로와 함께 명시). 이 파일들은 `MainScreen` 내의 탭, 바텀 네비게이션 아이템 또는 중첩된 `NavHost`를 정의할 수 있습니다.**
+*   **AI 제안 라우트**: 화면 이름(`[화면이름]`)을 기반으로 AI가 제안하는 라우트: `[화면이름을 소문자로 변환]` (예: `userprofile`). 필요시 인자를 포함하여 수정해주세요 (예: `userprofile/{userId}`). 이 라우트를 `TokitokiDestinations`에 정의해야 합니다.
+*   **중첩 네비게이션 (Nested Navigation) 고려 사항**:
+    *   새 화면이 `MainScreen` 내부에 통합되어야 하는 경우 (예: Bottom Navigation의 새 탭, 기존 탭 내의 서브 화면 등), 어떤 방식으로 `MainScreen`의 네비게이션 구조 (`NavHost` 또는 커스텀 네비게이션 로직)에 추가되어야 하나요? **(AI는 위에서 언급된 `MainScreen.kt` 또는 관련 내부 네비게이션 파일들을 참고하여 제안해야 합니다.)**
+    *   `MainScreen` 내부의 특정 `NavHost`에 이 화면을 위한 별도의 네비게이션 그래프 또는 목적지를 정의해야 하나요? 그렇다면 해당 `NavHost`는 어느 파일에 정의되어 있으며, 어떻게 수정해야 할까요?
+    *   `MainScreen`으로/부터 또는 `MainScreen` 내부 화면 간 네비게이션 시 특별히 고려해야 할 `NavController` 범위나 상태 관리가 있나요? 예를 들어, `MainScreen` 레벨의 `NavController`를 사용해야 하나요, 아니면 중첩된 `NavHost`의 `NavController`를 사용해야 하나요?
+*   **인자 전달**: 화면 이동 시 전달해야 할 인자가 있나요? (예: `userId: String`)
+*   **네비게이션 액션**:
+    *   기존 화면에서 이 새 화면으로 이동하는 함수가 `TokitokiNavigationActions`에 필요한가요? 그렇다면 어떤 형태로 추가되어야 할까요? (예: `fun navigateToUserProfile(userId: String)`)
+    *   혹시 `MainScreen` 내부의 특정 액션(예: Bottom Navigation 아이템 클릭)을 통해 이 화면으로 이동해야 한다면, 해당 액션은 어디에 정의되어야 하며, `MainScreen`의 ViewModel 또는 관련 Composable에서 어떻게 호출되어야 할까요?
+
+### 2.5. UI 모델 및 컨버터 (필요시)
+
+*   **UI 모델 필요성**: Domain 모델을 UI에 직접 사용하기보다, UI 표시에 더 적합한 형태로 가공된 별도의 모델이 필요한가요?
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/model/`
+*   **UI 컨버터 필요성**: Domain 모델을 위에서 정의한 UI 모델로 변환하는 로직이 필요하다면, 컨버터 클래스 생성을 고려하세요.
+    *   경로: `app/src/main/java/com/example/tokitoki/ui/converter/`
+
+## 3. Domain Layer (`app/src/main/java/com/example/tokitoki/domain`)
+
+*   **참고 가이드라인**: [domain_layer_code_guideline.mdc](mdc:domain_layer_code_guideline.mdc)
+
+### 3.1. UseCase (비즈니스 로직)
+
+*   **AI 코드베이스 검색 요청 (UseCase)**: 화면의 주요 기능(`[화면 목적]`)과 ViewModel에서 필요한 데이터(`[ViewModel에서 관리할 데이터]`)를 고려하여, **AI에게 `app/src/main/java/com/example/tokitoki/domain/usecase/` 경로에서 기존 UseCase 중 재사용 가능한 것이 있는지 코드베이스 검색을 요청하세요.**
+    *   예시 요청: "AI야, `[화면 목적]`을 달성하고 `[ViewModel에서 관리할 데이터]`를 처리하는 데 사용할 만한 기존 UseCase가 있는지 찾아줘. 있다면 목록과 간단한 설명을 알려주고, 없다면 없다고 말해줘."
+*   **검색 결과 기반 UseCase 정의**:
+    *   AI가 재사용 가능한 UseCase를 찾았다면: 그 이름과 기능을 검토하세요. 현재 화면에 맞게 약간의 수정(예: 파라미터 추가, 로직 변경)이 필요한가요? 아니면 그대로 사용할 수 있나요?
+    *   AI가 적절한 UseCase를 찾지 못했다면: 새로 생성할 UseCase의 AI 제안 이름(예: `Get[데이터명]UseCase`, `Update[데이터명]UseCase`)과 정확한 기능, 그리고 어떤 Repository 인터페이스에 의존할지를 구체적으로 정의하세요.
+
+### 3.2. Repository 인터페이스 (데이터 추상화)
+
+*   **AI 코드베이스 검색 요청 (Repository Interface)**: 위에서 정의/선택한 UseCase(`[UseCase 이름들]`)가 사용할 데이터 접근을 위해, **AI에게 `app/src/main/java/com/example/tokitoki/domain/repository/` 경로에서 기존 Repository 인터페이스 중 관련된 것을 코드베이스 검색을 요청하세요.**
+    *   예시 요청: "AI야, `[UseCase 이름들]` UseCase에서 사용할 만한 기존 Repository 인터페이스가 있는지 찾아줘. (예: `[관련 엔티티명]Repository`). 있다면 인터페이스 이름과 정의된 함수들을 알려주고, 없다면 없다고 말해줘."
+*   **검색 결과 기반 Repository 인터페이스 정의**:
+    *   AI가 관련된 Repository 인터페이스를 찾았다면: 해당 인터페이스에 필요한 함수(메서드)가 이미 존재하나요? 없다면 어떤 함수 시그니처(이름, 파라미터, 반환 타입)를 추가해야 할까요? (AI 제안 예: `UserRepository`에 `suspend fun getUserProfile(userId: String): UserProfileData` 추가)
+    *   AI가 적절한 Repository 인터페이스를 찾지 못했거나 새로운 종류의 데이터라면: 신규 Repository 인터페이스의 AI 제안 이름(`[엔티티명]Repository.kt`)과 필요한 함수들을 정의하세요.
+
+### 3.3. 도메인 모델 (핵심 데이터 구조)
+
+*   **AI 코드베이스 검색 요청 (Domain Model)**: UseCase나 Repository 인터페이스에서 사용될 핵심 비즈니스 엔티티(데이터 모델) 중, **AI에게 `app/src/main/java/com/example/tokitoki/domain/model/` 경로에서 기존 도메인 모델 중 재사용 가능한 것이 있는지 코드베이스 검색을 요청하세요.**
+    *   예시 요청: "AI야, `[화면 목적]` 또는 `[필요 데이터]`와 관련된 기존 도메인 모델이 있는지 찾아줘. 있다면 모델 이름과 주요 속성을 알려주고, 없다면 없다고 말해줘."
+*   **검색 결과 기반 도메인 모델 정의**:
+    *   AI가 재사용 가능한 도메인 모델을 찾았다면: 해당 모델을 그대로 사용하거나, 필요한 경우 확장 또는 수정할 부분을 알려주세요.
+    *   AI가 적절한 모델을 찾지 못했다면: AI가 제안하는 새 모델 이름(예: `[화면이름]Data`, `[엔티티명]`)과 주요 속성을 정의하세요.
+
+### 3.4. 도메인 컨버터 (필요시)
+
+*   **도메인 컨버터 필요성**: 데이터 계층의 모델(DTO)이나 프레젠테이션 계층의 모델(UI 모델)을 도메인 모델로 변환하거나 그 반대의 변환 로직이 필요한 경우, 컨버터 사용을 고려하세요.
+    *   경로: `app/src/main/java/com/example/tokitoki/domain/converter/`
+
+## 4. Data Layer (`app/src/main/java/com/example/tokitoki/data`)
+
+*   **참고 가이드라인**: [data_layer_code_guideline.mdc](mdc:data_layer_code_guideline.mdc)
+
+### 4.1. Repository 구현체
+
+*   **AI 코드베이스 검색 요청 (Repository Implementation)**: Domain Layer에서 정의/수정한 Repository 인터페이스(`[Repository 인터페이스명]`)에 대한 구현체를 찾기 위해, **AI에게 `app/src/main/java/com/example/tokitoki/data/repository/` 경로에서 기존 Repository 구현체 중 관련된 것을 코드베이스 검색을 요청하세요.**
+    *   예시 요청: "AI야, `[Repository 인터페이스명]` 인터페이스를 구현했거나 유사한 기능을 하는 기존 Repository 구현체가 있는지 찾아줘. 있다면 그 클래스 이름을 알려주고, 없다면 없다고 말해줘."
+*   **검색 결과 기반 Repository 구현체 정의**:
+    *   AI가 관련된 Repository 구현체를 찾았다면: 해당 구현체를 수정하여 새로운 함수를 구현하거나 기존 함수를 변경할 수 있나요? 어떤 부분을 수정해야 할까요?
+    *   AI가 적절한 구현체를 찾지 못했거나 새로운 Repository 인터페이스를 만들었다면: 그 구현체의 AI 제안 이름은 `[Repository 인터페이스명]Impl` (예: `UserProfileRepositoryImpl`)입니다. 이 구현체는 어떤 데이터 소스(원격 API, 로컬 DB, 더미 데이터)를 사용할 예정인가요?
+        *   더미 데이터 사용 시: 어떤 구조의 더미 데이터를 반환할 예정인가요? (예: `listOf(User("1", "Alice"))`)
+        *   API 호출 시: 어떤 API Endpoint를 호출하고, 응답은 어떤 DTO 형태로 받나요?
+        *   로컬 DB 사용 시: 어떤 DAO를 사용하고, 어떤 Entity를 조회/저장하나요?
+
+### 4.2. 데이터 모델 (DTO, Entity 등)
+
+*   **AI 코드베이스 검색 요청 (Data Model - DTO/Entity)**: 원격 API 통신 또는 로컬 DB 저장을 위한 데이터 모델을 정의하기 전에, **AI에게 `app/src/main/java/com/example/tokitoki/data/model/` (DTO) 또는 `app/src/main/java/com/example/tokitoki/data/local/` (Entity) 경로에서 기존 모델 중 재사용 가능한 것이 있는지 코드베이스 검색을 요청하세요.**
+    *   예시 요청 (DTO): "AI야, `[관련 API Endpoint 또는 예상 데이터 구조]`와 관련된 기존 DTO가 data/model에 있는지 찾아줘."
+    *   예시 요청 (Entity): "AI야, `[관련 DB 테이블 또는 도메인 모델]`과 관련된 기존 Entity가 data/local에 있는지 찾아줘."
+*   **검색 결과 기반 데이터 모델 정의 (DTO/Entity)**:
+    *   AI가 재사용 가능한 DTO/Entity를 찾았다면: 해당 모델을 그대로 사용하거나, 필요한 경우 수정할 부분을 알려주세요.
+    *   AI가 적절한 모델을 찾지 못했다면:
+        *   네트워크 DTO: 클래스명과 필드는 어떻게 구성되어야 할까요?
+        *   로컬 DB Entity: 클래스명, 필드, 테이블명은 어떻게 구성되어야 할까요?
+
+### 4.3. 로컬 데이터 소스 (DAO - Room 사용 시)
+
+*   **AI 코드베이스 검색 요청 (DAO)**: Room 데이터베이스를 사용하고 새로운 데이터 접근 로직(쿼리)이 필요한 경우, **AI에게 `app/src/main/java/com/example/tokitoki/data/local/dao/` 경로에서 기존 DAO 중 재사용 가능한 것이 있는지 코드베이스 검색을 요청하세요.**
+    *   예시 요청: "AI야, `[관련 Entity명]`을 다루거나 유사한 쿼리를 수행하는 기존 DAO가 있는지 찾아줘."
+*   **검색 결과 기반 DAO 정의**:
+    *   AI가 관련된 DAO를 찾았다면: 해당 DAO에 필요한 쿼리 함수를 추가하거나 기존 함수를 수정할 수 있나요?
+    *   AI가 적절한 DAO를 찾지 못했다면: 어떤 DAO를 새로 만들어야 하며, 어떤 쿼리 함수가 필요한가요?
+
+## 5. Dependency Injection (Hilt)
+
+*   **참고 가이드라인**: [hilt_guideline.mdc](mdc:hilt_guideline.mdc)
+*   **Hilt 모듈 분석**: 새로 생성/수정된 UseCase 및 Repository 구현체가 있다면 Hilt 모듈에 등록해야 합니다.
+    *   AI는 다음과 같은 바인딩을 예상합니다:
+        *   `[UseCase 인터페이스]` -> `[UseCase 구현체]` (만약 UseCase가 클래스이고 생성자 주입이 가능하다면 별도 바인딩 불필요)
+        *   `[Repository 인터페이스]` -> `[Repository 구현체]`
+    *   이러한 바인딩을 위해 어떤 Hilt 모듈(`UseCaseModule.kt`, `TokiTokiRepositoryModule.kt` 등)을 수정해야 하며, `@Binds` 또는 `@Provides` 코드를 어떻게 작성해야 할까요?
+    *   새로운 의존성(예: Retrofit 서비스 인터페이스, Room 데이터베이스 인스턴스, 특정 DAO)을 `@Provides`로 제공해야 하는 경우가 있나요?
+
+## 6. 기타
+
+*   **프로젝트 구조 참고**: [project_structure.mdc](mdc:project_structure.mdc)
+*   **테스트**: 신규 화면 및 관련 로직에 대한 단위 테스트 또는 UI 테스트 계획이 있나요? (AI 추천: ViewModel 로직, UseCase, Repository 구현체는 단위 테스트를, Composable 화면은 UI 테스트를 고려하세요.)
+*   **리소스**: 새로운 문자열, 색상, 아이콘 등의 Android 리소스(`app/src/main/res/`)가 필요한가요?
+
+이 프롬프트의 질문들에 답변하시면 신규 화면 개발에 필요한 전반적인 작업 범위를 파악하고 체계적으로 진행하는 데 도움이 될 것입니다。

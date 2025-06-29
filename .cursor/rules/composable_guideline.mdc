@@ -1,0 +1,222 @@
+---
+description: AI가 Jetpack Compose UI 컴포저블을 생성하거나 수정할 때 참고해야 할 코드 작성 가이드라인입니다. Screen 컴포저블과 Content 컴포저블의 명확한 분리 원칙과, 실제 파일 예시를 포함하여 효율적인 UI 컴포넌트 설계를 돕습니다.
+globs: 
+alwaysApply: false
+---
+```metadata
+name: composable_guideline
+description: AI가 Jetpack Compose UI 컴포저블을 생성하거나 수정할 때 참고해야 할 코드 작성 가이드라인입니다. Screen 컴포저블과 Content 컴포저블의 명확한 분리 원칙과, 실제 파일 예시를 포함하여 효율적인 UI 컴포넌트 설계를 돕습니다.
+```
+# UI 컴포저블 코드 작성 가이드라인
+
+이 가이드라인은 Jetpack Compose UI 컴포저블을 작성할 때 따라야 할 원칙을 정의합니다.
+
+## 주요 원칙:
+
+-   **책임 분리**: 각 컴포저블은 명확하고 단일한 책임을 가지도록 분리합니다.
+-   **재사용성**: UI 컴포넌트를 재사용 가능하도록 설계합니다.
+-   **테스트 용이성**: UI 로직과 상태를 분리하여 테스트하기 쉽게 만듭니다.
+
+## 구성 요소:
+
+-   **화면 컴포저블 (Screen Composable)**:
+    -   ViewModel과 상호작용하며 UI 상태를 관찰하고, 사용자 이벤트를 ViewModel로 전달하는 역할을 합니다.
+    -   주로 `@Composable` 함수로 정의되며, 하위 `Content Composable`을 호출하여 실제 UI를 구성합니다.
+    -   위치: `app/src/main/java/com/example/tokitoki/ui/screen/[화면명]Screen.kt`
+    -   명명 규칙: `[화면명]Screen.kt` 파일 내 `[화면명]Screen` (예: `SignInScreen.kt` 파일 내 `SignInScreen`)
+    -   **예시 (MainScreen.kt)**:
+        ```kotlin
+        // app/src/main/java/com/example/tokitoki/ui/screen/MainScreen.kt
+        @Composable
+        fun MainScreen(
+            viewModel: MainViewModel = hiltViewModel(),
+            sharedViewModel: SharedPickupViewModel,
+            onAshiatoClick: () -> Unit,
+            onFavoriteUsersClick: () -> Unit,
+            onIineSitaHitoClick: () -> Unit,
+            onNavigateToSignIn: () -> Unit,
+            onNavigateToUserDetail: (String, String) -> Unit,
+            onNavigateToTagSearch: () -> Unit,
+            onNavigateToMyTagList: () -> Unit,
+            onNavigateToTagDetail: (String) -> Unit,
+            onNavigateToMessageDetail: (String) -> Unit
+        ) {
+            val uiState by viewModel.uiState.collectAsState()
+
+            LaunchedEffect(viewModel.uiEvent) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is MainUiEvent.SelectBottomItem -> {
+                            // 탭이 변경될 때 처리
+                        }
+                    }
+                }
+            }
+
+            MainContents(
+                uiState = uiState,
+                onEvent = { viewModel.onEvent(it) },
+                onAshiatoClick = onAshiatoClick,
+                onFavoriteUsersClick = onFavoriteUsersClick,
+                onIineSitaHitoClick = onIineSitaHitoClick,
+                onNavigateToSignIn = onNavigateToSignIn,
+                onNavigateToUserDetail = onNavigateToUserDetail,
+                onNavigateToTagSearch = onNavigateToTagSearch,
+                onNavigateToMyTagList = onNavigateToMyTagList,
+                onNavigateToTagDetail = onNavigateToTagDetail,
+                onNavigateToMessageDetail = onNavigateToMessageDetail,
+                sharedViewModel = sharedViewModel
+            )
+        }
+        ```
+
+-   **콘텐츠 컴포저블 (Content Composable)**:
+    -   실제 UI 요소를 렌더링하는 데만 집중하며, 어떤 비즈니스 로직이나 ViewModel 의존성도 가지지 않습니다.
+    -   필요한 데이터와 이벤트 콜백을 매개변수로 받습니다.
+    -   위치: `app/src/main/java/com/example/tokitoki/ui/screen/components/[화면명]Content.kt` 또는 `app/src/main/java/com/example/tokitoki/ui/screen/[화면명]Screen.kt` 내부에 정의.
+    -   명명 규칙: `[화면명]Content` (예: `SignInContent`)
+    -   **예시 (MainContents)**:
+        ```kotlin
+        // app/src/main/java/com/example/tokitoki/ui/screen/MainScreen.kt
+        @Composable
+        fun MainContents(
+            uiState: MainUiState,
+            onEvent: (MainUiEvent) -> Unit,
+            onAshiatoClick: () -> Unit,
+            onFavoriteUsersClick: () -> Unit,
+            onIineSitaHitoClick: () -> Unit,
+            onNavigateToSignIn: () -> Unit,
+            onNavigateToUserDetail: (String, String) -> Unit,
+            onNavigateToTagSearch: () -> Unit,
+            onNavigateToMyTagList: () -> Unit,
+            onNavigateToTagDetail: (String) -> Unit,
+            onNavigateToMessageDetail: (String) -> Unit,
+            sharedViewModel: SharedPickupViewModel
+        ) {
+            Scaffold(
+                bottomBar = {
+                    MainBottomNavigation(
+                        selectedItem = uiState.selectedBottomItem,
+                        onItemSelected = { onEvent(MainUiEvent.SelectBottomItem(it)) }
+                    )
+                }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    when (uiState.selectedBottomItem) {
+                        MainBottomItem.HOME -> {
+                            MainHomeScreen(
+                                onNavigateToUserDetail = onNavigateToUserDetail,
+                                onNavigateToTagSearch = onNavigateToTagSearch,
+                                onNavigateToMyTagList = onNavigateToMyTagList,
+                                onNavigateToTagDetail = onNavigateToTagDetail,
+                                sharedViewModel = sharedViewModel
+                            )
+                        }
+
+                        MainBottomItem.LIKE -> {
+                            LikeScreen()
+                        }
+
+                        MainBottomItem.MESSAGE -> {
+                            MessageListScreen(
+                                onUserClick = onNavigateToMessageDetail,
+                                onChatClick = onNavigateToMessageDetail
+                            )
+                        }
+
+                        MainBottomItem.MY_PAGE -> {
+                            MyPageScreen(
+                                onAshiatoClick = onAshiatoClick,
+                                onFavoriteUsersClick = onFavoriteUsersClick,
+                                onIineSitaHitoClick = onIineSitaHitoClick,
+                                onNavigateToSignIn = onNavigateToSignIn,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        ```
+
+-   **재사용 가능한 하위 컴포저블 (Reusable Sub-Composables)**:
+    -   `Content Composable` 내에서 사용되는 더 작은 단위의 UI 컴포넌트입니다.
+    -   어떤 비즈니스 로직이나 ViewModel 의존성도 가지지 않으며, 필요한 데이터와 이벤트 콜백을 매개변수로 받습니다.
+    -   위치: `app/src/main/java/com/example/tokitoki/ui/screen/components/[컴포넌트명].kt`
+    -   명명 규칙: `[컴포넌트명]` (예: `TkBtn`, `TkIndicator`, `MainBottomNavigation`)
+    -   **예시 (MainBottomNavigation, CustomBottomNavigationItem)**:
+        ```kotlin
+        // app/src/main/java/com/example/tokitoki/ui/screen/MainScreen.kt
+        @Composable
+        fun MainBottomNavigation(
+            selectedItem: MainBottomItem,
+            onItemSelected: (MainBottomItem) -> Unit
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF5F5F5)) // 네비게이션 바 배경색
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MainBottomItem.entries.forEach { item ->
+                    CustomBottomNavigationItem(
+                        modifier = Modifier.weight(1f),
+                        item = item,
+                        isSelected = selectedItem == item,
+                        onClick = { onItemSelected(item) }
+                    )
+                }
+            }
+        }
+
+        @Composable
+        fun CustomBottomNavigationItem(
+            modifier: Modifier,
+            item: MainBottomItem,
+            isSelected: Boolean,
+            onClick: () -> Unit
+        ) {
+            val icon: ImageVector = when (item) {
+                MainBottomItem.HOME -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
+                MainBottomItem.LIKE -> if (isSelected) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                MainBottomItem.MESSAGE -> if (isSelected) Icons.Filled.Email else Icons.Outlined.Email
+                MainBottomItem.MY_PAGE -> if (isSelected) Icons.Filled.Person else Icons.Outlined.Person
+            }
+
+            Column(
+                modifier = modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onClick()
+                    }
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = item.label,
+                        tint = if (isSelected) Color.Black else Color.Gray
+                    )
+                }
+
+                Text(
+                    text = item.label,
+                    fontSize = 12.sp,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    color = if (isSelected) Color.Black else Color.Gray
+                )
+            }
+        }
+        ```
