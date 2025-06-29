@@ -51,7 +51,7 @@ fun AboutMeNameScreen(
     name: String = "",
     onAboutMeBirthdayScreen: () -> Unit = {},
     onAboutMeSecondScreen: () -> Unit = {},
-    onPrevScreen: () -> Unit = {},
+    onPrevScreen: (String) -> Unit = {},
     viewModel: AboutMeNameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -88,7 +88,7 @@ fun AboutMeNameScreen(
 
                         AboutMeNameAction.EDIT_OK -> {
                             if (viewModel.checkName()) {
-                                onPrevScreen()
+                                onPrevScreen(uiState.name)
                             } else {
                                 viewModel.updateShowDialogState(true)
                             }

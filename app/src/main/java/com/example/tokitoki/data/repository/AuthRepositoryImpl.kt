@@ -31,7 +31,9 @@ class AuthRepositoryImpl @Inject constructor(
                 myProfile.name,
                 myProfile.birthDay,
                 myProfile.isMale,
-                myProfile.mySelfSentenceId
+                myProfile.mySelfSentenceId,
+                myProfile.email,
+                thumbnailPath
             )
         )
     }
@@ -62,6 +64,11 @@ class AuthRepositoryImpl @Inject constructor(
         val refreshToken = tokenPreferences.getRefreshToken() ?: ""
         return Tokens(accessToken, refreshToken)
     }
+
+    override fun clearTokens() {
+        tokenPreferences.clearTokens()
+    }
+
 
     override fun saveRegistrationToken(registrationToken: String) {
         tokenPreferences.saveRegistrationToken(registrationToken)

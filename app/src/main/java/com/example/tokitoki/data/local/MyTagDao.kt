@@ -17,8 +17,8 @@ interface MyTagDao {
     suspend fun deleteMyTag(tagId: Int)
 
     // my_tags 테이블에서 모든 tagId 가져오기
-    @Query("SELECT * FROM my_tags WHERE tagId = :categoryId")
-    suspend fun getTagsByCategoryId(categoryId: Int): List<MyTagEntity>
+    @Query("SELECT * FROM my_tags WHERE tagTypeId = :tagTypeId")
+    suspend fun getTagsByTagTypeId(tagTypeId: Int): List<MyTagEntity>
 
     // my_tags 테이블의 모든 데이터를 가져오기 (필요하다면)
     @Query("SELECT * FROM my_tags")
@@ -27,4 +27,7 @@ interface MyTagDao {
     // 전체 태그 삭제 (userId는 항상 0)
     @Query("DELETE FROM my_tags")
     suspend fun deleteAllTagsForUser()
+
+    @Query("SELECT EXISTS(SELECT 1 FROM my_tags WHERE tagId = :tagId)")
+    suspend fun isTagExists(tagId: Int): Boolean
 }

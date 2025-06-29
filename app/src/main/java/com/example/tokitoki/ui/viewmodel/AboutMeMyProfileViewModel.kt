@@ -1,17 +1,22 @@
 package com.example.tokitoki.ui.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tokitoki.common.ResultWrapper
+import com.example.tokitoki.domain.model.MyProfile
+import com.example.tokitoki.domain.model.MyTag
 import com.example.tokitoki.domain.usecase.CalculateAgeUseCase
 import com.example.tokitoki.domain.usecase.CheckEmailRegisteredUseCase
+import com.example.tokitoki.domain.usecase.ClearMyTagUseCase
 import com.example.tokitoki.domain.usecase.GetMyProfileUseCase
 import com.example.tokitoki.domain.usecase.GetMySelfSentenceUseCase
 import com.example.tokitoki.domain.usecase.GetMyTagUseCase
-import com.example.tokitoki.domain.usecase.GetTagByTagIdWithCategoryIdUseCase
 import com.example.tokitoki.domain.usecase.RegisterMyProfileUseCase
 import com.example.tokitoki.domain.usecase.SaveTokensUseCase
+import com.example.tokitoki.domain.usecase.SetMyProfileUseCase
+import com.example.tokitoki.domain.usecase.SetMyTagUseCase
 import com.example.tokitoki.ui.constants.AboutMeMyProfileAction
 import com.example.tokitoki.ui.converter.MyProfileUiConverter
 import com.example.tokitoki.ui.state.AboutMeMyProfileEvent
@@ -27,36 +32,62 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tokitoki.domain.usecase.tag.GetTagsUseCase
+import com.example.tokitoki.ui.model.MyTagItem
 
 @HiltViewModel
 class AboutMeMyProfileViewModel
 @Inject constructor(
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val getMyTagUseCase: GetMyTagUseCase,
-    private val getTagByTagIdWithCategoryIdUseCase: GetTagByTagIdWithCategoryIdUseCase,
+    private val getTagsUseCase: GetTagsUseCase,
     private val calculateAgeUseCase: CalculateAgeUseCase,
     private val getMySelfSentenceUseCase: GetMySelfSentenceUseCase,
     private val registerMyProfileUseCase: RegisterMyProfileUseCase,
     private val fileManager: FileManager,
     private val checkEmailRegisteredUseCase: CheckEmailRegisteredUseCase,
-    private val saveTokensUseCase: SaveTokensUseCase
-) : ViewModel() {
+    private val saveTokensUseCase: SaveTokensUseCase,
+    private val setMyProfileUseCase: SetMyProfileUseCase,
+    private val setMyTagUseCase: SetMyTagUseCase,
+    private val clearMyTagUseCase: ClearMyTagUseCase,
+
+
+    ) : ViewModel() {
     private val _uiState = MutableStateFlow(AboutMeMyProfileState())
     val uiState: StateFlow<AboutMeMyProfileState> = _uiState.asStateFlow()
 
     private val _uiEvent = MutableSharedFlow<AboutMeMyProfileEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    suspend fun init(uri: Uri = Uri.EMPTY) {
-        val myProfile = getMyProfileUseCase()
-        val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
-        val myTags = getMyTagUseCase()
-        val myTagsMap =
-            myTags.groupBy { it.categoryId }.mapValues { entry -> entry.value.map { it.tagId } }
+    var buffer:MyProfile? = null
+    var tagBuffer:ArrayList<MyTagItem>? = null
 
-        val allTags = myTagsMap.flatMap { (categoryId, tagIds) ->
-            getTagByTagIdWithCategoryIdUseCase(categoryId, tagIds)
-        }
+    suspend fun init(
+        uri: Uri = Uri.EMPTY,
+        birthday: String? = null,
+        name: String? = null,
+        selfSentenceId: Int? = null,
+        tagIds: ArrayList<MyTagItem>? = null
+    ) {
+        Log.d("AboutMeMyProfileViewModel", "init uri: $uri $birthday $name $selfSentenceId $tagIds")
+
+        var myProfile = getMyProfileUseCase() // Fetches the base profile
+        myProfile = myProfile.copy(
+            birthDay = birthday ?: myProfile.birthDay, // Uses 'birthday' parameter if not null, else uses 'myProfile.birthDay' (from getMyProfileUseCase)
+            name = name ?: myProfile.name,             // Uses 'name' parameter if not null, else uses 'myProfile.name'
+            mySelfSentenceId = selfSentenceId ?: myProfile.mySelfSentenceId, // Uses 'selfSentenceId' parameter if not null, else uses 'myProfile.mySelfSentenceId'
+            thumbnailUrl = uri.toString()
+        )
+
+        buffer = myProfile
+        tagBuffer = tagIds
+
+        val age = calculateAgeUseCase(myProfile.birthDay).getOrNull() ?: ""
+
+        val myTags = tagIds?.map { MyTag(it.tagId, it.categoryId) } ?: getMyTagUseCase()
+        val allTagIds = myTags.map { it.tagId }
+
+        val allTags = getTagsUseCase(allTagIds)
 
         val mySelfSentence = getMySelfSentenceUseCase(myProfile.mySelfSentenceId)
 
@@ -66,7 +97,7 @@ class AboutMeMyProfileViewModel
         _uiState.update { currentState ->
             currentState.copy(
                 myProfileItem = myProfileItem,
-                uri = uri
+                uri = Uri.parse(Uri.decode(myProfile.thumbnailUrl))
             )
         }
     }
@@ -98,11 +129,9 @@ class AboutMeMyProfileViewModel
         val result = registerMyProfileUseCase(myProfile, thumbnailPath)
 
         if (result is ResultWrapper.Success) {
-//            (checkEmailRegisteredUseCase(myProfile.email) as ResultWrapper.Success).let { res ->
-//                saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
-//            }
+            setMyProfileUseCase(result.data)
 
-            (checkEmailRegisteredUseCase("true@asdf.com") as ResultWrapper.Success).let { res ->
+            (checkEmailRegisteredUseCase("true") as ResultWrapper.Success).let { res ->
                 saveTokensUseCase(res.data.accessToken, res.data.refreshToken)
             }
         }
@@ -110,4 +139,14 @@ class AboutMeMyProfileViewModel
         return result is ResultWrapper.Success
     }
 
+    suspend fun saveMyProfile() {
+        setMyProfileUseCase(buffer ?: MyProfile())
+        tagBuffer?.let { tagItems ->
+            clearMyTagUseCase()
+            val tagIds = tagItems.map { it.tagId }
+            val myTags = getTagsUseCase(tagIds) 
+             val tags = myTags.map { MyTag(it.id.toInt(), it.tagType.ordinal) }
+            setMyTagUseCase(tags)
+        }
+    }
 }

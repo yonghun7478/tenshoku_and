@@ -9,7 +9,7 @@ object MyTagConverter {
     fun entityToDomain(entity: MyTagEntity): MyTag {
         return MyTag(
             tagId = entity.tagId,
-            categoryId = entity.categoryId
+            tagTypeId = entity.tagTypeId
         )
     }
 
@@ -17,7 +17,7 @@ object MyTagConverter {
     fun domainToEntity(domain: MyTag): MyTagEntity {
         return MyTagEntity(
             tagId = domain.tagId,
-            categoryId = domain.categoryId
+            tagTypeId = domain.tagTypeId
         )
     }
 }

@@ -1,0 +1,63 @@
+---
+description: AI가 프로젝트의 전반적인 구조와 각 클린 아키텍처 레이어(data, domain, presentation)의 역할 및 주요 디렉토리 경로를 이해하는 데 도움이 되는 가이드라인입니다.
+globs: 
+alwaysApply: false
+---
+# 프로젝트 구조
+
+이 프로젝트는 `data`, `domain`, `presentation` 레이어로 구성된 클린 아키텍처 패턴을 따릅니다.
+
+## 핵심 레이어:
+
+-   **`domain`**: 프레임워크에 독립적인 비즈니스 로직, 엔티티, 유스케이스 및 레포지토리 인터페이스를 포함합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/domain](mdc:app/src/main/java/com/example/tokitoki/domain)
+    -   하위 디렉토리:
+        -   `converter`: 도메인 모델과 다른 레이어의 모델 간 변환을 담당합니다.
+        -   `model`: 애플리케이션의 핵심 비즈니스 엔티티를 정의합니다.
+        -   `repository`: 데이터 소스에 접근하기 위한 추상 인터페이스를 정의합니다.
+        -   `usecase`: 특정 비즈니스 로직을 캡슐화하는 단일 책임 클래스입니다.
+        -   `util`: 도메인 레이어에서 사용되는 유틸리티 클래스를 포함합니다.
+
+-   **`data`**: `domain` 레이어에 정의된 레포지토리 인터페이스를 구현하고 데이터 소스(로컬 저장소, 원격 API)를 처리합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/data](mdc:app/src/main/java/com/example/tokitoki/data)
+    -   하위 디렉토리:
+        -   `local`: 로컬 데이터베이스(Room) 관련 DAO, Entity 및 데이터베이스 클래스를 포함합니다.
+        -   `model`: 네트워크 또는 로컬 저장소에서 가져온 데이터 구조를 정의합니다.
+        -   `repository`: `domain` 레이어의 레포지토리 인터페이스를 실제로 구현하며, 데이터 소스(Local, Remote)와의 상호작용을 처리합니다.
+        -   `utils`: 데이터 레이어에서 사용되는 유틸리티 클래스를 포함합니다.
+
+-   **`presentation`**: UI(Jetpack Compose) 및 ViewModel로 구성되며 사용자 상호작용을 처리합니다. `domain` 레이어에 의존합니다.
+    -   위치: [app/src/main/java/com/example/tokitoki/ui](mdc:app/src/main/java/com/example/tokitoki/ui)
+    -   하위 디렉토리:
+        -   `constants`: UI에 사용되는 상수 값을 정의합니다.
+        -   `converter`: UI 모델과 도메인 모델 간 변환을 담당합니다.
+        -   `model`: UI에 표시될 데이터를 정의하는 모델 클래스입니다.
+        -   `screen`: Jetpack Compose를 사용하여 구현된 개별 화면 컴포저블을 포함합니다.
+        -   `screens`: 여러 화면 컴포저블을 묶는 상위 디렉토리입니다.
+        -   `state`: UI 상태를 정의하는 데이터 클래스 및 관련 이벤트를 포함합니다.
+        -   `theme`: 앱의 테마(색상, 타이포그래피 등)를 정의하는 파일을 포함합니다.
+        -   `util`: UI 관련 유틸리티 함수 및 확장 함수를 포함합니다.
+        -   `viewmodel`: UI 상태를 관리하고 비즈니스 로직(유스케이스)을 호출하는 ViewModel 클래스입니다.
+
+## 의존성 주입:
+
+-   의존성 관리를 위한 Hilt 모듈: [app/src/main/java/com/example/tokitoki/di](mdc:app/src/main/java/com/example/tokitoki/di) (Hilt 모듈을 정의하여 의존성을 주입합니다.)
+
+## 유틸리티:
+
+-   일반 유틸리티 클래스: [app/src/main/java/com/example/tokitoki/utils](mdc:app/src/main/java/com/example/tokitoki/utils) (애플리케이션 전반에 걸쳐 사용되는 공통 유틸리티 함수 또는 클래스를 포함합니다.)
+
+## 애플리케이션 진입점:
+
+-   메인 애플리케이션 클래스: [app/src/main/java/com/example/tokitoki/app/Tokitoki.kt](mdc:app/src/main/java/com/example/tokitoki/app/Tokitoki.kt) (Hilt를 포함한 애플리케이션 전역 설정을 담당합니다.)
+-   메인 액티비티: [app/src/main/java/com/example/tokitoki/TokitokiActivity.kt](mdc:app/src/main/java/com/example/tokitoki/TokitokiActivity.kt) (애플리케이션의 주 진입점이며, UI를 호스팅합니다.)
+
+## 테스트:
+
+-   Android 계측 테스트: [app/src/androidTest/java/com/example/tokitoki](mdc:app/src/androidTest/java/com/example/tokitoki) (실제 기기나 에뮬레이터에서 실행되는 UI 및 통합 테스트를 포함합니다.)
+-   단위 테스트: [app/src/test/java/com/example/tokitoki](mdc:app/src/test/java/com/example/tokitoki) (각 클래스 또는 함수의 개별 로직을 테스트하는 코드를 포함합니다.)
+-   스크린샷 테스트: [app/src/screenshotTest/kotlin](mdc:app/src/screenshotTest/kotlin) (UI 컴포넌트의 스크린샷을 찍어 UI 변경 사항을 추적하고 검증합니다.)
+
+## 리소스:
+
+-   Android 리소스(레이아웃, 드로어블, 값): [app/src/main/res](mdc:app/src/main/res) (UI 레이아웃, 이미지, 문자열, 색상 등 Android 리소스 파일을 포함합니다.)

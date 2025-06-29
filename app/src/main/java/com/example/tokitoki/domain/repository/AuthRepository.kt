@@ -18,6 +18,7 @@ interface AuthRepository {
 
     fun saveTokens(token: String, refreshToken: String)
     fun getTokens(): Tokens
+    fun clearTokens()
 
     fun saveRegistrationToken(registrationToken: String)
     fun getRegistrationToken(): String

@@ -45,7 +45,7 @@ import com.example.tokitoki.ui.viewmodel.SignInViewModel
 @Composable
 fun SignInScreen(
     onRegisterWithEmail: () -> Unit = {},
-    onAgreementConfirmation:  () -> Unit = {},
+    onAgreementConfirmation: () -> Unit = {},
     onMainScreen: () -> Unit = {},
     viewModel: SignInViewModel = hiltViewModel()
 ) {
@@ -66,22 +66,19 @@ fun SignInScreen(
                 is SignInEvent.ACTION -> {
                     when (uiEvent.action) {
                         SignInAction.LoginWithEmail -> {
-                            if(viewModel.checkToken()) {
-                                onMainScreen()
-                            } else {
-                                onRegisterWithEmail()
-                            }
+                            onRegisterWithEmail()
                         }
 
                         SignInAction.LoginWithGoogle -> {
-                            if(viewModel.checkToken()) {
+                            if (viewModel.checkToken()) {
                                 onMainScreen()
                             } else {
-                                when(viewModel.signInGoogle(activityContext)) {
+                                when (viewModel.signInGoogle(activityContext)) {
                                     VerificationType.Error -> {}
                                     VerificationType.GotoAboutMeScreen -> {
                                         onAgreementConfirmation()
                                     }
+
                                     VerificationType.GotoMainScreen -> {
                                         onMainScreen()
                                     }

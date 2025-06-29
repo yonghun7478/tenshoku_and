@@ -56,9 +56,10 @@ import com.example.tokitoki.ui.viewmodel.AboutMeBirthdayViewModel
 @Composable
 fun AboutMeBirthdayScreen(
     birthDay: String = "",
+    isFromMyPage: Boolean = false,
     onAboutMeGenderScreen: () -> Unit = {},
     onAboutMeNameScreen: () -> Unit = {},
-    onPrevScreen: () -> Unit = {},
+    onPrevScreen: (String) -> Unit = {},
     viewModel: AboutMeBirthdayViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -70,7 +71,7 @@ fun AboutMeBirthdayScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.init(birthDay = birthDay)
+        viewModel.init(birthDay = birthDay, isFromMyPage = isFromMyPage)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -98,7 +99,7 @@ fun AboutMeBirthdayScreen(
 
                         AboutMeBirthdayAction.EDIT_OK -> {
                             if (viewModel.checkBirthday()) {
-                                onPrevScreen()
+                                onPrevScreen(uiState.birthday)
                             } else {
                                 viewModel.updateShowDialogState(true)
                             }

@@ -6,6 +6,6 @@ object FavoriteTagConstants {
 
 sealed class FavoriteTagAction {
     data object NOTHING : FavoriteTagAction()
-    data class CategoryTabClicked(val index: Int) : FavoriteTagAction()
+    data class TagTypeTabClicked(val index: Int) : FavoriteTagAction()
     data object BackBtnClicked : FavoriteTagAction()
 }

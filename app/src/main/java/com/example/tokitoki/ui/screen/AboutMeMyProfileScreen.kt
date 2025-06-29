@@ -49,13 +49,19 @@ import com.example.tokitoki.ui.viewmodel.AboutMeMyProfileViewModel
 @Composable
 fun AboutMeMyProfileScreen(
     uri: Uri = Uri.EMPTY,
+    isFromMyPage: Boolean = false,
+    birthday: String? = null,
+    name: String? = null,
+    selfSentenceId: Int? = null,
+    tagIds: ArrayList<MyTagItem>? = null,
     onAboutMeProfInputScreen: (Int) -> Unit = {},
     onAboutMeNameScreen: (String) -> Unit = {},
     onAboutMeBirthDayScreen: (String) -> Unit = {},
-    onAboutMeTagScreen: (String) -> Unit = {},
+    onAboutMeTagScreen: (String, Boolean) -> Unit = { _, _ -> },
     onAboutMePhotoUploadScreen: (Uri) -> Unit = {},
     onMainScreen:() -> Unit = {},
     onFavoriteTagScreen: () -> Unit = {},
+    onNavigateUp: () -> Unit = {},
     viewModel: AboutMeMyProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -63,11 +69,12 @@ fun AboutMeMyProfileScreen(
     AboutMeMyProfileContents(
         uri = uiState.uri,
         myProfileItem = uiState.myProfileItem,
-        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction
+        aboutMeMyProfileAction = viewModel::aboutMeMyProfileAction,
+        isFromMyPage = isFromMyPage
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.init(uri)
+    LaunchedEffect(uri) {
+        viewModel.init(uri, birthday, name, selfSentenceId, tagIds)
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -79,9 +86,15 @@ fun AboutMeMyProfileScreen(
                     when (event.action) {
                         AboutMeMyProfileAction.SUBMIT -> {
                             val result = viewModel.registerMyProfile()
-
                             if (result) {
-                                onMainScreen()
+                                if (isFromMyPage) {
+                                    // 마이페이지를 통해 접근한 경우, 프로필 저장 성공 시 별도의 화면 이동을 하지 않습니다.
+                                    // 사용자가 이전 화면(마이페이지)으로 돌아갈 수 있도록 합니다.
+                                    viewModel.saveMyProfile()
+                                    onNavigateUp()
+                                } else {
+                                    onMainScreen()
+                                }
                             }
                         }
 
@@ -98,7 +111,7 @@ fun AboutMeMyProfileScreen(
                         }
 
                         AboutMeMyProfileAction.FIX_MY_TAG -> {
-                            onAboutMeTagScreen(viewModel.getMyTags())
+                            onAboutMeTagScreen(viewModel.getMyTags(), true)
                         }
 
                         AboutMeMyProfileAction.FIX_NAME -> {
@@ -124,7 +137,8 @@ fun AboutMeMyProfileContents(
     modifier: Modifier = Modifier,
     uri: Uri = Uri.EMPTY,
     myProfileItem: MyProfileItem = MyProfileItem(),
-    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {}
+    aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column {
         Column(
@@ -161,7 +175,8 @@ fun AboutMeMyProfileContents(
             )
         }
         AboutMeMyProfileBottomMenu(
-            aboutMeMyProfileAction = aboutMeMyProfileAction
+            aboutMeMyProfileAction = aboutMeMyProfileAction,
+            isFromMyPage = isFromMyPage
         )
     }
 }
@@ -598,6 +613,7 @@ fun AboutMeMyProfileProfBaseItem(
 fun AboutMeMyProfileBottomMenu(
     modifier: Modifier = Modifier,
     aboutMeMyProfileAction: (AboutMeMyProfileAction) -> Unit = {},
+    isFromMyPage: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -608,7 +624,7 @@ fun AboutMeMyProfileBottomMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 5.dp),
-            text = "これではじめる",
+            text = if (isFromMyPage) "修正する" else "これではじめる",
             textColor = LocalColor.current.white,
             backgroundColor = LocalColor.current.blue,
             action = aboutMeMyProfileAction,
